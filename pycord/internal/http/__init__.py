@@ -8,13 +8,14 @@ Pycord's Internal HTTP Routes.
 """
 
 import logging
-from typing import Any
+from typing import Any, Mapping
 
 from aiohttp import ClientSession
 from discord_typings import EmojiData
 from discord_typings.resources.user import UserData
 
 from pycord import __version__, utils
+from pycord.errors import HTTPException, NotFound, Forbidden, Unauthorized
 from pycord.internal.blocks import Block
 
 _log: logging.Logger = logging.getLogger(__name__)
@@ -31,64 +32,76 @@ class HTTPClient:
             'Content-Type': 'application/json',
         }
         self.version = version
-        self._blockers: list[Block] = []
+        self._blockers: dict[str, Block] = {}
         self.url = f'https://discord.com/api/v{self.version}'
 
     async def create(self):
         # TODO: add support for proxies
         self._session = ClientSession()
 
-    async def request(self, method: str, endpoint: str, data: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def request(self, method: str, endpoint: str, data: dict[str, Any] | None = None) -> dict[str, Any] | str:
         endpoint = self.url + endpoint
 
         if not self._session:
             await self.create()
 
-        for blocker in self._blockers:
-            if blocker.path == endpoint:
-                _log.debug(f'Blocking request to bucket {blocker.bucket_denom} prematurely.')
-                await blocker.wait()
-                break
-            elif blocker.is_global:
-                _log.debug(f'Blocking request to {endpoint} due to global ratelimit.')
-                await blocker.wait()
-                break
-
-        r = await self._session.request(
-            method=method,
-            url=endpoint,
-            data=data if data is None else utils.dumps(data),
-            headers=self._headers,
-        )
-
-        if r.status == 429:
-            try:
-                bucket = r.headers['X-RateLimit-Bucket']
-            except:
-                return await self.request(method=method, endpoint=endpoint, data=data)
-            FOUND_BLOCKER = False
-            for blocker in self._blockers:
-                if blocker.bucket_denom == bucket:
-                    # block request until ratelimit ends.
-                    FOUND_BLOCKER = True
+        # we only get 5 tries
+        for _ in range(5):
+            for blocker in self._blockers.values():
+                if blocker.path == endpoint:
+                    _log.debug(f'Blocking request to bucket {blocker.bucket_denom} prematurely.')
                     await blocker.wait()
-                    return await self.request(method=method, endpoint=endpoint, data=data)
+                    break
+                elif blocker.is_global:
+                    _log.debug(f'Blocking request to {endpoint} due to global ratelimit.')
+                    await blocker.wait()
+                    break
 
-            if not FOUND_BLOCKER:
-                block = Block(endpoint)
-                self._blockers.append(block)
-                _log.debug(f'Blocking request to bucket {block.bucket_denom} after 429.')
-                await block.block(
-                    reset_after=int(r.headers['X-RateLimit-Reset-After']),
-                    bucket=bucket,
-                    globalrt=True if r.headers['X-RateLimit-Scope'] == 'global' else False,
-                )
-                self._blockers.remove(block)
-                return await self.request(method=method, endpoint=endpoint, data=data)
+            r = await self._session.request(
+                method=method,
+                url=endpoint,
+                data=data if data is None else utils.dumps(data),
+                headers=self._headers,
+            )
 
-        _log.debug(f'Received {await r.text()} from request to {endpoint}')
+            # ratelimited
+            if r.status == 429:
+                try:
+                    bucket = r.headers['X-RateLimit-Bucket']
+                except:
+                    continue
+                # block request until ratelimit ends.
+                block = self._blockers.get(bucket)
+                if block:
+                    await blocker.wait()
+                    continue
+                else:
+                    block = Block(endpoint)
+                    self._blockers[bucket] = block
 
-        return await r.json(loads=utils.loads, encoding='utf-8')
+                    _log.debug(f'Blocking request to bucket {block.bucket_denom} after resource ratelimit.')
+                    await block.block(
+                        reset_after=int(r.headers['X-RateLimit-Reset-After']),
+                        bucket=bucket,
+                        globalrt=r.headers['X-RateLimit-Scope'] == 'global',
+                    )
+
+                    del self._blockers[bucket]
+                    continue
+
+            # something went wrong
+            if r.status >= 400:
+                if r.status == 401:
+                    raise Unauthorized
+                elif r.status == 403:
+                    raise Forbidden
+                elif r.status == 404:
+                    raise NotFound
+                else:
+                    raise HTTPException
+
+            _log.debug(f'Received {await r.text()} from request to {endpoint}')
+            return await utils._text_or_json(r)
 
     async def get_me(self) -> UserData:
         return await self.request('GET', '/users/@me')
