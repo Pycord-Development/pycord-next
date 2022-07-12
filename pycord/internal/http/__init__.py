@@ -62,7 +62,10 @@ class HTTPClient:
         )
 
         if r.status == 429:
-            bucket = r.headers['X-RateLimit-Bucket']
+            try:
+                bucket = r.headers['X-RateLimit-Bucket']
+            except:
+                return await self.request(method=method, endpoint=endpoint, data=data)
             FOUND_BLOCKER = False
             for blocker in self._blockers:
                 if blocker.bucket_denom == bucket:
