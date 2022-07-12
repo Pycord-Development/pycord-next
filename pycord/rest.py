@@ -49,18 +49,26 @@ class RESTApp:
             self.dispatcher.dispatch('hook')
 
         loop = find_loop()
-        loop.run_until_complete(runner())
-        loop.run_forever()
+
+        try:
+            loop.run_until_complete(runner())
+            loop.run_forever()
+        except KeyboardInterrupt:
+            loop.run_until_complete(self.close())
+        finally:
+            loop.stop()
 
     async def start(self):
         start_logging(level=self._level)
         self._state = ConnectionState(self, cache_timeout=self.cache_timeout)
         await self._state.start_cache()
 
-        http = HTTPClient(self.token, self._version)
-        self.http = http
-        user_data = await http.get_me()
+        self.http = HTTPClient(self.token, self._version)
+        user_data = await self.http.get_me()
         self.user = CurrentUser(user_data)
+
+    async def close(self):
+        await self.http._session.close()
 
     async def edit(self, username: str | None = None, avatar: bytes | None = None):
         return await self.user.edit(username=username, avatar=avatar)
