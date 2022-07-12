@@ -26,18 +26,11 @@ from pycord.rest import RESTApp
 
 class Bot(RESTApp):
     def __init__(
-        self,
-        intents: int,
-        *,
-        shards: int = 1,
-        version: int = 10,
-        level: int = logging.INFO,
-        cache_timeout: int = 10000
+        self, intents: int, *, shards: int = 1, version: int = 10, level: int = logging.INFO, cache_timeout: int = 10000
     ) -> None:
         self.intents = intents
         self.shards = shards
         super().__init__(version=version, level=level, cache_timeout=cache_timeout)
-
 
     async def start(self):
         await super().start()

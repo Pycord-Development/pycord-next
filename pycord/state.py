@@ -54,7 +54,6 @@ class ConnectionState:
 
     store: Type[AsyncDict] = AsyncDict
 
-
     gateway_enabled: bool = False
     """
     Specfies if this ConnectionState is being controlled by a member which has Gateway Access.
