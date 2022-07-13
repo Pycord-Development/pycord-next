@@ -8,10 +8,10 @@ Pycord's Internal HTTP Routes.
 """
 
 import logging
-from typing import Any, Mapping
+from typing import Any
 
 from aiohttp import ClientSession
-from discord_typings import EmojiData
+from discord_typings import EmojiData, Snowflake
 from discord_typings.resources.user import UserData
 
 from pycord import __version__, utils
@@ -19,6 +19,30 @@ from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.internal.blocks import Block
 
 _log: logging.Logger = logging.getLogger(__name__)
+
+
+class Route:
+    def __init__(
+        self,
+        path: str,
+        guild_id: int | None = None,
+        channel_id: int | None = None,
+        webhook_id: Snowflake | None = None,
+        webhook_token: str | None = None,
+    ):
+        self.path = path
+        self.guild_id = guild_id
+        self.channel_id = channel_id
+        self.webhook_id = webhook_id
+        self.webhook_token = webhook_token
+
+    def merge(self, url: str):
+        return url + self.path.format(
+            guild_id=self.guild_id,
+            channel_id=self.channel_id,
+            webhook_id=self.webhook_id,
+            webhook_token=self.webhook_token,
+        )
 
 
 class HTTPClient:
@@ -40,8 +64,10 @@ class HTTPClient:
         # TODO: add support for proxies
         self._session = ClientSession()
 
-    async def request(self, method: str, endpoint: str, data: dict[str, Any] | None = None) -> dict[str, Any] | str:  # type: ignore
-        endpoint = self.url + endpoint
+    async def request(
+        self, method: str, route: Route, data: dict[str, Any] | None = None
+    ) -> dict[str, Any] | str:  # type: ignore
+        endpoint = route.merge(self.url)
 
         if not self._session:
             await self.create()
@@ -49,7 +75,15 @@ class HTTPClient:
         # we only get 5 tries
         for _ in range(self.max_retries):
             for blocker in self._blockers.values():
-                if blocker.path == endpoint:
+                if (
+                    blocker.route.channel_id == route.channel_id
+                    or blocker.route.guild_id == route.guild_id
+                    or blocker.route.webhook_id == route.webhook_id
+                    or blocker.route.webhook_token == route.webhook_token
+                ):
+                    _log.debug(f'Blocking request to bucket {blocker.bucket_denom} prematurely.')
+                    await blocker.wait()
+                elif blocker.route.path == endpoint:
                     _log.debug(f'Blocking request to bucket {blocker.bucket_denom} prematurely.')
                     await blocker.wait()
                     break
@@ -77,12 +111,12 @@ class HTTPClient:
                     await block.wait()
                     continue
                 else:
-                    block = Block(endpoint)
+                    block = Block(route)
                     self._blockers[bucket] = block
 
-                    _log.debug(f'Blocking request to bucket {block.bucket_denom} after resource ratelimit.')
+                    _log.debug(f'Blocking request to bucket {endpoint} after resource ratelimit.')
                     await block.block(
-                        reset_after=int(r.headers['X-RateLimit-Reset-After']),
+                        reset_after=float(r.headers['X-RateLimit-Reset-After']),
                         bucket=bucket,
                         globalrt=r.headers['X-RateLimit-Scope'] == 'global',
                     )
@@ -105,7 +139,7 @@ class HTTPClient:
             return await utils._text_or_json(r)
 
     async def get_me(self) -> UserData:
-        return await self.request('GET', '/users/@me')  # type: ignore
+        return await self.request('GET', Route('/users/@me'))  # type: ignore
 
     async def edit_me(self, username: str | None = None, avatar: str | None = None) -> UserData:
         data = {}
@@ -116,13 +150,13 @@ class HTTPClient:
         if avatar:
             data['avatar'] = avatar
 
-        return await self.request('PATCH', '/users/@me', data)  # type: ignore
+        return await self.request('PATCH', Route('/users/@me'), data)  # type: ignore
 
     async def get_guild_emojis(self, guild_id: int) -> list[EmojiData]:
-        return await self.request('GET', f'/guilds/{guild_id}/emojis')  # type: ignore
+        return await self.request('GET', Route('/guilds/{guild_id}/emojis', guild_id=guild_id))  # type: ignore
 
     async def get_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:
-        return await self.request('GET', f'/guilds/{guild_id}/emojis/{emoji_id}')  # type: ignore
+        return await self.request('GET', Route('/guilds/{guild_id}/emojis/{emoji_id}', guild_id=guild_id))  # type: ignore
 
     async def create_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:  # type: ignore
         ...

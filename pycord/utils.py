@@ -20,6 +20,8 @@
 
 try:
     import orjson
+
+    HAS_ORJSON = True
 except (ImportError, ModuleNotFoundError):
     import json
 
