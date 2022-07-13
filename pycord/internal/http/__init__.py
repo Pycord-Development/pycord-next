@@ -22,7 +22,7 @@ _log: logging.Logger = logging.getLogger(__name__)
 
 class HTTPClient:
     def __init__(self, token: str, version: int):
-        # pyright hates identifying this as clientsession when its not-
+        # pyright hates identifying this as clientsession when it's not-
         # sadly, aiohttp errors a lot when not creating client sessions on an async environment.
         self._session: ClientSession = None  # type: ignore
         self._headers: dict[str, str] = {

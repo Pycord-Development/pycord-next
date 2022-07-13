@@ -24,7 +24,7 @@ import asyncio
 
 class Block:
     """
-    This class tempoarily blocks requests after hitting a ratelimit
+    This class temporarily blocks requests after hitting a ratelimit
     """
 
     def __init__(self, path: str):
