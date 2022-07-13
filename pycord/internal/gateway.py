@@ -27,13 +27,12 @@ from random import random
 from typing import Any
 
 from aiohttp import WSMsgType
-
-from pycord import utils
 from discord_typings.gateway import HelloEvent
 
+from pycord import utils
 
-from ..state import ConnectionState
 from ..errors import GatewayException
+from ..state import ConnectionState
 from .events import EventDispatcher
 
 ZLIB_SUFFIX = b'\x00\x00\xff\xff'
@@ -42,13 +41,7 @@ _log = logging.getLogger(__name__)
 
 
 class HeartThread(threading.Thread):
-    def __init__(
-        self,
-        shard: "Shard",
-        state: ConnectionState,
-        interval: float,
-        loop: asyncio.AbstractEventLoop
-    ):
+    def __init__(self, shard: "Shard", state: ConnectionState, interval: float, loop: asyncio.AbstractEventLoop):
         super().__init__()
         self.shard = shard
         self._state = state
@@ -63,13 +56,11 @@ class HeartThread(threading.Thread):
             if not self.disconnected:
                 time.sleep(self._interval)
 
-                payload = {
-                    'op': 1,
-                    'd': self._sequence
-                }
+                payload = {'op': 1, 'd': self._sequence}
                 coroutine = self.shard.send(payload)
                 future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self._loop)
                 future.result()
+
 
 class Shard:
     def __init__(
@@ -97,8 +88,7 @@ class Shard:
 
         if not self._state.gateway_enabled:
             raise GatewayException(
-                'ConnectionState used is not gateway enabled. '
-                '(if you are using RESTApp, please move to Bot.)'
+                'ConnectionState used is not gateway enabled. ' '(if you are using RESTApp, please move to Bot.)'
             )
 
     async def start_clock(self) -> None:
@@ -127,7 +117,7 @@ class Shard:
                 self._ratelimit_lock = asyncio.Event()
                 await self._rot_done.wait()
                 self._ratelimit_lock.set()
-                self._ratelimit_lock: asyncio.Event| None = None
+                self._ratelimit_lock: asyncio.Event | None = None
 
         _log.debug(f'shard:{self.id}:> {data}')
 
@@ -193,7 +183,6 @@ class Shard:
                     self._ratelimiter = HeartThread(self, self._state, interval, asyncio.get_running_loop())
                     await self.send({'op': 1, 'd': None})
                     self._ratelimiter.start()
-                    
 
             elif message.type == WSMsgType.CLOSED:
                 # TODO: Handle the connection being closed.

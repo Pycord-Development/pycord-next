@@ -20,7 +20,6 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Mapping, Type, Union
 
-
 if TYPE_CHECKING:
     from pycord.bot import Bot
     from pycord.rest import RESTApp
