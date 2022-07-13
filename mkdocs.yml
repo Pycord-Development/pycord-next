@@ -1,0 +1,21 @@
+site_name: ""
+site_description: Documentation, Guides & More for Pycord Developers.
+copyright: "©2022 VincentRPS & PDN Contributors"
+docs_dir: developer
+extra:
+  generator: false
+extra_css:
+  - assets/theme.css
+theme:
+  name: material
+  logo: assets/logo.png
+  locale: en
+  favicon: assets/logo.png
+  highlightjs: true
+nav:
+  - Home: 'index.md'
+markdown_extensions:
+    - toc:
+        permalink: true
+plugins:
+    - search

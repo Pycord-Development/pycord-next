@@ -20,7 +20,8 @@
 import asyncio
 import logging
 import platform
-import traceback
+import threading
+import time
 import zlib
 from random import random
 from typing import Any
@@ -28,7 +29,8 @@ from typing import Any
 from aiohttp import WSMsgType
 
 from pycord import utils
-from pycord.rest import RESTApp
+from discord_typings.gateway import HelloEvent
+
 
 from ..state import ConnectionState
 from ..errors import GatewayException
@@ -38,6 +40,36 @@ ZLIB_SUFFIX = b'\x00\x00\xff\xff'
 url = 'wss://gateway.discord.gg/?v={version}&encoding=json&compress=zlib-stream'
 _log = logging.getLogger(__name__)
 
+
+class HeartThread(threading.Thread):
+    def __init__(
+        self,
+        shard: "Shard",
+        state: ConnectionState,
+        interval: float,
+        loop: asyncio.AbstractEventLoop
+    ):
+        self.shard = shard
+        self._state = state
+        self._interval = interval
+        self._sequence: int | None = None
+        self.disconnected: bool = False
+        self.daemon: bool = True
+        self._loop = loop
+
+    def run(self):
+        while True:
+            if not self.disconnected:
+                if self.shard._sequence == None:
+                    time.sleep(self._interval)
+
+                payload = {
+                    'op': 1,
+                    'd': self._sequence
+                }
+                coroutine = self.shard.send(payload)
+                future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self._loop)
+                future.result()
 
 class Shard:
     def __init__(
@@ -56,12 +88,12 @@ class Shard:
         self._session_id: str | None = None
         self.requests_this_minute: int = 0
         self._stop_clock: bool = False
-        self._sequence: int | None = None  # type: ignore
         self._buf = bytearray()
         self._inf = zlib.decompressobj()
         self._ratelimit_lock: asyncio.Event | None = None
         self._rot_done: asyncio.Event = asyncio.Event()
         self.current_rotation_done: bool = False
+        self._sequence: int | None = None
 
         if not self._state.gateway_enabled:
             raise GatewayException(
@@ -69,7 +101,7 @@ class Shard:
                 '(if you are using RESTApp, please move to Bot.)'
             )
 
-    async def start_clock(self):
+    async def start_clock(self) -> None:
         self._rot_done.clear()
         await asyncio.sleep(60)
         self.requests_this_minute = 0
@@ -87,7 +119,9 @@ class Shard:
 
     async def send(self, data: dict[Any, Any]) -> None:
         if self.requests_this_minute == 119:
-            if self._ratelimit_lock:
+            if data.get('op') == 1:
+                pass
+            elif self._ratelimit_lock:
                 await self._ratelimit_lock.wait()
             else:
                 self._ratelimit_lock = asyncio.Event()
@@ -103,20 +137,6 @@ class Shard:
         await self._ws.send_bytes(payload)
 
         self.requests_this_minute += 1
-
-    async def heartbeat(self, interval: float, is_hello: bool = False) -> None:
-        if self._stop_clock:
-            return
-
-        if is_hello:
-            init = interval * random()
-            await asyncio.sleep(init)
-        else:
-            if not self._ws.closed:
-                await asyncio.sleep(interval)
-                await self.send({'op': 1, 'd': self._sequence})
-
-        await asyncio.create_task(self.heartbeat(interval=interval, is_hello=False))
 
     async def connect(self, token: str) -> None:
         _log.debug(f'shard:{self.id}: Connecting to the Gateway.')
@@ -157,10 +177,7 @@ class Shard:
 
                 self._sequence: int = data['s']
 
-                try:
-                    self._events.dispatch('WEBSOCKET_MESSAGE_RECEIVE', data)
-                except:
-                    traceback.print_exc()
+                self._events.dispatch('WEBSOCKET_MESSAGE_RECEIVE', data)
 
                 op = data.get('op')
                 t = data.get('t')
@@ -171,15 +188,16 @@ class Shard:
                         self._events.dispatch('ready')
                         self._session_id = data['d']['session_id']
                 elif op == 10:
+                    data: HelloEvent
                     interval = data['d']['heartbeat_interval'] / 1000
-                    await self.heartbeat(interval=interval, is_hello=True)
+                    
 
             elif message.type == WSMsgType.CLOSED:
                 # TODO: Handle the connection being closed.
                 self._stop_clock = True
                 break
 
-    async def identify(self):
+    async def identify(self) -> None:
         await self.send(
             {
                 'op': 2,
