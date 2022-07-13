@@ -56,7 +56,7 @@ class ConnectionState:
 
     gateway_enabled: bool = False
     """
-    Specfies if this ConnectionState is being controlled by a member which has Gateway Access.
+    Specifies if this ConnectionState is being controlled by a member which has Gateway Access.
     """
 
     async def start_cache(self):

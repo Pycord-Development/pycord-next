@@ -30,10 +30,10 @@ class EventDispatcher:
     async def _dispatch_under_names(self, event_name: Any, *args, **kwargs) -> None:
         t = 'temp-' + event_name
 
-        tempoary_events = self.events.get(t)
+        temporary_events = self.events.get(t)
 
-        if tempoary_events is not None:
-            for event in tempoary_events:
+        if temporary_events is not None:
+            for event in temporary_events:
                 if iscoroutinefunction(event):
                     await event(*args, **kwargs)
                 else:
