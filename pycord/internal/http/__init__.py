@@ -22,7 +22,7 @@ _log: logging.Logger = logging.getLogger(__name__)
 
 
 class HTTPClient:
-    def __init__(self, token: str, version: int):
+    def __init__(self, token: str, version: int, max_retries: int = 5):
         # pyright hates identifying this as clientsession when its not-
         # sadly, aiohttp errors a lot when not creating client sessions on an async environment.
         self._session: ClientSession = None  # type: ignore
@@ -33,6 +33,7 @@ class HTTPClient:
         }
         self.version = version
         self._blockers: dict[str, Block] = {}
+        self.max_retries = max_retries
         self.url = f'https://discord.com/api/v{self.version}'
 
     async def create(self):
@@ -46,7 +47,7 @@ class HTTPClient:
             await self.create()
 
         # we only get 5 tries
-        for _ in range(5):
+        for _ in range(self.max_retries):
             for blocker in self._blockers.values():
                 if blocker.path == endpoint:
                     _log.debug(f'Blocking request to bucket {blocker.bucket_denom} prematurely.')
