@@ -25,11 +25,18 @@ except (ImportError, ModuleNotFoundError):
 
     HAS_ORJSON = False
 
+from aiohttp import ClientResponse
 from base64 import b64encode
 from datetime import datetime, timezone
 from typing import Any
 
 EPOCH = 1420070400000
+
+
+async def _text_or_json(rp: ClientResponse):
+    if rp.content_type == "application/json":
+        return await rp.json(loads=loads, encoding='utf-8')
+    return await rp.text(encoding='utf-8')
 
 
 def dumps(obj: Any) -> str:
