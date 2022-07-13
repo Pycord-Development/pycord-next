@@ -49,6 +49,7 @@ class HeartThread(threading.Thread):
         interval: float,
         loop: asyncio.AbstractEventLoop
     ):
+        super().__init__()
         self.shard = shard
         self._state = state
         self._interval = interval
@@ -60,8 +61,7 @@ class HeartThread(threading.Thread):
     def run(self):
         while True:
             if not self.disconnected:
-                if self.shard._sequence == None:
-                    time.sleep(self._interval)
+                time.sleep(self._interval)
 
                 payload = {
                     'op': 1,
@@ -190,6 +190,9 @@ class Shard:
                 elif op == 10:
                     data: HelloEvent
                     interval = data['d']['heartbeat_interval'] / 1000
+                    self._ratelimiter = HeartThread(self, self._state, interval, asyncio.get_running_loop())
+                    await self.send({'op': 1, 'd': None})
+                    self._ratelimiter.start()
                     
 
             elif message.type == WSMsgType.CLOSED:

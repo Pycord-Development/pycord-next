@@ -8,10 +8,10 @@ Pycord's Internal HTTP Routes.
 """
 
 import logging
-from typing import Any, Mapping
+from typing import Any
 
 from aiohttp import ClientSession
-from discord_typings import EmojiData
+from discord_typings import EmojiData, Snowflake
 from discord_typings.resources.user import UserData
 
 from pycord import __version__, utils
@@ -19,6 +19,25 @@ from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.internal.blocks import Block
 
 _log: logging.Logger = logging.getLogger(__name__)
+
+
+class Route:
+    def __init__(
+        self,
+        path: str,
+        guild_id: int | None = None,
+        channel_id: int | None = None,
+        webhook_id: Snowflake | None = None,
+        webhook_token: str | None = None
+    ):
+        self.path = path
+        self.guild_id = guild_id
+        self.channel_id = channel_id
+        self.webhook_id = webhook_id
+        self.webhook_token = webhook_token
+
+    def merge(self, url: str):
+        return url + self.path
 
 
 class HTTPClient:
@@ -80,9 +99,9 @@ class HTTPClient:
                     block = Block(endpoint)
                     self._blockers[bucket] = block
 
-                    _log.debug(f'Blocking request to bucket {block.bucket_denom} after resource ratelimit.')
+                    _log.debug(f'Blocking request to bucket {block.path} after resource ratelimit.')
                     await block.block(
-                        reset_after=int(r.headers['X-RateLimit-Reset-After']),
+                        reset_after=float(r.headers['X-RateLimit-Reset-After']),
                         bucket=bucket,
                         globalrt=r.headers['X-RateLimit-Scope'] == 'global',
                     )
