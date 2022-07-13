@@ -19,10 +19,30 @@
 # SOFTWARE.
 
 
-class Asset:
+from pycord.mixins import AssetMixin
+from pycord.state import ConnectionState
+
+
+class Asset(AssetMixin):
     CDN_URL = 'https://cdn.discordapp.com'
 
-    def __init__(self, hash: str, type: str, animated: bool = False):
-        self._hash = hash
-        self.type = type
+    def __init__(self, state: ConnectionState, *, url: str, key: str, animated: bool = False):
+        self._state = state
+        self.url = url
+        self.key = key
         self.animated = animated
+
+    def __str__(self) -> str:
+        return self.url
+
+    def __len__(self) -> int:
+        return len(self.url)
+
+    def __repr__(self) -> str:
+        return f'<Asset url={self.url.replace(self.CDN_URL, "")} animated={self.animated}>'
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, Asset) and self.url == other.url
+
+    def __hash__(self) -> int:
+        return hash(self.url)

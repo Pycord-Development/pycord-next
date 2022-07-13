@@ -104,6 +104,19 @@ class HTTPClient:
             _log.debug(f'Received {await r.text()} from request to {endpoint}')
             return await utils._text_or_json(r)
 
+    # this should get moved to an asset-related http file
+    async def get_cdn_asset(self, url: str) -> bytes:
+        async with self._session.get(url) as response:
+            match response.status:
+                case 200:
+                    return await response.read()
+                case 403:
+                    raise Forbidden
+                case 404:
+                    raise NotFound
+                case _:
+                    raise HTTPException
+
     async def get_me(self) -> UserData:
         return await self.request('GET', '/users/@me')  # type: ignore
 

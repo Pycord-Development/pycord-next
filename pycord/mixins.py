@@ -18,9 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import io
+import os
 from typing import Any
 
 from discord_typings import Snowflake
+
+from pycord.state import ConnectionState
 
 
 class Comparable:
@@ -48,3 +52,28 @@ class Hashable(Dictable):
 
     def __hash__(self) -> int:
         return self.id >> 22  # type: ignore
+
+
+class AssetMixin:
+    url: str
+    _state: ConnectionState
+
+    async def read(self) -> bytes:
+        return await self._state._app.http.get_cdn_asset(self.url)
+
+    async def save(
+        self,
+        file_path: str | bytes | os.PathLike | io.BufferedIOBase,
+        *,
+        seek_to_beginning: bool = True,
+    ) -> int:
+        data = await self.read()
+        if isinstance(file_path, io.BufferedIOBase):
+            written = file_path.write(data)
+            if seek_to_beginning:
+                file_path.seek(0)
+            return written
+        else:
+            with open(file_path, "wb") as file:
+                return file.write(data)
+
