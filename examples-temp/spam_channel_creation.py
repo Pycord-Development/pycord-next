@@ -17,7 +17,7 @@ async def on_hook():
     for _ in range(30):
         ts.append(app.http.request('POST', f'/guilds/{GUILD}/channels', {'name': 'ratelimit-go-brr', 'type': 0}))
 
-    belts: list[TextChannelData] = await asyncio.gather(*ts)
+    belts: list[TextChannelData] = await asyncio.gather(*ts)  # type: ignore
     ts.clear()
 
     for belt in belts:

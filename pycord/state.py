@@ -18,7 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Type, Union
+from typing import TYPE_CHECKING, Any, Mapping, Type, Union
+
 
 if TYPE_CHECKING:
     from pycord.bot import Bot
@@ -36,8 +37,8 @@ class AsyncDict(dict):
     async def pop(self, key: Any, default: Any | None = None) -> Any:
         return super().pop(key, default)
 
-    async def values(self) -> list[Any]:
-        return super().values()
+    async def values(self) -> list[Mapping[Any, Any]]:
+        return super().values()  # type: ignore
 
 
 @dataclass
@@ -59,7 +60,7 @@ class ConnectionState:
     Specifies if this ConnectionState is being controlled by a member which has Gateway Access.
     """
 
-    async def start_cache(self):
+    async def start_cache(self) -> None:
 
         # channel_id: list of message objects
         self.messages: AsyncDict = self.store()

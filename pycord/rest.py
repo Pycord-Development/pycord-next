@@ -36,17 +36,15 @@ def find_loop():
 
 class RESTApp:
     def __init__(self, *, version: int = 10, level: int = logging.INFO, cache_timeout: int = 10000) -> None:
-        self.token: str = None
+        self.token: str | None = None
         self.cache_timeout = cache_timeout
         self._version = version
         self._level = level
         self.dispatcher = EventDispatcher()
 
     def run(self, token: str):
-        self.token = token
-
         async def runner():
-            await self.start()
+            await self.start(token=token)
             self.dispatcher.dispatch('hook')
 
         loop = find_loop()
@@ -59,14 +57,15 @@ class RESTApp:
         finally:
             loop.stop()
 
-    async def start(self):
+    async def start(self, token: str):
+        self.token = token
         start_logging(level=self._level)
         self._state = ConnectionState(self, cache_timeout=self.cache_timeout)
         await self._state.start_cache()
 
         self.http = HTTPClient(self.token, self._version)
         user_data = await self.http.get_me()
-        self.user = CurrentUser(user_data)
+        self.user = CurrentUser(user_data, self._state)
 
     async def close(self):
         await self.http._session.close()

@@ -35,10 +35,10 @@ class EventDispatcher:
         if temporary_events is not None:
             for event in temporary_events:
                 if iscoroutinefunction(event):
-                    await event(*args, **kwargs)
+                    await event(*args, **kwargs)  # type: ignore
                 else:
                     loop = get_running_loop()
-                    await loop.run_in_executor(None, event(*args, **kwargs))
+                    await loop.run_in_executor(None, event(*args, **kwargs))  # type: ignore
 
             self.events.pop(t)
 
@@ -49,10 +49,10 @@ class EventDispatcher:
 
         for event in events:
             if iscoroutinefunction(event):
-                await event(*args, **kwargs)
+                await event(*args, **kwargs)  # type: ignore
             else:
                 loop = get_running_loop()
-                await loop.run_in_executor(None, event(*args, **kwargs))
+                await loop.run_in_executor(None, event(*args, **kwargs))  # type: ignore
 
     def dispatch(self, event: Any, *args, **kwargs):
         create_task(self._dispatch_under_names(event, *args, **kwargs))

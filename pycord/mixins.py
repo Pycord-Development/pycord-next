@@ -39,11 +39,12 @@ class Comparable:
 
 class Dictable(Comparable):
     def __dict__(self) -> dict[Any, Any]:
-        return self.as_dict
+        # this is already assigned to any subclass, but pyright doesn't know.
+        return self.as_dict  # type: ignore
 
 
 class Hashable(Dictable):
     __slots__ = ()
 
     def __hash__(self) -> int:
-        return self.id >> 22
+        return self.id >> 22  # type: ignore

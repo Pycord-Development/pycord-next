@@ -25,10 +25,11 @@ except (ImportError, ModuleNotFoundError):
 
     HAS_ORJSON = False
 
-from aiohttp import ClientResponse
 from base64 import b64encode
 from datetime import datetime, timezone
 from typing import Any
+
+from aiohttp import ClientResponse
 
 EPOCH = 1420070400000
 

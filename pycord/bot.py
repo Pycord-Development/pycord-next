@@ -32,9 +32,10 @@ class Bot(RESTApp):
         self.shards = shards
         super().__init__(version=version, level=level, cache_timeout=cache_timeout)
 
-    async def start(self):
-        await super().start()
+    async def start(self, token: str):
+        await super().start(token=token)
         self._state.gateway_enabled = True
 
         self.shard_manager = ShardManager(self.shards, self._state, self.dispatcher, self._version)
-        await self.shard_manager.connect(self.token)
+        # .run already sets token to a non-None type.
+        await self.shard_manager.connect(self.token)  # type: ignore

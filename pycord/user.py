@@ -23,12 +23,14 @@ from datetime import datetime
 from discord_typings.resources import UserData
 
 from pycord.mixins import Hashable
+from pycord.state import ConnectionState
 from pycord.utils import _convert_base64_from_bytes, grab_creation_time
 
 
 class User(Hashable):
-    def __init__(self, data: UserData) -> None:
+    def __init__(self, data: UserData, state: ConnectionState) -> None:
         self.as_dict = data
+        self._state = state
 
         self.id = int(data['id'])
         self.email = data.get('email')
@@ -52,7 +54,7 @@ class User(Hashable):
 
     @property
     def created_at(self) -> datetime:
-        return grab_creation_time(self.id)
+        return grab_creation_time(self.id)  # type: ignore
 
 
 class CurrentUser(User):
@@ -61,9 +63,9 @@ class CurrentUser(User):
             return
 
         if avatar:
-            avatar = _convert_base64_from_bytes(avatar)
+            avatar = _convert_base64_from_bytes(avatar)  # type: ignore
 
-        edited = await self._state._app.http.edit_me(username=username, avatar=avatar)
+        edited = await self._state._app.http.edit_me(username=username, avatar=avatar)  # type: ignore
 
         self.username = edited['username']
         self.avatar = edited['avatar']

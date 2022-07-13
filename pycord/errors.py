@@ -19,12 +19,11 @@
 # SOFTWARE.
 
 
-from typing import Any
-
-
 class PycordException(Exception):
     ...
 
+class GatewayException(Exception):
+    ...
 
 class HTTPException(PycordException):
     ...

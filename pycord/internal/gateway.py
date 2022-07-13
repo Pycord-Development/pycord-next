@@ -28,8 +28,10 @@ from typing import Any
 from aiohttp import WSMsgType
 
 from pycord import utils
+from pycord.rest import RESTApp
 
 from ..state import ConnectionState
+from ..errors import GatewayException
 from .events import EventDispatcher
 
 ZLIB_SUFFIX = b'\x00\x00\xff\xff'
@@ -51,15 +53,21 @@ class Shard:
         self._events = events
         self.version = version
         self._state = state
-        self._session_id: str = None
+        self._session_id: str | None = None
         self.requests_this_minute: int = 0
         self._stop_clock: bool = False
-        self._sequence: int = None
+        self._sequence: int | None = None  # type: ignore
         self._buf = bytearray()
         self._inf = zlib.decompressobj()
-        self._ratelimit_lock: asyncio.Event = None
+        self._ratelimit_lock: asyncio.Event | None = None
         self._rot_done: asyncio.Event = asyncio.Event()
         self.current_rotation_done: bool = False
+
+        if not self._state.gateway_enabled:
+            raise GatewayException(
+                'ConnectionState used is not gateway enabled. '
+                '(if you are using RESTApp, please move to Bot.)'
+            )
 
     async def start_clock(self):
         self._rot_done.clear()
@@ -85,7 +93,7 @@ class Shard:
                 self._ratelimit_lock = asyncio.Event()
                 await self._rot_done.wait()
                 self._ratelimit_lock.set()
-                self._ratelimit_lock: asyncio.Event = None
+                self._ratelimit_lock: asyncio.Event| None = None
 
         _log.debug(f'shard:{self.id}:> {data}')
 
@@ -177,7 +185,7 @@ class Shard:
                 'op': 2,
                 'd': {
                     'token': self.token,
-                    'intents': self._state._app.intents,
+                    'intents': self._state._app.intents,  # type: ignore
                     'properties': {
                         'os': platform.system(),
                         'browser': 'pycord',

@@ -28,12 +28,13 @@ class Block:
     """
 
     def __init__(self, path: str):
-        self._event: asyncio.Event = None
+        self._event: asyncio.Event | None = None
         self.path = path
         self.is_global: bool = False
 
     async def wait(self):
-        await self._event.wait()
+        if self._event:
+            await self._event.wait()
 
     async def block(self, reset_after: int, bucket: str, globalrt: bool):
         self.bucket_denom = bucket
@@ -46,4 +47,5 @@ class Block:
         self.end()
 
     def end(self):
-        self._event.set()
+        if self._event:
+            self._event.set()

@@ -1,7 +1,6 @@
 [flake8]
 count = true
-max-line-length = 110
-max-function-length = 110
+max-line-length = 120
 show_source = True
 statistics = True
 
@@ -58,6 +57,7 @@ exclude =
     venv,
     breaking,
     .github,
+    tests-dev,
 
 accept-encodings = utf-8
 max-complexity = 19

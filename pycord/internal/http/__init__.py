@@ -15,7 +15,7 @@ from discord_typings import EmojiData
 from discord_typings.resources.user import UserData
 
 from pycord import __version__, utils
-from pycord.errors import HTTPException, NotFound, Forbidden, Unauthorized
+from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.internal.blocks import Block
 
 _log: logging.Logger = logging.getLogger(__name__)
@@ -40,7 +40,7 @@ class HTTPClient:
         # TODO: add support for proxies
         self._session = ClientSession()
 
-    async def request(self, method: str, endpoint: str, data: dict[str, Any] | None = None) -> dict[str, Any] | str:
+    async def request(self, method: str, endpoint: str, data: dict[str, Any] | None = None) -> dict[str, Any] | str:  # type: ignore
         endpoint = self.url + endpoint
 
         if not self._session:
@@ -74,7 +74,7 @@ class HTTPClient:
                 # block request until ratelimit ends.
                 block = self._blockers.get(bucket)
                 if block:
-                    await blocker.wait()
+                    await block.wait()
                     continue
                 else:
                     block = Block(endpoint)
@@ -105,7 +105,7 @@ class HTTPClient:
             return await utils._text_or_json(r)
 
     async def get_me(self) -> UserData:
-        return await self.request('GET', '/users/@me')
+        return await self.request('GET', '/users/@me')  # type: ignore
 
     async def edit_me(self, username: str | None = None, avatar: str | None = None) -> UserData:
         data = {}
@@ -116,16 +116,16 @@ class HTTPClient:
         if avatar:
             data['avatar'] = avatar
 
-        return await self.request('PATCH', '/users/@me', data)
+        return await self.request('PATCH', '/users/@me', data)  # type: ignore
 
     async def get_guild_emojis(self, guild_id: int) -> list[EmojiData]:
-        return await self.request('GET', f'/guilds/{guild_id}/emojis')
+        return await self.request('GET', f'/guilds/{guild_id}/emojis')  # type: ignore
 
     async def get_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:
-        return await self.request('GET', f'/guilds/{guild_id}/emojis/{emoji_id}')
+        return await self.request('GET', f'/guilds/{guild_id}/emojis/{emoji_id}')  # type: ignore
 
-    async def create_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:
+    async def create_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:  # type: ignore
         ...
 
-    async def edit_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:
+    async def edit_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:  # type: ignore
         ...
