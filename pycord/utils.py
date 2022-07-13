@@ -34,7 +34,7 @@ EPOCH = 1420070400000
 
 
 async def _text_or_json(rp: ClientResponse):
-    if rp.content_type == "application/json":
+    if rp.content_type == 'application/json':
         return await rp.json(loads=loads, encoding='utf-8')
     return await rp.text(encoding='utf-8')
 
