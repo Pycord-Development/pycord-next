@@ -40,6 +40,13 @@ url = 'wss://gateway.discord.gg/?v={version}&encoding=json&compress=zlib-stream'
 _log = logging.getLogger(__name__)
 
 
+# NOTE: This ramble is about using Thread's here instead of Task's, made by VincentRPS.
+# the decision of using a thread instead of just using a perpetual task seems to be controversial to a lot of people
+# I don't really care too much about that, everything here is thread safe and everything runs as fast and as well as
+# if I implemented a more complex and memory intensive (most likely due to having a lot of tasks running) version
+# with an asyncio.Task.
+# NOTE: I have thought of using multiprocessing here but I'm pretty sure it would still block the main event loop
+# since I use `while True`, which is obviously massively not ideal as everything uses the event loop.
 class HeartThread(threading.Thread):
     def __init__(self, shard: "Shard", state: ConnectionState, interval: float, loop: asyncio.AbstractEventLoop):
         super().__init__()
