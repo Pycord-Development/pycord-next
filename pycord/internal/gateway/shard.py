@@ -27,7 +27,7 @@ import zlib
 from typing import Any
 
 from aiohttp import WSMsgType
-from discord_typings.gateway import GatewayEvent#HelloEvent, InvalidSessionEvent
+from discord_typings.gateway import GatewayEvent
 
 from pycord import utils
 
