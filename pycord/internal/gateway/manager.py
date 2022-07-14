@@ -19,7 +19,8 @@
 # SOFTWARE.
 import asyncio
 
-from pycord import ConnectionState, EventDispatcher
+from pycord.state import ConnectionState
+from ..events import EventDispatcher
 from .shard import Shard
 
 class ShardManager:
