@@ -20,8 +20,10 @@
 import asyncio
 
 from pycord.state import ConnectionState
+
 from ..events import EventDispatcher
 from .shard import Shard
+
 
 class ShardManager:
     def __init__(self, shards: int, state: ConnectionState, events: EventDispatcher, version: int = 10) -> None:
