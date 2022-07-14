@@ -183,6 +183,8 @@ class Shard:
                         _log.info(f'shard:{self.id}:Connected to Gateway')
                         self._events.dispatch('ready')
                         self._session_id = data['d']['session_id']
+                    else:
+                        await self._state.process_event(data=data)
                 elif op == 10:
                     data: HelloEvent  # type: ignore
                     interval = data['d']['heartbeat_interval'] / 1000
