@@ -44,7 +44,7 @@ class _Missing:
         return False
 
     def __repr__(self):
-        return '...'
+        return 'MISSING'
 
 
 MISSING = _Missing()
