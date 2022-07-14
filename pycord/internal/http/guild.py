@@ -27,7 +27,7 @@ from discord_typings import BanData, ChannelData, ChannelPositionData, GuildData
     RoleData, RolePositionData, Snowflake, VoiceRegionData, WelcomeScreenData
 
 from pycord import MISSING
-from pycord.internal.http.route import Route
+from .route import Route
 
 
 class GuildRoutes:
