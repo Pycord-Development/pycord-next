@@ -22,8 +22,10 @@
 class PycordException(Exception):
     ...
 
+
 class GatewayException(Exception):
     ...
+
 
 class HTTPException(PycordException):
     ...

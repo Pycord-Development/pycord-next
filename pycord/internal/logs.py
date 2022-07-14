@@ -26,7 +26,7 @@ from typing import Union
 import colorlog
 import colorlog.escape_codes
 
-COLORLOG_FORMAT = '%(log_color)s%(bold)s%(levelname)s|%(asctime)s|%(name)s: %(thin)s%(message)s%(reset)s'
+COLORLOG_FORMAT = '%(log_color)s%(bold)s%(levelname)s | %(asctime)s | %(name)s: %(thin)s%(message)s%(reset)s'
 UNCOLORED_FORMAT = '%(levelname)s $(asctime)s %(name)s: %(message)s'
 
 
