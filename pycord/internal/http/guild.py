@@ -26,7 +26,7 @@ from discord_typings import BanData, ChannelData, ChannelPositionData, GuildData
     MFALevels, PermissionOverwriteData, \
     RoleData, RolePositionData, Snowflake, VoiceRegionData, WelcomeScreenData
 
-from pycord import MISSING
+from pycord.utils import MISSING
 from .route import Route
 
 
