@@ -90,7 +90,7 @@ class Shard:
         self._ratelimit_lock: asyncio.Event | None = None
         self._rot_done: asyncio.Event = asyncio.Event()
         self.current_rotation_done: bool = False
-        self._sequence: int | None = None
+        self._sequence: int | None = None  # type: ignore
 
         if not self._state.gateway_enabled:
             raise GatewayException(
@@ -184,7 +184,7 @@ class Shard:
                         self._events.dispatch('ready')
                         self._session_id = data['d']['session_id']
                 elif op == 10:
-                    data: HelloEvent
+                    data: HelloEvent  # type: ignore
                     interval = data['d']['heartbeat_interval'] / 1000
                     self._ratelimiter = HeartThread(self, self._state, interval, asyncio.get_running_loop())
                     await self.send({'op': 1, 'd': None})

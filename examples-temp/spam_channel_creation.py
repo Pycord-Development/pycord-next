@@ -26,7 +26,7 @@ async def on_hook():
     ts.clear()
 
     for belt in belts:
-        ts.append(app.http.request('DELETE', Route('/channels/{channel_id}', channel_id=belt['id'])))
+        ts.append(app.http.request('DELETE', Route('/channels/{channel_id}', channel_id=belt['id'])))  # type: ignore
 
     await asyncio.gather(*ts)
 
