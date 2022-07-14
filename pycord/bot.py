@@ -22,6 +22,7 @@ import logging
 
 from pycord.internal.gateway import ShardManager
 from pycord.rest import RESTApp
+from pycord.errors import PycordException
 
 
 class Bot(RESTApp):
