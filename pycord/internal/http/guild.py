@@ -437,10 +437,10 @@ class GuildRoutes(RouteCategoryMixin):
             "PATCH", Route("/guilds/{guild_id}/roles/{role_id}", guild_id=guild_id, role_id=role_id), payload,
             reason=reason)
 
-    async def modify_guild_mfa_level(self, guild_id: Snowflake, *, level: MFALevels) -> str:  # TODO: check return type
+    async def modify_guild_mfa_level(self, guild_id: Snowflake, *, level: MFALevels) -> dict[str, int]:
         payload = {"mfa_level": level}
 
-        return await self.request("PATCH", Route("/guilds/{guild_id}/mfa", guild_id=guild_id), payload)
+        return await self.request("POST", Route("/guilds/{guild_id}/mfa", guild_id=guild_id), payload)
 
     async def delete_guild_role(self, guild_id: Snowflake, role_id: Snowflake, *, reason: str = None) -> None:
         await self.request(
