@@ -72,7 +72,6 @@ class HTTPClient:
         if not self._session:
             await self.create()
 
-        # we only get 5 tries
         for _ in range(self.max_retries):
             for blocker in self._blockers.values():
                 if (
@@ -156,7 +155,7 @@ class HTTPClient:
         return await self.request('GET', Route('/guilds/{guild_id}/emojis', guild_id=guild_id))  # type: ignore
 
     async def get_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:
-        return await self.request('GET', Route('/guilds/{guild_id}/emojis/{emoji_id}', guild_id=guild_id))  # type: ignore
+        return await self.request('GET', Route('/guilds/{guild_id}/emojis/{emoji_id}', guild_id=guild_id))  # type: ignore # noqa: ignore
 
     async def create_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:  # type: ignore
         ...

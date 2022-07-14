@@ -17,26 +17,25 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import asyncio
 
-import logging
+from pycord.state import ConnectionState
 
-from pycord.internal.gateway import ShardManager
-from pycord.rest import RESTApp
-from pycord.errors import PycordException
+from ..events import EventDispatcher
+from .shard import Shard
 
 
-class Bot(RESTApp):
-    def __init__(
-        self, intents: int, *, shards: int = 1, version: int = 10, level: int = logging.INFO, cache_timeout: int = 10000
-    ) -> None:
-        self.intents = intents
-        self.shards = shards
-        super().__init__(version=version, level=level, cache_timeout=cache_timeout)
+class ShardManager:
+    def __init__(self, shards: int, state: ConnectionState, events: EventDispatcher, version: int = 10) -> None:
+        self._shards = shards
+        self.shards: list[Shard] = []
+        self.state = state
+        self.version = version
+        self.events = events
 
-    async def start(self, token: str):
-        await super().start(token=token)
-        self._state.gateway_enabled = True
-
-        self.shard_manager = ShardManager(self.shards, self._state, self.dispatcher, self._version)
-        # .run already sets token to a non-None type.
-        await self.shard_manager.connect(self.token)  # type: ignore
+    async def connect(self, token: str) -> None:
+        for i in range(self._shards):
+            shard = Shard(i, self._shards, self.state, self.events, self.version)
+            await shard.connect(token=token)
+            self.shards.append(shard)
+            await asyncio.sleep(5)
