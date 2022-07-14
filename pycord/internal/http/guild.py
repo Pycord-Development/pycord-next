@@ -26,6 +26,7 @@ from discord_typings import BanData, ChannelData, ChannelPositionData, GuildData
     MFALevels, PermissionOverwriteData, \
     RoleData, RolePositionData, Snowflake, VoiceRegionData, WelcomeScreenData
 
+from pycord import MISSING
 from pycord.internal.http.route import Route
 
 
@@ -79,71 +80,70 @@ class GuildRoutes:
     async def get_guild_preview(self, guild_id: Snowflake) -> GuildPreviewData:
         return await self.request("GET", Route("/guilds/{guild_id}/preview", guild_id=guild_id), None)
 
-    # TODO: use something other than ellipsis
     # TODO: icon, splash, discovery_splash, banner to `Asset`
     async def modify_guild(
             self,
             guild_id: Snowflake,
             *,
             reason: str = None,
-            name: str = ...,
-            icon: bytes = ...,
-            afk_timeout: int = ...,
-            owner_id: Snowflake = ...,
-            afk_channel_id: Snowflake = ...,
-            splash: bytes = ...,
-            discovery_splash: bytes = ...,
-            features: list[str] = ...,
-            verification_level: int = ...,
-            system_channel_id: Snowflake = ...,
-            default_message_notifications: int = ...,
-            description: str = ...,
-            explicit_content_filter: int = ...,
-            banner: bytes = ...,
-            system_channel_flags: int = ...,
-            rules_channel_id: Snowflake = ...,
-            public_updates_channel_id: Snowflake = ...,
-            preferred_locale: str = ...,
-            premium_progress_bar_enabled: bool = ...,
+            name: str = MISSING,
+            icon: bytes = MISSING,
+            afk_timeout: int = MISSING,
+            owner_id: Snowflake = MISSING,
+            afk_channel_id: Snowflake = MISSING,
+            splash: bytes = MISSING,
+            discovery_splash: bytes = MISSING,
+            features: list[str] = MISSING,
+            verification_level: int = MISSING,
+            system_channel_id: Snowflake = MISSING,
+            default_message_notifications: int = MISSING,
+            description: str = MISSING,
+            explicit_content_filter: int = MISSING,
+            banner: bytes = MISSING,
+            system_channel_flags: int = MISSING,
+            rules_channel_id: Snowflake = MISSING,
+            public_updates_channel_id: Snowflake = MISSING,
+            preferred_locale: str = MISSING,
+            premium_progress_bar_enabled: bool = MISSING,
     ) -> GuildData:
         payload = {}
-        if name is not ...:
+        if name is not MISSING:
             payload["name"] = name
-        if icon is not ...:
+        if icon is not MISSING:
             payload["icon"] = icon
-        if afk_timeout is not ...:
+        if afk_timeout is not MISSING:
             payload["afk_timeout"] = afk_timeout
-        if owner_id is not ...:
+        if owner_id is not MISSING:
             payload["owner_id"] = owner_id
-        if afk_channel_id is not ...:
+        if afk_channel_id is not MISSING:
             payload["afk_channel_id"] = afk_channel_id
-        if splash is not ...:
+        if splash is not MISSING:
             payload["splash"] = splash
-        if discovery_splash is not ...:
+        if discovery_splash is not MISSING:
             payload["discovery_splash"] = discovery_splash
-        if features is not ...:
+        if features is not MISSING:
             payload["features"] = features
-        if verification_level is not ...:
+        if verification_level is not MISSING:
             payload["verification_level"] = verification_level
-        if system_channel_id is not ...:
+        if system_channel_id is not MISSING:
             payload["system_channel_id"] = system_channel_id
-        if default_message_notifications is not ...:
+        if default_message_notifications is not MISSING:
             payload["default_message_notifications"] = default_message_notifications
-        if description is not ...:
+        if description is not MISSING:
             payload["description"] = description
-        if explicit_content_filter is not ...:
+        if explicit_content_filter is not MISSING:
             payload["explicit_content_filter"] = explicit_content_filter
-        if banner is not ...:
+        if banner is not MISSING:
             payload["banner"] = banner
-        if system_channel_flags is not ...:
+        if system_channel_flags is not MISSING:
             payload["system_channel_flags"] = system_channel_flags
-        if rules_channel_id is not ...:
+        if rules_channel_id is not MISSING:
             payload["rules_channel_id"] = rules_channel_id
-        if public_updates_channel_id is not ...:
+        if public_updates_channel_id is not MISSING:
             payload["public_updates_channel_id"] = public_updates_channel_id
-        if preferred_locale is not ...:
+        if preferred_locale is not MISSING:
             payload["preferred_locale"] = preferred_locale
-        if premium_progress_bar_enabled is not ...:
+        if premium_progress_bar_enabled is not MISSING:
             payload["premium_progress_bar_enabled"] = premium_progress_bar_enabled
 
         return await self.request("PATCH", Route("/guilds/{guild_id}", guild_id=guild_id), payload, reason=reason)
@@ -268,35 +268,35 @@ class GuildRoutes:
             guild_id: Snowflake,
             user_id: Snowflake,
             *,
-            nick: str = ...,
-            roles: list[Snowflake] = ...,
-            mute: bool = ...,
-            deaf: bool = ...,
-            channel_id: Snowflake = ...,
-            communication_disabled_until: datetime.datetime = ...,
+            nick: str = MISSING,
+            roles: list[Snowflake] = MISSING,
+            mute: bool = MISSING,
+            deaf: bool = MISSING,
+            channel_id: Snowflake = MISSING,
+            communication_disabled_until: datetime.datetime = MISSING,
             reason: str = None,
     ) -> GuildMemberData:
         payload = {}
-        if nick is not None:
+        if nick is not MISSING:
             payload["nick"] = nick
-        if roles is not None:
+        if roles is not MISSING:
             payload["roles"] = roles
-        if mute is not None:
+        if mute is not MISSING:
             payload["mute"] = mute
-        if deaf is not None:
+        if deaf is not MISSING:
             payload["deaf"] = deaf
-        if channel_id is not None:
+        if channel_id is not MISSING:
             payload["channel_id"] = channel_id
-        if communication_disabled_until is not None:
+        if communication_disabled_until is not MISSING:
             payload["communication_disabled_until"] = communication_disabled_until.isoformat()
 
         return await self.request(
             "PATCH", Route("/guilds/{guild_id}/members/{user_id}", guild_id=guild_id, user_id=user_id),
             payload, reason=reason)
 
-    async def modify_current_member(self, guild_id: Snowflake, *, nick: str = ..., reason: str = None):
+    async def modify_current_member(self, guild_id: Snowflake, *, nick: str = MISSING, reason: str = None):
         payload = {}
-        if nick is not None:
+        if nick is not MISSING:
             payload["nick"] = nick
         return await self.request(
             "PATCH", Route("/guilds/{guild_id}/members/@me", guild_id=guild_id), payload, reason=reason)
@@ -409,29 +409,29 @@ class GuildRoutes:
             guild_id: Snowflake,
             role_id: Snowflake,
             *,
-            name: str = ...,
-            permissions: int = ...,
-            color: int = ...,
-            hoist: bool = ...,
-            icon: bytes = ...,
-            unicode_emoji: str = ...,
-            mentionable: bool = ...,
+            name: str = MISSING,
+            permissions: int = MISSING,
+            color: int = MISSING,
+            hoist: bool = MISSING,
+            icon: bytes = MISSING,
+            unicode_emoji: str = MISSING,
+            mentionable: bool = MISSING,
             reason: str = None
     ) -> RoleData:
         payload = {}
-        if name is not ...:
+        if name is not MISSING:
             payload["name"] = name
-        if permissions is not ...:
+        if permissions is not MISSING:
             payload["permissions"] = permissions
-        if color is not ...:
+        if color is not MISSING:
             payload["color"] = color
-        if hoist is not ...:
+        if hoist is not MISSING:
             payload["hoist"] = hoist
-        if icon is not ...:
+        if icon is not MISSING:
             payload["icon"] = icon
-        if unicode_emoji is not ...:
+        if unicode_emoji is not MISSING:
             payload["unicode_emoji"] = unicode_emoji
-        if mentionable is not ...:
+        if mentionable is not MISSING:
             payload["mentionable"] = mentionable
 
         return await self.request(
@@ -510,14 +510,14 @@ class GuildRoutes:
             self,
             guild_id: Snowflake,
             *,
-            enabled: bool = ...,
-            channel_id: Snowflake = ...,
+            enabled: bool = MISSING,
+            channel_id: Snowflake = MISSING,
             reason: str = None
     ) -> GuildWidgetSettingsData:
         payload = {}
-        if enabled is not ...:
+        if enabled is not MISSING:
             payload["enabled"] = enabled
-        if channel_id is not ...:
+        if channel_id is not MISSING:
             payload["channel_id"] = channel_id
 
         return await self.request(
@@ -544,17 +544,17 @@ class GuildRoutes:
             self,
             guild_id: Snowflake,
             *,
-            enabled: bool = ...,
-            welcome_channels: list[dict] = ...,  # TODO
-            description: str = ...,
+            enabled: bool = MISSING,
+            welcome_channels: list[dict] = MISSING,  # TODO
+            description: str = MISSING,
             reason: str = None,
     ) -> WelcomeScreenData:
         payload = {}
-        if enabled is not ...:
+        if enabled is not MISSING:
             payload["enabled"] = enabled
-        if welcome_channels is not ...:
+        if welcome_channels is not MISSING:
             payload["welcome_channels"] = welcome_channels
-        if description is not ...:
+        if description is not MISSING:
             payload["description"] = description
 
         return await self.request(
@@ -564,16 +564,16 @@ class GuildRoutes:
             self,
             guild_id: Snowflake,
             *,
-            channel_id: Snowflake = ...,
-            suppress: bool = ...,
-            request_to_speak: datetime.datetime = ...,
+            channel_id: Snowflake = MISSING,
+            suppress: bool = MISSING,
+            request_to_speak: datetime.datetime = MISSING,
     ) -> None:
         payload = {}
-        if channel_id is not ...:
+        if channel_id is not MISSING:
             payload["channel_id"] = channel_id
-        if suppress is not ...:
+        if suppress is not MISSING:
             payload["suppress"] = suppress
-        if request_to_speak is not ...:
+        if request_to_speak is not MISSING:
             payload["request_to_speak"] = request_to_speak.isoformat()
 
         await self.request("PATCH", Route("/guilds/{guild_id}/voice-states/@me", guild_id=guild_id), payload)
@@ -583,13 +583,13 @@ class GuildRoutes:
             guild_id: Snowflake,
             user_id: Snowflake,
             *,
-            channel_id: Snowflake = ...,
-            suppress: bool = ...,
+            channel_id: Snowflake = MISSING,
+            suppress: bool = MISSING,
     ) -> None:
         payload = {}
-        if channel_id is not ...:
+        if channel_id is not MISSING:
             payload["channel_id"] = channel_id
-        if suppress is not ...:
+        if suppress is not MISSING:
             payload["suppress"] = suppress
 
         await self.request(

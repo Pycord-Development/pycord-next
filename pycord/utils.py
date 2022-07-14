@@ -36,6 +36,20 @@ from aiohttp import ClientResponse
 EPOCH = 1420070400000
 
 
+class _Missing:
+    def __eq__(self, other):
+        return False
+
+    def __bool__(self):
+        return False
+
+    def __repr__(self):
+        return "..."
+
+
+MISSING = _Missing()
+
+
 async def _text_or_json(rp: ClientResponse):
     if rp.content_type == 'application/json':
         return await rp.json(loads=loads, encoding='utf-8')
