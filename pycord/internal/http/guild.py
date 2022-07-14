@@ -438,7 +438,7 @@ class GuildRoutes(RouteCategoryMixin):
             reason=reason)
 
     async def modify_guild_mfa_level(self, guild_id: Snowflake, *, level: MFALevels) -> dict[str, int]:
-        payload = {"mfa_level": level}
+        payload = {"level": level}
 
         return await self.request("POST", Route("/guilds/{guild_id}/mfa", guild_id=guild_id), payload)
 
