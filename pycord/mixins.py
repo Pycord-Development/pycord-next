@@ -76,4 +76,3 @@ class AssetMixin:
         else:
             with open(file_path, "wb") as file:
                 return file.write(data)
-
