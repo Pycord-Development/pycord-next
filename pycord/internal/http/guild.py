@@ -26,7 +26,7 @@ from discord_typings import BanData, ChannelData, ChannelPositionData, GuildData
     MFALevels, PermissionOverwriteData, \
     RoleData, RolePositionData, Snowflake, VoiceRegionData, WelcomeScreenData
 
-from pycord.internal.http.route import Route
+from .route import Route
 
 
 class GuildRoutes:
