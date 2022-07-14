@@ -72,7 +72,6 @@ class HTTPClient:
         if not self._session:
             await self.create()
 
-        # we only get 5 tries
         for _ in range(self.max_retries):
             for blocker in self._blockers.values():
                 if (

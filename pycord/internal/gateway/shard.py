@@ -23,7 +23,6 @@ import platform
 import threading
 import time
 import zlib
-from random import random
 from typing import Any
 
 from aiohttp import WSMsgType
@@ -31,9 +30,9 @@ from discord_typings.gateway import HelloEvent
 
 from pycord import utils
 
-from ..errors import GatewayException
-from ..state import ConnectionState
-from .events import EventDispatcher
+from ...errors import GatewayException
+from ...state import ConnectionState
+from ..events import EventDispatcher
 
 ZLIB_SUFFIX = b'\x00\x00\xff\xff'
 url = 'wss://gateway.discord.gg/?v={version}&encoding=json&compress=zlib-stream'
@@ -226,18 +225,3 @@ class Shard:
             }
         )
 
-
-class ShardManager:
-    def __init__(self, shards: int, state: ConnectionState, events: EventDispatcher, version: int = 10) -> None:
-        self._shards = shards
-        self.shards: list[Shard] = []
-        self.state = state
-        self.version = version
-        self.events = events
-
-    async def connect(self, token: str) -> None:
-        for i in range(self._shards):
-            shard = Shard(i, self._shards, self.state, self.events, self.version)
-            await shard.connect(token=token)
-            self.shards.append(shard)
-            await asyncio.sleep(5)
