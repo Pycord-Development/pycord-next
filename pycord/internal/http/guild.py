@@ -28,11 +28,10 @@ from discord_typings import BanData, ChannelData, ChannelPositionData, GuildData
 
 from pycord.utils import MISSING
 from .route import Route
+from pycord.mixins import RouteCategoryMixin
 
 
-class GuildRoutes:
-    _session: ClientSession
-    request: Callable[..., Coroutine[Any, Any, dict[str, Any] | list[dict[str, Any]] | str]]
+class GuildRoutes(RouteCategoryMixin):
 
     # TODO: icon to `Asset`
     async def create_guild(

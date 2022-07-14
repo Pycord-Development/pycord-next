@@ -18,8 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Any
+from typing import Any, Callable, Coroutine
 
+from aiohttp import ClientSession
 from discord_typings import Snowflake
 
 
@@ -48,3 +49,8 @@ class Hashable(Dictable):
 
     def __hash__(self) -> int:
         return self.id >> 22  # type: ignore
+
+
+class RouteCategoryMixin:
+    _session: ClientSession
+    request: Callable[..., Coroutine[Any, Any, dict[str, Any] | list[dict[str, Any]] | str]]
