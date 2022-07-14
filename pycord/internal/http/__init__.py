@@ -11,41 +11,19 @@ import logging
 from typing import Any
 
 from aiohttp import ClientSession
-from discord_typings import EmojiData, Snowflake
+from discord_typings import EmojiData
 from discord_typings.resources.user import UserData
 
 from pycord import __version__, utils
 from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.internal.blocks import Block
+from pycord.internal.http.route import Route
+from pycord.internal.http.guild import GuildRoutes
 
 _log: logging.Logger = logging.getLogger(__name__)
 
 
-class Route:
-    def __init__(
-        self,
-        path: str,
-        guild_id: int | None = None,
-        channel_id: int | None = None,
-        webhook_id: Snowflake | None = None,
-        webhook_token: str | None = None,
-    ):
-        self.path = path
-        self.guild_id = guild_id
-        self.channel_id = channel_id
-        self.webhook_id = webhook_id
-        self.webhook_token = webhook_token
-
-    def merge(self, url: str):
-        return url + self.path.format(
-            guild_id=self.guild_id,
-            channel_id=self.channel_id,
-            webhook_id=self.webhook_id,
-            webhook_token=self.webhook_token,
-        )
-
-
-class HTTPClient:
+class HTTPClient(GuildRoutes):
     def __init__(self, token: str, version: int, max_retries: int = 5):
         # pyright hates identifying this as clientsession when its not-
         # sadly, aiohttp errors a lot when not creating client sessions on an async environment.
@@ -65,12 +43,16 @@ class HTTPClient:
         self._session = ClientSession()
 
     async def request(
-        self, method: str, route: Route, data: dict[str, Any] | None = None
-    ) -> dict[str, Any] | str:  # type: ignore
+        self, method: str, route: Route, data: dict[str, Any] | None = None, reason: str = None, **kwargs: Any
+    ) -> dict[str, Any] | list[dict[str, Any]] | str:  # type: ignore
         endpoint = route.merge(self.url)
 
         if not self._session:
             await self.create()
+
+        headers = self._headers.copy()
+        if reason:
+            headers['X-Audit-Log-Reason'] = reason
 
         for _ in range(self.max_retries):
             for blocker in self._blockers.values():
@@ -95,7 +77,8 @@ class HTTPClient:
                 method=method,
                 url=endpoint,
                 data=data if data is None else utils.dumps(data),
-                headers=self._headers,
+                headers=headers,
+                **kwargs,
             )
 
             # ratelimited
