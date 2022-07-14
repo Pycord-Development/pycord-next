@@ -23,7 +23,6 @@ import platform
 import threading
 import time
 import zlib
-from random import random
 from typing import Any
 
 from aiohttp import WSMsgType
@@ -31,9 +30,9 @@ from discord_typings.gateway import HelloEvent
 
 from pycord import utils
 
-from ..errors import GatewayException
-from ..state import ConnectionState
-from .events import EventDispatcher
+from ...errors import GatewayException
+from ...state import ConnectionState
+from ..events import EventDispatcher
 
 ZLIB_SUFFIX = b'\x00\x00\xff\xff'
 url = 'wss://gateway.discord.gg/?v={version}&encoding=json&compress=zlib-stream'
@@ -91,7 +90,7 @@ class Shard:
         self._ratelimit_lock: asyncio.Event | None = None
         self._rot_done: asyncio.Event = asyncio.Event()
         self.current_rotation_done: bool = False
-        self._sequence: int | None = None
+        self._sequence: int | None = None  # type: ignore
 
         if not self._state.gateway_enabled:
             raise GatewayException(
@@ -185,7 +184,7 @@ class Shard:
                         self._events.dispatch('ready')
                         self._session_id = data['d']['session_id']
                 elif op == 10:
-                    data: HelloEvent
+                    data: HelloEvent  # type: ignore
                     interval = data['d']['heartbeat_interval'] / 1000
                     self._ratelimiter = HeartThread(self, self._state, interval, asyncio.get_running_loop())
                     await self.send({'op': 1, 'd': None})
@@ -225,19 +224,3 @@ class Shard:
                 },
             }
         )
-
-
-class ShardManager:
-    def __init__(self, shards: int, state: ConnectionState, events: EventDispatcher, version: int = 10) -> None:
-        self._shards = shards
-        self.shards: list[Shard] = []
-        self.state = state
-        self.version = version
-        self.events = events
-
-    async def connect(self, token: str) -> None:
-        for i in range(self._shards):
-            shard = Shard(i, self._shards, self.state, self.events, self.version)
-            await shard.connect(token=token)
-            self.shards.append(shard)
-            await asyncio.sleep(5)

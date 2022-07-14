@@ -17,26 +17,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-import logging
-
-from pycord.internal.gateway import ShardManager
-from pycord.rest import RESTApp
-from pycord.errors import PycordException
-
-
-class Bot(RESTApp):
-    def __init__(
-        self, intents: int, *, shards: int = 1, version: int = 10, level: int = logging.INFO, cache_timeout: int = 10000
-    ) -> None:
-        self.intents = intents
-        self.shards = shards
-        super().__init__(version=version, level=level, cache_timeout=cache_timeout)
-
-    async def start(self, token: str):
-        await super().start(token=token)
-        self._state.gateway_enabled = True
-
-        self.shard_manager = ShardManager(self.shards, self._state, self.dispatcher, self._version)
-        # .run already sets token to a non-None type.
-        await self.shard_manager.connect(self.token)  # type: ignore
+"""
+Shard Cluster's are Group's of ShardManagers, these can be theoretically ran separately and scaled in kubernetes.
+"""
