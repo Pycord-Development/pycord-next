@@ -20,9 +20,9 @@
 
 import logging
 
-from pycord.internal.gateway import ShardManager
 from pycord.apps.rest import RESTApp
 from pycord.errors import PycordException
+from pycord.internal.gateway import ShardManager
 
 
 class GatewayApp(RESTApp):

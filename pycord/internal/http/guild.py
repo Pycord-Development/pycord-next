@@ -37,30 +37,30 @@ from discord_typings import (
     RolePositionData,
     Snowflake,
     VoiceRegionData,
-    WelcomeScreenData
+    WelcomeScreenData,
 )
 
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 from pycord.types import ModifyMFALevelData, PrunedData
 
 
 class GuildRoutes(RouteCategoryMixin):
     # TODO: icon to `Asset`
     async def create_guild(
-            self,
-            *,
-            name: str,
-            icon: bytes | None = None,
-            verification_level: int | None = None,
-            default_message_notifications: int | None = None,
-            explicit_content_filter: int | None = None,
-            roles: list[RoleData] | None = None,
-            channels: list[ChannelData] | None = None,
-            afk_channel_id: Snowflake | None = None,
-            afk_timeout: int | None = None,
-            system_channel_id: Snowflake | None = None,
-            system_channel_flags: int | None = None,
+        self,
+        *,
+        name: str,
+        icon: bytes | None = None,
+        verification_level: int | None = None,
+        default_message_notifications: int | None = None,
+        explicit_content_filter: int | None = None,
+        roles: list[RoleData] | None = None,
+        channels: list[ChannelData] | None = None,
+        afk_channel_id: Snowflake | None = None,
+        afk_timeout: int | None = None,
+        system_channel_id: Snowflake | None = None,
+        system_channel_flags: int | None = None,
     ) -> GuildData:
         payload = {'name': name}
         if icon is not None:
@@ -94,29 +94,29 @@ class GuildRoutes(RouteCategoryMixin):
 
     # TODO: icon, splash, discovery_splash, banner to `Asset`
     async def modify_guild(
-            self,
-            guild_id: Snowflake,
-            *,
-            reason: str | None = None,
-            name: str = ...,
-            verification_level: int | None = ...,
-            default_message_notifications: int | None = ...,
-            explicit_content_filter: int | None = ...,
-            afk_channel_id: Snowflake | None = ...,
-            afk_timeout: int = ...,
-            icon: bytes | None = ...,
-            owner_id: Snowflake = ...,
-            splash: bytes | None = ...,
-            discovery_splash: bytes | None = ...,
-            banner: bytes | None = ...,
-            system_channel_id: Snowflake | None = ...,
-            system_channel_flags: int = ...,
-            rules_channel_id: Snowflake | None = ...,
-            public_updates_channel_id: Snowflake | None = ...,
-            preferred_locale: str | None = ...,
-            features: list[str] = ...,
-            description: str | None = ...,
-            premium_progress_bar_enabled: bool = ...,
+        self,
+        guild_id: Snowflake,
+        *,
+        reason: str | None = None,
+        name: str = ...,
+        verification_level: int | None = ...,
+        default_message_notifications: int | None = ...,
+        explicit_content_filter: int | None = ...,
+        afk_channel_id: Snowflake | None = ...,
+        afk_timeout: int = ...,
+        icon: bytes | None = ...,
+        owner_id: Snowflake = ...,
+        splash: bytes | None = ...,
+        discovery_splash: bytes | None = ...,
+        banner: bytes | None = ...,
+        system_channel_id: Snowflake | None = ...,
+        system_channel_flags: int = ...,
+        rules_channel_id: Snowflake | None = ...,
+        public_updates_channel_id: Snowflake | None = ...,
+        preferred_locale: str | None = ...,
+        features: list[str] = ...,
+        description: str | None = ...,
+        premium_progress_bar_enabled: bool = ...,
     ) -> GuildData:
         payload = {}
         if name is not ...:
@@ -168,23 +168,23 @@ class GuildRoutes(RouteCategoryMixin):
 
     # TODO: type channel_type to ChannelType
     async def create_guild_channel(
-            self,
-            guild_id: Snowflake,
-            name: str,
-            *,
-            reason: str | None = None,
-            channel_type: int | None = None,
-            topic: str | None = None,
-            bitrate: int | None = None,
-            user_limit: int | None = None,
-            rate_limit_per_user: int | None = None,
-            position: int | None = None,
-            permission_overwrites: list[PermissionOverwriteData] | None = None,
-            parent_id: Snowflake | None = None,
-            nsfw: bool | None = None,
-            rtc_region: str | None = None,
-            video_quality_mode: int | None = None,
-            default_auto_archive_duration: int | None = None,
+        self,
+        guild_id: Snowflake,
+        name: str,
+        *,
+        reason: str | None = None,
+        channel_type: int | None = None,
+        topic: str | None = None,
+        bitrate: int | None = None,
+        user_limit: int | None = None,
+        rate_limit_per_user: int | None = None,
+        position: int | None = None,
+        permission_overwrites: list[PermissionOverwriteData] | None = None,
+        parent_id: Snowflake | None = None,
+        nsfw: bool | None = None,
+        rtc_region: str | None = None,
+        video_quality_mode: int | None = None,
+        default_auto_archive_duration: int | None = None,
     ) -> ChannelData:
         payload = {'name': name}
         # TODO: check keys based on channel type?
@@ -213,13 +213,14 @@ class GuildRoutes(RouteCategoryMixin):
         if default_auto_archive_duration is not None:
             payload['default_auto_archive_duration'] = default_auto_archive_duration
 
-        return await self.request('POST', Route('/guilds/{guild_id}/channels', guild_id=guild_id), payload,
-                                  reason=reason)
+        return await self.request(
+            'POST', Route('/guilds/{guild_id}/channels', guild_id=guild_id), payload, reason=reason
+        )
 
     async def modify_guild_channel_positions(
-            self,
-            guild_id: Snowflake,
-            *channel_positions: ChannelPositionData,
+        self,
+        guild_id: Snowflake,
+        *channel_positions: ChannelPositionData,
     ) -> None:
         payload = list(channel_positions)
 
@@ -230,10 +231,11 @@ class GuildRoutes(RouteCategoryMixin):
 
     async def get_guild_member(self, guild_id: Snowflake, user_id: Snowflake) -> GuildMemberData:
         return await self.request(
-            'GET', Route('/guilds/{guild_id}/members/{user_id}', guild_id=guild_id, user_id=user_id), None)
+            'GET', Route('/guilds/{guild_id}/members/{user_id}', guild_id=guild_id, user_id=user_id), None
+        )
 
     async def list_guild_members(
-            self, guild_id: Snowflake, *, limit: int | None = None, after: Snowflake | None = None
+        self, guild_id: Snowflake, *, limit: int | None = None, after: Snowflake | None = None
     ) -> list[GuildMemberData]:
         params = {}
         if limit is not None:
@@ -244,7 +246,7 @@ class GuildRoutes(RouteCategoryMixin):
         return await self.request('GET', Route('/guilds/{guild_id}/members', guild_id=guild_id), params=params)
 
     async def search_guild_members(
-            self, guild_id: Snowflake, *, query: str, limit: int | None = None
+        self, guild_id: Snowflake, *, query: str, limit: int | None = None
     ) -> list[GuildMemberData]:
         params = {'query': query}
         if limit is not None:
@@ -252,15 +254,15 @@ class GuildRoutes(RouteCategoryMixin):
         return await self.request('GET', Route('/guilds/{guild_id}/members/search', guild_id=guild_id), params=params)
 
     async def add_guild_member(
-            self,
-            guild_id: Snowflake,
-            user_id: Snowflake,
-            *,
-            access_token: str,
-            nick: str | None = None,
-            roles: list[Snowflake] | None = None,
-            mute: bool | None = None,
-            deaf: bool | None = None,
+        self,
+        guild_id: Snowflake,
+        user_id: Snowflake,
+        *,
+        access_token: str,
+        nick: str | None = None,
+        roles: list[Snowflake] | None = None,
+        mute: bool | None = None,
+        deaf: bool | None = None,
     ) -> GuildMemberData:
         payload = {'access_token': access_token}
         if nick is not None:
@@ -273,20 +275,21 @@ class GuildRoutes(RouteCategoryMixin):
             payload['deaf'] = deaf
 
         return await self.request(
-            'PUT', Route('/guilds/{guild_id}/members/{user_id}', guild_id=guild_id, user_id=user_id), payload)
+            'PUT', Route('/guilds/{guild_id}/members/{user_id}', guild_id=guild_id, user_id=user_id), payload
+        )
 
     async def modify_guild_member(
-            self,
-            guild_id: Snowflake,
-            user_id: Snowflake,
-            *,
-            nick: str | None = ...,
-            roles: list[Snowflake] = ...,
-            mute: bool = ...,
-            deaf: bool = ...,
-            channel_id: Snowflake | None = ...,
-            communication_disabled_until: datetime.datetime | None = ...,
-            reason: str | None = None,
+        self,
+        guild_id: Snowflake,
+        user_id: Snowflake,
+        *,
+        nick: str | None = ...,
+        roles: list[Snowflake] = ...,
+        mute: bool = ...,
+        deaf: bool = ...,
+        channel_id: Snowflake | None = ...,
+        communication_disabled_until: datetime.datetime | None = ...,
+        reason: str | None = None,
     ) -> GuildMemberData:
         payload = {}
         if nick is not ...:
@@ -303,42 +306,67 @@ class GuildRoutes(RouteCategoryMixin):
             payload['communication_disabled_until'] = communication_disabled_until.isoformat()
 
         return await self.request(
-            'PATCH', Route('/guilds/{guild_id}/members/{user_id}', guild_id=guild_id, user_id=user_id),
-            payload, reason=reason)
+            'PATCH',
+            Route('/guilds/{guild_id}/members/{user_id}', guild_id=guild_id, user_id=user_id),
+            payload,
+            reason=reason,
+        )
 
     async def modify_current_member(
-            self, guild_id: Snowflake, *, nick: str | None = ..., reason: str | None = None
+        self, guild_id: Snowflake, *, nick: str | None = ..., reason: str | None = None
     ) -> GuildMemberData:
         payload = {}
         if nick is not ...:
             payload['nick'] = nick
         return await self.request(
-            'PATCH', Route('/guilds/{guild_id}/members/@me', guild_id=guild_id), payload, reason=reason)
+            'PATCH', Route('/guilds/{guild_id}/members/@me', guild_id=guild_id), payload, reason=reason
+        )
 
-    async def add_guild_member_role(self, guild_id: Snowflake, user_id: Snowflake, role_id: Snowflake, *,
-                                    reason: str | None = None) -> None:
+    async def add_guild_member_role(
+        self, guild_id: Snowflake, user_id: Snowflake, role_id: Snowflake, *, reason: str | None = None
+    ) -> None:
         await self.request(
-            'PUT', Route('/guilds/{guild_id}/members/{user_id}/roles/{role_id}', guild_id=guild_id, user_id=user_id,
-                         role_id=role_id), None, reason=reason)
+            'PUT',
+            Route(
+                '/guilds/{guild_id}/members/{user_id}/roles/{role_id}',
+                guild_id=guild_id,
+                user_id=user_id,
+                role_id=role_id,
+            ),
+            None,
+            reason=reason,
+        )
 
-    async def remove_guild_member_role(self, guild_id: Snowflake, user_id: Snowflake, role_id: Snowflake, *,
-                                       reason: str | None = None) -> None:
+    async def remove_guild_member_role(
+        self, guild_id: Snowflake, user_id: Snowflake, role_id: Snowflake, *, reason: str | None = None
+    ) -> None:
         await self.request(
-            'DELETE', Route('/guilds/{guild_id}/members/{user_id}/roles/{role_id}', guild_id=guild_id, user_id=user_id,
-                            role_id=role_id), None, reason=reason)
+            'DELETE',
+            Route(
+                '/guilds/{guild_id}/members/{user_id}/roles/{role_id}',
+                guild_id=guild_id,
+                user_id=user_id,
+                role_id=role_id,
+            ),
+            None,
+            reason=reason,
+        )
 
     async def remove_guild_member(self, guild_id: Snowflake, user_id: Snowflake, *, reason: str | None = None) -> None:
         await self.request(
             'DELETE',
-            Route('/guilds/{guild_id}/members/{user_id}', guild_id=guild_id, user_id=user_id), None, reason=reason)
+            Route('/guilds/{guild_id}/members/{user_id}', guild_id=guild_id, user_id=user_id),
+            None,
+            reason=reason,
+        )
 
     async def get_guild_bans(
-            self,
-            guild_id: Snowflake,
-            *,
-            limit: int | None = None,
-            before: Snowflake | None = None,
-            after: Snowflake | None = None
+        self,
+        guild_id: Snowflake,
+        *,
+        limit: int | None = None,
+        before: Snowflake | None = None,
+        after: Snowflake | None = None,
     ) -> list[BanData]:
         params = {}
         if limit is not None:
@@ -351,44 +379,51 @@ class GuildRoutes(RouteCategoryMixin):
 
     async def get_guild_ban(self, guild_id: Snowflake, user_id: Snowflake) -> BanData:
         return await self.request(
-            'GET', Route('/guilds/{guild_id}/bans/{user_id}', guild_id=guild_id, user_id=user_id), None)
+            'GET', Route('/guilds/{guild_id}/bans/{user_id}', guild_id=guild_id, user_id=user_id), None
+        )
 
     async def create_guild_ban(
-            self,
-            guild_id: Snowflake,
-            user_id: Snowflake,
-            *,
-            delete_message_days: int | None = None,
-            reason: str | None = None
+        self,
+        guild_id: Snowflake,
+        user_id: Snowflake,
+        *,
+        delete_message_days: int | None = None,
+        reason: str | None = None,
     ) -> None:
         payload = {}
         if delete_message_days is not None:
             payload['delete_message_days'] = delete_message_days
         await self.request(
-            'PUT', Route('/guilds/{guild_id}/bans/{user_id}', guild_id=guild_id, user_id=user_id),
-            payload, reason=reason)
+            'PUT',
+            Route('/guilds/{guild_id}/bans/{user_id}', guild_id=guild_id, user_id=user_id),
+            payload,
+            reason=reason,
+        )
 
     async def remove_guild_ban(self, guild_id: Snowflake, user_id: Snowflake, *, reason: str | None = None) -> None:
         await self.request(
-            'DELETE', Route('/guilds/{guild_id}/bans/{user_id}', guild_id=guild_id, user_id=user_id), None,
-            reason=reason)
+            'DELETE',
+            Route('/guilds/{guild_id}/bans/{user_id}', guild_id=guild_id, user_id=user_id),
+            None,
+            reason=reason,
+        )
 
     async def get_guild_roles(self, guild_id: Snowflake) -> list[RoleData]:
         return await self.request('GET', Route('/guilds/{guild_id}/roles', guild_id=guild_id), None)
 
     # TODO: icon to `Asset`
     async def create_guild_role(
-            self,
-            guild_id: Snowflake,
-            *,
-            name: str | None = None,
-            permissions: int | None = None,
-            color: int | None = None,
-            hoist: bool | None = None,
-            icon: bytes | None = None,
-            unicode_emoji: str | None = None,
-            mentionable: bool | None = None,
-            reason: str | None = None
+        self,
+        guild_id: Snowflake,
+        *,
+        name: str | None = None,
+        permissions: int | None = None,
+        color: int | None = None,
+        hoist: bool | None = None,
+        icon: bytes | None = None,
+        unicode_emoji: str | None = None,
+        mentionable: bool | None = None,
+        reason: str | None = None,
     ) -> RoleData:
         payload = {}
         if name is not None:
@@ -409,28 +444,24 @@ class GuildRoutes(RouteCategoryMixin):
         return await self.request('POST', Route('/guilds/{guild_id}/roles', guild_id=guild_id), payload, reason=reason)
 
     async def modify_guild_role_positions(
-            self,
-            guild_id: Snowflake,
-            *positions: list[RolePositionData],
-            reason: str | None = None
+        self, guild_id: Snowflake, *positions: list[RolePositionData], reason: str | None = None
     ) -> None:
         payload = list(positions)
-        await self.request(
-            'PATCH', Route('/guilds/{guild_id}/roles', guild_id=guild_id), payload, reason=reason)
+        await self.request('PATCH', Route('/guilds/{guild_id}/roles', guild_id=guild_id), payload, reason=reason)
 
     async def modify_guild_role(
-            self,
-            guild_id: Snowflake,
-            role_id: Snowflake,
-            *,
-            name: str | None = ...,
-            permissions: int | None = ...,
-            color: int | None = ...,
-            hoist: bool | None = ...,
-            icon: bytes | None = ...,
-            unicode_emoji: str | None = ...,
-            mentionable: bool | None = ...,
-            reason: str | None = None
+        self,
+        guild_id: Snowflake,
+        role_id: Snowflake,
+        *,
+        name: str | None = ...,
+        permissions: int | None = ...,
+        color: int | None = ...,
+        hoist: bool | None = ...,
+        icon: bytes | None = ...,
+        unicode_emoji: str | None = ...,
+        mentionable: bool | None = ...,
+        reason: str | None = None,
     ) -> RoleData:
         payload = {}
         if name is not ...:
@@ -449,27 +480,34 @@ class GuildRoutes(RouteCategoryMixin):
             payload['mentionable'] = mentionable
 
         return await self.request(
-            'PATCH', Route('/guilds/{guild_id}/roles/{role_id}', guild_id=guild_id, role_id=role_id), payload,
-            reason=reason)
+            'PATCH',
+            Route('/guilds/{guild_id}/roles/{role_id}', guild_id=guild_id, role_id=role_id),
+            payload,
+            reason=reason,
+        )
 
     async def modify_guild_mfa_level(self, guild_id: Snowflake, *, level: MFALevels) -> MFALevels:
         payload = {'level': level}
 
         val: ModifyMFALevelData = await self.request(
-            'POST', Route('/guilds/{guild_id}/mfa', guild_id=guild_id), payload)
+            'POST', Route('/guilds/{guild_id}/mfa', guild_id=guild_id), payload
+        )
         return val['level']
 
     async def delete_guild_role(self, guild_id: Snowflake, role_id: Snowflake, *, reason: str | None = None) -> None:
         await self.request(
-            'DELETE', Route('/guilds/{guild_id}/roles/{role_id}', guild_id=guild_id, role_id=role_id), None,
-            reason=reason)
+            'DELETE',
+            Route('/guilds/{guild_id}/roles/{role_id}', guild_id=guild_id, role_id=role_id),
+            None,
+            reason=reason,
+        )
 
     async def get_guild_prune_count(
-            self,
-            guild_id: Snowflake,
-            *,
-            days: int | None = None,
-            include_roles: list[Snowflake] | None = None,
+        self,
+        guild_id: Snowflake,
+        *,
+        days: int | None = None,
+        include_roles: list[Snowflake] | None = None,
     ) -> int:
         params = {}
         if days is not None:
@@ -480,13 +518,13 @@ class GuildRoutes(RouteCategoryMixin):
         return val['pruned']
 
     async def begin_guild_prune(
-            self,
-            guild_id: Snowflake,
-            *,
-            days: int,
-            compute_prune_count: bool,
-            include_roles: list[Snowflake] | None = None,
-            reason: str | None = None,
+        self,
+        guild_id: Snowflake,
+        *,
+        days: int,
+        compute_prune_count: bool,
+        include_roles: list[Snowflake] | None = None,
+        reason: str | None = None,
     ) -> int | None:
         payload = {
             'days': days,
@@ -495,7 +533,8 @@ class GuildRoutes(RouteCategoryMixin):
         }
 
         val: PrunedData = await self.request(
-            'POST', Route('/guilds/{guild_id}/prune', guild_id=guild_id), payload, reason=reason)
+            'POST', Route('/guilds/{guild_id}/prune', guild_id=guild_id), payload, reason=reason
+        )
         return val['pruned']
 
     async def get_guild_voice_regions(self, guild_id: Snowflake) -> list[VoiceRegionData]:
@@ -508,28 +547,25 @@ class GuildRoutes(RouteCategoryMixin):
         return await self.request('GET', Route('/guilds/{guild_id}/integrations', guild_id=guild_id), None)
 
     async def delete_guild_integration(
-            self,
-            guild_id: Snowflake,
-            integration_id: Snowflake,
-            *,
-            reason: str | None = None
+        self, guild_id: Snowflake, integration_id: Snowflake, *, reason: str | None = None
     ) -> None:
         await self.request(
             'DELETE',
             Route('/guilds/{guild_id}/integrations/{integration_id}', guild_id=guild_id, integration_id=integration_id),
             None,
-            reason=reason)
+            reason=reason,
+        )
 
     async def get_guild_widget_settings(self, guild_id: Snowflake) -> GuildWidgetSettingsData:
         return await self.request('GET', Route('/guilds/{guild_id}/widget', guild_id=guild_id), None)
 
     async def modify_guild_widget(
-            self,
-            guild_id: Snowflake,
-            *,
-            enabled: bool = ...,
-            channel_id: Snowflake | None = ...,
-            reason: str | None = None
+        self,
+        guild_id: Snowflake,
+        *,
+        enabled: bool = ...,
+        channel_id: Snowflake | None = ...,
+        reason: str | None = None,
     ) -> GuildWidgetSettingsData:
         payload = {}
         if enabled is not ...:
@@ -538,7 +574,8 @@ class GuildRoutes(RouteCategoryMixin):
             payload['channel_id'] = channel_id
 
         return await self.request(
-            'PATCH', Route('/guilds/{guild_id}/widget', guild_id=guild_id), payload, reason=reason)
+            'PATCH', Route('/guilds/{guild_id}/widget', guild_id=guild_id), payload, reason=reason
+        )
 
     async def get_guild_widget(self, guild_id: Snowflake) -> GuildWidgetData:
         return await self.request('GET', Route('/guilds/{guild_id}/widget.json', guild_id=guild_id), None)
@@ -552,19 +589,20 @@ class GuildRoutes(RouteCategoryMixin):
             params['style'] = style
 
         return await self.request(  # type: ignore
-            'GET', Route('/guilds/{guild_id}/widget.png', guild_id=guild_id), params)
+            'GET', Route('/guilds/{guild_id}/widget.png', guild_id=guild_id), params
+        )
 
     async def get_guild_welcome_screen(self, guild_id: Snowflake) -> WelcomeScreenData:
         return await self.request('GET', Route('/guilds/{guild_id}/welcome-screen', guild_id=guild_id), None)
 
     async def modify_guild_welcome_screen(
-            self,
-            guild_id: Snowflake,
-            *,
-            enabled: bool = ...,
-            welcome_channels: list[dict] | None = ...,  # TODO
-            description: str | None = ...,
-            reason: str | None = None,
+        self,
+        guild_id: Snowflake,
+        *,
+        enabled: bool = ...,
+        welcome_channels: list[dict] | None = ...,  # TODO
+        description: str | None = ...,
+        reason: str | None = None,
     ) -> WelcomeScreenData:
         payload = {}
         if enabled is not ...:
@@ -575,15 +613,16 @@ class GuildRoutes(RouteCategoryMixin):
             payload['description'] = description
 
         return await self.request(
-            'PATCH', Route('/guilds/{guild_id}/welcome-screen', guild_id=guild_id), payload, reason=reason)
+            'PATCH', Route('/guilds/{guild_id}/welcome-screen', guild_id=guild_id), payload, reason=reason
+        )
 
     async def modify_current_user_voice_state(
-            self,
-            guild_id: Snowflake,
-            *,
-            channel_id: Snowflake,
-            suppress: bool = ...,
-            request_to_speak: datetime.datetime | None = ...,
+        self,
+        guild_id: Snowflake,
+        *,
+        channel_id: Snowflake,
+        suppress: bool = ...,
+        request_to_speak: datetime.datetime | None = ...,
     ) -> None:
         payload = {'channel_id': channel_id}
         if suppress is not ...:
@@ -594,16 +633,17 @@ class GuildRoutes(RouteCategoryMixin):
         await self.request('PATCH', Route('/guilds/{guild_id}/voice-states/@me', guild_id=guild_id), payload)
 
     async def modify_user_voice_state(
-            self,
-            guild_id: Snowflake,
-            user_id: Snowflake,
-            *,
-            channel_id: Snowflake,
-            suppress: bool = ...,
+        self,
+        guild_id: Snowflake,
+        user_id: Snowflake,
+        *,
+        channel_id: Snowflake,
+        suppress: bool = ...,
     ) -> None:
         payload = {'channel_id': channel_id}
         if suppress is not ...:
             payload['suppress'] = suppress
 
         await self.request(
-            'PATCH', Route('/guilds/{guild_id}/voice-states/{user_id}', guild_id=guild_id, user_id=user_id), payload)
+            'PATCH', Route('/guilds/{guild_id}/voice-states/{user_id}', guild_id=guild_id, user_id=user_id), payload
+        )
