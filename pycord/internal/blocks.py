@@ -20,8 +20,10 @@
 
 
 import asyncio
+from typing import TYPE_CHECKING
 
-from .http.route import Route
+if TYPE_CHECKING:
+    from .http import Route
 
 
 class Block:
@@ -29,9 +31,9 @@ class Block:
     This class temporarily blocks requests after hitting a ratelimit
     """
 
-    def __init__(self, route: Route):
+    def __init__(self, route: "Route"):
         self._event: asyncio.Event | None = None
-        self.route: Route | None = route
+        self.route: "Route" | None = route
         self.is_global: bool = False
 
     async def wait(self):
