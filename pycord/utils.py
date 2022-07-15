@@ -29,7 +29,7 @@ except (ImportError, ModuleNotFoundError):
 
 from base64 import b64encode
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Tuple
 
 from aiohttp import ClientResponse
 
@@ -79,3 +79,27 @@ def _convert_base64_from_bytes(data: bytes) -> str:
     mime = _get_image_mime_type(data)
     b64 = b64encode(data).decode('ascii')
     return fmt.format(mime=mime, data=b64)
+
+
+async def _validate_image_params(img_hash: str, fmt: str, size: int) -> Tuple[str, int]:
+    # format validation
+
+    static_formats = frozenset(("png", "jpg", "jpeg", "webp"))
+    asset_formats = static_formats | {"gif"}
+
+    animated = img_hash.startswith("a_")
+    if animated:
+        fmt = fmt if fmt in asset_formats else "gif"
+    else:
+        fmt = fmt if fmt in static_formats else "png"
+
+    # size validation
+
+    # size must be between 16 and 4096 (2**4 and 2**12)
+    if not 16 <= size <= 4096:
+        size = max(min(4096, size), 16)
+    # size must be a power of 2
+    elif size & (size - 1) != 0:
+        size = 1 << ((size - 1).bit_length())
+
+    return fmt, size
