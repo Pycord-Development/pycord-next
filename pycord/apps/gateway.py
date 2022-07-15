@@ -18,14 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
 import logging
 
+from pycord.apps.rest import RESTApp
 from pycord.internal.gateway import ShardManager
-from pycord.rest import RESTApp
-from pycord.errors import PycordException
 
 
-class Bot(RESTApp):
+class GatewayApp(RESTApp):
     def __init__(
         self, intents: int, *, shards: int = 1, version: int = 10, level: int = logging.INFO, cache_timeout: int = 10000
     ) -> None:
@@ -33,13 +33,19 @@ class Bot(RESTApp):
         self.shards = shards
         super().__init__(version=version, level=level, cache_timeout=cache_timeout)
 
-    async def start(self, token: str):
-        await super().start(token=token)
-        self._state.gateway_enabled = True
+    def connect(self, token: str):
+        async def _conn():
+            await self.start(token=token)
+            self._state.gateway_enabled = True
 
-        self.shard_manager = ShardManager(self.shards, self._state, self.dispatcher, self._version)
-        # .run/.start already sets token to a non-None type.
-        await self.shard_manager.connect(self.token)  # type: ignore
+            self.shard_manager = ShardManager(self.shards, self._state, self.dispatcher, self._version)
+            # .run/.start already sets token to a non-None type.
+            await self.shard_manager.connect(self.token)  # type: ignore
+
+        # TODO: Replace with asyncio.run
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(_conn())
+        loop.run_forever()
 
     async def close(self):
         await super().close()

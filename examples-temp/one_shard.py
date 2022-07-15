@@ -1,6 +1,8 @@
 import pycord
 
-# a discord bot connecting to the gateway with 1 shard and an intent number of 0
-bot = pycord.Bot(0, level='DEBUG')
 
-bot.run('token')
+app = pycord.GatewayApp(0, level='DEBUG')
+
+
+# Connects the bot with the token `token` to the Discord Gateway
+app.connect('token')

@@ -18,12 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import asyncio
-from datetime import datetime
 import logging
 import platform
 import threading
 import time
 import zlib
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from aiohttp import WSMsgType
@@ -81,7 +81,7 @@ class Shard:
         events: EventDispatcher,
         manager: "ShardManager",
         version: int = 10,
-        timeout: int = 30
+        timeout: int = 30,
     ) -> None:
         self.id = shard_id
         self.shard_count = shard_count
@@ -186,9 +186,10 @@ class Shard:
     async def receive(self) -> None:
         async for message in self._ws:
             try:
-                if self._last_heartbeat_ack and (
-                    datetime.now() - self._last_heartbeat_ack
-                ).total_seconds() > self._heartbeat_timeout:
+                if (
+                    self._last_heartbeat_ack
+                    and (datetime.now() - self._last_heartbeat_ack).total_seconds() > self._heartbeat_timeout
+                ):
                     # zombified connection, reconnect
                     await self.disconnect(1008)
 
@@ -237,7 +238,9 @@ class Shard:
                         await self.send({'op': 1, 'd': None})
                         self._ratelimiter.start()
                     elif op == 11:
-                        self._last_heartbeat_ack = datetime.now() # no need for a timezone aware date, this is for this program only
+                        self._last_heartbeat_ack = (
+                            datetime.now()
+                        )  # no need for a timezone aware date, this is for this program only
 
                 elif message.type == WSMsgType.CLOSED:
                     await self.disconnect(reconnect=False)
