@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from datetime import datetime
+from typing import Any
 from discord_typings import (
     AllowedMentionsData,
     AttachmentData,
@@ -26,11 +28,14 @@ from discord_typings import (
     EmbedData,
     FollowedChannelData,
     InviteData,
+    ListThreadsData,
     MessageData,
     MessageReferenceData,
     PartialAttachmentData,
     PermissionOverwriteData,
     Snowflake,
+    ThreadChannelData,
+    ThreadMemberData,
     UserData,
 )
 
@@ -302,9 +307,9 @@ class ChannelRoutes(RouteCategoryMixin):
 
     async def bulk_delete_messages(self, channel_id: Snowflake, *, reason: str | None = None, messages: list[Snowflake]) -> None:
         if not 2 <= len(messages) <= 100:
-            raise ValueError("The length of messages must be between 2 and 100 (inclusive)")
+            raise ValueError('The length of messages must be between 2 and 100 (inclusive)')
 
-        payload = {"messages": messages}
+        payload = {'messages': messages}
         return await self.request('POST', Route('/channels/{channel_id}/messages/bulk-delete', channel_id=channel_id), payload, reason=reason)
 
     async def edit_channel_permissions(
@@ -313,11 +318,11 @@ class ChannelRoutes(RouteCategoryMixin):
         overwrite_id: Snowflake,
         *,
         reason: str | None = None,
-        allow: str = "0",
-        deny: str = "0",
+        allow: str = '0',
+        deny: str = '0',
         type: int,
     ) -> None:
-        payload = {"allow": allow, "deny": deny, "type": type}
+        payload = {'allow': allow, 'deny': deny, 'type': type}
         return await self.request('PUT', Route('/channels/{channel_id}/permissions/{overwrite_id}', channel_id=channel_id, overwrite_id=overwrite_id), payload)
 
     async def get_channel_invites(self, channel_id: Snowflake) -> list[InviteData]:
@@ -336,7 +341,7 @@ class ChannelRoutes(RouteCategoryMixin):
         target_user_id: Snowflake = ...,
         target_application_id: Snowflake = ...,
     ) -> InviteData:
-        payload = {"max_age": max_age, "max_uses": max_uses, "temporary": temporary, "unique": unique}
+        payload = {'max_age': max_age, 'max_uses': max_uses, 'temporary': temporary, 'unique': unique}
         if target_type is not ...:
             payload['target_type'] = int(target_type)
         if target_user_id is not ...:
@@ -350,7 +355,7 @@ class ChannelRoutes(RouteCategoryMixin):
         return await self.request('DELETE', Route('/channels/{channel_id}/permissions/{overwrite_id}', channel_id=channel_id, overwrite_id=overwrite_id), reason=reason)
 
     async def follow_news_channel(self, channel_id: Snowflake, *, webhook_channel_id: Snowflake) -> FollowedChannelData:
-        payload = {"webhook_channel_id": webhook_channel_id}
+        payload = {'webhook_channel_id': webhook_channel_id}
         return await self.request('POST', Route('/channels/{channel_id}/followers', channel_id=channel_id), payload)
 
     async def trigger_typing_indicator(self, channel_id: Snowflake) -> None:
@@ -364,3 +369,103 @@ class ChannelRoutes(RouteCategoryMixin):
 
     async def unpin_message(self, channel_id: Snowflake, message_id: Snowflake, *, reason: str | None = None) -> None:
         return await self.request('DELETE', Route('/channels/{channel_id}/pins/{message_id}', channel_id=channel_id, message_id=message_id), reason=reason)
+
+    async def start_thread_from_message(
+        self,
+        channel_id: Snowflake,
+        message_id: Snowflake,
+        *,
+        reason: str | None = None,
+        name: str,
+        auto_archive_duration: int = ...,
+        rate_limit_per_user: int | None = ...,
+    ):
+        payload = {'name': name}
+        if auto_archive_duration is not ...:
+            payload['auto_archive_duration'] = auto_archive_duration
+        if rate_limit_per_user is not ...:
+            payload['rate_limit_per_user'] = rate_limit_per_user
+
+        return await self.request(
+            'POST', 
+            Route(
+                '/channels/{channel_id}/messages/{message_id}/threads', 
+                channel_id=channel_id, message_id=message_id
+            ), 
+            payload, 
+            reason=reason
+        )
+
+    async def start_thread_without_message(
+        self,
+        channel_id: Snowflake,
+        *,
+        reason: str | None = None,
+        name: str,
+        auto_archive_duration: int = ...,
+        type: ChannelType = ChannelType.GUILD_PRIVATE_THREAD,
+        invitable: bool = ...,
+        rate_limit_per_user: int | None = ...,
+    ):
+        payload = {'name': name, 'type': int(type)}
+        if auto_archive_duration is not ...:
+            payload['auto_archive_duration'] = auto_archive_duration
+        if invitable is not ...:
+            payload['invitable'] = invitable
+        if rate_limit_per_user is not ...:
+            payload['rate_limit_per_user'] = rate_limit_per_user
+
+        return await self.request(
+            'POST', 
+            Route('/channels/{channel_id}/threads', channel_id=channel_id), 
+            payload, 
+            reason=reason
+        )
+
+    # TODO: Start Thread in Forum Channel
+    # this one is pretty big and Forum Channels are unstable rn
+
+    async def join_thread(self, channel_id: Snowflake) -> None:
+        return await self.request('PUT', Route('/channels/{channel_id}/thread-members/@me', channel_id=channel_id))
+
+    async def add_thread_member(self, channel_id: Snowflake, user_id: Snowflake) -> None:
+        return await self.request('PUT', Route('/channels/{channel_id}/thread-members/{user_id}', channel_id=channel_id, user_id=user_id))
+
+    async def leave_thread(self, channel_id: Snowflake) -> None:
+        return await self.request('DELETE', Route('/channels/{channel_id}/thread-members/@me', channel_id=channel_id))
+
+    async def remove_thread_member(self, channel_id: Snowflake, user_id: Snowflake) -> None:
+        return await self.request('DELETE', Route('/channels/{channel_id}/thread-members/{user_id}', channel_id=channel_id, user_id=user_id))
+
+    async def get_thread_member(self, channel_id: Snowflake, user_id: Snowflake) -> ThreadMemberData:
+        return await self.request('GET', Route('/channels/{channel_id}/thread-members/{user_id}', channel_id=channel_id, user_id=user_id))
+
+    async def list_thread_members(self, channel_id: Snowflake) -> list[ThreadMemberData]:
+        return await self.request('GET', Route('/channels/{channel_id}/thread-members', channel_id=channel_id))
+
+    async def list_public_archived_threads(self, channel_id: Snowflake, *, before: datetime = ..., limit: int = ...) -> ListThreadsData:
+        payload = {}
+        if before is not ...:
+            payload['before'] = before
+        if limit is not ...:
+            payload['limit'] = limit
+
+        return await self.request('GET', Route('/channels/{channel_id}/threads/archived/public', channel_id=channel_id), params=payload)
+
+    async def list_private_archived_threads(self, channel_id: Snowflake, *, before: datetime = ..., limit: int = ...) -> ListThreadsData:
+        payload = {}
+        if before is not ...:
+            payload['before'] = before
+        if limit is not ...:
+            payload['limit'] = limit
+
+        return await self.request('GET', Route('/channels/{channel_id}/threads/archived/private', channel_id=channel_id), params=payload)
+
+    async def list_joined_private_archived_threads(self, channel_id: Snowflake, *, before: datetime = ..., limit: int = ...) -> ListThreadsData:
+        payload = {}
+        if before is not ...:
+            payload['before'] = before
+        if limit is not ...:
+            payload['limit'] = limit
+
+        return await self.request('GET', Route('/channels/{channel_id}/users/@me/threads/archived/private', channel_id=channel_id), params=payload)
