@@ -11,7 +11,6 @@ import logging
 from typing import Any
 
 from aiohttp import ClientSession
-from discord_typings import EmojiData
 from discord_typings.resources.user import UserData
 
 from pycord import __version__, utils
