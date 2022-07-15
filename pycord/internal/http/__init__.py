@@ -18,13 +18,36 @@ from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.internal.blocks import Block
 from pycord.internal.http.route import Route
 
+from pycord.internal.http.audit_logs import AuditLogRoutes
+from pycord.internal.http.auto_moderation import AutoModerationRoutes
 from pycord.internal.http.emoji import EmojiRoutes
 from pycord.internal.http.guild import GuildRoutes
+from pycord.internal.http.guild_scheduled_event import GuildScheduledEventRoutes
+from pycord.internal.http.guild_template import GuildTemplateRoutes
+from pycord.internal.http.invite import InviteRoutes
+from pycord.internal.http.stage_instance import StageInstanceRoutes
+from pycord.internal.http.sticker import StickerRoutes
+from pycord.internal.http.user import UserRoutes
+from pycord.internal.http.voice import VoiceRoutes
+from pycord.internal.http.webhook import WebhookRoutes
 
 _log: logging.Logger = logging.getLogger(__name__)
 
 
-class HTTPClient(EmojiRoutes, GuildRoutes):
+class HTTPClient(
+    AuditLogRoutes,
+    AutoModerationRoutes,
+    EmojiRoutes,
+    GuildRoutes,
+    GuildScheduledEventRoutes,
+    GuildTemplateRoutes,
+    InviteRoutes,
+    StageInstanceRoutes,
+    StickerRoutes,
+    UserRoutes,
+    VoiceRoutes,
+    WebhookRoutes,
+):
     def __init__(self, token: str, version: int, max_retries: int = 5):
         # pyright hates identifying this as clientsession when its not-
         # sadly, aiohttp errors a lot when not creating client sessions on an async environment.
