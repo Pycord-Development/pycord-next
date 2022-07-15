@@ -23,7 +23,7 @@ mkdocs-material = {version = "^8.3.9", optional = true}
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
 isort = "^5.10.1"
-pyright = "^1.1.257"
+pyright = "^1.1.260"
 types-orjson = "^3.6.2"
 flake8 = "^4.0.1"
 flake8-functions = "^0.0.7"
