@@ -22,7 +22,7 @@ import io
 import os
 from typing import Any
 
-from aiohttp import ClientSession, FormData
+from aiohttp import ClientSession
 from discord_typings import Snowflake
 
 from pycord.file import File
