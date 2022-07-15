@@ -9,24 +9,34 @@ watch: [pycord]
 
 # Navigation Tree
 nav:
-  - Home: 'index.md'
+  - Home: index.md
   - API Reference:
-    - Events: 'api/events.md'
-    - Models: 'api/models.md'
+    - Apps: api/apps.md
+    - Assets: api/assets.md
+    - Channels: api/channels.md
+    - Events: api/events.md
+    - Guild: api/guild.md
 
 
 # Theme Configuration
 theme:
   name: material
-  logo: assets/logo.png
-  favicon: assets/logo.png
-  icon:
-    repo: fontawesome/brands/github
   locale: en
-  highlightjs: true
+
+  features:
+    - navigation.indexes
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+
   font:
     text: Roboto
     code: Roboto Mono
+  favicon: assets/logo.png
+  logo: assets/logo.png
+  icon:
+    repo: fontawesome/brands/github
+  highlightjs: true
 
 # Extensions
 markdown_extensions:
