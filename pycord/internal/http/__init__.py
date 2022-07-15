@@ -11,19 +11,20 @@ import logging
 from typing import Any
 
 from aiohttp import ClientSession
-from discord_typings import EmojiData
 from discord_typings.resources.user import UserData
 
 from pycord import __version__, utils
 from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.internal.blocks import Block
-from pycord.internal.http.guild import GuildRoutes
 from pycord.internal.http.route import Route
+
+from pycord.internal.http.emoji import EmojiRoutes
+from pycord.internal.http.guild import GuildRoutes
 
 _log: logging.Logger = logging.getLogger(__name__)
 
 
-class HTTPClient(GuildRoutes):
+class HTTPClient(EmojiRoutes, GuildRoutes):
     def __init__(self, token: str, version: int, max_retries: int = 5):
         # pyright hates identifying this as clientsession when its not-
         # sadly, aiohttp errors a lot when not creating client sessions on an async environment.
@@ -44,7 +45,7 @@ class HTTPClient(GuildRoutes):
 
     async def request(
         self, method: str, route: Route, data: dict[str, Any] | None = None, reason: str = None, **kwargs: Any
-    ) -> dict[str, Any] | list[dict[str, Any]] | str:  # type: ignore
+    ) -> dict[str, Any] | list[dict[str, Any]] | str | None:  # type: ignore
         endpoint = route.merge(self.url)
 
         if not self._session:
@@ -133,15 +134,3 @@ class HTTPClient(GuildRoutes):
             data['avatar'] = avatar
 
         return await self.request('PATCH', Route('/users/@me'), data)  # type: ignore
-
-    async def get_guild_emojis(self, guild_id: int) -> list[EmojiData]:
-        return await self.request('GET', Route('/guilds/{guild_id}/emojis', guild_id=guild_id))  # type: ignore
-
-    async def get_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:
-        return await self.request('GET', Route('/guilds/{guild_id}/emojis/{emoji_id}', guild_id=guild_id))  # type: ignore # noqa: ignore
-
-    async def create_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:  # type: ignore
-        ...
-
-    async def edit_guild_emoji(self, guild_id: int, emoji_id: int) -> EmojiData:  # type: ignore
-        ...

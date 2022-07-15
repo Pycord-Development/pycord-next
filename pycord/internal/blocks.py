@@ -33,14 +33,14 @@ class Block:
 
     def __init__(self, route: "Route"):
         self._event: asyncio.Event | None = None
-        self.route: "Route" | None = None
+        self.route: "Route" | None = route
         self.is_global: bool = False
 
     async def wait(self):
         if self._event:
             await self._event.wait()
 
-    async def block(self, reset_after: int, bucket: str, globalrt: bool):
+    async def block(self, reset_after: int | float, bucket: str, globalrt: bool):
         self.bucket_denom = bucket
         self.is_global = globalrt
 
