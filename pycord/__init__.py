@@ -18,8 +18,8 @@ colorama.init()
 
 del colorama
 
-from .bot import *
-from .rest import *
+from .apps.gateway import *
+from .apps.rest import *
 from .state import *
 from .user import *
 from .utils import *
