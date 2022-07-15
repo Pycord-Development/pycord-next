@@ -46,7 +46,6 @@ from pycord.types import ModifyMFALevelData, PrunedData
 
 
 class GuildRoutes(RouteCategoryMixin):
-
     # TODO: icon to `Asset`
     async def create_guild(
             self,
