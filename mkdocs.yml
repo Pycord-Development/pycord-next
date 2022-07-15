@@ -11,6 +11,7 @@ watch: [pycord]
 nav:
   - Home: index.md
   - API Reference:
+    - api/index.md
     - Apps: api/apps.md
     - Assets: api/assets.md
     - Channels: api/channels.md
