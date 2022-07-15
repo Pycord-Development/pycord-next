@@ -23,6 +23,8 @@ from typing import Any, Callable, Coroutine
 from aiohttp import ClientSession
 from discord_typings import Snowflake
 
+from pycord.internal.http.route import Route
+
 
 class Comparable:
     __slots__ = ()
@@ -53,4 +55,8 @@ class Hashable(Dictable):
 
 class RouteCategoryMixin:
     _session: ClientSession
-    request: Callable[..., Coroutine[Any, Any, dict[str, Any] | list[dict[str, Any]] | str | None]]
+
+    async def request(
+        self, method: str, route: Route, data: dict[str, Any] | None = None, reason: str | None = None, **kwargs: Any
+    ) -> dict[str, Any] | list[dict[str, Any]] | str | None:
+        ...
