@@ -8,12 +8,12 @@ Pycord's Internal HTTP Routes.
 """
 
 import logging
-from typing import Any
+from typing import Any, List, Dict
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, FormData
 from discord_typings.resources.user import UserData
 
-from pycord import __version__, utils
+from pycord import __version__, utils, File
 from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.internal.blocks import Block
 from pycord.internal.http.route import Route
@@ -29,13 +29,12 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
         # pyright hates identifying this as clientsession when its not-
         # sadly, aiohttp errors a lot when not creating client sessions on an async environment.
         self._session: ClientSession = None  # type: ignore
-        self._headers: dict[str, str] = {
+        self._headers: Dict[str, str] = {
             'Authorization': 'Bot ' + token,
             'User-Agent': f'DiscordBot (https://github.com/pycord/pycord-v3, {__version__})',
-            'Content-Type': 'application/json',
         }
         self.version = version
-        self._blockers: dict[str, Block] = {}
+        self._blockers: Dict[str, Block] = {}
         self.max_retries = max_retries
         self.url = f'https://discord.com/api/v{self.version}'
 
@@ -44,8 +43,16 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
         self._session = ClientSession()
 
     async def request(
-        self, method: str, route: Route, data: dict[str, Any] | None = None, reason: str = None, **kwargs: Any
-    ) -> dict[str, Any] | list[dict[str, Any]] | str | None:  # type: ignore
+        self,
+        method: str,
+        route: Route,
+        data: Dict[str, Any] | None = None,
+        *,
+        form: FormData | None = None,
+        files: List[File] | None = None,
+        reason: str = None,
+        **kwargs: Any
+    ) -> Dict[str, Any] | list[Dict[str, Any]] | str | None:  # type: ignore
         endpoint = route.merge(self.url)
 
         if not self._session:
@@ -55,7 +62,11 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
         if reason:
             headers['X-Audit-Log-Reason'] = reason
 
-        for _ in range(self.max_retries):
+        for retry in range(self.max_retries):
+            if files:
+                for f in files:
+                    f.reset(retry)
+
             for blocker in self._blockers.values():
                 if (
                     blocker.route.channel_id == route.channel_id
@@ -74,10 +85,16 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
                     await blocker.wait()
                     break
 
+            if form:
+                data = form
+            elif data:
+                data = utils.dumps(data)
+                headers.update({"Content-Type": "application/json"})
+
             r = await self._session.request(
                 method=method,
                 url=endpoint,
-                data=data if data is None else utils.dumps(data),
+                data=data,
                 headers=headers,
                 **kwargs,
             )
@@ -119,6 +136,11 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
                     raise HTTPException
 
             _log.debug(f'Received {await r.text()} from request to {endpoint}')
+
+            if files:
+                for f in files:
+                    f.close()
+
             return await utils._text_or_json(r)
 
     # this should get moved to an asset-related http file
