@@ -25,6 +25,12 @@ from typing import Union, Optional
 __all__ = ("File",)
 
 class File:
+    """Represents a file that can be sent via Discord.
+
+    Attributes:
+        filename (str): 
+
+    """
     fp: io.BufferedIOBase
     filename: str | None
     description: str | None
@@ -32,12 +38,12 @@ class File:
 
     def __init__(
         self,
-        fp: Union[str, bytes, os.PathLike, io.BufferedIOBase],
-        filename: Optional[str] = None,
+        fp: str | bytes | os.PathLike | io.BufferedIOBase,
+        filename: str | None = None,
         *,
-        description: Optional[str] = None,
+        description: str | None = None,
         spoiler: bool = False,
-    ):
+    ) -> None:
         if isinstance(fp, io.IOBase):
             if not (fp.seekable() and fp.readable()):
                 raise ValueError(f"File buffer {fp!r} must be seekable and readable")
@@ -68,14 +74,14 @@ class File:
         self._close = self.fp.close
         self.fp.close = lambda: None
 
-    def reset(self, seek = True):
+    def reset(self, seek = True) -> None:
         # seek to initial position on failed requests
         # on the first try, `seek` will be 0, so the file
         # doesn't get reset
         if seek:
             self.fp.seek(self._original_pos)
 
-    def close(self):
+    def close(self) -> None:
         # close stream that we opened
         self.fp.close = self._close
         if self._owner:

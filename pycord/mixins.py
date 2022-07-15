@@ -20,12 +20,13 @@
 
 import io
 import os
-from typing import Any, Dict, List
+from typing import Any, List
 
 from aiohttp import ClientSession, FormData
 from discord_typings import Snowflake
 
-from pycord import utils, File, ConnectionState
+from pycord.file import File
+from pycord.state import ConnectionState
 from pycord.internal.http.route import Route
 
 
@@ -87,40 +88,13 @@ class RouteCategoryMixin:
         self,
         method: str,
         route: Route,
-        data: Dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
         *,
-        form: FormData | None = None,
         files: List[File] | None = None,
         reason: str = None,
         **kwargs: Any
-    ) -> Dict[str, Any] | list[Dict[str, Any]] | str | None:
+    ) -> dict[str, Any] | list[dict[str, Any]] | str | None:
         ...
 
-    def _prepare_form(self, payload: Dict[str, Any], files: List[File]):
-        form = []
-        attachments = []
-
-        for index, file in enumerate(files):
-            attachments.append(
-                {
-                    "id": index,
-                    "filename": file.filename,
-                    "description": file.description
-                }
-            )
-            form.append(
-                {
-                    "name": f"files[{index}]",
-                    "value": file.fp,
-                    "filename": file.filename,
-                    "content_type": "application/octet-stream"
-                }
-            )
-
-        payload["attachments"] = attachments
-        form.insert(0, {"name": "payload_json", "value": utils.dumps(payload)})
-        form_data = FormData(quote_fields=False)
-        for f in form:
-            form_data.add_field(**f)
-
-        return form_data
+    def _prepare_form(self, payload: dict[str, Any], files: List[File]) -> FormData:
+        ...
