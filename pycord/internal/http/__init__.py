@@ -16,13 +16,15 @@ from discord_typings.resources.user import UserData
 from pycord import __version__, utils
 from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.internal.blocks import Block
-from pycord.internal.http.guild import GuildRoutes
 from pycord.internal.http.route import Route
+
+from pycord.internal.http.emoji import EmojiRoutes
+from pycord.internal.http.guild import GuildRoutes
 
 _log: logging.Logger = logging.getLogger(__name__)
 
 
-class HTTPClient(GuildRoutes):
+class HTTPClient(EmojiRoutes, GuildRoutes):
     def __init__(self, token: str, version: int, max_retries: int = 5):
         # pyright hates identifying this as clientsession when its not-
         # sadly, aiohttp errors a lot when not creating client sessions on an async environment.
