@@ -29,11 +29,13 @@ except (ImportError, ModuleNotFoundError):
 
 from base64 import b64encode
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Callable, Mapping, TypeVar
 
 from aiohttp import ClientResponse
 
 EPOCH = 1420070400000
+T = TypeVar('T')
+D = TypeVar('D')
 
 
 async def _text_or_json(rp: ClientResponse):
@@ -79,3 +81,26 @@ def _convert_base64_from_bytes(data: bytes) -> str:
     mime = _get_image_mime_type(data)
     b64 = b64encode(data).decode('ascii')
     return fmt.format(mime=mime, data=b64)
+
+
+def _get_and_convert(key: str, converter: Callable[..., T], dict: Mapping[str, Any], default: D = None) -> T | D:
+    """Helper function that attempts to get a value with a key then converts it.
+    If the value is the default, then the pure value is returned.
+
+    Parameters
+    ----------
+    key: :class:`str`
+        The key of the value to grab from the dictionary.
+    converter: Callable[..., Any]
+        The converter to convert with.
+    dict: Mapping[:class:`str`, Any]
+        The dictionary/mapping to get the value from.
+    default: Any
+        The default value if there is no value with the key :param:`key` in the :param:`dict`.
+
+    Returns
+    -------
+        The converter's return type or the default type.
+    """
+    obj = dict.get(key, default)
+    return converter(obj) if obj is not default else obj
