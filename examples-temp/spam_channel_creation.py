@@ -16,9 +16,7 @@ async def on_hook():
     ts = []
 
     for _ in range(30):
-        ts.append(
-            app.http.create_guild_channel(GUILD, name='ratelimit-go-brr', channel_type=0)
-        )
+        ts.append(app.http.create_guild_channel(GUILD, name='ratelimit-go-brr', channel_type=0))
 
     belts: list[TextChannelData] = await asyncio.gather(*ts)  # type: ignore
     ts.clear()
