@@ -69,10 +69,14 @@ class File:
         self.fp.close = lambda: None
 
     def reset(self, seek = True):
+        # seek to initial position on failed requests
+        # on the first try, `seek` will be 0, so the file
+        # doesn't get reset
         if seek:
             self.fp.seek(self._original_pos)
 
     def close(self):
+        # close stream that we opened
         self.fp.close = self._close
         if self._owner:
             self.fp.close()

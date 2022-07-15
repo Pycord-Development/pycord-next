@@ -124,4 +124,3 @@ class RouteCategoryMixin:
             form_data.add_field(**f)
 
         return form_data
-
