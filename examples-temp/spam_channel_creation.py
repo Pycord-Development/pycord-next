@@ -27,4 +27,4 @@ async def on_hook():
     await asyncio.gather(*ts)
 
 
-app.run('token')
+asyncio.run(app.start('token'))
