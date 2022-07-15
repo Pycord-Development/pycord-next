@@ -32,3 +32,8 @@ class ChannelType(int, Enum):
     GUILD_PUBLIC_THREAD = 11
     GUILD_PRIVATE_THREAD = 12
     GUILD_STAGE_VOICE = 13
+
+
+class InviteTargetTypes(int, Enum):
+    STREAM = 1
+    EMBEDDED_APPLICATION = 2

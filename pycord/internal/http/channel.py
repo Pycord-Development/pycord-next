@@ -24,14 +24,17 @@ from discord_typings import (
     ChannelData,
     ComponentData,
     EmbedData,
+    FollowedChannelData,
+    InviteData,
     MessageData,
     MessageReferenceData,
     PartialAttachmentData,
     PermissionOverwriteData,
     Snowflake,
+    UserData,
 )
 
-from pycord.enums import ChannelType
+from pycord.enums import ChannelType, InviteTargetTypes
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
 
@@ -217,7 +220,7 @@ class ChannelRoutes(RouteCategoryMixin):
         *,
         after: Snowflake = ...,
         limit: int = 25,
-    ) -> None:
+    ) -> list[UserData]:
         if not 1 <= limit <= 100:
             raise ValueError('Limit must be between 1 and 100 (inclusive)')
 
@@ -269,7 +272,7 @@ class ChannelRoutes(RouteCategoryMixin):
         components: list[ComponentData] | None = ...,
         # TODO: files
         attachments: list[AttachmentData] | None = ...,
-    ):
+    ) -> MessageData:
         payload = {}
         if content is not ...:
             payload['content'] = content
@@ -290,9 +293,74 @@ class ChannelRoutes(RouteCategoryMixin):
             payload,
         )
 
-    async def delete_message(self, channel_id: Snowflake, message_id: Snowflake, *, reason: str | None = None):
+    async def delete_message(self, channel_id: Snowflake, message_id: Snowflake, *, reason: str | None = None) -> None:
         return await self.request(
             'DELETE',
             Route('/channels/{channel_id}/messages/{message_id}', channel_id=channel_id, message_id=message_id),
             reason=reason,
         )
+
+    async def bulk_delete_messages(self, channel_id: Snowflake, *, reason: str | None = None, messages: list[Snowflake]) -> None:
+        if not 2 <= len(messages) <= 100:
+            raise ValueError("The length of messages must be between 2 and 100 (inclusive)")
+
+        payload = {"messages": messages}
+        return await self.request('POST', Route('/channels/{channel_id}/messages/bulk-delete', channel_id=channel_id), payload, reason=reason)
+
+    async def edit_channel_permissions(
+        self, 
+        channel_id: Snowflake, 
+        overwrite_id: Snowflake,
+        *,
+        reason: str | None = None,
+        allow: str = "0",
+        deny: str = "0",
+        type: int,
+    ) -> None:
+        payload = {"allow": allow, "deny": deny, "type": type}
+        return await self.request('PUT', Route('/channels/{channel_id}/permissions/{overwrite_id}', channel_id=channel_id, overwrite_id=overwrite_id), payload)
+
+    async def get_channel_invites(self, channel_id: Snowflake) -> list[InviteData]:
+        return await self.request('GET', Route('/channels/{channel_id}/invites', channel_id=channel_id))
+
+    async def create_channel_invite(
+        self,
+        channel_id: Snowflake,
+        *,
+        reason: str | None = None,
+        max_age: int = 86400,
+        max_uses: int = 0,
+        temporary: bool = False,
+        unique: bool = False,
+        target_type: InviteTargetTypes = ...,
+        target_user_id: Snowflake = ...,
+        target_application_id: Snowflake = ...,
+    ) -> InviteData:
+        payload = {"max_age": max_age, "max_uses": max_uses, "temporary": temporary, "unique": unique}
+        if target_type is not ...:
+            payload['target_type'] = int(target_type)
+        if target_user_id is not ...:
+            payload['target_user_id'] = target_user_id
+        if target_application_id is not ...:
+            payload['target_application_id'] = target_application_id
+
+        return await self.request('POST', Route('/channels/{channel_id}/invites', channel_id=channel_id), payload, reason=reason)
+
+    async def delete_channel_permission(self, channel_id: Snowflake, overwrite_id: Snowflake, *, reason: str | None = None) -> None:
+        return await self.request('DELETE', Route('/channels/{channel_id}/permissions/{overwrite_id}', channel_id=channel_id, overwrite_id=overwrite_id), reason=reason)
+
+    async def follow_news_channel(self, channel_id: Snowflake, *, webhook_channel_id: Snowflake) -> FollowedChannelData:
+        payload = {"webhook_channel_id": webhook_channel_id}
+        return await self.request('POST', Route('/channels/{channel_id}/followers', channel_id=channel_id), payload)
+
+    async def trigger_typing_indicator(self, channel_id: Snowflake) -> None:
+        return await self.request('POST', Route('/channels/{channel_id}/typing', channel_id=channel_id))
+
+    async def get_pinned_messages(self, channel_id: Snowflake) -> list[MessageData]:
+        return await self.request('GET', Route('/channels/{channel_id}/pins', channel_id=channel_id))
+
+    async def pin_message(self, channel_id: Snowflake, message_id: Snowflake, *, reason: str | None = None) -> None:
+        return await self.request('PUT', Route('/channels/{channel_id}/pins/{message_id}', channel_id=channel_id, message_id=message_id), reason=reason)
+
+    async def unpin_message(self, channel_id: Snowflake, message_id: Snowflake, *, reason: str | None = None) -> None:
+        return await self.request('DELETE', Route('/channels/{channel_id}/pins/{message_id}', channel_id=channel_id, message_id=message_id), reason=reason)
