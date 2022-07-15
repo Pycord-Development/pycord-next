@@ -17,40 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-from typing import Any, Callable, Coroutine
-
-from aiohttp import ClientSession
-from discord_typings import Snowflake
+from typing import TypedDict
 
 
-class Comparable:
-    __slots__ = ()
-
-    id: Snowflake
-
-    def __eq__(self, obj: object) -> bool:
-        return isinstance(obj, self.__class__) and obj.id == self.id
-
-    def __ne__(self, obj: object) -> bool:
-        if isinstance(obj, self.__class__):
-            return obj.id != self.id
-        return True
+class ModifyMFALevelData(TypedDict):
+    level: int
 
 
-class Dictable(Comparable):
-    def __dict__(self) -> dict[Any, Any]:
-        # this is already assigned to any subclass, but pyright doesn't know.
-        return self.as_dict  # type: ignore
-
-
-class Hashable(Dictable):
-    __slots__ = ()
-
-    def __hash__(self) -> int:
-        return self.id >> 22  # type: ignore
-
-
-class RouteCategoryMixin:
-    _session: ClientSession
-    request: Callable[..., Coroutine[Any, Any, dict[str, Any] | list[dict[str, Any]] | str]]
+class PrunedData(TypedDict):
+    pruned: int | None
