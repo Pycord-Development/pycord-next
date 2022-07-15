@@ -1,21 +1,59 @@
-site_name: ""
+# Project Information
+site_name: "Pycord Developer Network"
 site_description: Documentation, Guides & More for Pycord Developers.
+repo_url: https://github.com/pycord/pycord-v3
+repo_name: pycord/pycord-v3
 copyright: "©2022 VincentRPS & PDN Contributors"
 docs_dir: developer
-extra:
-  generator: false
-extra_css:
-  - assets/theme.css
+watch: [pycord]
+
+# Navigation Tree
+nav:
+  - Home: 'index.md'
+  - API Reference:
+    - Events: 'api/events.md'
+    - Models: 'api/models.md'
+
+
+# Theme Configuration
 theme:
   name: material
   logo: assets/logo.png
-  locale: en
   favicon: assets/logo.png
+  icon:
+    repo: fontawesome/brands/github
+  locale: en
   highlightjs: true
-nav:
-  - Home: 'index.md'
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+# Extensions
 markdown_extensions:
-    - toc:
-        permalink: true
+  - toc:
+      permalink: true
+
+# Plugins
 plugins:
-    - search
+  - autorefs
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          selection:
+            docstring_style: google
+            inherited_members: true
+          rendering:
+            heading_level: 2
+            show_root_full_path: false
+            show_root_heading: true
+            show_signature_annotations: true
+            show_source: false
+  - search
+
+# Extra Customization
+extra:
+  generator: false
+
+extra_css:
+  - assets/theme.css
