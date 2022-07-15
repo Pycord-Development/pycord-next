@@ -38,5 +38,9 @@ class Bot(RESTApp):
         self._state.gateway_enabled = True
 
         self.shard_manager = ShardManager(self.shards, self._state, self.dispatcher, self._version)
-        # .run already sets token to a non-None type.
+        # .run/.start already sets token to a non-None type.
         await self.shard_manager.connect(self.token)  # type: ignore
+
+    async def close(self):
+        await super().close()
+        await self.shard_manager.disconnect()
