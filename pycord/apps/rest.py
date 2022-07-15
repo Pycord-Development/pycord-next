@@ -42,21 +42,6 @@ class RESTApp:
         self._level = level
         self.dispatcher = EventDispatcher()
 
-    def run(self, token: str):
-        async def runner():
-            await self.start(token=token)
-            self.dispatcher.dispatch('hook')
-
-        loop = find_loop()
-
-        try:
-            loop.run_until_complete(runner())
-            loop.run_forever()
-        except KeyboardInterrupt:
-            loop.run_until_complete(self.close())
-        finally:
-            loop.stop()
-
     async def start(self, token: str):
         self.token = token
         start_logging(level=self._level)
@@ -66,6 +51,7 @@ class RESTApp:
         self.http = HTTPClient(self.token, self._version)
         user_data = await self.http.get_me()
         self.user = CurrentUser(user_data, self._state)
+        self.dispatcher.dispatch('hook')
 
     async def close(self):
         await self.http._session.close()
