@@ -103,8 +103,8 @@ class Shard:
         self._last_heartbeat_ack: datetime | None = None
         self._heartbeat_timeout = timeout
 
-        self.receive_task: asyncio.Task | None = None
-        self.clock_task: asyncio.Task | None = None
+        self._receive_task: asyncio.Task | None = None
+        self._clock_task: asyncio.Task | None = None
 
         if not self._state.gateway_enabled:
             raise GatewayException(
@@ -123,7 +123,7 @@ class Shard:
             self._rot_done.set()
 
             try:
-                await asyncio.create_task(self.start_clock())
+                self._clock_task = asyncio.create_task(self.start_clock())
             except:
                 # user has most likely exited this process.
                 return
@@ -163,13 +163,13 @@ class Shard:
             if self._session_id is not None:
                 _log.debug(f'shard:{self.id}:Reconnecting to Gateway')
             await self.identify()
-            self.receive_task = asyncio.create_task(self.receive())
-            self.clock_task = asyncio.create_task(self.start_clock())
+            self._receive_task = asyncio.create_task(self.receive())
+            self._clock_task = asyncio.create_task(self.start_clock())
         else:
             _log.debug(f'shard:{self.id}:Reconnecting to Gateway')
             await self.resume()
-            self.receive_task = asyncio.create_task(self.receive())
-            self.clock_task = asyncio.create_task(self.start_clock())
+            self._receive_task = asyncio.create_task(self.receive())
+            self._clock_task = asyncio.create_task(self.start_clock())
 
     async def disconnect(self, code: int = 1000, reconnect: bool = True) -> None:
         if not self._ws.closed and self.receive_task and self.clock_task:
@@ -177,7 +177,7 @@ class Shard:
             self._reconnectable = reconnect
             await self._ws.close(code=code)
 
-            for task in (self.receive_task, self.clock_task):
+            for task in (self._receive_task, self._clock_task):
                 task.cancel()
                 await task
 
