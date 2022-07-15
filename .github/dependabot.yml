@@ -13,9 +13,3 @@ updates:
     labels:
       - "ci/cd"
       - "dependencies"
-  - package-ecosystem: "npm"
-    directory: "/developer/"
-    schedule:
-      interval: "weekly"
-    labels:
-      - "dependencies"
