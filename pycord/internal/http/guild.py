@@ -98,25 +98,25 @@ class GuildRoutes(RouteCategoryMixin):
             guild_id: Snowflake,
             *,
             reason: str | None = None,
-            name: str | ... = ...,
-            verification_level: int | None | ... = ...,
-            default_message_notifications: int | None | ... = ...,
-            explicit_content_filter: int | None | ... = ...,
-            afk_channel_id: Snowflake | None | ... = ...,
-            afk_timeout: int | ... = ...,
-            icon: bytes | None | ... = ...,
-            owner_id: Snowflake | ... = ...,
-            splash: bytes | None | ... = ...,
-            discovery_splash: bytes | None | ... = ...,
-            banner: bytes | None | ... = ...,
-            system_channel_id: Snowflake | None | ... = ...,
-            system_channel_flags: int | ... = ...,
-            rules_channel_id: Snowflake | None | ... = ...,
-            public_updates_channel_id: Snowflake | None | ... = ...,
-            preferred_locale: str | None | ... = ...,
-            features: list[str] | ... = ...,
-            description: str | None | ... = ...,
-            premium_progress_bar_enabled: bool | ... = ...,
+            name: str = ...,
+            verification_level: int | None = ...,
+            default_message_notifications: int | None = ...,
+            explicit_content_filter: int | None = ...,
+            afk_channel_id: Snowflake | None = ...,
+            afk_timeout: int = ...,
+            icon: bytes | None = ...,
+            owner_id: Snowflake = ...,
+            splash: bytes | None = ...,
+            discovery_splash: bytes | None = ...,
+            banner: bytes | None = ...,
+            system_channel_id: Snowflake | None = ...,
+            system_channel_flags: int = ...,
+            rules_channel_id: Snowflake | None = ...,
+            public_updates_channel_id: Snowflake | None = ...,
+            preferred_locale: str | None = ...,
+            features: list[str] = ...,
+            description: str | None = ...,
+            premium_progress_bar_enabled: bool = ...,
     ) -> GuildData:
         payload = {}
         if name is not ...:
@@ -280,12 +280,12 @@ class GuildRoutes(RouteCategoryMixin):
             guild_id: Snowflake,
             user_id: Snowflake,
             *,
-            nick: str | None | ... = ...,
-            roles: list[Snowflake] | ... = ...,
-            mute: bool | ... = ...,
-            deaf: bool | ... = ...,
-            channel_id: Snowflake | None | ... = ...,
-            communication_disabled_until: datetime.datetime | None | ... = ...,
+            nick: str | None = ...,
+            roles: list[Snowflake] = ...,
+            mute: bool = ...,
+            deaf: bool = ...,
+            channel_id: Snowflake | None = ...,
+            communication_disabled_until: datetime.datetime | None = ...,
             reason: str | None = None,
     ) -> GuildMemberData:
         payload = {}
@@ -423,13 +423,13 @@ class GuildRoutes(RouteCategoryMixin):
             guild_id: Snowflake,
             role_id: Snowflake,
             *,
-            name: str | None | ... = ...,
-            permissions: int | None | ... = ...,
-            color: int | None | ... = ...,
-            hoist: bool | None | ... = ...,
-            icon: bytes | None | ... = ...,
-            unicode_emoji: str | None | ... = ...,
-            mentionable: bool | None | ... = ...,
+            name: str | None = ...,
+            permissions: int | None = ...,
+            color: int | None = ...,
+            hoist: bool | None = ...,
+            icon: bytes | None = ...,
+            unicode_emoji: str | None = ...,
+            mentionable: bool | None = ...,
             reason: str | None = None
     ) -> RoleData:
         payload = {}
@@ -527,8 +527,8 @@ class GuildRoutes(RouteCategoryMixin):
             self,
             guild_id: Snowflake,
             *,
-            enabled: bool | ... = ...,
-            channel_id: Snowflake | None | ... = ...,
+            enabled: bool = ...,
+            channel_id: Snowflake | None = ...,
             reason: str | None = None
     ) -> GuildWidgetSettingsData:
         payload = {}
@@ -561,9 +561,9 @@ class GuildRoutes(RouteCategoryMixin):
             self,
             guild_id: Snowflake,
             *,
-            enabled: bool | ... = ...,
-            welcome_channels: list[dict] | None | ... = ...,  # TODO
-            description: str | None | ... = ...,
+            enabled: bool = ...,
+            welcome_channels: list[dict] | None = ...,  # TODO
+            description: str | None = ...,
             reason: str | None = None,
     ) -> WelcomeScreenData:
         payload = {}
@@ -582,8 +582,8 @@ class GuildRoutes(RouteCategoryMixin):
             guild_id: Snowflake,
             *,
             channel_id: Snowflake,
-            suppress: bool | ... = ...,
-            request_to_speak: datetime.datetime | None | ... = ...,
+            suppress: bool = ...,
+            request_to_speak: datetime.datetime | None = ...,
     ) -> None:
         payload = {'channel_id': channel_id}
         if suppress is not ...:
@@ -599,7 +599,7 @@ class GuildRoutes(RouteCategoryMixin):
             user_id: Snowflake,
             *,
             channel_id: Snowflake,
-            suppress: bool | ... = ...,
+            suppress: bool = ...,
     ) -> None:
         payload = {'channel_id': channel_id}
         if suppress is not ...:

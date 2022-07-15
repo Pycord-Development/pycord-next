@@ -53,8 +53,8 @@ class EmojiRoutes(RouteCategoryMixin):
             guild_id: Snowflake,
             emoji_id: Snowflake,
             *,
-            name: str | ... = ...,
-            roles: list[Snowflake] | None | ... = ...,
+            name: str = ...,
+            roles: list[Snowflake] | None = ...,
             reason: str | None = None
     ) -> EmojiData:
         payload = {}
