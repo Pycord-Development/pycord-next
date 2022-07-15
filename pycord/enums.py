@@ -20,6 +20,7 @@
 
 from enums import Enum
 
+
 class ChannelType(int, Enum):
     GUILD_TEXT = 0
     DM = 1

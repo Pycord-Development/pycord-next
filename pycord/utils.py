@@ -82,6 +82,7 @@ def _convert_base64_from_bytes(data: bytes) -> str:
     b64 = b64encode(data).decode('ascii')
     return fmt.format(mime=mime, data=b64)
 
+
 def _get_and_convert(key: str, converter: Callable[..., T], dict: Mapping[str, Any], default: D = None) -> T | D:
     """Helper function that attempts to get a value with a key then converts it.
     If the value is the default, then the pure value is returned.

@@ -188,7 +188,7 @@ class GuildRoutes(RouteCategoryMixin):
     ) -> ChannelData:
         payload = {'name': name}
         if channel_type is not None:
-            payload['type'] = int(channel_type) # ensure that it's an int in the payload
+            payload['type'] = int(channel_type)  # ensure that it's an int in the payload
         if topic is not None:
             payload['topic'] = topic
         if bitrate is not None:

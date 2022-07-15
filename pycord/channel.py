@@ -22,12 +22,12 @@ from datetime import datetime
 from typing import cast
 
 from discord_typings import (
+    CategoryChannelData,
     DMChannelData,
+    NewsChannelData,
+    PermissionOverwriteData,
     TextChannelData,
     VoiceChannelData,
-    NewsChannelData,
-    CategoryChannelData,
-    PermissionOverwriteData,
 )
 
 from pycord.enums import ChannelType
@@ -36,11 +36,10 @@ from pycord.state import ConnectionState
 from pycord.user import User
 from pycord.utils import _get_and_convert
 
+
 class GuildChannel(Hashable):
     def __init__(
-        self, 
-        data: TextChannelData | VoiceChannelData | NewsChannelData | CategoryChannelData, 
-        state: ConnectionState
+        self, data: TextChannelData | VoiceChannelData | NewsChannelData | CategoryChannelData, state: ConnectionState
     ) -> None:
         self.as_dict = data
         self._state = state
@@ -53,7 +52,7 @@ class GuildChannel(Hashable):
             cast(PermissionOverwriteData, po) for po in data['permission_overwrites']
         ]
         self.name = data['name']
-        self.nsfw = data['nsfw'] # TODO: Remove? Might not be in every guild channel
+        self.nsfw = data['nsfw']  # TODO: Remove? Might not be in every guild channel
         self.parent_id = _get_and_convert('parent_id', int, data)
 
 
@@ -71,7 +70,7 @@ class DMChannel(Hashable):
 
 class TextChannel(GuildChannel):
     def __init__(self, data: TextChannelData | NewsChannelData, state: ConnectionState) -> None:
-        GuildChannel.__init__(self, data, state) 
+        GuildChannel.__init__(self, data, state)
 
         self.topic = data.get('topic')
         self.last_message_id = _get_and_convert('last_message_id', int, data)
@@ -92,4 +91,3 @@ class VoiceChannel(GuildChannel):
 class CategoryChannel(GuildChannel):
     def __init__(self, data: CategoryChannelData, state: ConnectionState) -> None:
         GuildChannel.__init__(self, data, state)
-

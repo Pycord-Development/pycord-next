@@ -32,8 +32,9 @@ from discord_typings import (
 )
 
 from pycord.enums import ChannelType
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
+
 
 class ChannelRoutes(RouteCategoryMixin):
     async def get_channel(self, channel_id: Snowflake) -> ChannelData:
@@ -44,19 +45,19 @@ class ChannelRoutes(RouteCategoryMixin):
         channel_id: Snowflake,
         *,
         reason: str | None = None,
-        name: str  = ...,
-        type: ChannelType  = ...,
-        position: int | None  = ...,
-        topic: str | None  = ...,
-        nsfw: bool | None  = ...,
-        rate_limit_per_user: int | None  = ...,
-        bitrate: int | None  = ...,
-        user_limit: int | None  = ...,
-        permission_overwrites: list[PermissionOverwriteData] | None  = ...,
-        parent_id: Snowflake | None  = ...,
-        rtc_region: str | None  = ...,
-        video_quality_mode: int | None  = ...,
-        default_auto_archive_duration: int | None  = ...,
+        name: str = ...,
+        type: ChannelType = ...,
+        position: int | None = ...,
+        topic: str | None = ...,
+        nsfw: bool | None = ...,
+        rate_limit_per_user: int | None = ...,
+        bitrate: int | None = ...,
+        user_limit: int | None = ...,
+        permission_overwrites: list[PermissionOverwriteData] | None = ...,
+        parent_id: Snowflake | None = ...,
+        rtc_region: str | None = ...,
+        video_quality_mode: int | None = ...,
+        default_auto_archive_duration: int | None = ...,
     ) -> ChannelData:
         payload = {}
         if name is not ...:
@@ -87,18 +88,20 @@ class ChannelRoutes(RouteCategoryMixin):
             payload['default_auto_archive_duration'] = default_auto_archive_duration
         # TODO: Thread only parameters
 
-        return await self.request('PATCH', Route('/channels/{channel_id}', channel_id=channel_id), payload, reason=reason)
+        return await self.request(
+            'PATCH', Route('/channels/{channel_id}', channel_id=channel_id), payload, reason=reason
+        )
 
     async def delete_channel(self, channel_id: Snowflake, *, reason: str | None = None) -> ChannelData:
         return await self.request('DELETE', Route('/channels/{channel_id}', channel_id=channel_id), reason=reason)
 
     async def get_channel_messages(
-        self, 
+        self,
         channel_id: Snowflake,
         *,
-        around: Snowflake  = ...,
-        before: Snowflake  = ...,
-        after: Snowflake  = ...,
+        around: Snowflake = ...,
+        before: Snowflake = ...,
+        after: Snowflake = ...,
         limit: int = 50,
     ) -> list[MessageData]:
         if not 1 <= limit <= 100:
@@ -112,10 +115,14 @@ class ChannelRoutes(RouteCategoryMixin):
         if after is not ...:
             payload['after'] = after
 
-        return await self.request('GET', Route('/channels/{channel_id}/messages', channel_id=channel_id), params=payload)
+        return await self.request(
+            'GET', Route('/channels/{channel_id}/messages', channel_id=channel_id), params=payload
+        )
 
     async def get_channel_message(self, channel_id: Snowflake, message_id: Snowflake) -> MessageData:
-        return await self.request('GET', Route('/channels/{channel_id}/messages/{message_id}', channel_id=channel_id, message_id=message_id))
+        return await self.request(
+            'GET', Route('/channels/{channel_id}/messages/{message_id}', channel_id=channel_id, message_id=message_id)
+        )
 
     async def create_message(
         self,
@@ -159,11 +166,16 @@ class ChannelRoutes(RouteCategoryMixin):
         return await self.request('POST', Route('/channels/{channel_id}/messages', channel_id=channel_id), payload)
 
     async def crosspost_message(self, channel_id: Snowflake, message_id: Snowflake) -> MessageData:
-        return await self.request('POST', Route('/channels/{channel_id}/messages/{message_id}/crosspost', channel_id=channel_id, message_id=message_id))
+        return await self.request(
+            'POST',
+            Route(
+                '/channels/{channel_id}/messages/{message_id}/crosspost', channel_id=channel_id, message_id=message_id
+            ),
+        )
 
     async def create_reaction(self, channel_id: Snowflake, message_id: Snowflake, emoji: str) -> None:
         return await self.request(
-            'PUT', 
+            'PUT',
             Route(
                 '/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me',
                 channel_id=channel_id,
@@ -174,7 +186,7 @@ class ChannelRoutes(RouteCategoryMixin):
 
     async def delete_own_reaction(self, channel_id: Snowflake, message_id: Snowflake, emoji: str) -> None:
         return await self.request(
-            'DELETE', 
+            'DELETE',
             Route(
                 '/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me',
                 channel_id=channel_id,
@@ -183,9 +195,11 @@ class ChannelRoutes(RouteCategoryMixin):
             ),
         )
 
-    async def delete_user_reaction(self, channel_id: Snowflake, message_id: Snowflake, emoji: str, user_id: Snowflake) -> None:
+    async def delete_user_reaction(
+        self, channel_id: Snowflake, message_id: Snowflake, emoji: str, user_id: Snowflake
+    ) -> None:
         return await self.request(
-            'DELETE', 
+            'DELETE',
             Route(
                 '/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/{user_id}',
                 channel_id=channel_id,
@@ -196,9 +210,9 @@ class ChannelRoutes(RouteCategoryMixin):
         )
 
     async def get_reactions(
-        self, 
-        channel_id: Snowflake, 
-        message_id: Snowflake, 
+        self,
+        channel_id: Snowflake,
+        message_id: Snowflake,
         emoji: str,
         *,
         after: Snowflake = ...,
@@ -207,24 +221,24 @@ class ChannelRoutes(RouteCategoryMixin):
         if not 1 <= limit <= 100:
             raise ValueError('Limit must be between 1 and 100 (inclusive)')
 
-        payload = {'limit':limit}
+        payload = {'limit': limit}
         if after is not ...:
             payload['after'] = after
 
         return await self.request(
-            'GET', 
+            'GET',
             Route(
                 '/channels/{channel_id}/messages/{message_id}/reactions/{emoji}',
                 channel_id=channel_id,
                 message_id=message_id,
                 emoji=emoji,
             ),
-            payload
+            payload,
         )
 
     async def delete_all_reactions(self, channel_id: Snowflake, message_id: Snowflake) -> None:
         return await self.request(
-            'DELETE', 
+            'DELETE',
             Route(
                 '/channels/{channel_id}/messages/{message_id}/reactions',
                 channel_id=channel_id,
@@ -234,7 +248,7 @@ class ChannelRoutes(RouteCategoryMixin):
 
     async def delete_all_reactions_for_emoji(self, channel_id: Snowflake, message_id: Snowflake, emoji: str) -> None:
         return await self.request(
-            'DELETE', 
+            'DELETE',
             Route(
                 '/channels/{channel_id}/messages/{message_id}/reactions/{emoji}',
                 channel_id=channel_id,
@@ -271,14 +285,14 @@ class ChannelRoutes(RouteCategoryMixin):
             payload['attachments'] = attachments
 
         return await self.request(
-            'PATCH', 
-            Route(
-                '/channels/{channel_id}/messages/{message_id}', 
-                channel_id=channel_id, 
-                message_id=message_id
-            ), 
-            payload
+            'PATCH',
+            Route('/channels/{channel_id}/messages/{message_id}', channel_id=channel_id, message_id=message_id),
+            payload,
         )
 
     async def delete_message(self, channel_id: Snowflake, message_id: Snowflake, *, reason: str | None = None):
-        return await self.request('DELETE', Route('/channels/{channel_id}/messages/{message_id}', channel_id=channel_id, message_id=message_id), reason=reason)
+        return await self.request(
+            'DELETE',
+            Route('/channels/{channel_id}/messages/{message_id}', channel_id=channel_id, message_id=message_id),
+            reason=reason,
+        )
