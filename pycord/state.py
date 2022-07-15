@@ -21,8 +21,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Mapping, Type, Union
 
 if TYPE_CHECKING:
-    from pycord.bot import Bot
-    from pycord.rest import RESTApp
+    from pycord.apps.gateway import GatewayApp
+    from pycord.apps.rest import RESTApp
 
 
 class AsyncDict(dict):
@@ -42,7 +42,7 @@ class AsyncDict(dict):
 
 @dataclass
 class ConnectionState:
-    _app: Union["RESTApp", "Bot"]
+    _app: Union["RESTApp", "GatewayApp"]
     """
     The app controlling the ConnectionState.
     """
