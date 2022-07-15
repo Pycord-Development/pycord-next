@@ -43,7 +43,7 @@ class HTTPClient(GuildRoutes):
 
     async def request(
         self, method: str, route: Route, data: dict[str, Any] | None = None, reason: str = None, **kwargs: Any
-    ) -> dict[str, Any] | list[dict[str, Any]] | str:  # type: ignore
+    ) -> dict[str, Any] | list[dict[str, Any]] | str | None:  # type: ignore
         endpoint = route.merge(self.url)
 
         if not self._session:

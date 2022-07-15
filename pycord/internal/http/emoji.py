@@ -32,13 +32,13 @@ class EmojiRoutes(RouteCategoryMixin):
 
     # TODO: image to `Asset`
     async def create_guild_emoji(
-            self,
-            guild_id: Snowflake,
-            *,
-            name: str,
-            image: bytes,
-            roles: list[Snowflake] | None = None,
-            reason: str | None = None,
+        self,
+        guild_id: Snowflake,
+        *,
+        name: str,
+        image: bytes,
+        roles: list[Snowflake] | None = None,
+        reason: str | None = None,
     ) -> EmojiData:
         payload = {
             "name": name,
@@ -49,13 +49,13 @@ class EmojiRoutes(RouteCategoryMixin):
         return await self.request("POST", Route(f"/guilds/{guild_id}/emojis"), payload, reason=reason)
 
     async def modify_guild_emoji(
-            self,
-            guild_id: Snowflake,
-            emoji_id: Snowflake,
-            *,
-            name: str = ...,
-            roles: list[Snowflake] | None = ...,
-            reason: str | None = None
+        self,
+        guild_id: Snowflake,
+        emoji_id: Snowflake,
+        *,
+        name: str = ...,
+        roles: list[Snowflake] | None = ...,
+        reason: str | None = None
     ) -> EmojiData:
         payload = {}
         if name is not ...:
@@ -66,4 +66,4 @@ class EmojiRoutes(RouteCategoryMixin):
         return await self.request("PATCH", Route(f"/guilds/{guild_id}/emojis/{emoji_id}"), payload, reason=reason)
 
     async def delete_guild_emoji(self, guild_id: Snowflake, emoji_id: Snowflake, *, reason: str | None = None) -> None:
-        await self.request("DELETE", Route(f"/guilds/{guild_id}/emojis/{emoji_id}"), None, reason=reason)
+        return await self.request("DELETE", Route(f"/guilds/{guild_id}/emojis/{emoji_id}"), None, reason=reason)
