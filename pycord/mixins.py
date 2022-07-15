@@ -20,7 +20,7 @@
 
 import io
 import os
-from typing import Any, List
+from typing import Any
 
 from aiohttp import ClientSession, FormData
 from discord_typings import Snowflake
@@ -90,11 +90,11 @@ class RouteCategoryMixin:
         route: Route,
         data: dict[str, Any] | None = None,
         *,
-        files: List[File] | None = None,
+        files: list[File] | None = None,
         reason: str = None,
         **kwargs: Any
     ) -> dict[str, Any] | list[dict[str, Any]] | str | None:
         ...
 
-    def _prepare_form(self, payload: dict[str, Any], files: List[File]) -> FormData:
+    def _prepare_form(self, payload: dict[str, Any], files: list[File]) -> FormData:
         ...

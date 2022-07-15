@@ -8,7 +8,7 @@ Pycord's Internal HTTP Routes.
 """
 from __future__ import annotations
 import logging
-from typing import Any, List
+from typing import Any
 
 from aiohttp import ClientSession, FormData
 from discord_typings.resources.user import UserData
@@ -49,7 +49,7 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
         route: Route,
         data: dict[str, Any] | None = None,
         *,
-        files: List[File] | None = None,
+        files: list[File] | None = None,
         reason: str = None,
         **kwargs: Any
     ) -> dict[str, Any] | list[dict[str, Any]] | str | None:  # type: ignore
@@ -174,59 +174,6 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
             form_data.add_field(**f)
 
         return form_data
-
-    async def execute_webhook(
-        self,
-        webhook_id: Snowflake,
-        webhook_token: str,
-        *,
-        wait: bool | None = None,
-        thread_id: Snowflake | None = None,
-        content: str | None = None,
-        username: str | None = None,
-        avatar_url: str | None = None,
-        tts: bool | None = None,
-        embeds: list[EmbedData] | None = None,
-        allowed_mentions: AllowedMentionsData | None = None,
-        components: list[ComponentData] | None = None,
-        files: list[bytes] | None = None,
-        flags: int | None = None,
-        thread_name: str | None = None,
-    ) -> None:
-        # TODO: proper file uploading
-        params = {}
-        if wait is not None:
-            params['wait'] = wait
-        if thread_id is not None:
-            params['thread_id'] = thread_id
-
-        payload = {}
-        if content is not None:
-            payload['content'] = content
-        if username is not None:
-            payload['username'] = username
-        if avatar_url is not None:
-            payload['avatar_url'] = avatar_url
-        if tts is not None:
-            payload['tts'] = tts
-        if embeds is not None:
-            payload['embeds'] = embeds
-        if allowed_mentions is not None:
-            payload['allowed_mentions'] = allowed_mentions
-        if components is not None:
-            payload['components'] = components
-
-        if flags is not None:
-            payload['flags'] = flags
-        if thread_name is not None:
-            payload['thread_name'] = thread_name
-
-        await self.request(
-            'POST',
-            Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
-            payload,
-            files=files
-        )
 
     # this should get moved to an asset-related http file
     async def get_cdn_asset(self, url: str) -> bytes:

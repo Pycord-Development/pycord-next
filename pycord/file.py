@@ -20,7 +20,6 @@
 
 import os
 import io
-from typing import Union, Optional
 
 __all__ = ("File",)
 
