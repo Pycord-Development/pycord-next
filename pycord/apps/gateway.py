@@ -21,7 +21,6 @@
 import logging
 
 from pycord.apps.rest import RESTApp
-from pycord.errors import PycordException
 from pycord.internal.gateway import ShardManager
 
 
@@ -33,7 +32,7 @@ class GatewayApp(RESTApp):
         self.shards = shards
         super().__init__(version=version, level=level, cache_timeout=cache_timeout)
 
-    async def start(self, token: str):
+    async def connect(self, token: str):
         await super().start(token=token)
         self._state.gateway_enabled = True
 
