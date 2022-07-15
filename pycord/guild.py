@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from discord_typings import EmojiData, GuildData, RoleData, RoleTagsData
+from discord_typings import EmojiData, GuildData, RoleData, RoleTagsData, Snowflake
 
 from pycord.mixins import Hashable
 from pycord.state import ConnectionState
@@ -73,6 +73,61 @@ class Guild(Hashable):
         self.system_channel_flags = data['system_channel_flags']
         # TODO: Possibly replace with channel object.
         self.rules_channel_id = data['rules_channel_id']
+
+    async def modify(
+        self,
+        reason: str | None = None,
+        name: str = ...,
+        verification_level: int | None = ...,
+        default_message_notifications: int | None = ...,
+        explicit_content_filter: int | None = ...,
+        afk_channel_id: Snowflake | None = ...,
+        afk_timeout: int = ...,
+        icon: bytes | None = ...,
+        owner_id: Snowflake = ...,
+        splash: bytes | None = ...,
+        discovery_splash: bytes | None = ...,
+        banner: bytes | None = ...,
+        system_channel_id: Snowflake | None = ...,
+        system_channel_flags: int = ...,
+        rules_channel_id: Snowflake | None = ...,
+        public_updates_channel_id: Snowflake | None = ...,
+        preferred_locale: str | None = ...,
+        features: list[str] = ...,
+        description: str | None = ...,
+        premium_progress_bar_enabled: bool = ...,
+    ) -> "Guild":
+        guild = Guild(
+            await self._state._app.http.modify_guild(
+                self.id,
+                reason=reason,
+                name=name,
+                verification_level=verification_level,
+                default_message_notifications=default_message_notifications,
+                explicit_content_filter=explicit_content_filter,
+                afk_channel_id=afk_channel_id,
+                afk_timeout=afk_timeout,
+                icon=icon,
+                owner_id=owner_id,
+                splash=splash,
+                discovery_splash=discovery_splash,
+                banner=banner,
+                system_channel_id=system_channel_id,
+                system_channel_flags=system_channel_flags,
+                rules_channel_id=rules_channel_id,
+                public_updates_channel_id=public_updates_channel_id,
+                preferred_locale=preferred_locale,
+                features=features,
+                description=description,
+                premium_progress_bar_enabled=premium_progress_bar_enabled
+            ),
+            self._state
+        )
+
+        if self.id in self._state.guilds:
+            self._state.guilds[self.id] = guild
+
+        return guild
 
 
 class _RoleTags:
