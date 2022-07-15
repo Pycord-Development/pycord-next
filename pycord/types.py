@@ -17,39 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from typing import TypedDict
 
 
-import asyncio
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .http import Route
+class ModifyMFALevelData(TypedDict):
+    level: int
 
 
-class Block:
-    """
-    This class temporarily blocks requests after hitting a ratelimit
-    """
-
-    def __init__(self, route: "Route"):
-        self._event: asyncio.Event | None = None
-        self.route: "Route" | None = route
-        self.is_global: bool = False
-
-    async def wait(self):
-        if self._event:
-            await self._event.wait()
-
-    async def block(self, reset_after: int | float, bucket: str, globalrt: bool):
-        self.bucket_denom = bucket
-        self.is_global = globalrt
-
-        self._event = asyncio.Event()
-
-        await asyncio.sleep(reset_after)
-
-        self.end()
-
-    def end(self):
-        if self._event:
-            self._event.set()
+class PrunedData(TypedDict):
+    pruned: int | None

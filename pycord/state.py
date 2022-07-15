@@ -21,8 +21,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Mapping, Type, Union
 
 if TYPE_CHECKING:
-    from pycord.bot import Bot
-    from pycord.rest import RESTApp
+    from pycord.apps.gateway import GatewayApp
+    from pycord.apps.rest import RESTApp
 
 
 class AsyncDict(dict):
@@ -42,7 +42,7 @@ class AsyncDict(dict):
 
 @dataclass
 class ConnectionState:
-    _app: Union["RESTApp", "Bot"]
+    _app: Union["RESTApp", "GatewayApp"]
     """
     The app controlling the ConnectionState.
     """
@@ -74,9 +74,7 @@ class ConnectionState:
         self.members: AsyncDict = self.store()
 
     async def process_event(self, data: Mapping[Any, Any]):
-        self._app.dispatcher.dispatch(
-            f'on_raw_{data["t"].lower()}', data
-        )
+        self._app.dispatcher.dispatch(f'on_raw_{data["t"].lower()}', data)
 
         if hasattr(self, data['t'].lower()):
             attr = getattr(self, data['t'].lower())

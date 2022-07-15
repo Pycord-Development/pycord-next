@@ -20,12 +20,11 @@
 
 import logging
 
+from pycord.apps.rest import RESTApp
 from pycord.internal.gateway import ShardManager
-from pycord.rest import RESTApp
-from pycord.errors import PycordException
 
 
-class Bot(RESTApp):
+class GatewayApp(RESTApp):
     def __init__(
         self, intents: int, *, shards: int = 1, version: int = 10, level: int = logging.INFO, cache_timeout: int = 10000
     ) -> None:
@@ -33,10 +32,14 @@ class Bot(RESTApp):
         self.shards = shards
         super().__init__(version=version, level=level, cache_timeout=cache_timeout)
 
-    async def start(self, token: str):
+    async def connect(self, token: str):
         await super().start(token=token)
         self._state.gateway_enabled = True
 
         self.shard_manager = ShardManager(self.shards, self._state, self.dispatcher, self._version)
-        # .run already sets token to a non-None type.
+        # .run/.start already sets token to a non-None type.
         await self.shard_manager.connect(self.token)  # type: ignore
+
+    async def close(self):
+        await super().close()
+        await self.shard_manager.disconnect()

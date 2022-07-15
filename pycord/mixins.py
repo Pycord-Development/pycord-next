@@ -20,8 +20,9 @@
 
 import io
 import os
-from typing import Any
+from typing import Any, Callable, Coroutine
 
+from aiohttp import ClientSession
 from discord_typings import Snowflake
 
 from pycord.state import ConnectionState
@@ -76,3 +77,8 @@ class AssetMixin:
         else:
             with open(file_path, "wb") as file:
                 return file.write(data)
+
+
+class RouteCategoryMixin:
+    _session: ClientSession
+    request: Callable[..., Coroutine[Any, Any, dict[str, Any] | list[dict[str, Any]] | str | None]]
