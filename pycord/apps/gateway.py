@@ -21,11 +21,11 @@
 import logging
 
 from pycord.internal.gateway import ShardManager
-from pycord.rest import RESTApp
+from pycord.apps.rest import RESTApp
 from pycord.errors import PycordException
 
 
-class Bot(RESTApp):
+class GatewayApp(RESTApp):
     def __init__(
         self, intents: int, *, shards: int = 1, version: int = 10, level: int = logging.INFO, cache_timeout: int = 10000
     ) -> None:
