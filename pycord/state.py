@@ -72,3 +72,12 @@ class ConnectionState:
 
         # guild_id: list of member objects.
         self.members: AsyncDict = self.store()
+
+    async def process_event(self, data: Mapping[Any, Any]):
+        self._app.dispatcher.dispatch(
+            f'on_raw_{data["t"].lower()}', data
+        )
+
+        if hasattr(self, data['t'].lower()):
+            attr = getattr(self, data['t'].lower())
+            await attr(data)
