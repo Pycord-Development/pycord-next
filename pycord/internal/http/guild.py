@@ -42,6 +42,7 @@ from discord_typings import (
 
 from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.types import ModifyMFALevelData, PrunedData
 
 
 class GuildRoutes(RouteCategoryMixin):
@@ -452,7 +453,7 @@ class GuildRoutes(RouteCategoryMixin):
             'PATCH', Route('/guilds/{guild_id}/roles/{role_id}', guild_id=guild_id, role_id=role_id), payload,
             reason=reason)
 
-    async def modify_guild_mfa_level(self, guild_id: Snowflake, *, level: MFALevels) -> dict[str, int]:
+    async def modify_guild_mfa_level(self, guild_id: Snowflake, *, level: MFALevels) -> ModifyMFALevelData:
         payload = {'level': level}
 
         return await self.request('POST', Route('/guilds/{guild_id}/mfa', guild_id=guild_id), payload)
@@ -476,7 +477,6 @@ class GuildRoutes(RouteCategoryMixin):
             params['include_roles'] = ','.join(str(i) for i in include_roles)
         return await self.request('GET', Route('/guilds/{guild_id}/prune', guild_id=guild_id), params)
 
-    # TODO: unsure if i did the parameters right
     async def begin_guild_prune(
             self,
             guild_id: Snowflake,
@@ -485,7 +485,7 @@ class GuildRoutes(RouteCategoryMixin):
             compute_prune_count: bool,
             include_roles: list[Snowflake] | None = None,
             reason: str | None = None,
-    ) -> dict:  # TODO
+    ) -> PrunedData:
         payload = {
             'days': days,
             'compute_prune_count': compute_prune_count,
