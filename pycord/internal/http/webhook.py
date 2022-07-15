@@ -17,7 +17,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from discord_typings import AllowedMentionsData, ComponentData, EmbedData, PartialAttachmentData, Snowflake, WebhookData
+from discord_typings import AllowedMentionsData, ComponentData, EmbedData, MessageData, PartialAttachmentData, \
+    Snowflake, WebhookData
 
 from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
@@ -136,7 +137,6 @@ class WebhookRoutes(RouteCategoryMixin):
         allowed_mentions: AllowedMentionsData | None = None,
         components: list[ComponentData] | None = None,
         files: list[bytes] | None = None,
-        payload_json: str | None = None,
         attachments: list[PartialAttachmentData] | None = None,
         flags: int | None = None,
         thread_name: str | None = None,
@@ -163,18 +163,107 @@ class WebhookRoutes(RouteCategoryMixin):
             payload['allowed_mentions'] = allowed_mentions
         if components is not None:
             payload['components'] = components
-        # TODO: proper file uploading
-        if payload_json is not None:
-            payload['payload_json'] = payload_json
         if attachments is not None:
             payload['attachments'] = attachments
         if flags is not None:
             payload['flags'] = flags
         if thread_name is not None:
             payload['thread_name'] = thread_name
+        # TODO: proper file uploading
 
         await self.request(
             'POST',
             Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
             payload,
+        )
+
+    async def get_webhook_message(
+        self,
+        webhook_id: Snowflake,
+        webhook_token: str,
+        message_id: Snowflake,
+        *,
+        thread_id: Snowflake | None = None,
+    ) -> MessageData:
+        params = {}
+        if thread_id is not None:
+            params['thread_id'] = thread_id
+
+        return await self.request(
+            'GET',
+            Route(
+                '/webhooks/{webhook_id}/{webhook_token}/{message_id}',
+                webhook_id=webhook_id,
+                webhook_token=webhook_token,
+                message_id=message_id
+            ),
+            None,
+            params=params
+        )
+
+    async def edit_webhook_message(
+        self,
+        webhook_id: Snowflake,
+        webhook_token: str,
+        message_id: Snowflake,
+        *,
+        thread_id: Snowflake | None = None,
+        content: str | None = None,
+        embeds: list[EmbedData] | None = None,
+        allowed_mentions: AllowedMentionsData | None = None,
+        components: list[ComponentData] | None = None,
+        files: list[bytes] | None = None,
+        attachments: list[PartialAttachmentData] | None = None,
+    ) -> MessageData:
+        params = {}
+        if thread_id is not None:
+            params['thread_id'] = thread_id
+
+        payload = {}
+        if content is not None:
+            payload['content'] = content
+        if embeds is not None:
+            payload['embeds'] = embeds
+        if allowed_mentions is not None:
+            payload['allowed_mentions'] = allowed_mentions
+        if components is not None:
+            payload['components'] = components
+        if attachments is not None:
+            payload['attachments'] = attachments
+        # TODO: proper file uploading
+
+        return await self.request(
+            'PATCH',
+            Route(
+                '/webhooks/{webhook_id}/{webhook_token}/{message_id}',
+                webhook_id=webhook_id,
+                webhook_token=webhook_token,
+                message_id=message_id
+            ),
+            payload,
+            params=params
+        )
+
+    async def delete_webhook_message(
+        self,
+        webhook_id: Snowflake,
+        webhook_token: str,
+        message_id: Snowflake,
+        *,
+        thread_id: Snowflake | None = None,
+    ) -> None:
+        params = {}
+        if thread_id is not None:
+            params['thread_id'] = thread_id
+
+        await self.request(
+            'DELETE',
+            Route(
+                '/webhooks/{webhook_id}/{webhook_token}/{message_id}',
+                webhook_id=webhook_id,
+                webhook_token=webhook_token,
+                message_id=message_id
+            ),
+            None,
+            params=params
         )
