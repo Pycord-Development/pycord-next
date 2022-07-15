@@ -8,12 +8,13 @@ Pycord's Internal HTTP Routes.
 """
 
 import logging
-from typing import Any, List, Dict
+from typing import Any
 
 from aiohttp import ClientSession, FormData
 from discord_typings.resources.user import UserData
 
-from pycord import __version__, utils, File
+from pycord import __version__, utils
+from pycord.file import File
 from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.internal.blocks import Block
 from pycord.internal.http.route import Route
@@ -34,7 +35,7 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
             'User-Agent': f'DiscordBot (https://github.com/pycord/pycord-v3, {__version__})',
         }
         self.version = version
-        self._blockers: Dict[str, Block] = {}
+        self._blockers: dict[str, Block] = {}
         self.max_retries = max_retries
         self.url = f'https://discord.com/api/v{self.version}'
 
@@ -46,13 +47,13 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
         self,
         method: str,
         route: Route,
-        data: Dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
         *,
         form: FormData | None = None,
-        files: List[File] | None = None,
+        files: list[File] | None = None,
         reason: str = None,
         **kwargs: Any
-    ) -> Dict[str, Any] | list[Dict[str, Any]] | str | None:  # type: ignore
+    ) -> dict[str, Any] | list[dict[str, Any]] | str | None:  # type: ignore
         endpoint = route.merge(self.url)
 
         if not self._session:

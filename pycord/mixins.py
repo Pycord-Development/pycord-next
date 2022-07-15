@@ -20,12 +20,14 @@
 
 import io
 import os
-from typing import Any, Dict, List
+from typing import Any
 
 from aiohttp import ClientSession, FormData
 from discord_typings import Snowflake
 
-from pycord import utils, File, ConnectionState
+from pycord import utils
+from pycord.file import File
+from pycord.state import ConnectionState
 from pycord.internal.http.route import Route
 
 
@@ -87,13 +89,13 @@ class RouteCategoryMixin:
         self,
         method: str,
         route: Route,
-        data: Dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
         *,
         form: FormData | None = None,
-        files: List[File] | None = None,
+        files: list[File] | None = None,
         reason: str = None,
         **kwargs: Any
-    ) -> Dict[str, Any] | list[Dict[str, Any]] | str | None:
+    ) -> dict[str, Any] | list[dict[str, Any]] | str | None:
         ...
 
     def _prepare_form(self, payload: Dict[str, Any], files: List[File]):
