@@ -18,39 +18,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Any, Callable, Coroutine, Mapping
+import asyncio
+from typing import TYPE_CHECKING
+from typing_extensions import Self
 
-from aiohttp import ClientSession
-from discord_typings import Snowflake
+if TYPE_CHECKING:
+    from .abc import Messageable
 
-class Comparable:
-    __slots__ = ()
+class Typing:
+    def __init__(self, messageable: "Messageable") -> None:
+        self.messageable = messageable
+        self._task: asyncio.Task | None = None
 
-    id: Snowflake
+    async def perform_typing(self):
+        channel_id = await self.messageable._get_channel_id()
+        trigger_typing = self.messageable._state._app.http.trigger_typing_indicator
 
-    def __eq__(self, obj: object) -> bool:
-        return isinstance(obj, self.__class__) and obj.id == self.id
+        while True:
+            await trigger_typing(channel_id)
+            await asyncio.sleep(10)
 
-    def __ne__(self, obj: object) -> bool:
-        if isinstance(obj, self.__class__):
-            return obj.id != self.id
-        return True
+    async def __aenter__(self: Self) -> Self:
+        self._task = asyncio.create_task(self.perform_typing())
+        return self
 
-
-class Dictable(Comparable):
-    as_dict: Mapping[str, Any]
-
-    def __dict__(self) -> dict[str, Any]:
-        return self.as_dict  # type: ignore
-
-
-class Hashable(Dictable):
-    __slots__ = ()
-
-    def __hash__(self) -> int:
-        return self.id >> 22  # type: ignore
-
-
-class RouteCategoryMixin:
-    _session: ClientSession
-    request: Callable[..., Coroutine[Any, Any, dict[str, Any] | list[dict[str, Any]] | str | None]]
+    # we use args here to abstract the other parameters we don't care about
+    async def __aexit__(self, *args):
+        if self._task:
+            self._task.cancel()
+            await self._task

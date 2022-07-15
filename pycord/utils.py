@@ -29,6 +29,7 @@ except (ImportError, ModuleNotFoundError):
 
 from base64 import b64encode
 from datetime import datetime, timezone
+import math
 from typing import Any, Callable, Mapping, TypeVar
 
 from aiohttp import ClientResponse
@@ -61,6 +62,10 @@ def loads(obj: str | bytes) -> Any:
 def grab_creation_time(id: int) -> datetime:
     ts = ((id >> 22) + EPOCH) / 1000
     return datetime.fromtimestamp(ts, tz=timezone.utc)
+
+
+def datetime_to_snowflake(dt: datetime) -> int:
+    return (math.floor(dt.timestamp()) - EPOCH) << 22
 
 
 def _get_image_mime_type(data: bytes):

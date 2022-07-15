@@ -30,6 +30,7 @@ from discord_typings import (
     VoiceChannelData,
 )
 
+from pycord.abc import Messageable
 from pycord.enums import ChannelType
 from pycord.mixins import Hashable
 from pycord.state import ConnectionState
@@ -56,7 +57,7 @@ class GuildChannel(Hashable):
         self.parent_id = _get_and_convert('parent_id', int, data)
 
 
-class DMChannel(Hashable):
+class DMChannel(Hashable, Messageable):
     def __init__(self, data: DMChannelData, state: ConnectionState) -> None:
         self.as_dict = data
         self._state = state
@@ -68,7 +69,7 @@ class DMChannel(Hashable):
         self.last_pin_timestamp = _get_and_convert('last_pin_timestamp', datetime.fromisoformat, data)
 
 
-class TextChannel(GuildChannel):
+class TextChannel(GuildChannel, Messageable):
     def __init__(self, data: TextChannelData | NewsChannelData, state: ConnectionState) -> None:
         GuildChannel.__init__(self, data, state)
 
@@ -78,7 +79,7 @@ class TextChannel(GuildChannel):
         self.last_pin_timestamp = _get_and_convert('last_pin_timestamp', datetime.fromisoformat, data)
 
 
-class VoiceChannel(GuildChannel):
+class VoiceChannel(GuildChannel, Messageable):
     def __init__(self, data: VoiceChannelData, state: ConnectionState) -> None:
         GuildChannel.__init__(self, data, state)
 
