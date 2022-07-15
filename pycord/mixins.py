@@ -53,4 +53,4 @@ class Hashable(Dictable):
 
 class RouteCategoryMixin:
     _session: ClientSession
-    request: Callable[..., Coroutine[Any, Any, dict[str, Any] | list[dict[str, Any]] | str]]
+    request: Callable[..., Coroutine[Any, Any, dict[str, Any] | list[dict[str, Any]] | str | None]]
