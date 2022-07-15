@@ -453,10 +453,12 @@ class GuildRoutes(RouteCategoryMixin):
             'PATCH', Route('/guilds/{guild_id}/roles/{role_id}', guild_id=guild_id, role_id=role_id), payload,
             reason=reason)
 
-    async def modify_guild_mfa_level(self, guild_id: Snowflake, *, level: MFALevels) -> ModifyMFALevelData:
+    async def modify_guild_mfa_level(self, guild_id: Snowflake, *, level: MFALevels) -> MFALevels:
         payload = {'level': level}
 
-        return await self.request('POST', Route('/guilds/{guild_id}/mfa', guild_id=guild_id), payload)
+        val: ModifyMFALevelData = await self.request(
+            'POST', Route('/guilds/{guild_id}/mfa', guild_id=guild_id), payload)
+        return val['level']
 
     async def delete_guild_role(self, guild_id: Snowflake, role_id: Snowflake, *, reason: str | None = None) -> None:
         await self.request(
@@ -469,13 +471,14 @@ class GuildRoutes(RouteCategoryMixin):
             *,
             days: int | None = None,
             include_roles: list[Snowflake] | None = None,
-    ) -> dict:  # TODO
+    ) -> int:
         params = {}
         if days is not None:
             params['days'] = days
         if include_roles is not None:
             params['include_roles'] = ','.join(str(i) for i in include_roles)
-        return await self.request('GET', Route('/guilds/{guild_id}/prune', guild_id=guild_id), params)
+        val: PrunedData = await self.request('GET', Route('/guilds/{guild_id}/prune', guild_id=guild_id), params)
+        return val['pruned']
 
     async def begin_guild_prune(
             self,
@@ -485,15 +488,16 @@ class GuildRoutes(RouteCategoryMixin):
             compute_prune_count: bool,
             include_roles: list[Snowflake] | None = None,
             reason: str | None = None,
-    ) -> PrunedData:
+    ) -> int | None:
         payload = {
             'days': days,
             'compute_prune_count': compute_prune_count,
             'include_roles': include_roles,
         }
 
-        return await self.request(
+        val: PrunedData = await self.request(
             'POST', Route('/guilds/{guild_id}/prune', guild_id=guild_id), payload, reason=reason)
+        return val['pruned']
 
     async def get_guild_voice_regions(self, guild_id: Snowflake) -> list[VoiceRegionData]:
         return await self.request('GET', Route('/guilds/{guild_id}/regions', guild_id=guild_id), None)
