@@ -24,12 +24,6 @@ import io
 __all__ = ("File",)
 
 class File:
-    """Represents a file that can be sent via Discord.
-
-    Attributes:
-        filename (str): 
-
-    """
     fp: io.BufferedIOBase
     filename: str | None
     description: str | None

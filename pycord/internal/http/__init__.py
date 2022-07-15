@@ -6,7 +6,7 @@ Pycord's Internal HTTP Routes.
 :copyright: 2021-2022 VincentRPS
 :license: MIT, see LICENSE for more details.
 """
-from __future__ import annotations
+
 import logging
 from typing import Any
 
@@ -134,8 +134,6 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
                     elif r.status == 404:
                         raise NotFound
                     else:
-                        print(await r.json())
-                        print(data._fields)
                         raise HTTPException
 
                 _log.debug(f'Received {await r.text()} from request to {endpoint}')
@@ -146,7 +144,7 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
                 for f in files:
                     f.close()
 
-    def _prepare_form(self, files: List[File], payload: dict[str, Any] = {}) -> FormData:
+    def _prepare_form(self, files: list[File], payload: dict[str, Any] = {}) -> FormData:
         form = []
         attachments = []
 
