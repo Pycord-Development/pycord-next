@@ -60,7 +60,17 @@ class AssetMixin:
     url: str
     _state: ConnectionState
 
-    async def read(self) -> bytes:
+    async def read(self) -> bytes | None:
+        """Retrieves the asset as [bytes][].
+
+        Raises:
+            Forbidden: You don't have permission to access the asset.
+            NotFound: The asset was not found.
+            HTTPException: Getting the asset failed.
+
+        Returns:
+            The asset as a [bytes][] object.
+        """
         return await self._state._app.http.get_cdn_asset(self.url)
 
     async def save(
@@ -68,7 +78,17 @@ class AssetMixin:
         file_path: str | bytes | os.PathLike | io.BufferedIOBase,
         *,
         seek_to_beginning: bool = True,
-    ) -> int:
+    ) -> int | None:
+        """Saves the asset into a file-like object.
+
+        Raises:
+            Forbidden: You don't have permission to access the asset.
+            NotFound: The asset was not found.
+            HTTPException: Getting the asset failed.
+
+        Returns:
+            The number of bytes written.
+        """
         data = await self.read()
         if isinstance(file_path, io.BufferedIOBase):
             written = file_path.write(data)

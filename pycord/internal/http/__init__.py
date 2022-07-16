@@ -120,8 +120,7 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
             _log.debug(f'Received {await r.text()} from request to {endpoint}')
             return await utils._text_or_json(r)
 
-    # this should get moved to an asset-related http file
-    async def get_cdn_asset(self, url: str) -> bytes:
+    async def get_cdn_asset(self, url: str) -> bytes | None:
         async with self._session.get(url) as response:
             match response.status:
                 case 200:
