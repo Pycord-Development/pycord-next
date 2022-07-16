@@ -10,3 +10,6 @@ pip install git+ssh://git@github.com/pycord/pycord-v3.git
 
 ## Reporting Bugs or Errors
 If you need to report a bug, please make an issue.
+
+## Extra Libraries
+For extra libraries and other extensions for Pycord v3 please check out [pycord.community](https://github.com/aperturea/pycord.community)'s curated repository of greatly manufactured v3 extensions.
