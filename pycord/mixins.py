@@ -20,12 +20,13 @@
 
 import io
 import os
-from typing import Any, Callable, Coroutine
+from typing import Any
 
 from aiohttp import ClientSession
 from discord_typings import Snowflake
 
 from pycord.internal.http.route import Route
+from pycord.state import ConnectionState
 
 
 class Comparable:

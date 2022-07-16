@@ -24,9 +24,7 @@ from pycord.mixins import AssetMixin
 from pycord.state import ConnectionState
 from pycord.utils import _validate_image_params
 
-__all__ = (
-    "Asset",
-)
+__all__ = ("Asset",)
 
 
 class Asset(AssetMixin):
