@@ -166,7 +166,7 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
             )
 
         payload["attachments"] = attachments
-        form.insert(0, {"name": "payload_json", "value": utils.dumps(payload)})
+        form.insert(0, {"name": "payload_json", "content_type": "application/json", "value": utils.dumps(payload)})
         form_data = FormData(quote_fields=False)
         for f in form:
             form_data.add_field(**f)
