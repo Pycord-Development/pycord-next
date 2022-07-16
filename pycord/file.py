@@ -54,13 +54,11 @@ class File:
             else:
                 filename = getattr(fp, "name", None)
  
-        self.spoiler = False
+        self.spoiler = spoiler
         self.filename = filename
         if filename.startswith("SPOILER_"):
             self.spoiler = True
-            self.filename = filename
-        elif spoiler is True:
-            self.spoiler = True
+        elif spoiler:
             self.filename = f"SPOILER_{filename}"
 
         self.description = description
