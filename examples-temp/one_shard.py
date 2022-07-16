@@ -1,6 +1,5 @@
 import pycord
 
-
 app = pycord.GatewayApp(0, level='DEBUG')
 
 

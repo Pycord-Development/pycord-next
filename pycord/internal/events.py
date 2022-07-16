@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from functools import partial
 from asyncio import create_task, get_running_loop, iscoroutinefunction
 from typing import Any, Callable, Coroutine
 
@@ -38,7 +39,8 @@ class EventDispatcher:
                     await event(*args, **kwargs)  # type: ignore
                 else:
                     loop = get_running_loop()
-                    await loop.run_in_executor(None, event(*args, **kwargs))  # type: ignore
+                    e = partial(event, *args, **kwargs)
+                    await loop.run_in_executor(None, e)  # type: ignore
 
             self.events.pop(t)
 
@@ -52,7 +54,8 @@ class EventDispatcher:
                 await event(*args, **kwargs)  # type: ignore
             else:
                 loop = get_running_loop()
-                await loop.run_in_executor(None, event(*args, **kwargs))  # type: ignore
+                e = partial(event, *args, **kwargs)
+                await loop.run_in_executor(None, e)  # type: ignore
 
     def dispatch(self, event: Any, *args, **kwargs):
         create_task(self._dispatch_under_names(event, *args, **kwargs))

@@ -17,10 +17,9 @@ from pycord import __version__, utils
 from pycord.file import File
 from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.internal.blocks import Block
-from pycord.internal.http.route import Route
-
 from pycord.internal.http.emoji import EmojiRoutes
 from pycord.internal.http.guild import GuildRoutes
+from pycord.internal.http.route import Route
 
 _log: logging.Logger = logging.getLogger(__name__)
 

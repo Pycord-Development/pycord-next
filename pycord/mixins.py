@@ -28,6 +28,7 @@ from discord_typings import Snowflake
 from pycord.file import File
 from pycord.state import ConnectionState
 from pycord.internal.http.route import Route
+from pycord.state import ConnectionState
 
 
 class Comparable:

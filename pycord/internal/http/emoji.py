@@ -19,8 +19,8 @@
 # SOFTWARE.
 from discord_typings import EmojiData, Snowflake
 
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 
 
 class EmojiRoutes(RouteCategoryMixin):
@@ -55,7 +55,7 @@ class EmojiRoutes(RouteCategoryMixin):
         *,
         name: str = ...,
         roles: list[Snowflake] | None = ...,
-        reason: str | None = None
+        reason: str | None = None,
     ) -> EmojiData:
         payload = {}
         if name is not ...:
