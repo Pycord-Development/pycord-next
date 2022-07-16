@@ -51,5 +51,6 @@ class Extension:
 
     def extend(self, app: "appt"):
         self.app = app
-        for name, function in self._listeners.items():
-            app.dispatcher.add_listener(name=name, function=function)
+        for name, functions in self._listeners.items():
+            for function in functions:
+                app.dispatcher.add_listener(name=name, function=function)
