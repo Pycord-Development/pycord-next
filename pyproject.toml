@@ -2,7 +2,7 @@
 name = "py-cord"
 version = "3.0.0"
 description = ""
-authors = ["VincentRPS <vincentbusiness55@gmail.com>"]
+authors = ["VincentRPS <vincentbusiness55@gmail.com>", "Pycord <team@pycord.dev>", "Pycord Contributors <contributors@pycord.dev>"]
 license = "MIT"
 packages = [
     { include = "pycord" }
