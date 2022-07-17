@@ -50,7 +50,7 @@ class HTTPClient(ChannelRoutes, EmojiRoutes, GuildRoutes):
         data: dict[str, Any] | None = None,
         *,
         files: list[File] | None = None,
-        reason: str = None,
+        reason: str | None = None,
         **kwargs: Any
     ) -> dict[str, Any] | list[dict[str, Any]] | str | None:  # type: ignore
         endpoint = route.merge(self.url)
