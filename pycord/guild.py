@@ -119,9 +119,9 @@ class Guild(Hashable):
                 preferred_locale=preferred_locale,
                 features=features,
                 description=description,
-                premium_progress_bar_enabled=premium_progress_bar_enabled
+                premium_progress_bar_enabled=premium_progress_bar_enabled,
             ),
-            self._state
+            self._state,
         )
 
         if self.id in self._state.guilds:
