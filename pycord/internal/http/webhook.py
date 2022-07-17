@@ -20,6 +20,7 @@
 from discord_typings import AllowedMentionsData, ComponentData, EmbedData, MessageData, PartialAttachmentData, \
     Snowflake, WebhookData
 
+from pycord import File
 from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
 
@@ -136,12 +137,11 @@ class WebhookRoutes(RouteCategoryMixin):
         embeds: list[EmbedData] | None = None,
         allowed_mentions: AllowedMentionsData | None = None,
         components: list[ComponentData] | None = None,
-        files: list[bytes] | None = None,
+        files: list[File] | None = None,
         attachments: list[PartialAttachmentData] | None = None,
         flags: int | None = None,
         thread_name: str | None = None,
     ) -> None:
-        # TODO: proper file uploading
         params = {}
         if wait is not None:
             params['wait'] = wait
@@ -169,12 +169,12 @@ class WebhookRoutes(RouteCategoryMixin):
             payload['flags'] = flags
         if thread_name is not None:
             payload['thread_name'] = thread_name
-        # TODO: proper file uploading
 
         await self.request(
             'POST',
             Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
             payload,
+            files=files,
         )
 
     async def get_webhook_message(
@@ -212,7 +212,7 @@ class WebhookRoutes(RouteCategoryMixin):
         embeds: list[EmbedData] | None = None,
         allowed_mentions: AllowedMentionsData | None = None,
         components: list[ComponentData] | None = None,
-        files: list[bytes] | None = None,
+        files: list[File] | None = None,
         attachments: list[PartialAttachmentData] | None = None,
     ) -> MessageData:
         params = {}
@@ -230,7 +230,6 @@ class WebhookRoutes(RouteCategoryMixin):
             payload['components'] = components
         if attachments is not None:
             payload['attachments'] = attachments
-        # TODO: proper file uploading
 
         return await self.request(
             'PATCH',
@@ -241,7 +240,8 @@ class WebhookRoutes(RouteCategoryMixin):
                 message_id=message_id
             ),
             payload,
-            params=params
+            params=params,
+            files=files,
         )
 
     async def delete_webhook_message(
