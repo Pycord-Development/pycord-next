@@ -113,6 +113,9 @@ class Shard:
 
     async def start_clock(self) -> None:
         try:
+            if self._clock_task:
+                await self._clock_task
+
             self._rot_done.clear()
             await asyncio.sleep(60)
             self.requests_this_minute = 0
@@ -151,11 +154,12 @@ class Shard:
 
         self.requests_this_minute += 1
 
-    async def connect(self, token: str) -> None:
+    async def connect(self, token: str | None = None) -> None:
         _log.debug(f'shard:{self.id}: Connecting to the Gateway.')
         self._ws = await self._state._app.http._session.ws_connect(url.format(version=self.version))
 
-        self.token = token
+        if token:
+            self.token = token
 
         # There are some scenarios where the Gateway client cannot resume its previous session and
         # has to start all over again.
@@ -172,7 +176,9 @@ class Shard:
             self._clock_task = asyncio.create_task(self.start_clock())
 
     async def disconnect(self, code: int = 1000, reconnect: bool = True) -> None:
-        if not self._ws.closed and self.receive_task and self.clock_task:
+        if not self._ws.closed and self._receive_task and self._clock_task:
+            _log.debug(f'shard:{self.id}:Disconnecting from Gateway')
+
             self._stop_clock = True
             self._reconnectable = reconnect
             await self._ws.close(code=code)
@@ -181,7 +187,8 @@ class Shard:
                 task.cancel()
                 await task
 
-            self.manager.shard_disconnected_hook(self.id)
+            if self._reconnectable:
+                await self.connect()
 
     async def receive(self) -> None:
         async for message in self._ws:
@@ -212,7 +219,7 @@ class Shard:
 
                     _log.debug(f'shard:{self.id}:< {encoded}')
 
-                    self._sequence: int = data['s']
+                    self._sequence = data['s']  # type: ignore
 
                     self._events.dispatch('WEBSOCKET_MESSAGE_RECEIVE', data)
 
@@ -223,17 +230,17 @@ class Shard:
                         if t == 'READY':
                             _log.info(f'shard:{self.id}:Connected to Gateway')
                             self._events.dispatch('ready')
-                            self._session_id = data['d']['session_id']
+                            self._session_id = data['d']['session_id']  # type: ignore
                     elif op == 7:
                         self._resumable = True
                         await self.disconnect()
                         break
                     elif op == 9:
-                        self._resumable = data['d']
+                        self._resumable = data['d']  # type: ignore
                         await self.disconnect()
                         break
                     elif op == 10:
-                        interval = data['d']['heartbeat_interval'] / 1000
+                        interval = data['d']['heartbeat_interval'] / 1000  # type: ignore
                         self._ratelimiter = HeartThread(self, self._state, interval, asyncio.get_running_loop())
                         await self.send({'op': 1, 'd': None})
                         self._ratelimiter.start()

@@ -38,7 +38,7 @@ class ShardManager:
         self.token = token
 
         for i in range(self._shards):
-            shard = Shard(i, self._shards, self.state, self.events, self.version)
+            shard = Shard(i, self._shards, self.state, self.events, self, self.version)
             await shard.connect(token=self.token)
             self.shards.append(shard)
             await asyncio.sleep(5)
@@ -50,12 +50,12 @@ class ShardManager:
     async def _shard_disconnected_hook(self, shard: Shard, shard_id: int):
         if shard._ws.closed and shard._reconnectable:
             # the websocket is closed, we have to reconnect
-            await shard.connect(token=self.token)
+            return await shard.connect(token=self.token)
         elif not shard._reconnectable:
             # we cannot reconnect, so we have to recreate the shard
-            new_shard = Shard(shard_id, self._shards, self.state, self.events, self.version)
-            await new_shard.connect(token=self.token)
+            new_shard = Shard(shard_id, self._shards, self.state, self.events, self, self.version)
             self.shards[shard_id] = new_shard
+            return await new_shard.connect(token=self.token)
 
     def shard_disconnected_hook(self, shard_id: int):
         shard = self.shards[shard_id]
