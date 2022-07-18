@@ -566,7 +566,7 @@ diagrams = ["railroad-diagrams", "jinja2"]
 
 [[package]]
 name = "pyright"
-version = "1.1.260"
+version = "1.1.261"
 description = "Command line wrapper for pyright"
 category = "dev"
 optional = false
@@ -707,7 +707,7 @@ speed = ["uvloop", "cchardet", "aiodns", "Brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "a1a6b741ab2639d4be726e1738116d82715df9207094de9a4cc557b3c61bc2f1"
+content-hash = "5436c2cde5cd2ae8fbbbf9bff838ff38a6116347eb5530f36ead7507fa8ef956"
 
 [metadata.files]
 aiodns = [
@@ -1332,8 +1332,8 @@ pyparsing = [
     {file = "pyparsing-3.0.9.tar.gz", hash = "sha256:2b020ecf7d21b687f219b71ecad3631f644a47f01403fa1d1036b0c6416d70fb"},
 ]
 pyright = [
-    {file = "pyright-1.1.260-py3-none-any.whl", hash = "sha256:465250aabcdaec63e30632ccd17498a2df90dd8cdeafd5564a714ee4fae166d9"},
-    {file = "pyright-1.1.260.tar.gz", hash = "sha256:6dbc1f32a88d65be8a3cacb17cb890a1b379f6374447f9511686d570109b533e"},
+    {file = "pyright-1.1.261-py3-none-any.whl", hash = "sha256:56d3a10d0fe938cb26864728e65c02f625fe40b2d4b0babba057ff4ac4479eae"},
+    {file = "pyright-1.1.261.tar.gz", hash = "sha256:bbae6f40d31e61ac5754b45f0a80942a7473dd4ebeb86325d44f200d6a0615e4"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
