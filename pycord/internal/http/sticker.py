@@ -17,10 +17,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-
+from aiohttp import FormData
 from discord_typings import Snowflake, StickerData, StickerPackData
 
+from pycord import File
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
 from pycord.types import ListNitroStickerPacksData
@@ -49,20 +49,19 @@ class StickerRoutes(RouteCategoryMixin):
         name: str,
         description: str,
         tags: str,
-        file: bytes,
+        file: File,
         reason: str | None = None,
     ) -> StickerData:
-        payload = {
-            'name': name,
-            'description': description,
-            'tags': tags,
-            'file': file,
-        }
+        form_data = FormData(quote_fields=False)
+        form_data.add_field(name='name', value=name)
+        form_data.add_field(name='description', value=description)
+        form_data.add_field(name='tags', value=tags)
+        form_data.add_field(name='file', value=file.fp, content_type='application/octet-stream', filename=file.filename)
 
         return await self.request(
             'POST',
             Route('/guilds/{guild_id}/stickers', guild_id=guild_id),
-            payload,
+            form_data,
             reason=reason,
         )
 

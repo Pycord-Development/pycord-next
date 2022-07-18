@@ -32,10 +32,10 @@ from discord_typings import (
 from pycord import File
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
+from pycord.utils import _convert_base64_from_bytes
 
 
 class WebhookRoutes(RouteCategoryMixin):
-    # TODO: avatar to `Asset`
     async def create_webhook(
         self,
         channel_id: Snowflake,
@@ -46,7 +46,7 @@ class WebhookRoutes(RouteCategoryMixin):
     ) -> WebhookData:
         payload = {'name': name}
         if avatar is not None:
-            payload['avatar'] = avatar
+            payload['avatar'] = _convert_base64_from_bytes(avatar)
 
         return await self.request(
             'POST',
@@ -68,7 +68,6 @@ class WebhookRoutes(RouteCategoryMixin):
         return await self.request('GET', Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id,
                                                webhook_token=webhook_token))
 
-    # TODO: avatar to `Asset`
     async def modify_webhook(
         self,
         webhook_id: Snowflake,
@@ -82,7 +81,7 @@ class WebhookRoutes(RouteCategoryMixin):
         if name is not None:
             payload['name'] = name
         if avatar is not None:
-            payload['avatar'] = avatar
+            payload['avatar'] = _convert_base64_from_bytes(avatar)
         if channel_id is not ...:
             payload['channel_id'] = channel_id
 
@@ -93,7 +92,6 @@ class WebhookRoutes(RouteCategoryMixin):
             reason=reason,
         )
 
-    # TODO: avatar to `Asset`
     async def modify_webhook_with_token(
         self,
         webhook_id: Snowflake,
@@ -106,7 +104,7 @@ class WebhookRoutes(RouteCategoryMixin):
         if name is not None:
             payload['name'] = name
         if avatar is not None:
-            payload['avatar'] = avatar
+            payload['avatar'] = _convert_base64_from_bytes(avatar)
 
         return await self.request(
             'PATCH',

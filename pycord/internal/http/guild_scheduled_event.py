@@ -33,6 +33,7 @@ from discord_typings import (
 
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
+from pycord.utils import _convert_base64_from_bytes
 
 
 class GuildScheduledEventRoutes(RouteCategoryMixin):
@@ -45,7 +46,6 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
 
         return await self.request('GET', Route('/guilds/{guild_id}/scheduled-events', guild_id=guild_id), params=params)
 
-    # TODO: image to `Asset`
     async def create_guild_scheduled_event(
         self,
         guild_id: Snowflake,
@@ -77,7 +77,7 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
         if description is not None:
             payload['description'] = description
         if image is not None:
-            payload['image'] = image
+            payload['image'] = _convert_base64_from_bytes(image)
 
         return await self.request(
             'POST',
@@ -134,7 +134,7 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
         if status is not ...:
             payload['status'] = status.value
         if image is not ...:
-            payload['image'] = image
+            payload['image'] = _convert_base64_from_bytes(image)
 
         return await self.request(
             'PATCH',

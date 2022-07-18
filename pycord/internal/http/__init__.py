@@ -69,7 +69,7 @@ class HTTPClient(
         self,
         method: str,
         route: Route,
-        data: dict[str, Any] | list[str | int | dict[str, Any]] | None = None,
+        data: dict[str, Any] | list[str | int | dict[str, Any]] | FormData | None = None,
         *,
         files: list[File] | None = None,
         reason: str | None = None,
@@ -87,8 +87,11 @@ class HTTPClient(
         if files:
             data = self._prepare_form(files, data)
         elif data:
-            data = utils.dumps(data)
-            headers.update({"Content-Type": "application/json"})
+            if isinstance(data, dict | list):
+                data = utils.dumps(data)
+                headers.update({"Content-Type": "application/json"})
+            elif isinstance(data, FormData):
+                headers.update({"Content-Type": "multipart/form-data"})
 
         try:
             for retry in range(self.max_retries):

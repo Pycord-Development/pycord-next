@@ -23,6 +23,7 @@ from discord_typings import EmojiData, Snowflake
 
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
+from pycord.utils import _convert_base64_from_bytes
 
 
 class EmojiRoutes(RouteCategoryMixin):
@@ -33,7 +34,6 @@ class EmojiRoutes(RouteCategoryMixin):
         return await self.request("GET",
                                   Route("/guilds/{guild_id}/emojis/{emoji_id}", guild_id=guild_id, emoji_id=emoji_id))
 
-    # TODO: image to `Asset`
     async def create_guild_emoji(
         self,
         guild_id: Snowflake,
@@ -45,7 +45,7 @@ class EmojiRoutes(RouteCategoryMixin):
     ) -> EmojiData:
         payload = {
             "name": name,
-            "image": image,
+            "image": _convert_base64_from_bytes(image),
             "roles": roles or [],
         }
 

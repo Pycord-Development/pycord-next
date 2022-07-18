@@ -24,6 +24,7 @@ from discord_typings import GuildMemberData, PartialGuildData, Snowflake, UserDa
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
 from pycord.types import ConnectionData
+from pycord.utils import _convert_base64_from_bytes
 
 
 class UserRoutes(RouteCategoryMixin):
@@ -43,7 +44,7 @@ class UserRoutes(RouteCategoryMixin):
         if username is not ...:
             payload['username'] = username
         if avatar is not ...:
-            payload['avatar'] = avatar
+            payload['avatar'] = _convert_base64_from_bytes(avatar)
 
         return await self.request('PATCH', Route('/users/@me'), payload)
 

@@ -45,10 +45,10 @@ from discord_typings import (
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
 from pycord.types import ModifyMFALevelData, PrunedData
+from pycord.utils import _convert_base64_from_bytes
 
 
 class GuildRoutes(RouteCategoryMixin):
-    # TODO: icon to `Asset`
     async def create_guild(
         self,
         *,
@@ -66,7 +66,7 @@ class GuildRoutes(RouteCategoryMixin):
     ) -> GuildData:
         payload = {'name': name}
         if icon is not None:
-            payload['icon'] = icon
+            payload['icon'] = _convert_base64_from_bytes(icon)
         if verification_level is not None:
             payload['verification_level'] = verification_level
         if default_message_notifications is not None:
@@ -94,7 +94,6 @@ class GuildRoutes(RouteCategoryMixin):
     async def get_guild_preview(self, guild_id: Snowflake) -> GuildPreviewData:
         return await self.request('GET', Route('/guilds/{guild_id}/preview', guild_id=guild_id))
 
-    # TODO: icon, splash, discovery_splash, banner to `Asset`
     async def modify_guild(
         self,
         guild_id: Snowflake,
@@ -134,15 +133,15 @@ class GuildRoutes(RouteCategoryMixin):
         if afk_timeout is not ...:
             payload['afk_timeout'] = afk_timeout
         if icon is not ...:
-            payload['icon'] = icon
+            payload['icon'] = _convert_base64_from_bytes(icon)
         if owner_id is not ...:
             payload['owner_id'] = owner_id
         if splash is not ...:
-            payload['splash'] = splash
+            payload['splash'] = _convert_base64_from_bytes(splash)
         if discovery_splash is not ...:
-            payload['discovery_splash'] = discovery_splash
+            payload['discovery_splash'] = _convert_base64_from_bytes(discovery_splash)
         if banner is not ...:
-            payload['banner'] = banner
+            payload['banner'] = _convert_base64_from_bytes(banner)
         if system_channel_id is not ...:
             payload['system_channel_id'] = system_channel_id
         if system_channel_flags is not ...:
@@ -168,7 +167,7 @@ class GuildRoutes(RouteCategoryMixin):
     async def get_guild_channels(self, guild_id: Snowflake) -> list[ChannelData]:
         return await self.request('GET', Route('/guilds/{guild_id}/channels', guild_id=guild_id))
 
-    # TODO: type channel_type to ChannelType
+    # TODO: channel_type to ChannelType
     async def create_guild_channel(
         self,
         guild_id: Snowflake,
@@ -394,7 +393,6 @@ class GuildRoutes(RouteCategoryMixin):
     async def get_guild_roles(self, guild_id: Snowflake) -> list[RoleData]:
         return await self.request('GET', Route('/guilds/{guild_id}/roles', guild_id=guild_id))
 
-    # TODO: icon to `Asset`
     async def create_guild_role(
         self,
         guild_id: Snowflake,
@@ -418,7 +416,7 @@ class GuildRoutes(RouteCategoryMixin):
         if hoist is not None:
             payload['hoist'] = hoist
         if icon is not None:
-            payload['icon'] = icon
+            payload['icon'] = _convert_base64_from_bytes(icon)
         if unicode_emoji is not None:
             payload['unicode_emoji'] = unicode_emoji
         if mentionable is not None:
@@ -456,7 +454,7 @@ class GuildRoutes(RouteCategoryMixin):
         if hoist is not ...:
             payload['hoist'] = hoist
         if icon is not ...:
-            payload['icon'] = icon
+            payload['icon'] = _convert_base64_from_bytes(icon)
         if unicode_emoji is not ...:
             payload['unicode_emoji'] = unicode_emoji
         if mentionable is not ...:

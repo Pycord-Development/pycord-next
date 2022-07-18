@@ -21,6 +21,7 @@ from discord_typings import GuildData, GuildTemplateData, Snowflake
 
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
+from pycord.utils import _convert_base64_from_bytes
 
 
 class GuildTemplateRoutes(RouteCategoryMixin):
@@ -36,7 +37,7 @@ class GuildTemplateRoutes(RouteCategoryMixin):
     ) -> GuildData:
         payload = {'name': name}
         if icon is not None:
-            payload['icon'] = icon
+            payload['icon'] = _convert_base64_from_bytes(icon)
 
         return await self.request(
             'POST',
