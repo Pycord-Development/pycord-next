@@ -40,6 +40,7 @@ from discord_typings import (
 )
 
 from pycord.enums import ChannelType, InviteTargetTypes
+from pycord.file import File
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
 
@@ -143,13 +144,11 @@ class ChannelRoutes(RouteCategoryMixin):
         message_reference: MessageReferenceData = ...,
         components: list[ComponentData] = ...,
         sticker_ids: list[Snowflake] = ...,
-        # TODO: files
-        attachments: list[PartialAttachmentData] = ...,
+        files: list[File] | None = None,
         flags: int = ...,
     ) -> MessageData:
-        # TODO: check if files are included
-        if content is ... and embeds is ... and sticker_ids is ...:
-            raise ValueError('One of content, embeds, or sticker_ids are required.')
+        if content is ... and embeds is ... and sticker_ids is ... and not files:
+            raise ValueError('One of content, embeds, sticker_ids, or files are required.')
 
         payload = {}
         if content is not ...:
@@ -166,12 +165,10 @@ class ChannelRoutes(RouteCategoryMixin):
             payload['components'] = components
         if sticker_ids is not ...:
             payload['sticker_ids'] = sticker_ids
-        if attachments is not ...:
-            payload['attachments'] = attachments
         if flags is not ...:
             payload['flags'] = flags
 
-        return await self.request('POST', Route('/channels/{channel_id}/messages', channel_id=channel_id), payload)
+        return await self.request('POST', Route('/channels/{channel_id}/messages', channel_id=channel_id), payload, files=files)
 
     async def crosspost_message(self, channel_id: Snowflake, message_id: Snowflake) -> MessageData:
         return await self.request(
@@ -275,8 +272,7 @@ class ChannelRoutes(RouteCategoryMixin):
         flags: int | None = ...,
         allowed_mentions: AllowedMentionsData | None = ...,
         components: list[ComponentData] | None = ...,
-        # TODO: files
-        attachments: list[AttachmentData] | None = ...,
+        files: list[File] | None = None,
     ) -> MessageData:
         payload = {}
         if content is not ...:
@@ -289,13 +285,12 @@ class ChannelRoutes(RouteCategoryMixin):
             payload['allowed_mentions'] = allowed_mentions
         if components is not ...:
             payload['components'] = components
-        if attachments is not ...:
-            payload['attachments'] = attachments
 
         return await self.request(
             'PATCH',
             Route('/channels/{channel_id}/messages/{message_id}', channel_id=channel_id, message_id=message_id),
             payload,
+            files=files
         )
 
     async def delete_message(self, channel_id: Snowflake, message_id: Snowflake, *, reason: str | None = None) -> None:
@@ -422,8 +417,51 @@ class ChannelRoutes(RouteCategoryMixin):
             reason=reason
         )
 
-    # TODO: Start Thread in Forum Channel
-    # this one is pretty big and Forum Channels are unstable rn
+    async def start_thread_in_forum_channel(
+        self,
+        channel_id: Snowflake,
+        *,
+        reason: str | None = None,
+        name: str,
+        auto_archive_duration: int = ...,
+        rate_limit_per_user: int | None = ...,
+        content: str = ...,
+        embeds: list[EmbedData] = ...,
+        allowed_mentions: AllowedMentionsData = ...,
+        components: list[ComponentData] = ...,
+        sticker_ids: list[Snowflake] = ...,
+        files: list[File] | None = None,
+        flags: int = ...,
+    ):
+        if content is ... and embeds is ... and sticker_ids is ... and not files:
+            raise ValueError('One of content, embeds, sticker_ids, or files are required.')
+
+        payload: dict[str, Any] = {'name': name}
+        if auto_archive_duration is not ...:
+            payload['auto_archive_duration'] = auto_archive_duration
+        if rate_limit_per_user is not ...:
+            payload['rate_limit_per_user'] = rate_limit_per_user
+        if content is not ...:
+            payload['content'] = content
+        if embeds is not ...:
+            payload['embeds'] = embeds
+        if allowed_mentions is not ...:
+            payload['allowed_mentions'] = allowed_mentions
+        if components is not ...:
+            payload['components'] = components
+        if sticker_ids is not ...:
+            payload['sticker_ids'] = sticker_ids
+        if flags is not ...:
+            payload['flags'] = flags
+
+        return await self.request(
+            'POST', 
+            Route('/channels/{channel_id}/threads', channel_id=channel_id), 
+            payload=payload, 
+            reason=reason, 
+            files=files
+        )
+
 
     async def join_thread(self, channel_id: Snowflake) -> None:
         return await self.request('PUT', Route('/channels/{channel_id}/thread-members/@me', channel_id=channel_id))
