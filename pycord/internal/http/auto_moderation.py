@@ -17,24 +17,28 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from discord_typings import AutoModerationActionData, AutoModerationEventTypes, AutoModerationRuleData, \
-    AutoModerationTriggerMetadataData, \
-    AutoModerationTriggerTypes, Snowflake
 
-from pycord.mixins import RouteCategoryMixin
+
+from discord_typings import (
+    AutoModerationActionData,
+    AutoModerationEventTypes,
+    AutoModerationRuleData,
+    AutoModerationTriggerMetadataData,
+    AutoModerationTriggerTypes,
+    Snowflake,
+)
+
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 
 
 class AutoModerationRoutes(RouteCategoryMixin):
     async def list_auto_moderation_rules_for_guild(self, guild_id: Snowflake) -> list[AutoModerationRuleData]:
-        return await self.request('GET', Route('/guilds/{guild_id}/automod-rules', guild_id=guild_id), None)
+        return await self.request('GET', Route('/guilds/{guild_id}/automod-rules', guild_id=guild_id))
 
     async def get_auto_moderation_rule(self, guild_id: Snowflake, rule_id: Snowflake) -> AutoModerationRuleData:
-        return await self.request(
-            'GET',
-            Route('/guilds/{guild_id}/automod-rules/{rule_id}', guild_id=guild_id, rule_id=rule_id),
-            None
-        )
+        return await self.request('GET', Route('/guilds/{guild_id}/automod-rules/{rule_id}', guild_id=guild_id,
+                                               rule_id=rule_id))
 
     async def create_auto_moderation_rule(
         self,
@@ -113,9 +117,5 @@ class AutoModerationRoutes(RouteCategoryMixin):
     async def delete_auto_moderation_rule(
         self, guild_id: Snowflake, rule_id: Snowflake, reason: str | None = None
     ) -> None:
-        return await self.request(
-            'DELETE',
-            Route('/guilds/{guild_id}/automod-rules/{rule_id}', guild_id=guild_id, rule_id=rule_id),
-            None,
-            reason=reason
-        )
+        return await self.request('DELETE', Route('/guilds/{guild_id}/automod-rules/{rule_id}', guild_id=guild_id,
+                                                  rule_id=rule_id), reason=reason)

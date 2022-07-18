@@ -14,19 +14,17 @@ from aiohttp import ClientSession, FormData
 from discord_typings.resources.user import UserData
 
 from pycord import __version__, utils
-from pycord.file import File
 from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
+from pycord.file import File
 from pycord.internal.blocks import Block
-from pycord.internal.http.route import Route
-
 from pycord.internal.http.audit_logs import AuditLogRoutes
 from pycord.internal.http.auto_moderation import AutoModerationRoutes
 from pycord.internal.http.emoji import EmojiRoutes
 from pycord.internal.http.guild import GuildRoutes
-from pycord.internal.http.route import Route
 from pycord.internal.http.guild_scheduled_event import GuildScheduledEventRoutes
 from pycord.internal.http.guild_template import GuildTemplateRoutes
 from pycord.internal.http.invite import InviteRoutes
+from pycord.internal.http.route import Route, Route
 from pycord.internal.http.stage_instance import StageInstanceRoutes
 from pycord.internal.http.sticker import StickerRoutes
 from pycord.internal.http.user import UserRoutes
@@ -71,12 +69,12 @@ class HTTPClient(
         self,
         method: str,
         route: Route,
-        data: dict[str, Any] | None = None,
+        data: dict[str, Any] | list[str | int | dict[str, Any]] | None = None,
         *,
         files: list[File] | None = None,
         reason: str | None = None,
         **kwargs: Any
-    ) -> dict[str, Any] | list[dict[str, Any]] | str | None:  # type: ignore
+    ) -> dict[str, Any] | list[str | int | dict[str, Any]] | str | None:  # type: ignore
         endpoint = route.merge(self.url)
 
         if not self._session:
@@ -168,7 +166,9 @@ class HTTPClient(
                 for f in files:
                     f.close()
 
-    def _prepare_form(self, files: list[File], payload: dict[str, Any] = {}) -> FormData:
+    def _prepare_form(self, files: list[File], payload: dict[str, Any] = None) -> FormData:
+        if payload is None:
+            payload = {}
         form = []
         attachments = []
 

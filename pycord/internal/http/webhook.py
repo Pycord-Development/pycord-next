@@ -17,12 +17,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from discord_typings import AllowedMentionsData, ComponentData, EmbedData, MessageData, PartialAttachmentData, \
-    Snowflake, WebhookData
+
+
+from discord_typings import (
+    AllowedMentionsData,
+    ComponentData,
+    EmbedData,
+    MessageData,
+    PartialAttachmentData,
+    Snowflake,
+    WebhookData,
+)
 
 from pycord import File
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 
 
 class WebhookRoutes(RouteCategoryMixin):
@@ -47,20 +56,17 @@ class WebhookRoutes(RouteCategoryMixin):
         )
 
     async def get_channel_webhooks(self, channel_id: Snowflake) -> list[WebhookData]:
-        return await self.request('GET', Route('/channels/{channel_id}/webhooks', channel_id=channel_id), None)
+        return await self.request('GET', Route('/channels/{channel_id}/webhooks', channel_id=channel_id))
 
     async def get_guild_webhooks(self, guild_id: Snowflake) -> list[WebhookData]:
-        return await self.request('GET', Route('/guilds/{guild_id}/webhooks', guild_id=guild_id), None)
+        return await self.request('GET', Route('/guilds/{guild_id}/webhooks', guild_id=guild_id))
 
     async def get_webhook(self, webhook_id: Snowflake) -> WebhookData:
-        return await self.request('GET', Route('/webhooks/{webhook_id}', webhook_id=webhook_id), None)
+        return await self.request('GET', Route('/webhooks/{webhook_id}', webhook_id=webhook_id))
 
     async def get_webhook_with_token(self, webhook_id: Snowflake, webhook_token: str) -> WebhookData:
-        return await self.request(
-            'GET',
-            Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
-            None,
-        )
+        return await self.request('GET', Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id,
+                                               webhook_token=webhook_token))
 
     # TODO: avatar to `Asset`
     async def modify_webhook(
@@ -109,19 +115,11 @@ class WebhookRoutes(RouteCategoryMixin):
         )
 
     async def delete_webhook(self, webhook_id: Snowflake, reason: str | None = None) -> None:
-        await self.request(
-            'DELETE',
-            Route('/webhooks/{webhook_id}', webhook_id=webhook_id),
-            None,
-            reason=reason,
-        )
+        await self.request('DELETE', Route('/webhooks/{webhook_id}', webhook_id=webhook_id), reason=reason)
 
     async def delete_webhook_with_token(self, webhook_id: Snowflake, webhook_token: str) -> None:
-        await self.request(
-            'DELETE',
-            Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
-            None,
-        )
+        await self.request('DELETE', Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id,
+                                           webhook_token=webhook_token))
 
     async def execute_webhook(
         self,
@@ -189,17 +187,12 @@ class WebhookRoutes(RouteCategoryMixin):
         if thread_id is not None:
             params['thread_id'] = thread_id
 
-        return await self.request(
-            'GET',
-            Route(
-                '/webhooks/{webhook_id}/{webhook_token}/{message_id}',
-                webhook_id=webhook_id,
-                webhook_token=webhook_token,
-                message_id=message_id
-            ),
-            None,
-            params=params
-        )
+        return await self.request('GET', Route(
+            '/webhooks/{webhook_id}/{webhook_token}/{message_id}',
+            webhook_id=webhook_id,
+            webhook_token=webhook_token,
+            message_id=message_id
+        ), params=params)
 
     async def edit_webhook_message(
         self,
@@ -256,14 +249,9 @@ class WebhookRoutes(RouteCategoryMixin):
         if thread_id is not None:
             params['thread_id'] = thread_id
 
-        await self.request(
-            'DELETE',
-            Route(
-                '/webhooks/{webhook_id}/{webhook_token}/{message_id}',
-                webhook_id=webhook_id,
-                webhook_token=webhook_token,
-                message_id=message_id
-            ),
-            None,
-            params=params
-        )
+        await self.request('DELETE', Route(
+            '/webhooks/{webhook_id}/{webhook_token}/{message_id}',
+            webhook_id=webhook_id,
+            webhook_token=webhook_token,
+            message_id=message_id
+        ), params=params)

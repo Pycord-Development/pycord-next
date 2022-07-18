@@ -17,6 +17,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+
 from discord_typings import EmojiData, Snowflake
 
 from pycord.internal.http.route import Route
@@ -25,14 +27,11 @@ from pycord.mixins import RouteCategoryMixin
 
 class EmojiRoutes(RouteCategoryMixin):
     async def list_guild_emojis(self, guild_id: Snowflake) -> EmojiData:
-        return await self.request("GET", Route("/guilds/{guild_id}/emojis", guild_id=guild_id), None)
+        return await self.request("GET", Route("/guilds/{guild_id}/emojis", guild_id=guild_id))
 
     async def get_guild_emoji(self, guild_id: Snowflake, emoji_id: Snowflake) -> EmojiData:
-        return await self.request(
-            "GET",
-            Route("/guilds/{guild_id}/emojis/{emoji_id}", guild_id=guild_id, emoji_id=emoji_id),
-            None
-        )
+        return await self.request("GET",
+                                  Route("/guilds/{guild_id}/emojis/{emoji_id}", guild_id=guild_id, emoji_id=emoji_id))
 
     # TODO: image to `Asset`
     async def create_guild_emoji(
@@ -75,9 +74,6 @@ class EmojiRoutes(RouteCategoryMixin):
         )
 
     async def delete_guild_emoji(self, guild_id: Snowflake, emoji_id: Snowflake, *, reason: str | None = None) -> None:
-        return await self.request(
-            "DELETE",
-            Route("/guilds/{guild_id}/emojis/{emoji_id}", guild_id=guild_id, emoji_id=emoji_id),
-            None,
-            reason=reason
-        )
+        return await self.request("DELETE",
+                                  Route("/guilds/{guild_id}/emojis/{emoji_id}", guild_id=guild_id, emoji_id=emoji_id),
+                                  reason=reason)

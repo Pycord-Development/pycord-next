@@ -17,12 +17,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+
 from discord_typings import VoiceRegionData
 
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 
 
 class VoiceRoutes(RouteCategoryMixin):
     async def list_voice_regions(self) -> list[VoiceRegionData]:
-        return await self.request('GET', Route('/voice/regions'), None)
+        return await self.request('GET', Route('/voice/regions'))

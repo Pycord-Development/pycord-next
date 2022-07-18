@@ -19,8 +19,8 @@
 # SOFTWARE.
 from discord_typings import GuildData, GuildTemplateData, Snowflake
 
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 
 
 class GuildTemplateRoutes(RouteCategoryMixin):
@@ -65,11 +65,8 @@ class GuildTemplateRoutes(RouteCategoryMixin):
         )
 
     async def sync_guild_template(self, guild_id: Snowflake, template_code: str) -> GuildTemplateData:
-        return await self.request(
-            'PUT',
-            Route('/guilds/{guild_id}/templates/{template_code}', guild_id, template_code=template_code),
-            None
-        )
+        return await self.request('PUT', Route('/guilds/{guild_id}/templates/{template_code}', guild_id,
+                                               template_code=template_code))
 
     async def modify_guild_template(
         self,
@@ -92,8 +89,5 @@ class GuildTemplateRoutes(RouteCategoryMixin):
         )
 
     async def delete_guild_template(self, guild_id: Snowflake, template_code: str) -> None:
-        return await self.request(
-            'DELETE',
-            Route('/guilds/{guild_id}/templates/{template_code}', guild_id, template_code=template_code),
-            None
-        )
+        return await self.request('DELETE', Route('/guilds/{guild_id}/templates/{template_code}', guild_id,
+                                                  template_code=template_code))

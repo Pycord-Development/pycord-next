@@ -17,10 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+
 from discord_typings import Snowflake, StageInstanceData, StageInstancePrivacyLevels
 
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 
 
 class StageInstanceRoutes(RouteCategoryMixin):
@@ -50,7 +52,7 @@ class StageInstanceRoutes(RouteCategoryMixin):
         )
 
     async def get_stage_instance(self, channel_id: Snowflake) -> StageInstanceData:
-        return await self.request('GET', Route('/stage-instances/{channel_id}', channel_id=channel_id), None)
+        return await self.request('GET', Route('/stage-instances/{channel_id}', channel_id=channel_id))
 
     async def modify_stage_instance(
         self,
@@ -74,9 +76,4 @@ class StageInstanceRoutes(RouteCategoryMixin):
         )
 
     async def delete_stage_instance(self, channel_id: Snowflake, reason: str | None = None) -> None:
-        await self.request(
-            'DELETE',
-            Route('/stage-instances/{channel_id}', channel_id=channel_id),
-            None,
-            reason=reason,
-        )
+        await self.request('DELETE', Route('/stage-instances/{channel_id}', channel_id=channel_id), reason=reason)

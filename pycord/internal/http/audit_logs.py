@@ -17,10 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+
 from discord_typings import AuditLogData, AuditLogEvents, Snowflake
 
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 
 
 class AuditLogRoutes(RouteCategoryMixin):
@@ -43,4 +45,4 @@ class AuditLogRoutes(RouteCategoryMixin):
         if limit is not None:
             params['limit'] = limit
 
-        return await self.request('GET', Route('/guilds/{guild_id}/audit-logs', guild_id=guild_id), None, params=params)
+        return await self.request('GET', Route('/guilds/{guild_id}/audit-logs', guild_id=guild_id), params=params)

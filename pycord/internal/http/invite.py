@@ -17,10 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+
 from discord_typings import InviteData, Snowflake
 
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 
 
 class InviteRoutes(RouteCategoryMixin):
@@ -47,9 +49,4 @@ class InviteRoutes(RouteCategoryMixin):
         )
 
     async def delete_invite(self, invite_code: str, *, reason: str | None = None) -> None:
-        return await self.request(
-            'DELETE',
-            Route('/invites/{invite_code}', invite_code=invite_code),
-            None,
-            reason=reason
-        )
+        return await self.request('DELETE', Route('/invites/{invite_code}', invite_code=invite_code), reason=reason)

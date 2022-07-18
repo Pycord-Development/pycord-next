@@ -17,14 +17,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+
 import datetime
 
-from discord_typings import GuildScheduledEventData, GuildScheduledEventEntityMetadata, GuildScheduledEventEntityTypes, \
-    GuildScheduledEventPrivacyLevels, \
-    GuildScheduledEventStatus, GuildScheduledEventUserData, Snowflake
+from discord_typings import (
+    GuildScheduledEventData,
+    GuildScheduledEventEntityMetadata,
+    GuildScheduledEventEntityTypes,
+    GuildScheduledEventPrivacyLevels,
+    GuildScheduledEventStatus,
+    GuildScheduledEventUserData,
+    Snowflake,
+)
 
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 
 
 class GuildScheduledEventRoutes(RouteCategoryMixin):
@@ -35,12 +43,7 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
         if with_user_count is not None:
             params['with_user_count'] = with_user_count
 
-        return await self.request(
-            'GET',
-            Route('/guilds/{guild_id}/scheduled-events', guild_id=guild_id),
-            None,
-            params=params
-        )
+        return await self.request('GET', Route('/guilds/{guild_id}/scheduled-events', guild_id=guild_id), params=params)
 
     # TODO: image to `Asset`
     async def create_guild_scheduled_event(
@@ -91,12 +94,8 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
         if with_user_count is not None:
             params['with_user_count'] = with_user_count
 
-        return await self.request(
-            'GET',
-            Route('/guilds/{guild_id}/scheduled-events/{event_id}', guild_id=guild_id, event_id=event_id),
-            None,
-            params=params,
-        )
+        return await self.request('GET', Route('/guilds/{guild_id}/scheduled-events/{event_id}', guild_id=guild_id,
+                                               event_id=event_id), params=params)
 
     async def modify_guild_scheduled_event(
         self,
@@ -145,15 +144,12 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
         )
 
     async def delete_guild_scheduled_event(self, guild_id: Snowflake, event_id: Snowflake) -> None:
-        return await self.request(
-            'DELETE',
-            Route('/guilds/{guild_id}/scheduled-events/{event_id}', guild_id=guild_id, event_id=event_id),
-            None,
-        )
-    
+        return await self.request('DELETE', Route('/guilds/{guild_id}/scheduled-events/{event_id}', guild_id=guild_id,
+                                                  event_id=event_id))
+
     async def get_guild_scheduled_event_users(
-        self, 
-        guild_id: Snowflake, 
+        self,
+        guild_id: Snowflake,
         event_id: Snowflake,
         *,
         limit: int | None = None,
@@ -170,9 +166,7 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
             params['before'] = before
         if after is not None:
             params['after'] = after
-        
-        return await self.request(
-            'GET',
-            Route('/guilds/{guild_id}/scheduled-events/{event_id}/users', guild_id=guild_id, event_id=event_id),
-            None,
-        )
+
+        return await self.request('GET',
+                                  Route('/guilds/{guild_id}/scheduled-events/{event_id}/users', guild_id=guild_id,
+                                        event_id=event_id))

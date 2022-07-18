@@ -17,19 +17,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+
 from discord_typings import GuildMemberData, PartialGuildData, Snowflake, UserData
 
-from pycord.mixins import RouteCategoryMixin
 from pycord.internal.http.route import Route
+from pycord.mixins import RouteCategoryMixin
 from pycord.types import ConnectionData
 
 
 class UserRoutes(RouteCategoryMixin):
     async def get_current_user(self) -> UserData:
-        return await self.request('GET', Route('/users/@me'), None)
+        return await self.request('GET', Route('/users/@me'))
 
     async def get_user(self, user_id: Snowflake) -> UserData:
-        return await self.request('GET', Route('/users/{user_id}', user_id=user_id), None)
+        return await self.request('GET', Route('/users/{user_id}', user_id=user_id))
 
     async def modify_current_user(
         self,
@@ -46,13 +48,13 @@ class UserRoutes(RouteCategoryMixin):
         return await self.request('PATCH', Route('/users/@me'), payload)
 
     async def get_current_user_guilds(self) -> list[PartialGuildData]:
-        return await self.request('GET', Route('/users/@me/guilds'), None)
+        return await self.request('GET', Route('/users/@me/guilds'))
 
     async def get_current_user_guild_member(self, guild_id: Snowflake) -> GuildMemberData:
-        return await self.request('GET', Route('/users/@me/guilds/{guild_id}/member', guild_id=guild_id), None)
+        return await self.request('GET', Route('/users/@me/guilds/{guild_id}/member', guild_id=guild_id))
 
     async def leave_guild(self, guild_id: Snowflake) -> None:
-        return await self.request('DELETE', Route('/users/@me/guilds/{guild_id}', guild_id=guild_id), None)
+        return await self.request('DELETE', Route('/users/@me/guilds/{guild_id}', guild_id=guild_id))
 
     async def create_dm(self, recipient_id: Snowflake) -> UserData:
         payload = {'recipient_id': recipient_id}
@@ -60,4 +62,4 @@ class UserRoutes(RouteCategoryMixin):
         return await self.request('POST', Route('/users/@me/channels'), payload)
 
     async def get_user_connections(self) -> list[ConnectionData]:
-        return await self.request('GET', Route('/users/@me/connections'), None)
+        return await self.request('GET', Route('/users/@me/connections'))
