@@ -31,6 +31,7 @@ class GatewayApp(RESTApp):
     ) -> None:
         self.intents = intents
         self.shards = shards
+        self.shard_manager: ShardManager | None = None
         super().__init__(version=version, level=level, cache_timeout=cache_timeout)
 
     def connect(self, token: str):
@@ -44,9 +45,17 @@ class GatewayApp(RESTApp):
 
         # TODO: Replace with asyncio.run
         loop = asyncio.new_event_loop()
-        loop.run_until_complete(_conn())
-        loop.run_forever()
+        try:
+            loop.run_until_complete(_conn())
+            loop.run_forever()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            loop.run_until_complete(self.close())
+            loop.close()
+
 
     async def close(self):
         await super().close()
-        await self.shard_manager.disconnect()
+        if self.shard_manager:
+            await self.shard_manager.disconnect()
