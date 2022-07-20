@@ -14,8 +14,8 @@ from aiohttp import ClientSession, FormData
 from discord_typings.resources.user import UserData
 
 from pycord import __version__, utils
-from pycord.file import File
 from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
+from pycord.file import File
 from pycord.internal.blocks import Block
 from pycord.internal.http.emoji import EmojiRoutes
 from pycord.internal.http.guild import GuildRoutes
@@ -50,7 +50,7 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
         *,
         files: list[File] | None = None,
         reason: str | None = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> dict[str, Any] | list[dict[str, Any]] | str | None:  # type: ignore
         endpoint = route.merge(self.url)
 
@@ -148,19 +148,13 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
         attachments = []
 
         for index, file in enumerate(files):
-            attachments.append(
-                {
-                    "id": index,
-                    "filename": file.filename,
-                    "description": file.description
-                }
-            )
+            attachments.append({"id": index, "filename": file.filename, "description": file.description})
             form.append(
                 {
                     "name": f"files[{index}]",
                     "value": file.fp,
                     "filename": file.filename,
-                    "content_type": "application/octet-stream"
+                    "content_type": "application/octet-stream",
                 }
             )
 

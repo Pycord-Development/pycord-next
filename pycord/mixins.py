@@ -92,6 +92,6 @@ class RouteCategoryMixin:
         *,
         files: list[File] | None = None,
         reason: str = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> dict[str, Any] | list[dict[str, Any]] | str | None:
         ...
