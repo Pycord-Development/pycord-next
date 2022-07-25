@@ -20,8 +20,6 @@
 import asyncio
 import logging
 import platform
-import threading
-import time
 import zlib
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
@@ -41,35 +39,6 @@ if TYPE_CHECKING:
 ZLIB_SUFFIX = b'\x00\x00\xff\xff'
 url = 'wss://gateway.discord.gg/?v={version}&encoding=json&compress=zlib-stream'
 _log = logging.getLogger(__name__)
-
-
-# NOTE: This ramble is about using Thread's here instead of Task's, made by VincentRPS.
-# the decision of using a thread instead of just using a perpetual task seems to be controversial to a lot of people
-# I don't really care too much about that, everything here is thread safe and everything runs as fast and as well as
-# if I implemented a more complex and memory intensive (most likely due to having a lot of tasks running) version
-# with an asyncio.Task.
-# NOTE: I have thought of using multiprocessing here but I'm pretty sure it would still block the main event loop
-# since I use `while True`, which is obviously massively not ideal as everything uses the event loop.
-class HeartThread(threading.Thread):
-    def __init__(self, shard: "Shard", state: ConnectionState, interval: float, loop: asyncio.AbstractEventLoop):
-        super().__init__()
-        self.shard = shard
-        self._state = state
-        self._interval = interval
-        self._sequence: int | None = None
-        self.disconnected: bool = False
-        self.daemon: bool = True
-        self._loop = loop
-
-    def run(self):
-        while True:
-            if not self.disconnected:
-                time.sleep(self._interval)
-
-                payload = {'op': 1, 'd': self._sequence}
-                coroutine = self.shard.send(payload)
-                future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self._loop)
-                future.result()
 
 
 class Shard:
@@ -130,6 +99,15 @@ class Shard:
         except asyncio.CancelledError:
             pass
 
+    async def heartbeat(self, interval: float):
+        if not self.disconnected:
+            await asyncio.sleep(interval)
+
+            payload = {'op': 1, 'd': self._sequence}
+            await self.send(payload)
+
+        self._heartbeat_task = asyncio.create_task(self.heartbeat(), name=f'heartbeat-shard-{self.id}')
+
     async def send(self, data: dict[Any, Any]) -> None:
         if self.requests_this_minute == 119:
             if data.get('op') == 1:
@@ -160,8 +138,6 @@ class Shard:
         # There are some scenarios where the Gateway client cannot resume its previous session and
         # has to start all over again.
         if self._session_id is None or not self._resumable:
-            if self._session_id is not None:
-                _log.debug(f'shard:{self.id}:Reconnecting to Gateway')
             await self.identify()
             self._receive_task = asyncio.create_task(self.receive())
             self._clock_task = asyncio.create_task(self.start_clock())
@@ -177,7 +153,7 @@ class Shard:
             self._reconnectable = reconnect
             await self._ws.close(code=code)
 
-            for task in (self._receive_task, self._clock_task):
+            for task in (self._receive_task, self._clock_task, self._heartbeat_task):
                 task.cancel()
                 await task
 
@@ -233,10 +209,10 @@ class Shard:
                         await self.disconnect()
                         break
                     elif op == 10:
-                        interval = data['d']['heartbeat_interval'] / 1000
-                        self._ratelimiter = HeartThread(self, self._state, interval, asyncio.get_running_loop())
-                        await self.send({'op': 1, 'd': None})
-                        self._ratelimiter.start()
+                        interval: float = data['d']['heartbeat_interval'] / 1000
+                        asyncio.create_task(
+                            self.heartbeat(interval=interval), name=f'initial-heartbeat-shard-{self.id}'
+                        )
                     elif op == 11:
                         self._last_heartbeat_ack = (
                             datetime.now()

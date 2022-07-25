@@ -73,8 +73,8 @@ class HTTPClient(
         *,
         files: list[File] | None = None,
         reason: str | None = None,
-        **kwargs: Any
-    ) -> dict[str, Any] | list[str | int | dict[str, Any]] | str | None:  # type: ignore
+        **kwargs: Any,
+    ) -> dict[str, Any] | list[dict[str, Any]] | str | None:  # type: ignore
         endpoint = route.merge(self.url)
 
         if not self._session:
@@ -176,19 +176,13 @@ class HTTPClient(
         attachments = []
 
         for index, file in enumerate(files):
-            attachments.append(
-                {
-                    "id": index,
-                    "filename": file.filename,
-                    "description": file.description
-                }
-            )
+            attachments.append({"id": index, "filename": file.filename, "description": file.description})
             form.append(
                 {
                     "name": f"files[{index}]",
                     "value": file.fp,
                     "filename": file.filename,
-                    "content_type": "application/octet-stream"
+                    "content_type": "application/octet-stream",
                 }
             )
 
