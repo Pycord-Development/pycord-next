@@ -25,6 +25,21 @@ __all__ = ("File",)
 
 
 class File:
+    """File to send to discord.
+
+    Parameters:
+        fp: The file data or path to file.
+        filename: Filename override.
+        description: Description of the file (that will appear as alt-text on discord).
+        spoiler: Whether the file is a spoiler.
+
+    Attributes:
+        fp (io.BufferedReader): The file data.
+        filename (str): The file's filename.
+        description (str): The file's description.
+        spoiler (bool): If the file is a spoiler.
+    """
+
     fp: io.BufferedIOBase
     filename: str | None
     description: str | None

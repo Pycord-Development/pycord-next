@@ -16,6 +16,7 @@ nav:
     - Assets: api/assets.md
     - Channels: api/channels.md
     - Events: api/events.md
+    - File: api/file.md
     - Guild: api/guild.md
 
 
