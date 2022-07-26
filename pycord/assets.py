@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import re
+
 from pycord.mixins import AssetMixin
 from pycord.state import ConnectionState
 from pycord.utils import _validate_image_params
@@ -39,34 +41,38 @@ class Asset(AssetMixin):
 
     Parameters:
         state: The relevant connection state.
-        endpoint: The endpoint URL related to the asset with all fields filled in, except for format and size.
-                  The URL must also start with a `/`.
+        path: The asset's path, excludes key (hash), format, and size.
+              The URL must also start with a `/`.
+        key: The key (hash) of the image.
         fmt: The format the image will be in.
         size: The size in pixels the image will be set to (must be between 16 and 4096 and a power of 2).
 
     Attributes:
         url (str): The asset's underlying CDN URL.
         key (str): The asset's identifying hash key.
+        path (str): The asset's path, excludes key (hash), format, and size.
+        fmt (str): The asset's format (e.g. png, jpg, gif)
+        size (int): The size in pixels of the image.
         animated (bool): Whether the asset is animated.
     """
 
     def __init__(
         self,
         state: ConnectionState,
-        endpoint: str,
+        path: str,
+        key: str,
         fmt: str = 'png',
         size: int = 128,
     ):
         self._state = state
-        self.key = endpoint.split('/')[-1]
-        self.animated = self.key.startswith('a_')
+        self.path = path
+        self.key = key
+        self.animated = key.startswith('a_')
 
-        if 'embed/avatars/' in endpoint:  # this endpoint doesn't accept sizes and only takes .png
-            self.fmt, self.size = fmt, size
-            self.url = CDN_URL + endpoint + '.png'
-        else:
-            self.fmt, self.size = _validate_image_params(self.key, fmt, size)
-            self.url = CDN_URL + endpoint + f'.{self.fmt}?size={self.size}'
+        if path.startswith('/embed/avatars/'):  # this endpoint doesn't accept sizes and only takes .png
+            fmt = "png"
+
+        self.fmt, self.size = _validate_image_params(self.key, fmt, size)
 
     def __str__(self) -> str:
         return self.url
@@ -82,3 +88,23 @@ class Asset(AssetMixin):
 
     def __hash__(self) -> int:
         return hash(self.url)
+
+    @classmethod
+    def from_url(cls, state: ConnectionState, url: str):
+        res = re.search(r"https://cdn.discordapp.com(/(?:[a-z/]*|[0-9]{15,19})*/)([a-f0-9]*)\.([a-z]{1,3})(?:\?size=([0-9]{1,4}))?", url)
+
+        if not res:
+            raise TypeError("invalid asset url given")
+
+        path, key, fmt, size = res.groups()
+        if not size:
+            size = 128
+
+        return cls(state, path, key, fmt, size)
+
+    @property
+    def url(self):
+        url = f"{CDN_URL}{self.path}{self.key}.{self.fmt}"
+        if self.size:
+            url += f"?size={self.size}"
+        return url
