@@ -32,7 +32,7 @@ class ShardManager:
         self.state = state
         self.version = version
         self.events = events
-        self.token = ""
+        self.token = ''
 
     async def connect(self, token: str) -> None:
         self.token = token

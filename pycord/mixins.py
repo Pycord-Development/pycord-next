@@ -25,6 +25,7 @@ from typing import Any
 from aiohttp import ClientSession
 from discord_typings import Snowflake
 
+from pycord.file import File
 from pycord.internal.http.route import Route
 from pycord.state import ConnectionState
 
@@ -104,6 +105,13 @@ class RouteCategoryMixin:
     _session: ClientSession
 
     async def request(
-        self, method: str, route: Route, data: dict[str, Any] | None = None, reason: str | None = None, **kwargs: Any
+        self,
+        method: str,
+        route: Route,
+        data: dict[str, Any] | None = None,
+        *,
+        files: list[File] | None = None,
+        reason: str = None,
+        **kwargs: Any,
     ) -> dict[str, Any] | list[dict[str, Any]] | str | None:
         ...
