@@ -3,9 +3,25 @@
 
 ## Installing
 v3 is in a pre-alpha phase currently, so to install you have to use git (via [ssh](https://github.com/settings/ssh/new)) via the following:
-
 ```
 pip install git+ssh://git@github.com/pycord/pycord-v3.git
+```
+
+## Documentation
+
+Install docs dependencies:
+```
+poetry install -E docs
+```
+
+Server Locally:
+```
+mkdocs serve
+```
+
+Build:
+```
+mkdocs build
 ```
 
 ## Reporting Bugs or Errors

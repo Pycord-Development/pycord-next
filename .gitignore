@@ -2,3 +2,6 @@
 tests-dev
 __pycache__
 .idea/
+
+# docs build folder
+site/
