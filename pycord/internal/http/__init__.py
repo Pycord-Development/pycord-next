@@ -166,8 +166,7 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
 
         return form_data
 
-    # this should get moved to an asset-related http file
-    async def get_cdn_asset(self, url: str) -> bytes:
+    async def get_cdn_asset(self, url: str) -> bytes | None:
         async with self._session.get(url) as response:
             match response.status:
                 case 200:
