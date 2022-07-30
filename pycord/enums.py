@@ -18,30 +18,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-class PycordException(Exception):
-    ...
+from enum import Enum
 
 
-class GatewayException(Exception):
-    ...
+class ChannelType(int, Enum):
+    GUILD_TEXT = 0
+    DM = 1
+    GUILD_VOICE = 2
+    GROUP_DM = 3
+    GUILD_CATEGORY = 4
+    GUILD_NEWS = 5
+    GUILD_NEWS_THREAD = 10
+    GUILD_PUBLIC_THREAD = 11
+    GUILD_PRIVATE_THREAD = 12
+    GUILD_STAGE_VOICE = 13
 
 
-class HTTPException(PycordException):
-    ...
-
-
-class NotFound(HTTPException):
-    ...
-
-
-class Forbidden(HTTPException):
-    ...
-
-
-class Unauthorized(HTTPException):
-    ...
-
-
-class NoMoreItems(PycordException):
-    ...
+class InviteTargetTypes(int, Enum):
+    STREAM = 1
+    EMBEDDED_APPLICATION = 2
