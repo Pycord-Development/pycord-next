@@ -64,8 +64,8 @@ def grab_creation_time(id: int) -> datetime:
     return datetime.fromtimestamp(ts, tz=timezone.utc)
 
 
-def datetime_to_snowflake(dt: datetime) -> int:
-    return (math.floor(dt.timestamp()) - EPOCH) << 22
+def datetime_to_snowflake(timestamp: datetime) -> int:
+    return (math.floor(timestamp.timestamp()) - EPOCH) << 22
 
 
 def _get_image_mime_type(data: bytes):
@@ -88,7 +88,7 @@ def _convert_base64_from_bytes(data: bytes) -> str:
     return fmt.format(mime=mime, data=b64)
 
 
-def _get_and_convert(key: str, converter: Callable[..., T], dict: Mapping[str, Any], default: D = None) -> T | D:
+def get_and_convert(key: str, converter: Callable[..., T], dict: Mapping[str, Any], default: D = None) -> T | D:
     """Helper function that attempts to get a value with a key then converts it.
     If the value is the default, then the pure value is returned.
 

@@ -22,9 +22,10 @@ from datetime import datetime
 
 from discord_typings import AllowedMentionsData, ComponentData, EmbedData, PartialAttachmentData, Snowflake
 
+from pycord.file import File
 from pycord.generators import MessageableHistoryGenerator
 from pycord.state import ConnectionState
-from pycord.typing import Typing
+from pycord.channel_typing import Typing
 from pycord.utils import datetime_to_snowflake
 
 # TODO: Replace raw data from discord_typings with models
@@ -41,17 +42,32 @@ class Messageable:
 
     async def send(
         self, 
-        *, 
         content: str = ..., 
+        *,
         tts: bool = ...,
         embeds: list[EmbedData] = ...,
         allowed_mentions: AllowedMentionsData = ...,
         components: list[ComponentData] = ...,
         sticker_ids: list[Snowflake] = ...,
-        # TODO: files
-        attachments: list[PartialAttachmentData] = ...,
+        files: list[File] = ...,
         flags: int = ...,
     ):
+        """Sends a message in this channel.
+
+        All parameters are not required, however, one of the `content`, `embeds`, 
+        `sticker_ids`, and `files` parameters have to be provided.
+
+        Parameters
+        ----------
+        content: :class:`str`
+            The content of this message.
+        tts: :class:`bool`
+            Whether or not this message should be played via text-to-speech.
+        embeds: list[:class:`EmbedData`]
+            The embeds of this message.
+        allowed_mentions: :class:`AllowedMentionsData`
+            The allowed mentions of this message.
+        """
         return await self._state._app.http.create_message(
             await self._get_channel_id(),
             content=content,
@@ -60,7 +76,7 @@ class Messageable:
             allowed_mentions=allowed_mentions,
             components=components,
             sticker_ids=sticker_ids,
-            attachments=attachments,
+            files=files,
             flags=flags
         )
 
@@ -72,6 +88,27 @@ class Messageable:
         after: Snowflake | datetime = ..., 
         limit: int | None = 50
     ):
+        """Gets all messages from a certain time.
+
+        Parameters
+        ----------
+        around: :class:`Snowflake` | :class:`datetime`
+            Around the given time that the messages should be fetched from.
+        before: :class:`Snowflake` | :class:`datetime`
+            Before the given time that the messages should be fetched from.
+        after: :class:`Snowflake` | :class:`datetime`
+            After the given time that the messages should be fetched from.
+        limit: :class:`int` | :class:`None`
+            The limit of the amount of messages to grab. If set to :class:`None`, then
+            all of the messages matching the conditions provided are fetched. Set to 50 
+            by default.
+
+        Returns
+        -------
+        :class:`MessageableHistoryGenerator`
+            A generator that automatically handles grabbing the messages with the met
+            conditions.
+        """
         if isinstance(around, datetime):
             around = datetime_to_snowflake(around)
         if isinstance(before, datetime):
