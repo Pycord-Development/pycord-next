@@ -29,11 +29,14 @@ except (ImportError, ModuleNotFoundError):
 
 from base64 import b64encode
 from datetime import datetime, timezone
-from typing import Any, Tuple
+import math
+from typing import Any, Callable, Mapping, TypeVar, Tuple
 
 from aiohttp import ClientResponse
 
 EPOCH = 1420070400000
+T = TypeVar('T')
+D = TypeVar('D')
 
 
 async def _text_or_json(rp: ClientResponse):
@@ -61,6 +64,10 @@ def grab_creation_time(id: int) -> datetime:
     return datetime.fromtimestamp(ts, tz=timezone.utc)
 
 
+def datetime_to_snowflake(dt: datetime) -> int:
+    return (math.floor(dt.timestamp()) - EPOCH) << 22
+
+
 def _get_image_mime_type(data: bytes):
     if data.startswith(b'\x89\x50\x4E\x47\x0D\x0A\x1A\x0A'):
         return 'image/png'
@@ -81,7 +88,31 @@ def _convert_base64_from_bytes(data: bytes) -> str:
     return fmt.format(mime=mime, data=b64)
 
 
+def _get_and_convert(key: str, converter: Callable[..., T], dict: Mapping[str, Any], default: D = None) -> T | D:
+    """Helper function that attempts to get a value with a key then converts it.
+    If the value is the default, then the pure value is returned.
+
+    Parameters
+    ----------
+    key: :class:`str`
+        The key of the value to grab from the dictionary.
+    converter: Callable[..., Any]
+        The converter to convert with.
+    dict: Mapping[:class:`str`, Any]
+        The dictionary/mapping to get the value from.
+    default: Any
+        The default value if there is no value with the key :param:`key` in the :param:`dict`.
+
+    Returns
+    -------
+        The converter's return type or the default type.
+    """
+    obj = dict.get(key, default)
+    return converter(obj) if obj is not default else obj
+
+
 def _validate_image_params(key: str, fmt: str, size: int) -> Tuple[str, int]:
+
     # format validation
 
     static_formats = frozenset(("png", "jpg", "jpeg", "webp"))

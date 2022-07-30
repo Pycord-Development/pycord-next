@@ -18,30 +18,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
+from typing import TYPE_CHECKING
+from typing_extensions import Self
 
-class PycordException(Exception):
-    ...
+if TYPE_CHECKING:
+    from .abc import Messageable
 
+class Typing:
+    def __init__(self, messageable: "Messageable") -> None:
+        self.messageable = messageable
+        self._task: asyncio.Task | None = None
 
-class GatewayException(Exception):
-    ...
+    async def perform_typing(self):
+        channel_id = await self.messageable._get_channel_id()
+        trigger_typing = self.messageable._state._app.http.trigger_typing_indicator
 
+        while True:
+            await trigger_typing(channel_id)
+            await asyncio.sleep(10)
 
-class HTTPException(PycordException):
-    ...
+    async def __aenter__(self: Self) -> Self:
+        self._task = asyncio.create_task(self.perform_typing())
+        return self
 
-
-class NotFound(HTTPException):
-    ...
-
-
-class Forbidden(HTTPException):
-    ...
-
-
-class Unauthorized(HTTPException):
-    ...
-
-
-class NoMoreItems(PycordException):
-    ...
+    # we use args here to abstract the other parameters we don't care about
+    async def __aexit__(self, *args):
+        if self._task:
+            self._task.cancel()
+            await self._task
