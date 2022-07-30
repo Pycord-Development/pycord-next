@@ -217,7 +217,9 @@ class Shard:
                         break
                     elif op == 10:
                         interval: float = data['d']['heartbeat_interval'] / 1000
-                        asyncio.create_task(self.heartbeat(interval=interval), name=f'initial-heartbeat-shard-{self.id}')
+                        asyncio.create_task(
+                            self.heartbeat(interval=interval), name=f'initial-heartbeat-shard-{self.id}'
+                        )
                     elif op == 11:
                         self._last_heartbeat_ack = (
                             datetime.now()

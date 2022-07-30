@@ -13,14 +13,29 @@
     --md-primary-bg-color: #FFFFFF;
 
     /* Code Shades */
-    --md-code-fg-color: #E2E4F1;
+    --md-code-fg-color: #FFFFFF;
     --md-code-bg-color: #191919;
+
+    --md-code-hl-name-color: #FFFFFF;
+    --md-code-hl-punctuation-color: #FFFFFF;
+    --md-code-hl-constant-color: #FFFFFF;
+    --md-code-hl-operator-color: #FFFFFF;
 
     /* Typeset Shades */
     --md-typeset-color: #FFFFFF;
-    --md-typeset-a-color: #FFFFFF;
+    --md-typeset-a-color: var(--md-accent-fg-color);
 
     /* Footer Shades */
+    --md-footer-bg-color: #333333;
     --md-footer-bg-color--dark: #2C2F33;
 
+    /* Admonition Shades */
+    --md-admonition-fg-color: #FFFFFF;
+    --md-admonition-bg-color: #191919;
+
+}
+
+/* Nav Link/URL Link Hovering Shades */
+.md-typeset a:hover, .md-nav__link--active:hover{
+    color: #6E83FA;
 }

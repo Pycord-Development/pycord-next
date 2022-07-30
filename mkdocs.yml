@@ -17,6 +17,7 @@ nav:
     - Channels: api/channels.md
     - Events: api/events.md
     - Guild: api/guild.md
+    - Mixins: api/mixins.md
 
 
 # Theme Configuration
@@ -41,6 +42,9 @@ theme:
 
 # Extensions
 markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
   - toc:
       permalink: true
 
@@ -51,15 +55,15 @@ plugins:
       default_handler: python
       handlers:
         python:
-          selection:
-            docstring_style: google
-            inherited_members: true
+          import:
+          - https://docs.python.org/3.10/objects.inv
           rendering:
             heading_level: 2
             show_root_full_path: false
             show_root_heading: true
-            show_signature_annotations: true
             show_source: false
+          selection:
+            docstring_style: google
   - search
 
 # Extra Customization

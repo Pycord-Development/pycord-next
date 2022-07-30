@@ -18,10 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
 import io
+import os
 
 __all__ = ("File",)
+
 
 class File:
     fp: io.BufferedIOBase
@@ -53,7 +54,7 @@ class File:
                 _, filename = os.path.split(fp)
             else:
                 filename = getattr(fp, "name", None)
- 
+
         self.spoiler = spoiler
         self.filename = filename
         if filename.startswith("SPOILER_"):
@@ -65,7 +66,7 @@ class File:
         self._close = self.fp.close
         self.fp.close = lambda: None
 
-    def reset(self, seek = True) -> None:
+    def reset(self, seek=True) -> None:
         # seek to initial position on failed requests
         # on the first try, `seek` will be 0, so the file
         # doesn't get reset
