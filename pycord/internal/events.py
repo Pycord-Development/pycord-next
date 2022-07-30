@@ -18,8 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from functools import partial
 from asyncio import create_task, get_running_loop, iscoroutinefunction
+from functools import partial
 from typing import Any, Callable, Coroutine
 
 

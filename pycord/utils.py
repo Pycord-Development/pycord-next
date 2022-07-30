@@ -111,13 +111,14 @@ def _get_and_convert(key: str, converter: Callable[..., T], dict: Mapping[str, A
     return converter(obj) if obj is not default else obj
 
 
-async def _validate_image_params(img_hash: str, fmt: str, size: int) -> Tuple[str, int]:
+def _validate_image_params(key: str, fmt: str, size: int) -> Tuple[str, int]:
+
     # format validation
 
     static_formats = frozenset(("png", "jpg", "jpeg", "webp"))
     asset_formats = static_formats | {"gif"}
 
-    animated = img_hash.startswith("a_")
+    animated = key.startswith("a_")
     if animated:
         fmt = fmt if fmt in asset_formats else "gif"
     else:

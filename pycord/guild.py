@@ -172,5 +172,5 @@ class Emoji(Hashable):
         self.animated = data.get('animated')
         self.available = data.get('available')
 
-    def from_guild(self) -> list["Emoji"]:
+    def from_guild(self, guild: Guild) -> list["Emoji"]:
         ...

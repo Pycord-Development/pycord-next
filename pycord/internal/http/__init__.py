@@ -14,8 +14,8 @@ from aiohttp import ClientSession, FormData
 from discord_typings.resources.user import UserData
 
 from pycord import __version__, utils
-from pycord.file import File
 from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
+from pycord.file import File
 from pycord.internal.blocks import Block
 from pycord.internal.http.channel import ChannelRoutes
 from pycord.internal.http.emoji import EmojiRoutes
@@ -51,7 +51,7 @@ class HTTPClient(ChannelRoutes, EmojiRoutes, GuildRoutes):
         *,
         files: list[File] | None = None,
         reason: str | None = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> dict[str, Any] | list[dict[str, Any]] | str | None:  # type: ignore
         endpoint = route.merge(self.url)
 
@@ -149,19 +149,13 @@ class HTTPClient(ChannelRoutes, EmojiRoutes, GuildRoutes):
         attachments = []
 
         for index, file in enumerate(files):
-            attachments.append(
-                {
-                    "id": index,
-                    "filename": file.filename,
-                    "description": file.description
-                }
-            )
+            attachments.append({"id": index, "filename": file.filename, "description": file.description})
             form.append(
                 {
                     "name": f"files[{index}]",
                     "value": file.fp,
                     "filename": file.filename,
-                    "content_type": "application/octet-stream"
+                    "content_type": "application/octet-stream",
                 }
             )
 
@@ -173,8 +167,7 @@ class HTTPClient(ChannelRoutes, EmojiRoutes, GuildRoutes):
 
         return form_data
 
-    # this should get moved to an asset-related http file
-    async def get_cdn_asset(self, url: str) -> bytes:
+    async def get_cdn_asset(self, url: str) -> bytes | None:
         async with self._session.get(url) as response:
             match response.status:
                 case 200:
