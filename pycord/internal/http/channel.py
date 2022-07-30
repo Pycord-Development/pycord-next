@@ -22,7 +22,6 @@ from datetime import datetime
 from typing import Any
 from discord_typings import (
     AllowedMentionsData,
-    AttachmentData,
     ChannelData,
     ComponentData,
     EmbedData,
@@ -43,6 +42,7 @@ from pycord.enums import ChannelType, InviteTargetTypes
 from pycord.file import File
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
+from pycord.types import GuildChannelData
 
 
 class ChannelRoutes(RouteCategoryMixin):
@@ -67,7 +67,7 @@ class ChannelRoutes(RouteCategoryMixin):
         rtc_region: str | None = ...,
         video_quality_mode: int | None = ...,
         default_auto_archive_duration: int | None = ...,
-    ) -> ChannelData:
+    ) -> GuildChannelData:
         payload = {}
         if name is not ...:
             payload['name'] = name

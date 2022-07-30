@@ -47,8 +47,8 @@ class Comparable:
 class Dictable(Comparable):
     as_dict: Mapping[str, Any]
 
-    def __dict__(self) -> dict[str, Any]:
-        return self.as_dict  # type: ignore
+    def __dict__(self) -> Mapping[str, Any]:
+        return self.as_dict
 
 
 class Hashable(Dictable):
