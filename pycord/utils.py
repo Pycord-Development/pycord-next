@@ -81,13 +81,13 @@ def _convert_base64_from_bytes(data: bytes) -> str:
     return fmt.format(mime=mime, data=b64)
 
 
-async def _validate_image_params(img_hash: str, fmt: str, size: int) -> Tuple[str, int]:
+def _validate_image_params(key: str, fmt: str, size: int) -> Tuple[str, int]:
     # format validation
 
     static_formats = frozenset(("png", "jpg", "jpeg", "webp"))
     asset_formats = static_formats | {"gif"}
 
-    animated = img_hash.startswith("a_")
+    animated = key.startswith("a_")
     if animated:
         fmt = fmt if fmt in asset_formats else "gif"
     else:
