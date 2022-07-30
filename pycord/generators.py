@@ -19,6 +19,7 @@
 # SOFTWARE.
 
 import asyncio
+from types import EllipsisType
 from typing import TYPE_CHECKING, AsyncIterator, TypeVar
 
 from discord_typings import MessageData, Snowflake
@@ -46,79 +47,55 @@ class BaseAsyncGenerator(AsyncIterator[T]):
         except NoMoreItems:
             raise StopAsyncIteration
 
-class MessageableHistoryGenerator(BaseAsyncGenerator[MessageData]):
-    def __init__(
-        self, 
-        messageable: Messageable, 
-        limit: int | None = None, 
-        around: Snowflake = ...,
-        before: Snowflake = ...,
-        after: Snowflake = ...,
-    ):
-        self.around = around
-        self.before = before
-        self.after = after
-        self.limit = limit
-        self.retrieve = 0
+async def channel_history_generator(
+    messageable: Messageable,
+    limit: int | None = None,
+    around: Snowflake = ...,
+    before: Snowflake = ...,
+    after: Snowflake = ...,
+):
+    _around: Snowflake | EllipsisType = around
+    retrieve = 0
+    reverse = after is not ...
+    channel_id = await messageable._get_channel_id()
 
-        self.reverse = after is not None
-        self.messageable = messageable
-        self.channel_id: Snowflake | None = None
-        self.messages = asyncio.Queue()
-
-    async def next(self) -> MessageData:
-        if self.messages.empty():
-            await self.fill_messages()
-
-        try:
-            return self.messages.get_nowait()
-        except asyncio.QueueEmpty:
-            raise NoMoreItems
-
-    def _should_retrieve(self):
-        limit = self.limit
-        retrieve = 0
+    def should_retrieve():
         if limit is None or limit > 100:
             retrieve = 100
         else:
             retrieve = limit
-
-        self.retrieve = retrieve
         return retrieve > 0
 
-    async def fill_messages(self):
-        if not self.channel_id:
-            self.channel_id = await self.messageable._get_channel_id()
+    while should_retrieve():
+        get_msg_args = {
+            'before': before,
+            'after': after,
+            'limit': retrieve
+        }
+        if _around is not ...:
+            get_msg_args['around'] = _around
 
-        if self._should_retrieve():
-            data = await self._fetch_messages()
-            if len(data) < 100:
-                self.limit = 0
-
-            if self.reverse:
-                data = reversed(data)
-
-            for elem in data:
-                await self.messages.put(elem)
-
-    async def _fetch_messages(self):
-        data: list[MessageData] = await self.messageable._state._app.http.get_channel_messages(
-            self.channel_id,  # type: ignore
-            around=self.around,  # type: ignore
-            before=self.before,
-            after=self.after,
-            limit=self.retrieve
+        data = await messageable._state._app.http.get_channel_messages(
+            channel_id,
+            **get_msg_args,
         )
 
         if len(data):
-            if self.limit is not None:
-                self.limit -= self.retrieve
-                
-            if self.before:
-                self.before = int(data[-1]['id'])
-            if self.after:
-                self.after = int(data[0]['id'])
-            if self.around:
-                self.around = ...
+            if limit is not None:
+                limit -= retrieve
 
-        return data
+            if before is not ...:
+                before = int(data[-1]['id'])
+            if after is not ...:
+                after = int(data[0]['id'])
+            if around is not ...:
+                _around = ...
+
+            if len(data) < 100:
+                limit = 0
+
+        if reverse:
+            data = reversed(data)
+
+        for msg in data:
+            yield msg

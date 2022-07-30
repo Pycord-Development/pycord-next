@@ -23,7 +23,7 @@ from datetime import datetime
 from discord_typings import AllowedMentionsData, ComponentData, EmbedData, PartialAttachmentData, Snowflake
 
 from pycord.file import File
-from pycord.generators import MessageableHistoryGenerator
+from pycord.generators import channel_history_generator
 from pycord.state import ConnectionState
 from pycord.channel_typing import Typing
 from pycord.utils import datetime_to_snowflake
@@ -116,7 +116,7 @@ class Messageable:
         if isinstance(after, datetime):
             after = datetime_to_snowflake(after)
 
-        return MessageableHistoryGenerator(
+        return channel_history_generator(
             self,
             limit,
             around,
@@ -156,7 +156,7 @@ class Messageable:
             after = datetime_to_snowflake(after)
 
         msgs = await self.get_messages(around=around, before=before, after=after, limit=limit)
-        ids = [msg['id'] for msg in await msgs.flatten()]
+        ids = [msg['id'] async for msg in msgs]
         
         await self._state._app.http.bulk_delete_messages(
             await self._get_channel_id(),
