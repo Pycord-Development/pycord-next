@@ -20,7 +20,23 @@
 from discord_typings import Snowflake
 
 
-class Route:
+class BaseRoute:
+    def __init__(
+        self,
+        path: str,
+        guild_id: Snowflake | None = None,
+        channel_id: Snowflake | None = None,
+        webhook_id: Snowflake | None = None,
+        webhook_token: str | None = None,
+        **parameters: str | int,
+    ) -> None:
+        ...
+
+    def merge(self, url: str) -> str:
+        pass
+
+
+class Route(BaseRoute):
     def __init__(
         self,
         path: str,

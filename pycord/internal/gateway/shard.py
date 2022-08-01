@@ -30,8 +30,8 @@ from discord_typings.gateway import GatewayEvent
 from pycord import utils
 
 from ...errors import GatewayException
-from ...state import ConnectionState
-from ..events import EventDispatcher
+from ...state import BaseConnectionState
+from ..events import BaseEventDispatcher
 
 if TYPE_CHECKING:
     from .manager import ShardManager
@@ -41,13 +41,14 @@ url = 'wss://gateway.discord.gg/?v={version}&encoding=json&compress=zlib-stream'
 _log = logging.getLogger(__name__)
 
 
+# TODO: Make a baseclass for this
 class Shard:
     def __init__(
         self,
         shard_id: int,
         shard_count: int,
-        state: ConnectionState,
-        events: EventDispatcher,
+        state: BaseConnectionState,
+        events: BaseEventDispatcher,
         manager: "ShardManager",
         version: int = 10,
         timeout: int = 30,
