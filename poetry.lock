@@ -175,7 +175,7 @@ typing_extensions = ">=4.3,<5"
 
 [[package]]
 name = "flake8"
-version = "5.0.1"
+version = "5.0.3"
 description = "the modular source code checker: pep8 pyflakes and co"
 category = "dev"
 optional = false
@@ -707,7 +707,7 @@ speed = ["uvloop", "cchardet", "aiodns", "Brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "ed29604f97e5cd20ff186568b1889edc483a113a9de652d8b139884954835174"
+content-hash = "52228fe33e7bf1f7ec9c388fa5a3edee27302c4467b6fd6bc06b9abb4c465c33"
 
 [metadata.files]
 aiodns = [
@@ -1011,8 +1011,8 @@ discord-typings = [
     {file = "discord_typings-0.5.1-py3-none-any.whl", hash = "sha256:55ebdb6d6f0f47df774a0c31193ba6a45de14625fab9c6fbd43bfe87bb8c0128"},
 ]
 flake8 = [
-    {file = "flake8-5.0.1-py2.py3-none-any.whl", hash = "sha256:44e3ecd719bba1cb2ae65d1b54212cc9df4f5db15ac271f8856e5e6c2eebefed"},
-    {file = "flake8-5.0.1.tar.gz", hash = "sha256:9c51d3d1426379fd444d3b79eabbeb887849368bd053039066439523d8486961"},
+    {file = "flake8-5.0.3-py2.py3-none-any.whl", hash = "sha256:93aa565ae2f0316b95bb57a354f2b2d55ee8508e1fe1cb13b77b9c195b4a2537"},
+    {file = "flake8-5.0.3.tar.gz", hash = "sha256:b27fd7faa8d90aaae763664a489012292990388e5d3604f383b290caefbbc922"},
 ]
 flake8-functions = [
     {file = "flake8_functions-0.0.7-py3-none-any.whl", hash = "sha256:f2f75545c2b0df9eeba0ad316e2ac38c101676970b4441300fc07af3226a44f6"},
