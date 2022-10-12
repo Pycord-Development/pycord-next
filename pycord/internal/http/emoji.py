@@ -17,20 +17,23 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+
 from discord_typings import EmojiData, Snowflake
 
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
+from pycord.utils import _convert_base64_from_bytes
 
 
 class EmojiRoutes(RouteCategoryMixin):
     async def list_guild_emojis(self, guild_id: Snowflake) -> EmojiData:
-        return await self.request("GET", Route(f"/guilds/{guild_id}/emojis"), None)
+        return await self.request("GET", Route("/guilds/{guild_id}/emojis", guild_id=guild_id))
 
     async def get_guild_emoji(self, guild_id: Snowflake, emoji_id: Snowflake) -> EmojiData:
-        return await self.request("GET", Route(f"/guilds/{guild_id}/emojis/{emoji_id}"), None)
+        return await self.request("GET",
+                                  Route("/guilds/{guild_id}/emojis/{emoji_id}", guild_id=guild_id, emoji_id=emoji_id))
 
-    # TODO: image to `Asset`
     async def create_guild_emoji(
         self,
         guild_id: Snowflake,
@@ -42,11 +45,11 @@ class EmojiRoutes(RouteCategoryMixin):
     ) -> EmojiData:
         payload = {
             "name": name,
-            "image": image,
+            "image": _convert_base64_from_bytes(image),
             "roles": roles or [],
         }
 
-        return await self.request("POST", Route(f"/guilds/{guild_id}/emojis"), payload, reason=reason)
+        return await self.request("POST", Route("/guilds/{guild_id}/emojis", guild_id=guild_id), payload, reason=reason)
 
     async def modify_guild_emoji(
         self,
@@ -63,7 +66,14 @@ class EmojiRoutes(RouteCategoryMixin):
         if roles is not ...:
             payload["roles"] = roles or []
 
-        return await self.request("PATCH", Route(f"/guilds/{guild_id}/emojis/{emoji_id}"), payload, reason=reason)
+        return await self.request(
+            "PATCH",
+            Route("/guilds/{guild_id}/emojis/{emoji_id}", guild_id=guild_id, emoji_id=emoji_id),
+            payload,
+            reason=reason
+        )
 
     async def delete_guild_emoji(self, guild_id: Snowflake, emoji_id: Snowflake, *, reason: str | None = None) -> None:
-        return await self.request("DELETE", Route(f"/guilds/{guild_id}/emojis/{emoji_id}"), None, reason=reason)
+        return await self.request("DELETE",
+                                  Route("/guilds/{guild_id}/emojis/{emoji_id}", guild_id=guild_id, emoji_id=emoji_id),
+                                  reason=reason)
