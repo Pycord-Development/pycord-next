@@ -35,6 +35,7 @@ class AuditLogRoutes(RouteCategoryMixin):
         before: Snowflake | None = None,
         limit: int | None = None,
     ) -> AuditLogData:
+         """Returns the audit log for the guild. Requires the `VIEW_AUDIT_LOG` permission."""
         params = {}
         if user_id is not None:
             params['user_id'] = user_id
