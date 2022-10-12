@@ -34,11 +34,11 @@ from pycord.mixins import RouteCategoryMixin
 
 class AutoModerationRoutes(RouteCategoryMixin):
     async def list_auto_moderation_rules_for_guild(self, guild_id: Snowflake) -> list[AutoModerationRuleData]:
-        """Get a list of all rules currently configured for the guild. Returns a list of auto moderation rule objects."""
+        """Get a list of all rules currently configured for the guild."""
         return await self.request('GET', Route('/guilds/{guild_id}/automod-rules', guild_id=guild_id))
 
     async def get_auto_moderation_rule(self, guild_id: Snowflake, rule_id: Snowflake) -> AutoModerationRuleData:
-        """Get a single rule. Returns an auto moderation rule."""
+        """Get a single rule."""
         return await self.request('GET', Route('/guilds/{guild_id}/automod-rules/{rule_id}', guild_id=guild_id,
                                                rule_id=rule_id))
 
@@ -56,7 +56,7 @@ class AutoModerationRoutes(RouteCategoryMixin):
         exempt_channels: list[Snowflake] | None = None,
         reason: str | None = None,
     ) -> AutoModerationRuleData:
-        """Create a new rule. Returns an auto moderation rule on success. Fires an Auto Moderation Rule Create Gateway event."""
+        """Create a new rule."""
         payload = {
             'name': name,
             'event_type': event_type.value,
@@ -94,7 +94,7 @@ class AutoModerationRoutes(RouteCategoryMixin):
         exempt_channels: list[Snowflake] = ...,
         reason: str | None = None,
     ) -> AutoModerationRuleData:
-        """Modify an existing rule. Returns an auto moderation rule on success. Fires an Auto Moderation Rule Update Gateway event."""
+        """Modify an existing rule."""
         payload = {}
         if name is not ...:
             payload['name'] = name
@@ -121,6 +121,6 @@ class AutoModerationRoutes(RouteCategoryMixin):
     async def delete_auto_moderation_rule(
         self, guild_id: Snowflake, rule_id: Snowflake, reason: str | None = None
     ) -> None:
-        """Delete a rule. Fires an Auto Moderation Rule Delete Gateway event."""
+        """Delete a rule."""
         return await self.request('DELETE', Route('/guilds/{guild_id}/automod-rules/{rule_id}', guild_id=guild_id,
                                                   rule_id=rule_id), reason=reason)
