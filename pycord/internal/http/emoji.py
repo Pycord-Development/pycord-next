@@ -78,6 +78,7 @@ class EmojiRoutes(RouteCategoryMixin):
         )
 
     async def delete_guild_emoji(self, guild_id: Snowflake, emoji_id: Snowflake, *, reason: str | None = None) -> None:
+        """Delete the given emoji."""
         return await self.request("DELETE",
                                   Route("/guilds/{guild_id}/emojis/{emoji_id}", guild_id=guild_id, emoji_id=emoji_id),
                                   reason=reason)
