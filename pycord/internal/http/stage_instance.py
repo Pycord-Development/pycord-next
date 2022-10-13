@@ -35,6 +35,7 @@ class StageInstanceRoutes(RouteCategoryMixin):
         send_start_notification: bool | None = None,
         reason: str | None = None,
     ) -> StageInstanceData:
+        """Creates a new Stage instance associated to a Stage channel."""
         payload = {
             'channel_id': channel_id,
             'topic': topic,
@@ -52,6 +53,7 @@ class StageInstanceRoutes(RouteCategoryMixin):
         )
 
     async def get_stage_instance(self, channel_id: Snowflake) -> StageInstanceData:
+        """Gets the stage instance associated with the Stage channel, if it exists."""
         return await self.request('GET', Route('/stage-instances/{channel_id}', channel_id=channel_id))
 
     async def modify_stage_instance(
@@ -62,6 +64,7 @@ class StageInstanceRoutes(RouteCategoryMixin):
         privacy_level: StageInstancePrivacyLevels = ...,
         reason: str | None = None,
     ) -> StageInstanceData:
+        """Updates fields of an existing Stage instance."""
         payload = {}
         if topic is not ...:
             payload['topic'] = topic
@@ -76,4 +79,5 @@ class StageInstanceRoutes(RouteCategoryMixin):
         )
 
     async def delete_stage_instance(self, channel_id: Snowflake, reason: str | None = None) -> None:
+        """Deletes the Stage instance."""
         await self.request('DELETE', Route('/stage-instances/{channel_id}', channel_id=channel_id), reason=reason)

@@ -44,6 +44,7 @@ class WebhookRoutes(RouteCategoryMixin):
         avatar: bytes | None = None,
         reason: str | None = None,
     ) -> WebhookData:
+        """Creates a new webhook."""
         payload = {'name': name}
         if avatar is not None:
             payload['avatar'] = _convert_base64_from_bytes(avatar)
@@ -56,15 +57,19 @@ class WebhookRoutes(RouteCategoryMixin):
         )
 
     async def get_channel_webhooks(self, channel_id: Snowflake) -> list[WebhookData]:
+        """Returns a list of channel webhooks."""
         return await self.request('GET', Route('/channels/{channel_id}/webhooks', channel_id=channel_id))
 
     async def get_guild_webhooks(self, guild_id: Snowflake) -> list[WebhookData]:
+        """Returns a list of guild webhooks."""
         return await self.request('GET', Route('/guilds/{guild_id}/webhooks', guild_id=guild_id))
 
     async def get_webhook(self, webhook_id: Snowflake) -> WebhookData:
+        """Returns a webhook for the given id."""
         return await self.request('GET', Route('/webhooks/{webhook_id}', webhook_id=webhook_id))
 
     async def get_webhook_with_token(self, webhook_id: Snowflake, webhook_token: str) -> WebhookData:
+        """Returns a webhook for the given token. Does not return a user in the returned webhook."""
         return await self.request('GET', Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id,
                                                webhook_token=webhook_token))
 
@@ -77,6 +82,7 @@ class WebhookRoutes(RouteCategoryMixin):
         channel_id: Snowflake = ...,
         reason: str | None = None,
     ) -> WebhookData:
+        """Modify a webhook."""
         payload = {}
         if name is not None:
             payload['name'] = name
@@ -100,6 +106,7 @@ class WebhookRoutes(RouteCategoryMixin):
         name: str = ...,
         avatar: bytes | None = ...,
     ) -> WebhookData:
+        """Modify a webhook. Does not return a user in the returned webhook."""
         payload = {}
         if name is not None:
             payload['name'] = name
@@ -113,9 +120,11 @@ class WebhookRoutes(RouteCategoryMixin):
         )
 
     async def delete_webhook(self, webhook_id: Snowflake, reason: str | None = None) -> None:
+        """Delete a webhook permanently."""
         await self.request('DELETE', Route('/webhooks/{webhook_id}', webhook_id=webhook_id), reason=reason)
 
     async def delete_webhook_with_token(self, webhook_id: Snowflake, webhook_token: str) -> None:
+        """Delete a webhook permanently."""
         await self.request('DELETE', Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id,
                                            webhook_token=webhook_token))
 
@@ -138,6 +147,7 @@ class WebhookRoutes(RouteCategoryMixin):
         flags: int | None = None,
         thread_name: str | None = None,
     ) -> None:
+        """Sends a message with a webhook."""
         params = {}
         if wait is not None:
             params['wait'] = wait
@@ -181,6 +191,7 @@ class WebhookRoutes(RouteCategoryMixin):
         *,
         thread_id: Snowflake | None = None,
     ) -> MessageData:
+        """Returns a previously-sent webhook message from the same token."""
         params = {}
         if thread_id is not None:
             params['thread_id'] = thread_id
@@ -206,6 +217,7 @@ class WebhookRoutes(RouteCategoryMixin):
         files: list[File] | None = None,
         attachments: list[PartialAttachmentData] | None = None,
     ) -> MessageData:
+        """Edits a previously-sent webhook message from the same token."""
         params = {}
         if thread_id is not None:
             params['thread_id'] = thread_id
@@ -243,6 +255,7 @@ class WebhookRoutes(RouteCategoryMixin):
         *,
         thread_id: Snowflake | None = None,
     ) -> None:
+        """Deletes a message that was created by the webhook."""
         params = {}
         if thread_id is not None:
             params['thread_id'] = thread_id

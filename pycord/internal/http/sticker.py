@@ -28,20 +28,25 @@ from pycord.types import ListNitroStickerPacksData
 
 class StickerRoutes(RouteCategoryMixin):
     async def get_sticker(self, sticker_id: Snowflake) -> dict:
+        """Returns a sticker for the given sticker ID."""
         return await self.request('GET', Route('/stickers/{sticker_id}', sticker_id=sticker_id))
 
     async def list_nitro_sticker_packs(self) -> list[StickerPackData]:
+        """Returns the list of sticker packs available to Nitro subscribers."""
         val: ListNitroStickerPacksData = await self.request('GET', Route('/sticker-packs'))
         return val['sticker_packs']
 
     async def list_guild_stickers(self, guild_id: Snowflake) -> list[StickerData]:
+        """Returns a list of stickers for the given guild."""
         return await self.request('GET', Route('/guilds/{guild_id}/stickers', guild_id=guild_id))
 
     async def get_guild_sticker(self, guild_id: Snowflake, sticker_id: Snowflake) -> StickerData:
+        """Returns a sticker for the given guild and sticker IDs."""
         return await self.request('GET', Route('/guilds/{guild_id}/stickers/{sticker_id}', guild_id=guild_id,
                                                sticker_id=sticker_id))
 
     # TODO: file to `Asset` or something special
+    # FIXME: Untested
     async def create_guild_sticker(
         self,
         guild_id: Snowflake,
@@ -52,6 +57,7 @@ class StickerRoutes(RouteCategoryMixin):
         file: File,
         reason: str | None = None,
     ) -> StickerData:
+        """Create a new sticker for the guild."""
         form_data = FormData(quote_fields=False)
         form_data.add_field(name='name', value=name)
         form_data.add_field(name='description', value=description)
@@ -75,6 +81,7 @@ class StickerRoutes(RouteCategoryMixin):
         tags: str = ...,
         reason: str | None = None,
     ) -> StickerData:
+        """Modify the given sticker."""
         payload = {}
         if name is not ...:
             payload['name'] = name
@@ -91,6 +98,7 @@ class StickerRoutes(RouteCategoryMixin):
         )
 
     async def delete_guild_sticker(self, guild_id: Snowflake, sticker_id: Snowflake, reason: str | None = None) -> None:
+        """Delete the given sticker."""
         await self.request('DELETE',
                            Route('/guilds/{guild_id}/stickers/{sticker_id}', guild_id=guild_id, sticker_id=sticker_id),
                            reason=reason)

@@ -40,6 +40,7 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
     async def list_scheduled_events_for_guild(
         self, guild_id: Snowflake, with_user_count: bool | None = None
     ) -> list[GuildScheduledEventData]:
+        """Returns a list of guild scheduled events for the given guild."""
         params = {}
         if with_user_count is not None:
             params['with_user_count'] = with_user_count
@@ -61,6 +62,7 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
         image: bytes | None = None,
         reason: str | None = None,
     ) -> GuildScheduledEventData:
+        """Create a guild scheduled event in the guild."""
         payload = {
             'name': name,
             'privacy_level': privacy_level.value,
@@ -90,6 +92,7 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
         self, guild_id: Snowflake, event_id: Snowflake,
         *, with_user_count: bool | None = None
     ) -> GuildScheduledEventData:
+        """Get a guild scheduled event."""
         params = {}
         if with_user_count is not None:
             params['with_user_count'] = with_user_count
@@ -114,6 +117,7 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
         image: bytes = ...,
         reason: str | None = None,
     ) -> GuildScheduledEventData:
+        """Modify a guild scheduled event."""
         payload = {}
         if channel_id is not ...:
             payload['channel_id'] = channel_id
@@ -144,6 +148,7 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
         )
 
     async def delete_guild_scheduled_event(self, guild_id: Snowflake, event_id: Snowflake) -> None:
+        """Delete a guild scheduled event."""
         return await self.request('DELETE', Route('/guilds/{guild_id}/scheduled-events/{event_id}', guild_id=guild_id,
                                                   event_id=event_id))
 
@@ -157,6 +162,7 @@ class GuildScheduledEventRoutes(RouteCategoryMixin):
         before: Snowflake | None = None,
         after: Snowflake | None = None,
     ) -> list[GuildScheduledEventUserData]:
+        """Get a list of guild scheduled event users subscribed to a guild scheduled event."""
         params = {}
         if limit is not None:
             params['limit'] = limit

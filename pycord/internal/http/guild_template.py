@@ -26,6 +26,7 @@ from pycord.utils import _convert_base64_from_bytes
 
 class GuildTemplateRoutes(RouteCategoryMixin):
     async def get_guild_template(self, template_code: str) -> GuildTemplateData:
+        """Returns a guild template for the given code."""
         return await self.request('GET', Route('/guilds/templates/{template_code}', template_code=template_code))
 
     async def create_guild_from_guild_template(
@@ -35,6 +36,7 @@ class GuildTemplateRoutes(RouteCategoryMixin):
         name: str,
         icon: bytes | None = None,
     ) -> GuildData:
+        """Create a new guild based on a template."""
         payload = {'name': name}
         if icon is not None:
             payload['icon'] = _convert_base64_from_bytes(icon)
@@ -46,6 +48,7 @@ class GuildTemplateRoutes(RouteCategoryMixin):
         )
 
     async def get_guild_templates(self, guild_id: Snowflake) -> list[GuildTemplateData]:
+        """Returns a list of guild templates."""
         return await self.request('GET', Route('/guilds/{guild_id}/templates', guild_id=guild_id))
 
     async def create_guild_template(
@@ -55,6 +58,7 @@ class GuildTemplateRoutes(RouteCategoryMixin):
         name: str,
         description: str | None = None,
     ) -> GuildTemplateData:
+        """Creates a template for the guild."""
         payload = {'name': name}
         if description is not None:
             payload['description'] = description
@@ -66,6 +70,7 @@ class GuildTemplateRoutes(RouteCategoryMixin):
         )
 
     async def sync_guild_template(self, guild_id: Snowflake, template_code: str) -> GuildTemplateData:
+        """Syncs the template to the guild's current state."""
         return await self.request('PUT', Route('/guilds/{guild_id}/templates/{template_code}', guild_id,
                                                template_code=template_code))
 
@@ -77,6 +82,7 @@ class GuildTemplateRoutes(RouteCategoryMixin):
         name: str = ...,
         description: str | None = ...,
     ) -> GuildTemplateData:
+        """Modifies the template's metadata."""
         payload = {}
         if name is not ...:
             payload['name'] = name
@@ -90,5 +96,6 @@ class GuildTemplateRoutes(RouteCategoryMixin):
         )
 
     async def delete_guild_template(self, guild_id: Snowflake, template_code: str) -> None:
+        """Deletes the template."""
         return await self.request('DELETE', Route('/guilds/{guild_id}/templates/{template_code}', guild_id,
                                                   template_code=template_code))

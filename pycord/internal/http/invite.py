@@ -34,6 +34,7 @@ class InviteRoutes(RouteCategoryMixin):
         with_expiration: bool | None = None,
         guild_scheduled_event_id: Snowflake | None = None,
     ) -> InviteData:
+        """Returns an invite for the given code."""
         params = {}
         if with_counts is not None:
             params['with_counts'] = with_counts
@@ -49,4 +50,5 @@ class InviteRoutes(RouteCategoryMixin):
         )
 
     async def delete_invite(self, invite_code: str, *, reason: str | None = None) -> None:
+        """Delete an invite."""
         return await self.request('DELETE', Route('/invites/{invite_code}', invite_code=invite_code), reason=reason)
