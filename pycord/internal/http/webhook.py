@@ -180,6 +180,7 @@ class WebhookRoutes(RouteCategoryMixin):
             'POST',
             Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
             payload,
+            params=params,
             files=files,
         )
 
