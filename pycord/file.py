@@ -20,16 +20,33 @@
 
 import io
 import os
+from typing import Protocol
 
-__all__ = ("File",)
 
-
-class File:
+class BaseFile(Protocol):
     fp: io.BufferedIOBase
     filename: str | None
     description: str | None
     spoiler: bool
 
+    def __init__(
+        self,
+        fp: str | bytes | os.PathLike | io.BufferedIOBase,
+        filename: str | None = None,
+        *,
+        description: str | None = None,
+        spoiler: bool = False,
+    ) -> None:
+        pass
+
+    def reset(self, seek: bool = False) -> None:
+        pass
+
+    def close(self) -> None:
+        pass
+
+
+class File(BaseFile):
     def __init__(
         self,
         fp: str | bytes | os.PathLike | io.BufferedIOBase,
