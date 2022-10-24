@@ -89,12 +89,12 @@ class GuildRoutes(RouteCategoryMixin):
         return await self.request('POST', Route('/guilds'), payload)
 
     async def get_guild(self, guild_id: Snowflake, with_counts: bool = False) -> GuildData:
-        """Returns the guild object for the given id."""
+        """Returns the guild for the given id."""
         params = {'with_counts': with_counts}
         return await self.request('GET', Route('/guilds/{guild_id}', guild_id=guild_id), params=params)
 
     async def get_guild_preview(self, guild_id: Snowflake) -> GuildPreviewData:
-        """Returns the guild preview object for the given id."""
+        """Returns the guild preview for the given id."""
         return await self.request('GET', Route('/guilds/{guild_id}/preview', guild_id=guild_id))
 
     async def modify_guild(
@@ -170,7 +170,7 @@ class GuildRoutes(RouteCategoryMixin):
         return await self.request('DELETE', Route('/guilds/{guild_id}', guild_id=guild_id))
 
     async def get_guild_channels(self, guild_id: Snowflake) -> list[ChannelData]:
-        """Returns a list of guild channel objects. Does not include threads."""
+        """Returns a list of guild channels. Does not include threads."""
         return await self.request('GET', Route('/guilds/{guild_id}/channels', guild_id=guild_id))
 
     # TODO: channel_type to ChannelType
@@ -193,7 +193,7 @@ class GuildRoutes(RouteCategoryMixin):
         video_quality_mode: int | None = None,
         default_auto_archive_duration: int | None = None,
     ) -> ChannelData:
-        """Create a new channel object for the guild."""
+        """Create a new channel for the guild."""
         payload = {'name': name}
         # TODO: check keys based on channel type?
         if channel_type is not None:
@@ -230,7 +230,7 @@ class GuildRoutes(RouteCategoryMixin):
         guild_id: Snowflake,
         *channel_positions: ChannelPositionData,
     ) -> None:
-        """Modify the positions of a set of channel objects for the guild."""
+        """Modify the positions of a set of channels for the guild."""
         payload = list(channel_positions)
 
         return await self.request('PATCH', Route('/guilds/{guild_id}/channels', guild_id=guild_id), payload)
@@ -240,14 +240,14 @@ class GuildRoutes(RouteCategoryMixin):
         return await self.request('GET', Route('/guilds/{guild_id}/threads/active', guild_id=guild_id))
 
     async def get_guild_member(self, guild_id: Snowflake, user_id: Snowflake) -> GuildMemberData:
-        """Returns a guild member object for the specified user."""
+        """Returns a guild member for the specified user."""
         return await self.request('GET',
                                   Route('/guilds/{guild_id}/members/{user_id}', guild_id=guild_id, user_id=user_id))
 
     async def list_guild_members(
         self, guild_id: Snowflake, *, limit: int | None = None, after: Snowflake | None = None
     ) -> list[GuildMemberData]:
-        """Returns a list of guild member objects that are members of the guild."""
+        """Returns a list of guild members that are members of the guild."""
         params = {}
         if limit is not None:
             params['limit'] = limit
@@ -259,7 +259,7 @@ class GuildRoutes(RouteCategoryMixin):
     async def search_guild_members(
         self, guild_id: Snowflake, *, query: str, limit: int | None = None
     ) -> list[GuildMemberData]:
-        """Returns a list of guild member objects whose username or nickname starts with a provided string."""
+        """Returns a list of guild members whose username or nickname starts with a provided string."""
         params = {'query': query}
         if limit is not None:
             params['limit'] = limit
@@ -373,7 +373,7 @@ class GuildRoutes(RouteCategoryMixin):
         before: Snowflake | None = None,
         after: Snowflake | None = None,
     ) -> list[BanData]:
-        """Returns a list of ban objects for the users banned from this guild."""
+        """Returns a list of bans for the users banned from this guild."""
         params = {}
         if limit is not None:
             params['limit'] = limit
@@ -384,7 +384,7 @@ class GuildRoutes(RouteCategoryMixin):
         return await self.request('GET', Route('/guilds/{guild_id}/bans', guild_id=guild_id))
 
     async def get_guild_ban(self, guild_id: Snowflake, user_id: Snowflake) -> BanData:
-        """Returns a ban object for the given user"""
+        """Returns a ban for the given user"""
         return await self.request('GET', Route('/guilds/{guild_id}/bans/{user_id}', guild_id=guild_id, user_id=user_id))
 
     async def create_guild_ban(
@@ -413,7 +413,7 @@ class GuildRoutes(RouteCategoryMixin):
                                   reason=reason)
 
     async def get_guild_roles(self, guild_id: Snowflake) -> list[RoleData]:
-        """Returns a list of role objects for the guild."""
+        """Returns a list of roles for the guild."""
         return await self.request('GET', Route('/guilds/{guild_id}/roles', guild_id=guild_id))
 
     async def create_guild_role(
@@ -451,7 +451,7 @@ class GuildRoutes(RouteCategoryMixin):
     async def modify_guild_role_positions(
         self, guild_id: Snowflake, *positions: RolePositionData, reason: str | None = None
     ) -> None:
-        """Modify the positions of a set of role objects for the guild."""
+        """Modify the positions of a set of roles for the guild."""
         payload = list(positions)
         return await self.request('PATCH', Route('/guilds/{guild_id}/roles', guild_id=guild_id), payload, reason=reason)
 
@@ -546,7 +546,7 @@ class GuildRoutes(RouteCategoryMixin):
         return val['pruned']
 
     async def get_guild_voice_regions(self, guild_id: Snowflake) -> list[VoiceRegionData]:
-        """Returns a list of voice region objects for the guild."""
+        """Returns a list of voice regions for the guild."""
         return await self.request('GET', Route('/guilds/{guild_id}/regions', guild_id=guild_id))
 
     async def get_guild_invites(self, guild_id: Snowflake) -> list[InviteData]:

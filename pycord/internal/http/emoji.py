@@ -28,11 +28,11 @@ from pycord.utils import _convert_base64_from_bytes
 
 class EmojiRoutes(RouteCategoryMixin):
     async def list_guild_emojis(self, guild_id: Snowflake) -> EmojiData:
-        """Returns a list of emoji objects for the given guild."""
+        """Returns a list of emojis for the given guild."""
         return await self.request("GET", Route("/guilds/{guild_id}/emojis", guild_id=guild_id))
 
     async def get_guild_emoji(self, guild_id: Snowflake, emoji_id: Snowflake) -> EmojiData:
-        """Returns an emoji object for the given guild and emoji IDs."""
+        """Returns an emoji for the given guild and emoji IDs."""
         return await self.request("GET",
                                   Route("/guilds/{guild_id}/emojis/{emoji_id}", guild_id=guild_id, emoji_id=emoji_id))
 

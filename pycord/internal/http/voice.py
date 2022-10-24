@@ -27,4 +27,5 @@ from pycord.mixins import RouteCategoryMixin
 
 class VoiceRoutes(RouteCategoryMixin):
     async def list_voice_regions(self) -> list[VoiceRegionData]:
+        """Returns an array of voice regions that can be used when setting a voice or stage channel's `rtc_region`."""
         return await self.request('GET', Route('/voice/regions'))
