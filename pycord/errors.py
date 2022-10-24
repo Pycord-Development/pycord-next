@@ -100,3 +100,7 @@ class Forbidden(HTTPException):
 
 class Unauthorized(HTTPException):
     ...
+
+
+class NoMoreItems(PycordException):
+    ...

@@ -20,7 +20,7 @@
 
 import io
 import os
-from typing import Any, Protocol
+from typing import Any, Protocol, Mapping
 
 from aiohttp import ClientSession, FormData
 from discord_typings import Snowflake
@@ -45,9 +45,10 @@ class Comparable:
 
 
 class Dictable(Comparable):
-    def __dict__(self) -> dict[Any, Any]:
-        # this is already assigned to any subclass, but pyright doesn't know.
-        return self.as_dict  # type: ignore
+    as_dict: Mapping[str, Any]
+
+    def __dict__(self) -> Mapping[str, Any]:
+        return self.as_dict
 
 
 class Hashable(Dictable):

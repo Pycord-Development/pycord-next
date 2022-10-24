@@ -17,33 +17,23 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from discord_typings import IntegrationData, StickerPackData
-from typing import TypedDict, NotRequired
 
-from discord_typings import TextChannelData, VoiceChannelData, NewsChannelData, CategoryChannelData
-
-class ModifyMFALevelData(TypedDict):
-    level: int
+from enum import Enum
 
 
-class PrunedData(TypedDict):
-    pruned: int | None
+class ChannelType(int, Enum):
+    GUILD_TEXT = 0
+    DM = 1
+    GUILD_VOICE = 2
+    GROUP_DM = 3
+    GUILD_CATEGORY = 4
+    GUILD_NEWS = 5
+    GUILD_NEWS_THREAD = 10
+    GUILD_PUBLIC_THREAD = 11
+    GUILD_PRIVATE_THREAD = 12
+    GUILD_STAGE_VOICE = 13
 
 
-class ListNitroStickerPacksData(TypedDict):
-    sticker_packs: list[StickerPackData]
-
-
-class ConnectionData(TypedDict):
-    id: str
-    name: str
-    type: str
-    revoked: NotRequired[bool]
-    integrations: NotRequired[list[IntegrationData]]
-    verified: bool
-    friend_sync: bool
-    show_activity: bool
-    visibility: int
-    
-    
-GuildChannelData = TextChannelData | VoiceChannelData | NewsChannelData | CategoryChannelData
+class InviteTargetTypes(int, Enum):
+    STREAM = 1
+    EMBEDDED_APPLICATION = 2

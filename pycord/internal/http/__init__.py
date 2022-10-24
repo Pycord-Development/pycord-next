@@ -19,6 +19,7 @@ from pycord.file import File
 from pycord.internal.blocks import Block
 from pycord.internal.http.audit_logs import AuditLogRoutes
 from pycord.internal.http.auto_moderation import AutoModerationRoutes
+from pycord.internal.http.channel import ChannelRoutes
 from pycord.internal.http.emoji import EmojiRoutes
 from pycord.internal.http.guild import GuildRoutes
 from pycord.internal.http.guild_scheduled_event import GuildScheduledEventRoutes
@@ -37,6 +38,7 @@ _log: logging.Logger = logging.getLogger(__name__)
 class HTTPClient(
     AuditLogRoutes,
     AutoModerationRoutes,
+    ChannelRoutes,
     EmojiRoutes,
     GuildRoutes,
     GuildScheduledEventRoutes,
