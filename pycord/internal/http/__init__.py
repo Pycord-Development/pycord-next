@@ -97,7 +97,7 @@ class HTTPClient(
                     for f in files:
                         f.reset(retry)
 
-                for blocker in self._blockers.values():
+                for blocker in list(self._blockers.values()):
                     if (
                         blocker.route.channel_id == route.channel_id
                         or blocker.route.guild_id == route.guild_id
@@ -163,8 +163,18 @@ class HTTPClient(
                         raise HTTPException(response, response_data)
 
                 return response_data
-            print("Exceeded retries")
-            raise ValueError
+
+            # we ran out of retries
+            if response.status >= 400:
+                if response.status == 401:
+                    raise Unauthorized(response, response_data)
+                elif response.status == 403:
+                    raise Forbidden(response, response_data)
+                elif response.status == 404:
+                    raise NotFound(response, response_data)
+                else:
+                    raise HTTPException(response, response_data)
+            return response_data
         finally:
             if files:
                 for f in files:
