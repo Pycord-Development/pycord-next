@@ -20,11 +20,28 @@
 
 from asyncio import create_task, get_running_loop, iscoroutinefunction
 from functools import partial
-from typing import Any, Callable, Coroutine
+from typing import Any, Callable, Coroutine, Protocol
+
+
+class BaseEventDispatcher(Protocol):
+    def __init__(self) -> None:
+        pass
+
+    async def _dispatch_under_names(self, event_name: Any, *args, **kwargs) -> None:
+        pass
+
+    def dispatch(self, event: Any, *args, **kwargs):
+        pass
+
+    def add_listener(self, name: Any, function: Coroutine | Callable) -> None:
+        pass
+
+    def remove_listener(self, name: Any, function: Coroutine | Callable) -> None:
+        pass
 
 
 # TODO: wait_for with timeout.
-class EventDispatcher:
+class EventDispatcher(BaseEventDispatcher):
     def __init__(self) -> None:
         self.events: dict[Any, list[Coroutine | Callable]] = {}
 

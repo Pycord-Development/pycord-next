@@ -20,14 +20,16 @@
 
 import io
 import os
-from typing import Any
+from typing import Any, Protocol, Mapping, TYPE_CHECKING
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, FormData
 from discord_typings import Snowflake
 
 from pycord.file import File
-from pycord.internal.http.route import Route
-from pycord.state import ConnectionState
+from pycord.state import BaseConnectionState
+
+if TYPE_CHECKING:
+    from pycord.internal.http.route import Route
 
 
 class Comparable:
@@ -45,9 +47,10 @@ class Comparable:
 
 
 class Dictable(Comparable):
-    def __dict__(self) -> dict[Any, Any]:
-        # this is already assigned to any subclass, but pyright doesn't know.
-        return self.as_dict  # type: ignore
+    as_dict: Mapping[str, Any]
+
+    def __dict__(self) -> Mapping[str, Any]:
+        return self.as_dict
 
 
 class Hashable(Dictable):
@@ -57,10 +60,23 @@ class Hashable(Dictable):
         return self.id >> 22  # type: ignore
 
 
-class AssetMixin:
+class BaseAssetMixin(Protocol):
     url: str
-    _state: ConnectionState
+    _state: BaseConnectionState
 
+    async def read(self) -> bytes | None:
+        pass
+
+    async def save(
+        self,
+        file_path: str | bytes | os.PathLike | io.BufferedIOBase,
+        *,
+        seek_to_beginning: bool = True,
+    ) -> int | None:
+        pass
+
+
+class AssetMixin(BaseAssetMixin):
     async def read(self) -> bytes | None:
         """Retrieves the asset as [bytes][].
 
@@ -107,11 +123,14 @@ class RouteCategoryMixin:
     async def request(
         self,
         method: str,
-        route: Route,
-        data: dict[str, Any] | None = None,
+        route: 'Route',
+        data: dict[str, Any] | list[str | int | dict[str, Any]] | FormData | None = None,
         *,
         files: list[File] | None = None,
         reason: str = None,
         **kwargs: Any,
     ) -> dict[str, Any] | list[dict[str, Any]] | str | None:
+        ...
+
+    def _prepare_message_form(self, files: list[File], payload: dict[str, Any] = None) -> FormData:
         ...

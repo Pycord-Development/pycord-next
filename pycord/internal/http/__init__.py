@@ -17,14 +17,39 @@ from pycord import __version__, utils
 from pycord.errors import Forbidden, HTTPException, NotFound, Unauthorized
 from pycord.file import File
 from pycord.internal.blocks import Block
+from pycord.internal.http.audit_logs import AuditLogRoutes
+from pycord.internal.http.auto_moderation import AutoModerationRoutes
+from pycord.internal.http.channel import ChannelRoutes
 from pycord.internal.http.emoji import EmojiRoutes
 from pycord.internal.http.guild import GuildRoutes
-from pycord.internal.http.route import Route
+from pycord.internal.http.guild_scheduled_event import GuildScheduledEventRoutes
+from pycord.internal.http.guild_template import GuildTemplateRoutes
+from pycord.internal.http.invite import InviteRoutes
+from pycord.internal.http.route import Route, Route
+from pycord.internal.http.stage_instance import StageInstanceRoutes
+from pycord.internal.http.sticker import StickerRoutes
+from pycord.internal.http.user import UserRoutes
+from pycord.internal.http.voice import VoiceRoutes
+from pycord.internal.http.webhook import WebhookRoutes
 
 _log: logging.Logger = logging.getLogger(__name__)
 
 
-class HTTPClient(EmojiRoutes, GuildRoutes):
+class HTTPClient(
+    AuditLogRoutes,
+    AutoModerationRoutes,
+    ChannelRoutes,
+    EmojiRoutes,
+    GuildRoutes,
+    GuildScheduledEventRoutes,
+    GuildTemplateRoutes,
+    InviteRoutes,
+    StageInstanceRoutes,
+    StickerRoutes,
+    UserRoutes,
+    VoiceRoutes,
+    WebhookRoutes,
+):
     def __init__(self, token: str, version: int, max_retries: int = 5):
         # pyright hates identifying this as clientsession when its not-
         # sadly, aiohttp errors a lot when not creating client sessions on an async environment.
@@ -46,7 +71,7 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
         self,
         method: str,
         route: Route,
-        data: dict[str, Any] | None = None,
+        data: dict[str, Any] | list[str | int | dict[str, Any]] | FormData | None = None,
         *,
         files: list[File] | None = None,
         reason: str | None = None,
@@ -61,11 +86,10 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
         if reason:
             headers['X-Audit-Log-Reason'] = reason
 
-        if files:
-            data = self._prepare_form(files, data)
-        elif data:
-            data = utils.dumps(data)
-            headers.update({"Content-Type": "application/json"})
+        if data:
+            if isinstance(data, dict | list):
+                data = utils.dumps(data)
+                headers.update({'Content-Type': 'application/json'})
 
         try:
             for retry in range(self.max_retries):
@@ -91,7 +115,7 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
                         await blocker.wait()
                         break
 
-                r = await self._session.request(
+                response = await self._session.request(
                     method=method,
                     url=endpoint,
                     data=data,
@@ -99,11 +123,14 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
                     **kwargs,
                 )
 
+                response_data = await utils._text_or_json(response)
+                _log.debug(f'Received {response_data} from request to {endpoint} ({response.status})')
+
                 # ratelimited
-                if r.status == 429:
+                if response.status == 429:
                     try:
-                        bucket = r.headers['X-RateLimit-Bucket']
-                    except:
+                        bucket = response.headers['X-RateLimit-Bucket']
+                    except KeyError:
                         continue
                     # block request until ratelimit ends.
                     block = self._blockers.get(bucket)
@@ -116,50 +143,52 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
 
                         _log.debug(f'Blocking request to bucket {endpoint} after resource ratelimit.')
                         await block.block(
-                            reset_after=float(r.headers['X-RateLimit-Reset-After']),
+                            reset_after=float(response.headers['X-RateLimit-Reset-After']),
                             bucket=bucket,
-                            globalrt=r.headers['X-RateLimit-Scope'] == 'global',
+                            globalrt=response.headers['X-RateLimit-Scope'] == 'global',
                         )
 
                         del self._blockers[bucket]
                         continue
 
                 # something went wrong
-                if r.status >= 400:
-                    if r.status == 401:
-                        raise Unauthorized
-                    elif r.status == 403:
-                        raise Forbidden
-                    elif r.status == 404:
-                        raise NotFound
+                if response.status >= 400:
+                    if response.status == 401:
+                        raise Unauthorized(response, response_data)
+                    elif response.status == 403:
+                        raise Forbidden(response, response_data)
+                    elif response.status == 404:
+                        raise NotFound(response, response_data)
                     else:
-                        raise HTTPException
+                        raise HTTPException(response, response_data)
 
-                _log.debug(f'Received {await r.text()} from request to {endpoint}')
-
-                return await utils._text_or_json(r)
+                return response_data
+            print("Exceeded retries")
+            raise ValueError
         finally:
             if files:
                 for f in files:
                     f.close()
 
-    def _prepare_form(self, files: list[File], payload: dict[str, Any] = {}) -> FormData:
+    def _prepare_message_form(self, files: list[File], payload: dict[str, Any] = None) -> FormData:
+        if payload is None:
+            payload = {}
         form = []
         attachments = []
 
         for index, file in enumerate(files):
-            attachments.append({"id": index, "filename": file.filename, "description": file.description})
+            attachments.append({'id': index, 'filename': file.filename, 'description': file.description})
             form.append(
                 {
-                    "name": f"files[{index}]",
-                    "value": file.fp,
-                    "filename": file.filename,
-                    "content_type": "application/octet-stream",
+                    'name': f'files[{index}]',
+                    'value': file.fp,
+                    'filename': file.filename,
+                    'content_type': 'application/octet-stream',
                 }
             )
 
-        payload["attachments"] = attachments
-        form.insert(0, {"name": "payload_json", "content_type": "application/json", "value": utils.dumps(payload)})
+        payload['attachments'] = attachments
+        form.insert(0, {'name': 'payload_json', 'content_type': 'application/json', 'value': utils.dumps(payload)})
         form_data = FormData(quote_fields=False)
         for f in form:
             form_data.add_field(**f)
@@ -172,22 +201,8 @@ class HTTPClient(EmojiRoutes, GuildRoutes):
                 case 200:
                     return await response.read()
                 case 403:
-                    raise Forbidden
+                    raise Forbidden(response, None)
                 case 404:
-                    raise NotFound
+                    raise NotFound(response, None)
                 case _:
-                    raise HTTPException
-
-    async def get_me(self) -> UserData:
-        return await self.request('GET', Route('/users/@me'))  # type: ignore
-
-    async def edit_me(self, username: str | None = None, avatar: str | None = None) -> UserData:
-        data = {}
-
-        if username:
-            data['username'] = username
-
-        if avatar:
-            data['avatar'] = avatar
-
-        return await self.request('PATCH', Route('/users/@me'), data)  # type: ignore
+                    raise HTTPException(response, None)

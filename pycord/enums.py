@@ -17,32 +17,23 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import asyncio
 
-from pycord.state import BaseConnectionState
-
-from ..events import EventDispatcher
-from .shard import Shard
+from enum import Enum
 
 
-class ShardManager:
-    def __init__(self, shards: int, state: BaseConnectionState, events: EventDispatcher, version: int = 10) -> None:
-        self._shards = shards
-        self.shards: list[Shard] = []
-        self.state = state
-        self.version = version
-        self.events = events
-        self.token = ''
+class ChannelType(int, Enum):
+    GUILD_TEXT = 0
+    DM = 1
+    GUILD_VOICE = 2
+    GROUP_DM = 3
+    GUILD_CATEGORY = 4
+    GUILD_NEWS = 5
+    GUILD_NEWS_THREAD = 10
+    GUILD_PUBLIC_THREAD = 11
+    GUILD_PRIVATE_THREAD = 12
+    GUILD_STAGE_VOICE = 13
 
-    async def connect(self, token: str) -> None:
-        self.token = token
 
-        for i in range(self._shards):
-            shard = Shard(i, self._shards, self.state, self.events, self, self.version)
-            await shard.connect(token=self.token)
-            self.shards.append(shard)
-            await asyncio.sleep(5)
-
-    async def disconnect(self) -> None:
-        for shard in self.shards:
-            await shard.disconnect(reconnect=False)
+class InviteTargetTypes(int, Enum):
+    STREAM = 1
+    EMBEDDED_APPLICATION = 2
