@@ -48,7 +48,7 @@ class BaseAsyncGenerator(AsyncIterator[T]):
             raise StopAsyncIteration
 
 async def channel_history_generator(
-    messageable: Messageable,
+    messageable: 'Messageable',
     limit: int | None = None,
     around: Snowflake = ...,
     before: Snowflake = ...,

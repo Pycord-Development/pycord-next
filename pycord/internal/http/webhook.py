@@ -180,10 +180,15 @@ class WebhookRoutes(RouteCategoryMixin):
         if thread_name is not None:
             payload['thread_name'] = thread_name
 
+        if files is not None:
+            payload = self._prepare_message_form(files, payload)
+        else:
+            files = []
+
         await self.request(
             'POST',
             Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
-            self._prepare_message_form(files, payload),
+            payload,
             params=params,
             files=files,
         )
@@ -214,13 +219,13 @@ class WebhookRoutes(RouteCategoryMixin):
         webhook_token: str,
         message_id: Snowflake,
         *,
-        thread_id: Snowflake | None = None,
-        content: str | None = None,
-        embeds: list[EmbedData] | None = None,
-        allowed_mentions: AllowedMentionsData | None = None,
-        components: list[ComponentData] | None = None,
-        files: list['File'] | None = None,
-        attachments: list[PartialAttachmentData] | None = None,
+        thread_id: Snowflake | None = ...,
+        content: str | None = ...,
+        embeds: list[EmbedData] | None = ...,
+        allowed_mentions: AllowedMentionsData | None = ...,
+        components: list[ComponentData] | None = ...,
+        files: list['File'] | None = ...,
+        attachments: list[PartialAttachmentData] | None = ...,
     ) -> MessageData:
         """Edits a previously-sent webhook message from the same token."""
         params = {}
@@ -228,16 +233,21 @@ class WebhookRoutes(RouteCategoryMixin):
             params['thread_id'] = thread_id
 
         payload = {}
-        if content is not None:
+        if content is not ...:
             payload['content'] = content
-        if embeds is not None:
+        if embeds is not ...:
             payload['embeds'] = embeds
-        if allowed_mentions is not None:
+        if allowed_mentions is not ...:
             payload['allowed_mentions'] = allowed_mentions
-        if components is not None:
+        if components is not ...:
             payload['components'] = components
-        if attachments is not None:
+        if attachments is not ...:
             payload['attachments'] = attachments
+
+        if files is not ...:
+            payload = self._prepare_message_form(files, payload)
+        else:
+            files = []
 
         return await self.request(
             'PATCH',
@@ -247,7 +257,7 @@ class WebhookRoutes(RouteCategoryMixin):
                 webhook_token=webhook_token,
                 message_id=message_id
             ),
-            self._prepare_message_form(files, payload),
+            payload,
             params=params,
             files=files,
         )

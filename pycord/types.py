@@ -18,7 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from discord_typings import IntegrationData, StickerPackData
-from typing import TypedDict, NotRequired
+from typing_extensions import NotRequired
+from typing import TypedDict
+
 
 from discord_typings import TextChannelData, VoiceChannelData, NewsChannelData, CategoryChannelData
 
