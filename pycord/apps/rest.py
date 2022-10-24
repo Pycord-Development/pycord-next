@@ -49,7 +49,7 @@ class RESTApp:
         await self._state.start_cache()
 
         self.http = HTTPClient(self.token, self._version)
-        user_data = await self.http.get_me()
+        user_data = await self.http.get_current_user()
         self.user = CurrentUser(user_data, self._state)
         self.dispatcher.dispatch('hook')
 

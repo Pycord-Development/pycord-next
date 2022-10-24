@@ -121,11 +121,14 @@ class HTTPClient(
                     **kwargs,
                 )
 
+                response_data = await utils._text_or_json(response)
+                _log.debug(f'Received {response_data} from request to {endpoint} ({response.status})')
+
                 # ratelimited
                 if response.status == 429:
                     try:
-                        bucket = r.headers['X-RateLimit-Bucket']
-                    except:
+                        bucket = response.headers['X-RateLimit-Bucket']
+                    except KeyError:
                         continue
                     # block request until ratelimit ends.
                     block = self._blockers.get(bucket)
@@ -138,30 +141,28 @@ class HTTPClient(
 
                         _log.debug(f'Blocking request to bucket {endpoint} after resource ratelimit.')
                         await block.block(
-                            reset_after=float(r.headers['X-RateLimit-Reset-After']),
+                            reset_after=float(response.headers['X-RateLimit-Reset-After']),
                             bucket=bucket,
-                            globalrt=r.headers['X-RateLimit-Scope'] == 'global',
+                            globalrt=response.headers['X-RateLimit-Scope'] == 'global',
                         )
 
                         del self._blockers[bucket]
                         continue
 
-                data = await utils._text_or_json(response)
-
                 # something went wrong
                 if response.status >= 400:
                     if response.status == 401:
-                        raise Unauthorized(response, data)
+                        raise Unauthorized(response, response_data)
                     elif response.status == 403:
-                        raise Forbidden(response, data)
+                        raise Forbidden(response, response_data)
                     elif response.status == 404:
-                        raise NotFound(response, data)
+                        raise NotFound(response, response_data)
                     else:
-                        raise HTTPException(response, data)
+                        raise HTTPException(response, response_data)
 
-                _log.debug(f'Received {data} from request to {endpoint}')
-
-                return data
+                return response_data
+            print("Exceeded retries")
+            raise ValueError
         finally:
             if files:
                 for f in files:
