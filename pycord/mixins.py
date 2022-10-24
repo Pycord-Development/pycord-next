@@ -18,10 +18,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Any, Callable, Coroutine
+import io
+import os
+from typing import Any, Protocol
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, FormData
 from discord_typings import Snowflake
+
+from pycord.file import File
+from pycord.internal.http.route import Route
+from pycord.state import BaseConnectionState
 
 
 class Comparable:
@@ -51,6 +57,77 @@ class Hashable(Dictable):
         return self.id >> 22  # type: ignore
 
 
+class BaseAssetMixin(Protocol):
+    url: str
+    _state: BaseConnectionState
+
+    async def read(self) -> bytes | None:
+        pass
+
+    async def save(
+        self,
+        file_path: str | bytes | os.PathLike | io.BufferedIOBase,
+        *,
+        seek_to_beginning: bool = True,
+    ) -> int | None:
+        pass
+
+
+class AssetMixin(BaseAssetMixin):
+    async def read(self) -> bytes | None:
+        """Retrieves the asset as [bytes][].
+
+        Raises:
+            Forbidden: You don't have permission to access the asset.
+            NotFound: The asset was not found.
+            HTTPException: Getting the asset failed.
+
+        Returns:
+            The asset as a [bytes][] object.
+        """
+        return await self._state._app.http.get_cdn_asset(self.url)
+
+    async def save(
+        self,
+        file_path: str | bytes | os.PathLike | io.BufferedIOBase,
+        *,
+        seek_to_beginning: bool = True,
+    ) -> int | None:
+        """Saves the asset into a file-like object.
+
+        Raises:
+            Forbidden: You don't have permission to access the asset.
+            NotFound: The asset was not found.
+            HTTPException: Getting the asset failed.
+
+        Returns:
+            The number of bytes written.
+        """
+        data = await self.read()
+        if isinstance(file_path, io.BufferedIOBase):
+            written = file_path.write(data)
+            if seek_to_beginning:
+                file_path.seek(0)
+            return written
+        else:
+            with open(file_path, "wb") as file:
+                return file.write(data)
+
+
 class RouteCategoryMixin:
     _session: ClientSession
-    request: Callable[..., Coroutine[Any, Any, dict[str, Any] | list[dict[str, Any]] | str | None]]
+
+    async def request(
+        self,
+        method: str,
+        route: Route,
+        data: dict[str, Any] | list[str | int | dict[str, Any]] | FormData | None = None,
+        *,
+        files: list[File] | None = None,
+        reason: str = None,
+        **kwargs: Any,
+    ) -> dict[str, Any] | list[dict[str, Any]] | str | None:
+        ...
+
+    def _prepare_message_form(self, files: list[File], payload: dict[str, Any] = None) -> FormData:
+        ...

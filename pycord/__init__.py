@@ -19,6 +19,8 @@ colorama.init()
 del colorama
 
 from .apps import *
+from .assets import *
+from .file import *
 from .state import *
 from .user import *
 from .utils import *

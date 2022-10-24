@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Mapping, Type, Union
+from typing import TYPE_CHECKING, Any, Mapping, Protocol, Type, Union
 
 if TYPE_CHECKING:
     from pycord.apps.gateway import GatewayApp
@@ -40,8 +40,36 @@ class AsyncDict(dict):
         return super().values()  # type: ignore
 
 
+class BaseConnectionState(Protocol):
+    _app: Union["RESTApp", "GatewayApp"]
+    cache_timeout: int
+    store: Type[AsyncDict]
+    gateway_enabled: bool
+
+    # cache
+    messages: AsyncDict
+    guilds: AsyncDict
+    channels: AsyncDict
+    members: AsyncDict
+
+    def __init__(
+        self,
+        _app: Union["RESTApp", "GatewayApp"],
+        cache_timeout: int = 10000,
+        store: Type[AsyncDict] = AsyncDict(),
+        gateway_enabled: bool = False,
+    ) -> None:
+        pass
+
+    async def start_cache(self) -> None:
+        pass
+
+    async def process_event(self, data: Mapping[Any, Any]) -> None:
+        pass
+
+
 @dataclass
-class ConnectionState:
+class ConnectionState(BaseConnectionState):
     _app: Union["RESTApp", "GatewayApp"]
     """
     The app controlling the ConnectionState.

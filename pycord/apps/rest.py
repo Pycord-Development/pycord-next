@@ -20,11 +20,13 @@
 
 import asyncio
 import logging
-from typing import Any, Callable, Coroutine
+from typing import Any, Callable, Coroutine, Type, TypedDict
 
+from pycord.guild import BaseEmoji, BaseGuild, BaseRole, Emoji, Guild, Role
 from pycord.internal import EventDispatcher, HTTPClient, start_logging
-from pycord.state import ConnectionState
-from pycord.user import CurrentUser
+from pycord.internal.events import BaseEventDispatcher
+from pycord.state import BaseConnectionState, ConnectionState
+from pycord.user import BaseCurrentUser, BaseUser, CurrentUser, User
 
 
 def find_loop():
@@ -34,38 +36,72 @@ def find_loop():
         return asyncio.new_event_loop()
 
 
-class RESTApp:
+class Models(TypedDict):
+    user: Type[BaseUser]
+    current_user: Type[BaseCurrentUser]
+    state: Type[BaseConnectionState]
+    guild: Type[BaseGuild]
+    role: Type[BaseRole]
+    emoji: Type[BaseEmoji]
+    event_dispatcher: Type[BaseEventDispatcher]
+
+
+class BaseRESTApp:
+    self.token: str | None
+    cache_timeout: int
+    _version: int
+    _level: int
+    dispatcher: BaseEventDispatcher
+    models: Models
+
+    def __init__(self, *, version: int = 10, level: int = logging.INFO, cache_timeout: int = 10000) -> None:
+        pass
+
+    async def start(self, token: str) -> None:
+        pass
+
+    async def close(self) -> None:
+        pass
+
+    async def edit(self, username: str | None = None, avatar: bytes | None = None):
+        pass
+
+    @property
+    async def guilds(self) -> list[BaseGuild]:
+        pass
+
+    def listen(self, name: Any) -> None:
+        pass
+
+
+class RESTApp(BaseRESTApp):
     def __init__(self, *, version: int = 10, level: int = logging.INFO, cache_timeout: int = 10000) -> None:
         self.token: str | None = None
         self.cache_timeout = cache_timeout
         self._version = version
         self._level = level
-        self.dispatcher = EventDispatcher()
 
-    def run(self, token: str):
-        async def runner():
-            await self.start(token=token)
-            self.dispatcher.dispatch('hook')
-
-        loop = find_loop()
-
-        try:
-            loop.run_until_complete(runner())
-            loop.run_forever()
-        except KeyboardInterrupt:
-            loop.run_until_complete(self.close())
-        finally:
-            loop.stop()
+        self.models: Models = {
+            'user': User,
+            'current_user': CurrentUser,
+            'state': ConnectionState,
+            'guild': Guild,
+            'role': Role,
+            'emoji': Emoji,
+            'event_dispatcher': EventDispatcher,
+        }
+        self.dispatcher = self.models['event_dispatcher']()
 
     async def start(self, token: str):
         self.token = token
         start_logging(level=self._level)
-        self._state = ConnectionState(self, cache_timeout=self.cache_timeout)
+        self._state = self.models['state'](self, self.cache_timeout)
         await self._state.start_cache()
 
         self.http = HTTPClient(self.token, self._version)
-        user_data = await self.http.get_me()
-        self.user = CurrentUser(user_data, self._state)
+        user_data = await self.http.get_current_user()
+        self.user = self.models['current_user'](user_data, self._state)
+        self.dispatcher.dispatch('hook')
 
     async def close(self):
         await self.http._session.close()

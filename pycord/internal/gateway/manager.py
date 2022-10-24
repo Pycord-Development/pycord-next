@@ -19,20 +19,20 @@
 # SOFTWARE.
 import asyncio
 
-from pycord.state import ConnectionState
+from pycord.state import BaseConnectionState
 
 from ..events import EventDispatcher
 from .shard import Shard
 
 
 class ShardManager:
-    def __init__(self, shards: int, state: ConnectionState, events: EventDispatcher, version: int = 10) -> None:
+    def __init__(self, shards: int, state: BaseConnectionState, events: EventDispatcher, version: int = 10) -> None:
         self._shards = shards
         self.shards: list[Shard] = []
         self.state = state
         self.version = version
         self.events = events
-        self.token = ""
+        self.token = ''
 
     async def connect(self, token: str) -> None:
         self.token = token

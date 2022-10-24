@@ -19,16 +19,46 @@
 # SOFTWARE.
 
 from datetime import datetime
+from typing import Protocol
 
 from discord_typings.resources import UserData
 
 from pycord.mixins import Hashable
-from pycord.state import ConnectionState
+from pycord.state import BaseConnectionState
 from pycord.utils import _convert_base64_from_bytes, grab_creation_time
 
 
-class User(Hashable):
-    def __init__(self, data: UserData, state: ConnectionState) -> None:
+class BaseUser(Protocol):
+    as_dict: UserData
+    _state: BaseConnectionState
+
+    id: int
+    email: str | None
+    username: str
+    flags: int | None
+    public_flags: int | None
+    locale: str | None
+    accent_color: int | None
+    banner: str | None
+    avatar: str | None
+    discriminator: str
+    premium_type: int | None
+    system: bool | None
+    mfa_enabled: bool | None
+    verified: bool | None
+    bot: bool | None
+
+    def __init__(self, data: UserData, state: BaseConnectionState) -> None:
+        pass
+
+
+class BaseCurrentUser(BaseUser):
+    async def edit(self, username: str | None = None, avatar: bytes | None = None) -> None:
+        pass
+
+
+class User(BaseUser, Hashable):
+    def __init__(self, data: UserData, state: BaseConnectionState) -> None:
         self.as_dict = data
         self._state = state
 
@@ -57,7 +87,7 @@ class User(Hashable):
         return grab_creation_time(self.id)  # type: ignore
 
 
-class CurrentUser(User):
+class CurrentUser(User, BaseCurrentUser):
     async def edit(self, username: str | None = None, avatar: bytes | None = None) -> None:
         if not username and not avatar:
             return
