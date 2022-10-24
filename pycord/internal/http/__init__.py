@@ -87,7 +87,7 @@ class HTTPClient(
         if data:
             if isinstance(data, dict | list):
                 data = utils.dumps(data)
-                headers.update({"Content-Type": "application/json"})
+                headers.update({'Content-Type': 'application/json'})
 
         try:
             for retry in range(self.max_retries):
@@ -174,18 +174,18 @@ class HTTPClient(
         attachments = []
 
         for index, file in enumerate(files):
-            attachments.append({"id": index, "filename": file.filename, "description": file.description})
+            attachments.append({'id': index, 'filename': file.filename, 'description': file.description})
             form.append(
                 {
-                    "name": f"files[{index}]",
-                    "value": file.fp,
-                    "filename": file.filename,
-                    "content_type": "application/octet-stream",
+                    'name': f'files[{index}]',
+                    'value': file.fp,
+                    'filename': file.filename,
+                    'content_type': 'application/octet-stream',
                 }
             )
 
-        payload["attachments"] = attachments
-        form.insert(0, {"name": "payload_json", "content_type": "application/json", "value": utils.dumps(payload)})
+        payload['attachments'] = attachments
+        form.insert(0, {'name': 'payload_json', 'content_type': 'application/json', 'value': utils.dumps(payload)})
         form_data = FormData(quote_fields=False)
         for f in form:
             form_data.add_field(**f)
