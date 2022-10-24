@@ -20,18 +20,51 @@
 
 import re
 
-from pycord.mixins import AssetMixin
-from pycord.state import ConnectionState
+from pycord.mixins import AssetMixin, BaseAssetMixin
+from pycord.state import BaseConnectionState
 from pycord.utils import _validate_image_params
 
-__all__ = (
-    'Asset',
-)
+__all__ = ('Asset',)
 
 CDN_URL = 'https://cdn.discordapp.com'
 
 
-class Asset(AssetMixin):
+class BaseAsset(BaseAssetMixin):
+    def __init__(
+        self,
+        state: BaseConnectionState,
+        path: str,
+        key: str,
+        fmt: str = 'png',
+        size: int = 128,
+    ) -> None:
+        pass
+
+    def __str__(self) -> str:
+        pass
+
+    def __len__(self) -> int:
+        pass
+
+    def __repr__(self) -> str:
+        pass
+
+    def __eq__(self, other) -> bool:
+        pass
+
+    def __hash__(self) -> int:
+        pass
+
+    @classmethod
+    def from_url(cls, state: BaseConnectionState, url: str) -> "BaseAsset":
+        pass
+
+    @property
+    def url(self) -> str:
+        pass
+
+
+class Asset(BaseAsset, AssetMixin):
     """Represents a Discord CDN asset.
 
     !!! note
@@ -58,7 +91,7 @@ class Asset(AssetMixin):
 
     def __init__(
         self,
-        state: ConnectionState,
+        state: BaseConnectionState,
         path: str,
         key: str,
         fmt: str = 'png',
@@ -90,8 +123,11 @@ class Asset(AssetMixin):
         return hash(self.url)
 
     @classmethod
-    def from_url(cls, state: ConnectionState, url: str):
-        res = re.search(r"https://cdn.discordapp.com(/(?:[a-z/]*|[0-9]{15,19})*/)([a-f0-9]*)\.([a-z]{1,3})(?:\?size=([0-9]{1,4}))?", url)
+    def from_url(cls, state: BaseConnectionState, url: str):
+        res = re.search(
+            r"https://cdn.discordapp.com(/(?:[a-z/]*|[0-9]{15,19})*/)([a-f0-9]*)\.([a-z]{1,3})(?:\?size=([0-9]{1,4}))?",
+            url,
+        )
 
         if not res:
             raise TypeError("invalid asset url given")

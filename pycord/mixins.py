@@ -20,14 +20,14 @@
 
 import io
 import os
-from typing import Any
+from typing import Any, Protocol
 
 from aiohttp import ClientSession, FormData
 from discord_typings import Snowflake
 
 from pycord.file import File
 from pycord.internal.http.route import Route
-from pycord.state import ConnectionState
+from pycord.state import BaseConnectionState
 
 
 class Comparable:
@@ -57,10 +57,23 @@ class Hashable(Dictable):
         return self.id >> 22  # type: ignore
 
 
-class AssetMixin:
+class BaseAssetMixin(Protocol):
     url: str
-    _state: ConnectionState
+    _state: BaseConnectionState
 
+    async def read(self) -> bytes | None:
+        pass
+
+    async def save(
+        self,
+        file_path: str | bytes | os.PathLike | io.BufferedIOBase,
+        *,
+        seek_to_beginning: bool = True,
+    ) -> int | None:
+        pass
+
+
+class AssetMixin(BaseAssetMixin):
     async def read(self) -> bytes | None:
         """Retrieves the asset as [bytes][].
 
