@@ -17,35 +17,33 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from discord_typings import IntegrationData, StickerPackData
-from typing_extensions import NotRequired
-from typing import TypedDict
 
+import asyncio
+from typing import TYPE_CHECKING
+from typing_extensions import Self
 
-from discord_typings import TextChannelData, VoiceChannelData, NewsChannelData, CategoryChannelData
+if TYPE_CHECKING:
+    from .abc import Messageable
 
-class ModifyMFALevelData(TypedDict):
-    level: int
+class Typing:
+    def __init__(self, messageable: "Messageable") -> None:
+        self.messageable = messageable
+        self._task: asyncio.Task | None = None
 
+    async def perform_typing(self):
+        channel_id = await self.messageable._get_channel_id()
+        trigger_typing = self.messageable._state._app.http.trigger_typing_indicator
 
-class PrunedData(TypedDict):
-    pruned: int | None
+        while True:
+            await trigger_typing(channel_id)
+            await asyncio.sleep(10)
 
+    async def __aenter__(self: Self) -> Self:
+        self._task = asyncio.create_task(self.perform_typing())
+        return self
 
-class ListNitroStickerPacksData(TypedDict):
-    sticker_packs: list[StickerPackData]
-
-
-class ConnectionData(TypedDict):
-    id: str
-    name: str
-    type: str
-    revoked: NotRequired[bool]
-    integrations: NotRequired[list[IntegrationData]]
-    verified: bool
-    friend_sync: bool
-    show_activity: bool
-    visibility: int
-    
-    
-GuildChannelData = TextChannelData | VoiceChannelData | NewsChannelData | CategoryChannelData
+    # we use args here to abstract the other parameters we don't care about
+    async def __aexit__(self, *args):
+        if self._task:
+            self._task.cancel()
+            await self._task

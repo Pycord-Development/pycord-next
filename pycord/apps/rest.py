@@ -22,6 +22,8 @@ import asyncio
 import logging
 from typing import Any, Callable, Coroutine, Type, TypedDict
 
+from discord_typings import ChannelData
+from pycord.channel import _create_channel, Channel
 from pycord.guild import BaseEmoji, BaseGuild, BaseRole, Emoji, Guild, Role
 from pycord.internal import EventDispatcher, HTTPClient, start_logging
 from pycord.internal.events import BaseEventDispatcher
@@ -47,7 +49,7 @@ class Models(TypedDict):
 
 
 class BaseRESTApp:
-    self.token: str | None
+    token: str | None
     cache_timeout: int
     _version: int
     _level: int
@@ -108,6 +110,10 @@ class RESTApp(BaseRESTApp):
 
     async def edit(self, username: str | None = None, avatar: bytes | None = None):
         return await self.user.edit(username=username, avatar=avatar)
+
+    async def get_channel(self, channel_id) -> Channel:
+        data: ChannelData = await self.http.get_channel(channel_id)
+        return _create_channel(data, self._state)
 
     @property
     async def guilds(self):

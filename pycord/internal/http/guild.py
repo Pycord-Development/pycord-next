@@ -42,6 +42,7 @@ from discord_typings import (
     WelcomeScreenData,
 )
 
+from pycord.enums import ChannelType
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
 from pycord.types import ModifyMFALevelData, PrunedData
@@ -173,14 +174,13 @@ class GuildRoutes(RouteCategoryMixin):
         """Returns a list of guild channels. Does not include threads."""
         return await self.request('GET', Route('/guilds/{guild_id}/channels', guild_id=guild_id))
 
-    # TODO: channel_type to ChannelType
     async def create_guild_channel(
         self,
         guild_id: Snowflake,
         name: str,
         *,
         reason: str | None = None,
-        channel_type: int | None = None,
+        channel_type: ChannelType | None = None,
         topic: str | None = None,
         bitrate: int | None = None,
         user_limit: int | None = None,
@@ -195,9 +195,8 @@ class GuildRoutes(RouteCategoryMixin):
     ) -> ChannelData:
         """Create a new channel for the guild."""
         payload = {'name': name}
-        # TODO: check keys based on channel type?
         if channel_type is not None:
-            payload['type'] = channel_type
+            payload['type'] = int(channel_type)  # ensure that it's an int in the payload
         if topic is not None:
             payload['topic'] = topic
         if bitrate is not None:
