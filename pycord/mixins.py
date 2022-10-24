@@ -20,14 +20,16 @@
 
 import io
 import os
-from typing import Any, Protocol, Mapping
+from typing import Any, Protocol, Mapping, TYPE_CHECKING
 
 from aiohttp import ClientSession, FormData
 from discord_typings import Snowflake
 
 from pycord.file import File
-from pycord.internal.http.route import Route
 from pycord.state import BaseConnectionState
+
+if TYPE_CHECKING:
+    from pycord.internal.http.route import Route
 
 
 class Comparable:
@@ -121,7 +123,7 @@ class RouteCategoryMixin:
     async def request(
         self,
         method: str,
-        route: Route,
+        route: 'Route',
         data: dict[str, Any] | list[str | int | dict[str, Any]] | FormData | None = None,
         *,
         files: list[File] | None = None,

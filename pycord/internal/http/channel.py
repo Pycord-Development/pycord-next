@@ -168,7 +168,17 @@ class ChannelRoutes(RouteCategoryMixin):
         if flags is not ...:
             payload['flags'] = flags
 
-        return await self.request('POST', Route('/channels/{channel_id}/messages', channel_id=channel_id), payload, files=files)
+        if files is not ...:
+            payload = self._prepare_message_form(files, payload)
+        else:
+            files = []
+
+        return await self.request(
+            'POST',
+            Route('/channels/{channel_id}/messages', channel_id=channel_id),
+            payload,
+            files=files
+        )
 
     async def crosspost_message(self, channel_id: Snowflake, message_id: Snowflake) -> MessageData:
         return await self.request(

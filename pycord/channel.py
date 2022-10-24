@@ -19,17 +19,17 @@
 # SOFTWARE.
 
 from datetime import datetime
-from typing import cast
+from typing import cast, Union
 
 from discord_typings import (
     CategoryChannelData,
+    ChannelData,
     DMChannelData,
     NewsChannelData,
     PermissionOverwriteData,
     TextChannelData,
     VoiceChannelData,
 )
-
 from pycord.abc import Messageable
 from pycord.enums import ChannelType
 from pycord.mixins import Hashable
@@ -56,13 +56,16 @@ class GuildChannel(Hashable):
         self.nsfw = data['nsfw']  # TODO: Remove? Might not be in every guild channel
         self.parent_id = get_and_convert('parent_id', int, data)
 
+    async def _get_channel_id(self):
+        return self.id
+
     async def edit(
         self,
         *,
         reason: str | None = None,
         name: str = ...,
         permission_overwrites: list[PermissionOverwriteData] | None = ...,
-        **kwargs, # these kwargs are not for the user but the internal API
+        **kwargs,  # these kwargs are not for the user but the internal API
     ):
         if type(self) is GuildChannel and kwargs:
             raise ValueError('The user cannot pass in kwargs, only the internal API can!')
@@ -78,11 +81,11 @@ class GuildChannel(Hashable):
         return self.__class__(data, self._state)
 
     async def move(
-        self, 
-        *, 
-        position: int | None = ..., 
-        lock_permissions: bool = ..., 
-        parent: 'GuildChannel' | None = ...,
+        self,
+        *,
+        position: int | None = ...,
+        lock_permissions: bool = ...,
+        parent: Union['GuildChannel', None] = ...,
     ):
         parent_id = ...
         if parent is not ... and parent is not None:
@@ -110,6 +113,8 @@ class DMChannel(Hashable, Messageable):
         self.recipients = [User(d, self._state) for d in data['recipients']]
         self.last_pin_timestamp = get_and_convert('last_pin_timestamp', datetime.fromisoformat, data)
 
+    async def _get_channel_id(self):
+        return self.id
 
 class TextChannel(GuildChannel, Messageable):
     def __init__(self, data: TextChannelData | NewsChannelData, state: ConnectionState) -> None:
@@ -121,18 +126,20 @@ class TextChannel(GuildChannel, Messageable):
         self.last_pin_timestamp = get_and_convert('last_pin_timestamp', datetime.fromisoformat, data)
 
     async def edit(
-        self, 
-        *, 
-        reason: str | None = None, 
-        name: str = ..., 
-        permission_overwrites: list[PermissionOverwriteData] | None = ..., 
-        type: ChannelType = ..., 
+        self,
+        *,
+        reason: str | None = None,
+        name: str = ...,
+        permission_overwrites: list[PermissionOverwriteData] | None = ...,
+        type: ChannelType = ...,
         topic: str | None = ...,
         nsfw: bool | None = ...,
         rate_limit_per_user: int | None = ...,
         default_auto_archive_duration: int | None = ...,
     ):
-        if self.type is ChannelType.GUILD_TEXT and type is not ChannelType.GUILD_NEWS:
+        if type is ...:
+            pass
+        elif self.type is ChannelType.GUILD_TEXT and type is not ChannelType.GUILD_NEWS:
             raise TypeError('You can only convert Text Channels to News Channels!')
         elif self.type is ChannelType.GUILD_NEWS and type is not ChannelType.GUILD_TEXT:
             raise TypeError('You can only convert News Channels to Text Channels!')
@@ -166,3 +173,29 @@ class VoiceChannel(GuildChannel, Messageable):
 class CategoryChannel(GuildChannel):
     def __init__(self, data: CategoryChannelData, state: ConnectionState) -> None:
         GuildChannel.__init__(self, data, state)
+
+
+Channel = Union[TextChannel, DMChannel, VoiceChannel, CategoryChannel]
+
+
+def _create_channel(data: ChannelData, state: ConnectionState) -> Channel:
+    cls = GuildChannel
+    match data['type']:
+        case 0 | 5:
+            cls = TextChannel
+        case 1 | 3:
+            cls = DMChannel
+        case 2:
+            cls = VoiceChannel
+        case 3:
+            # TODO: Group DM channel
+            cls = DMChannel
+        case 4:
+            cls = CategoryChannel
+        case 10 | 11 | 12:
+            # TODO: Thread channel
+            pass
+        case 13:
+            # TODO: Stage channel
+            cls = VoiceChannel
+    return cls(data, state)
