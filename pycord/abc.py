@@ -42,15 +42,15 @@ class Messageable:
 
     async def send(
         self, 
-        content: str = ..., 
+        content: str = None,
         *,
-        tts: bool = ...,
-        embeds: list[EmbedData] = ...,
-        allowed_mentions: AllowedMentionsData = ...,
-        components: list[ComponentData] = ...,
-        sticker_ids: list[Snowflake] = ...,
-        files: list[File] = ...,
-        flags: int = ...,
+        tts: bool = None,
+        embeds: list[EmbedData] = None,
+        allowed_mentions: AllowedMentionsData = None,
+        components: list[ComponentData] = None,
+        sticker_ids: list[Snowflake] = None,
+        files: list[File] = None,
+        flags: int = None,
     ):
         """Sends a message in this channel.
 
@@ -83,9 +83,9 @@ class Messageable:
     async def get_messages(
         self, 
         *, 
-        around: Snowflake | datetime = ...,
-        before: Snowflake | datetime = ..., 
-        after: Snowflake | datetime = ..., 
+        around: Snowflake | datetime = None,
+        before: Snowflake | datetime = None,
+        after: Snowflake | datetime = None,
         limit: int | None = 50
     ):
         """Gets all messages from a certain time.
@@ -127,9 +127,9 @@ class Messageable:
     async def purge_messages(
         self, 
         *, 
-        around: Snowflake | datetime = ..., 
-        before: Snowflake | datetime = ..., 
-        after: Snowflake | datetime = ...,
+        around: Snowflake | datetime = None,
+        before: Snowflake | datetime = None,
+        after: Snowflake | datetime = None,
         limit: int = 50,
         reason: str | None = None,
     ):
