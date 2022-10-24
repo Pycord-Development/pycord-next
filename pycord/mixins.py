@@ -115,3 +115,6 @@ class RouteCategoryMixin:
         **kwargs: Any,
     ) -> dict[str, Any] | list[dict[str, Any]] | str | None:
         ...
+
+    def _prepare_message_form(self, files: list[File], payload: dict[str, Any] = None) -> FormData:
+        ...

@@ -84,14 +84,10 @@ class HTTPClient(
         if reason:
             headers['X-Audit-Log-Reason'] = reason
 
-        if files:
-            data = self._prepare_form(files, data)
-        elif data:
+        if data:
             if isinstance(data, dict | list):
                 data = utils.dumps(data)
                 headers.update({"Content-Type": "application/json"})
-            elif isinstance(data, FormData):
-                headers.update({"Content-Type": "multipart/form-data"})
 
         try:
             for retry in range(self.max_retries):
@@ -117,7 +113,7 @@ class HTTPClient(
                         await blocker.wait()
                         break
 
-                r = await self._session.request(
+                response = await self._session.request(
                     method=method,
                     url=endpoint,
                     data=data,
@@ -126,7 +122,7 @@ class HTTPClient(
                 )
 
                 # ratelimited
-                if r.status == 429:
+                if response.status == 429:
                     try:
                         bucket = r.headers['X-RateLimit-Bucket']
                     except:
@@ -150,26 +146,28 @@ class HTTPClient(
                         del self._blockers[bucket]
                         continue
 
+                data = await utils._text_or_json(response)
+
                 # something went wrong
-                if r.status >= 400:
-                    if r.status == 401:
-                        raise Unauthorized
-                    elif r.status == 403:
-                        raise Forbidden
-                    elif r.status == 404:
-                        raise NotFound
+                if response.status >= 400:
+                    if response.status == 401:
+                        raise Unauthorized(response, data)
+                    elif response.status == 403:
+                        raise Forbidden(response, data)
+                    elif response.status == 404:
+                        raise NotFound(response, data)
                     else:
-                        raise HTTPException
+                        raise HTTPException(response, data)
 
-                _log.debug(f'Received {await r.text()} from request to {endpoint}')
+                _log.debug(f'Received {data} from request to {endpoint}')
 
-                return await utils._text_or_json(r)
+                return data
         finally:
             if files:
                 for f in files:
                     f.close()
 
-    def _prepare_form(self, files: list[File], payload: dict[str, Any] = None) -> FormData:
+    def _prepare_message_form(self, files: list[File], payload: dict[str, Any] = None) -> FormData:
         if payload is None:
             payload = {}
         form = []
@@ -200,22 +198,8 @@ class HTTPClient(
                 case 200:
                     return await response.read()
                 case 403:
-                    raise Forbidden
+                    raise Forbidden(response, None)
                 case 404:
-                    raise NotFound
+                    raise NotFound(response, None)
                 case _:
-                    raise HTTPException
-
-    async def get_me(self) -> UserData:
-        return await self.request('GET', Route('/users/@me'))  # type: ignore
-
-    async def edit_me(self, username: str | None = None, avatar: str | None = None) -> UserData:
-        data = {}
-
-        if username:
-            data['username'] = username
-
-        if avatar:
-            data['avatar'] = avatar
-
-        return await self.request('PATCH', Route('/users/@me'), data)  # type: ignore
+                    raise HTTPException(response, None)

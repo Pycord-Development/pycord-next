@@ -606,7 +606,7 @@ class GuildRoutes(RouteCategoryMixin):
         )
 
     async def get_guild_welcome_screen(self, guild_id: Snowflake) -> WelcomeScreenData:
-        """"""
+        """Returns a PNG image widget for the guild.Returns a PNG image widget for the guild."""
         return await self.request('GET', Route('/guilds/{guild_id}/welcome-screen', guild_id=guild_id))
 
     async def modify_guild_welcome_screen(

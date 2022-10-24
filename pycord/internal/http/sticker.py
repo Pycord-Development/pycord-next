@@ -17,13 +17,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import aiohttp
 from aiohttp import FormData
 from discord_typings import Snowflake, StickerData, StickerPackData
 
-from pycord import File
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
 from pycord.types import ListNitroStickerPacksData
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pycord import File
 
 
 class StickerRoutes(RouteCategoryMixin):
@@ -41,7 +46,6 @@ class StickerRoutes(RouteCategoryMixin):
         return await self.request('GET', Route('/guilds/{guild_id}/stickers/{sticker_id}', guild_id=guild_id,
                                                sticker_id=sticker_id))
 
-    # TODO: file to `Asset` or something special
     async def create_guild_sticker(
         self,
         guild_id: Snowflake,
@@ -49,21 +53,35 @@ class StickerRoutes(RouteCategoryMixin):
         name: str,
         description: str,
         tags: str,
-        file: File,
+        file: 'File',
         reason: str | None = None,
     ) -> StickerData:
-        form_data = FormData(quote_fields=False)
-        form_data.add_field(name='name', value=name)
-        form_data.add_field(name='description', value=description)
-        form_data.add_field(name='tags', value=tags)
-        form_data.add_field(name='file', value=file.fp, content_type='application/octet-stream', filename=file.filename)
+        initial_bytes = file.fp.read(16)
+        try:
+            mime_type = utils._get_mime_type_for_image(initial_bytes)
+        except InvalidArgument:
+            if initial_bytes.startswith(b"{"):
+                mime_type = "application/json"
+            else:
+                mime_type = "application/octet-stream"
+        finally:
+            file.reset()
+
+        form_data = aiohttp.FormData(quote_fields=False)
+        form_data.add_field(name="file", value=file.fp, filename=file.filename, content_type="application/octet-stream")
+        form_data.add_field(name="name", value=name)
+        form_data.add_field(name="description", value=description)
+        form_data.add_field(name="tags", value=tags)
 
         return await self.request(
             'POST',
             Route('/guilds/{guild_id}/stickers', guild_id=guild_id),
             form_data,
+            files=[file],
             reason=reason,
         )
+
+
 
     async def modify_guild_sticker(
         self,

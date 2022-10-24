@@ -29,11 +29,15 @@ from discord_typings import (
     WebhookData,
 )
 
-from pycord import File
+
 from pycord.internal.http.route import Route
 from pycord.mixins import RouteCategoryMixin
 from pycord.utils import _convert_base64_from_bytes
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pycord import File
 
 class WebhookRoutes(RouteCategoryMixin):
     async def create_webhook(
@@ -133,7 +137,7 @@ class WebhookRoutes(RouteCategoryMixin):
         embeds: list[EmbedData] | None = None,
         allowed_mentions: AllowedMentionsData | None = None,
         components: list[ComponentData] | None = None,
-        files: list[File] | None = None,
+        files: list['File'] | None = None,
         attachments: list[PartialAttachmentData] | None = None,
         flags: int | None = None,
         thread_name: str | None = None,
@@ -169,7 +173,7 @@ class WebhookRoutes(RouteCategoryMixin):
         await self.request(
             'POST',
             Route('/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
-            payload,
+            self._prepare_message_form(files, payload),
             files=files,
         )
 
@@ -203,7 +207,7 @@ class WebhookRoutes(RouteCategoryMixin):
         embeds: list[EmbedData] | None = None,
         allowed_mentions: AllowedMentionsData | None = None,
         components: list[ComponentData] | None = None,
-        files: list[File] | None = None,
+        files: list['File'] | None = None,
         attachments: list[PartialAttachmentData] | None = None,
     ) -> MessageData:
         params = {}
@@ -230,7 +234,7 @@ class WebhookRoutes(RouteCategoryMixin):
                 webhook_token=webhook_token,
                 message_id=message_id
             ),
-            payload,
+            self._prepare_message_form(files, payload),
             params=params,
             files=files,
         )
