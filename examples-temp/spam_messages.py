@@ -26,7 +26,7 @@ async def on_hook():
     for future in futs:
         ts.append(
             app.http.request(
-                'DELETE', Route(f'/channels/{{channel_id}}/messages/{future["id"]}', channel_id=CHANNEL_ID)
+                'DELETE', Route('/channels/{channel_id}/messages/{message_id}', channel_id=CHANNEL_ID, message_id=future["id"])
             )
         )
 
