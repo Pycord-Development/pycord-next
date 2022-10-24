@@ -22,7 +22,7 @@ import io
 import os
 from typing import Any, Protocol
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, FormData
 from discord_typings import Snowflake
 
 from pycord.file import File
@@ -121,10 +121,13 @@ class RouteCategoryMixin:
         self,
         method: str,
         route: Route,
-        data: dict[str, Any] | None = None,
+        data: dict[str, Any] | list[str | int | dict[str, Any]] | FormData | None = None,
         *,
         files: list[File] | None = None,
         reason: str = None,
         **kwargs: Any,
     ) -> dict[str, Any] | list[dict[str, Any]] | str | None:
+        ...
+
+    def _prepare_message_form(self, files: list[File], payload: dict[str, Any] = None) -> FormData:
         ...
