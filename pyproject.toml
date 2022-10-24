@@ -27,7 +27,7 @@ pyright = "^1.1.276"
 types-orjson = "^3.6.2"
 flake8 = "^5.0.4"
 flake8-functions = "^0.0.7"
-flake8-if-statements = "^0.1.0"
+flake8-if-statements = "^1.0.0"
 
 [tool.poetry.extras]
 speed = [ "uvloop", "cchardet", "aiodns", "Brotli" ]

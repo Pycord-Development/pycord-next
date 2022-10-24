@@ -208,11 +208,11 @@ setuptools = "*"
 
 [[package]]
 name = "flake8-if-statements"
-version = "0.1.0"
+version = "1.0.0"
 description = "Flake8 linter for if statements"
 category = "dev"
 optional = false
-python-versions = ">=3.6,<4.0"
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
 astor = ">=0.8.1,<0.9.0"
@@ -738,7 +738,7 @@ speed = ["uvloop", "cchardet", "aiodns", "Brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "b4bde12d334b3b9cbdbf4ee4d10c48adb70f7e5c1a4b8395ce384b4ec9636270"
+content-hash = "80fc711ac9a34e83fd9a93234801e16b1f3a50d6a66269012af140485f923a2b"
 
 [metadata.files]
 aiodns = [
@@ -1052,8 +1052,8 @@ flake8-functions = [
     {file = "flake8_functions-0.0.7.tar.gz", hash = "sha256:40584b05d57e5ab185545bcfa08aa0edca52b04646d0df266e2b1667d6437184"},
 ]
 flake8-if-statements = [
-    {file = "flake8-if-statements-0.1.0.tar.gz", hash = "sha256:88d57da0b9bfeee46e416169086b65e23171939f8d08a9773097423a43c683eb"},
-    {file = "flake8_if_statements-0.1.0-py3-none-any.whl", hash = "sha256:30bbf55b4206919820a7e1c3719034215d7256b7c2844cc77b9ef5a75f171214"},
+    {file = "flake8-if-statements-1.0.0.tar.gz", hash = "sha256:4de1a05c6840ed7ca419a0de6038a343317fe327401a91c887cd8661730662c9"},
+    {file = "flake8_if_statements-1.0.0-py3-none-any.whl", hash = "sha256:7a247fab5f409e3f2c18c3d92e1f7a9a9d1a8e0cd3aa1d446a17097e16ecddab"},
 ]
 flake8-plugin-utils = [
     {file = "flake8-plugin-utils-1.3.2.tar.gz", hash = "sha256:20fa2a8ca2decac50116edb42e6af0a1253ef639ad79941249b840531889c65a"},
