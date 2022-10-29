@@ -38,6 +38,20 @@ from pycord import __copyright__, __git_sha1__, __license__, __version__
 __all__ = ['start_logging', 'print_banner']
 
 
+day_prefixes: dict[int, str] = {
+    1: 'st',
+    2: 'nd',
+    3: 'rd',
+    4: 'th',
+    5: 'th',
+    6: 'th',
+    7: 'th',
+    8: 'th',
+    9: 'th',
+    0: 'th',
+}
+
+
 def start_logging(flavor: Union[None, int, str, dict], debug: bool = False):
     if len(logging.root.handlers) != 0:
         return  # the user is most likely using logging.basicConfig, or is being spearheaded by something else.
@@ -74,6 +88,11 @@ def start_logging(flavor: Union[None, int, str, dict], debug: bool = False):
     logging.captureWarnings(True)
 
 
+def get_day_prefix(num: int) -> str:
+    n = str(num)
+    return day_prefixes[int(n[len(n) - 1])]
+
+
 def print_banner(module: Optional[str] = 'pycord'):
     banner = importlib.resources.read_text(module, 'banner.txt')
     info_banner = importlib.resources.read_text(module, 'ibanner.txt')
@@ -83,7 +102,7 @@ def print_banner(module: Optional[str] = 'pycord'):
         'copyright': __copyright__,
         'version': __version__,
         'license': __license__,
-        'current_time': today.strftime('%B the %d, of %Y'),
+        'current_time': today.strftime(f'%B the %d{get_day_prefix(today.day)}, of %Y'),
         'py_version': platform.python_version(),
         'git_sha': __git_sha1__[:8],
     }
