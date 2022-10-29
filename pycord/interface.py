@@ -102,7 +102,7 @@ def print_banner(module: Optional[str] = 'pycord'):
         'copyright': __copyright__,
         'version': __version__,
         'license': __license__,
-        'current_time': today.strftime(f'%B the %d{get_day_prefix(today.day)}, of %Y'),
+        'current_time': today.strftime(f'%B the %d{get_day_prefix(today.day)} of %Y'),
         'py_version': platform.python_version(),
         'git_sha': __git_sha1__[:8],
     }

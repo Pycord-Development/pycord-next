@@ -20,15 +20,28 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+"""
+Implementation of Discord's Snowflake ID
+"""
 
-from typing import Any
+from datetime import datetime, timezone
 
-from aiohttp import ClientResponse
-
-DISCORD_EPOCH: int = 1420070400000
+from .utils import DISCORD_EPOCH
 
 
-async def _text_or_json(cr: ClientResponse) -> str | dict[str, Any]:
-    if cr.content_type == 'application/json':
-        return await cr.json(encoding='utf-8')
-    return await cr.text('utf-8')
+class Snowflake(int):
+    @property
+    def timestamp(self) -> datetime:
+        return datetime.fromtimestamp(((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc)
+
+    @property
+    def worker_id(self) -> int:
+        return (self & 0x3E0000) >> 17
+
+    @property
+    def process_id(self) -> int:
+        return (self & 0x1F000) >> 12
+
+    @property
+    def increment(self) -> int:
+        return self & 0xFFF
