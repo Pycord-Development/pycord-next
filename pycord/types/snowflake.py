@@ -21,12 +21,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-from typing import Any
+from __future__ import annotations
 
-from aiohttp import ClientResponse
+from typing import TypeVar, Union
 
+__all__ = ['Snowflake', 'SnowflakeL', 'SnowflakeOr']
 
-async def _text_or_json(cr: ClientResponse) -> str | dict[str, Any]:
-    if cr.content_type == 'application/json':
-        return await cr.json(encoding='utf-8')
-    return await cr.text('utf-8')
+T = TypeVar('T', covariant=True)
+
+Snowflake = Union[int, str]
+SnowflakeL = list[Snowflake]
+SnowflakeOr = Union[T, Snowflake]

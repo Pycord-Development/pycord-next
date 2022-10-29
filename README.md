@@ -1,15 +1,16 @@
-# Pycord v3
-🚀 Blazingly fast, highly intuitive and more friendly rewrite of Pycord.
+<div align='center'>
+    <br />
+    <p>
+        <a href="https://github.com/pycord/pycord-v3"><img src="https://raw.githubusercontent.com/pycord/pycord-v3/master/docs/assets/pycord-v3.png" width="546" alt="pycord" /></a>
+    </p>
+    <br />
+    <p>
+        <a href="https://discord.gg/pycord"><img src="https://img.shields.io/discord/881207955029110855?color=5865F2&logo=discord&logoColor=white" alt="discord"> </a>
+        <a href="https://pypi.org/project/py-cord"><img src="https://img.shields.io/pypi/v/py-cord?label=pip" alt="pip version"> </a>
+        <a href="https://pypi.org/project/py-cord"><img src="https://static.pepy.tech/personalized-badge/py-cord?period=total&units=abbreviation&left_color=grey&right_color=green&left_text=downloads" alt="pip downloads"> </a>
+    </p>
+</div>
 
-## Installing
-v3 is in a pre-alpha phase currently, so to install you have to use git (via [ssh](https://github.com/settings/ssh/new)) via the following:
-
-```
-pip install git+ssh://git@github.com/pycord/pycord-v3.git
-```
-
-## Reporting Bugs or Errors
-If you need to report a bug, please make an issue.
-
-## Extra Libraries
-For extra libraries and other extensions for Pycord v3 please check out [the vector project's](https://github.com/vector-libs) curated repository of greatly manufactured v3 extensions.
+<p align='center'>
+ Python's Intuitive API Wrapper
+</p>

@@ -20,13 +20,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+"""Cli processes."""
+import platform
+import sys
 
-from typing import Any
-
-from aiohttp import ClientResponse
+import pycord
 
 
-async def _text_or_json(cr: ClientResponse) -> str | dict[str, Any]:
-    if cr.content_type == 'application/json':
-        return await cr.json(encoding='utf-8')
-    return await cr.text('utf-8')
+def main() -> None:
+    version = pycord.__version__  # type: ignore
+    python_version = platform.python_version()
+    sys.stderr.write(f'Running on Pycord Version {version},')
+    sys.stderr.write(f' with Python version {python_version}.')
+
+
+if __name__ == '__main__':
+    main()

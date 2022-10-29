@@ -1,0 +1,4 @@
+include requirements.txt
+include pycord/py.typed
+include pycord/banner.txt
+include pycord/bin/*.dll

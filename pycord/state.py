@@ -1,4 +1,7 @@
-# Copyright (c) 2021-2022 VincentRPS
+# -*- coding: utf-8 -*-
+# cython: language_level=3
+# Copyright (c) 2021-present VincentRPS
+# Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -16,94 +19,15 @@
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Mapping, Protocol, Type, Union
+# SOFTWARE
+from typing import Any
 
-if TYPE_CHECKING:
-    from pycord.apps.gateway import GatewayApp
-    from pycord.apps.rest import RESTApp
+__all__ = ['State']
 
 
-class AsyncDict(dict):
-    """
-    A dict with async methods to help support async dbs.
-    """
+class State:
+    def __init__(self, **options: Any) -> None:
+        self.max_messages: int = options.get('max_messages')
 
-    async def get(self, key: Any) -> Any:
-        return super().get(key)
-
-    async def pop(self, key: Any, default: Any | None = None) -> Any:
-        return super().pop(key, default)
-
-    async def values(self) -> list[Mapping[Any, Any]]:
-        return super().values()  # type: ignore
-
-
-class BaseConnectionState(Protocol):
-    _app: Union["RESTApp", "GatewayApp"]
-    cache_timeout: int
-    store: Type[AsyncDict]
-    gateway_enabled: bool
-
-    # cache
-    messages: AsyncDict
-    guilds: AsyncDict
-    channels: AsyncDict
-    members: AsyncDict
-
-    def __init__(
-        self,
-        _app: Union["RESTApp", "GatewayApp"],
-        cache_timeout: int = 10000,
-        store: Type[AsyncDict] = AsyncDict(),
-        gateway_enabled: bool = False,
-    ) -> None:
+    def reset(self) -> None:
         pass
-
-    async def start_cache(self) -> None:
-        pass
-
-    async def process_event(self, data: Mapping[Any, Any]) -> None:
-        pass
-
-
-@dataclass
-class ConnectionState(BaseConnectionState):
-    _app: Union["RESTApp", "GatewayApp"]
-    """
-    The app controlling the ConnectionState.
-    """
-
-    cache_timeout: int = 10000
-    """
-    Cache timeout in seconds.
-    """
-
-    store: Type[AsyncDict] = AsyncDict
-
-    gateway_enabled: bool = False
-    """
-    Specifies if this ConnectionState is being controlled by a member which has Gateway Access.
-    """
-
-    async def start_cache(self) -> None:
-
-        # channel_id: list of message objects
-        self.messages: AsyncDict = self.store()
-
-        # guild_id: guild object
-        self.guilds: AsyncDict = self.store()
-
-        # channel_id: channel object
-        self.channels: AsyncDict = self.store()
-
-        # guild_id: list of member objects.
-        self.members: AsyncDict = self.store()
-
-    async def process_event(self, data: Mapping[Any, Any]):
-        self._app.dispatcher.dispatch(f'on_raw_{data["t"].lower()}', data)
-
-        if hasattr(self, data['t'].lower()):
-            attr = getattr(self, data['t'].lower())
-            await attr(data)
