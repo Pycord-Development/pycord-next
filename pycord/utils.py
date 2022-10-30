@@ -35,14 +35,14 @@ except ImportError:
 DISCORD_EPOCH: int = 1420070400000
 
 
-async def _text_or_json(cr: ClientResponse) -> str | dict[str, Any]:
+async def _text_or_json(cr: ClientResponse, self) -> str | dict[str, Any]:
     if cr.content_type == 'application/json':
-        return await cr.json(encoding='utf-8')
+        return await cr.json(encoding='utf-8', loads=self._json_decoder)
     return await cr.text('utf-8')
 
 
 def loads(data: Any) -> Any:
-    return msgspec.json.decode(data) if msgspec else json.loads(data)
+    return msgspec.json.decode(data.encode()) if msgspec else json.loads(data)
 
 
 def dumps(data: Any) -> str:

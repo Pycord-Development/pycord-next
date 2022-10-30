@@ -22,25 +22,25 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+import logging
+from typing import TYPE_CHECKING
 
-from .api import HTTPClient
+from .shard import Shard
 
 if TYPE_CHECKING:
-    from .flags import Intents
-    from .gateway import PassThrough
+    from .manager import BaseShardManager
 
-__all__ = ['State']
+_log = logging.getLogger(__name__)
 
 
-class State:
-    def __init__(self, **options: Any) -> None:
-        self.max_messages: int = options.get('max_messages')
-        self.http = HTTPClient(options.get('token', ''), options.get('http_base_url', 'https://discord.com/api/v10'))
-        self.large_threshold: int = options.get('large_threshold', 250)
-        self.shard_concurrency: PassThrough | None = None
-        self.intents: Intents = options['intents']
-        self.raw_user: dict[str, Any] | None = None
+class Notifier:
+    def __init__(self, manager: BaseShardManager) -> None:
+        self.manager = manager
 
-    def reset(self) -> None:
-        pass
+    async def shard_died(self, shard: Shard) -> None:
+        _log.debug(f'Shard {shard.id} died, restarting it')
+        self.manager.remove_shard(shard)
+
+        new_shard = Shard(id=shard.id, state=shard._state, session=shard._session, notifier=self)
+        await new_shard.connect(token=self.manager.token)
+        self.manager.add_shard(new_shard)

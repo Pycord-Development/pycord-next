@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 from typing import Any
+
 from ..utils import loads
 
 
@@ -31,3 +32,5 @@ class JSONDecoder:
     def decode(self, s: str) -> Any:
         return loads(s)
 
+    def __call__(self, s: str) -> Any:
+        return self.decode(s)

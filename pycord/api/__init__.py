@@ -8,13 +8,13 @@ from typing import Any, Optional
 
 from aiohttp import BasicAuth, ClientSession
 
-from pycord.__init__ import __version__
+from pycord._about import __version__
 
 from .. import utils
-from .execution import Executer
-from .route import BaseRoute, Route
 from ..utils import dumps
+from .execution import Executer
 from .json_decoder import JSONDecoder
+from .route import BaseRoute, Route
 
 __all__ = ['Route', 'BaseRoute', 'HTTPClient']
 
@@ -77,6 +77,7 @@ class HTTPClient:
             r = await self._session.request(
                 method, endpoint, data=data, headers=headers, proxy=self._proxy, proxy_auth=self._proxy_auth
             )
+            _log.debug(f'Received back {await r.text()}')
 
             if r.status == 429:
                 _log.debug(f'Request to {endpoint} failed: Request returned rate limit')
@@ -93,5 +94,7 @@ class HTTPClient:
                 continue
 
             # TODO: Handle normal errors
+            return await utils._text_or_json(cr=r, self=self)
 
-            return await utils._text_or_json(cr=r)
+    async def get_gateway_bot(self) -> dict[str, Any]:
+        return await self.request('GET', Route('/gateway/bot'))

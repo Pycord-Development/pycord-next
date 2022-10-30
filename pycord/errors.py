@@ -20,27 +20,27 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any
-
-from .api import HTTPClient
-
-if TYPE_CHECKING:
-    from .flags import Intents
-    from .gateway import PassThrough
-
-__all__ = ['State']
 
 
-class State:
-    def __init__(self, **options: Any) -> None:
-        self.max_messages: int = options.get('max_messages')
-        self.http = HTTPClient(options.get('token', ''), options.get('http_base_url', 'https://discord.com/api/v10'))
-        self.large_threshold: int = options.get('large_threshold', 250)
-        self.shard_concurrency: PassThrough | None = None
-        self.intents: Intents = options['intents']
-        self.raw_user: dict[str, Any] | None = None
+class PycordException(Exception):
+    pass
 
-    def reset(self) -> None:
-        pass
+
+class GatewayException(PycordException):
+    pass
+
+
+class NoIdentifiesLeft(GatewayException):
+    pass
+
+
+class DisallowedIntents(GatewayException):
+    pass
+
+
+class ShardingRequired(GatewayException):
+    pass
+
+
+class InvalidAuth(GatewayException):
+    pass

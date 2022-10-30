@@ -21,7 +21,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-from typing import Callable, Type, TypeVar
+from __future__ import annotations
+
+from typing import Callable, Literal, Type, TypeVar
 
 F = TypeVar('F', bound='Flags')
 
@@ -51,6 +53,9 @@ class Flags:
             if not hasattr(self, name):
                 raise AttributeError(f'Flag {repr(name)} does not exist')
 
+            if name == 'as_bit':
+                raise AttributeError('as_bit is not a flag')
+
             flag_value = getattr(self.__class__, name)
             self._overwrite_flag(flag_value, value)
 
@@ -62,6 +67,10 @@ class Flags:
             self._flag_overwrites.remove((flag, value))
 
         self._flag_overwrites.append((flag, value))
+
+    @staticmethod
+    def _valid_flags(flagcls) -> dict[str, Literal[True]]:
+        return {v: True for v in dir(flagcls) if not v.startswith('_') and v != 'as_bit' and v != 'mro' and v != 'all'}
 
     @property
     def as_bit(self) -> int:
@@ -144,3 +153,8 @@ class Intents(Flags):
     @flag
     def auto_moderation_execution(self) -> bool | int:
         return 1 << 21
+
+    @classmethod
+    def all(cls) -> Intents:
+        valid_intents = Intents._valid_flags(Intents)
+        return cls(**valid_intents)

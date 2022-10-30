@@ -33,7 +33,7 @@ from typing import Optional, Union
 
 import colorlog
 
-from pycord import __copyright__, __git_sha1__, __license__, __version__
+from pycord._about import __copyright__, __git_sha1__, __license__, __version__
 
 __all__ = ['start_logging', 'print_banner']
 
