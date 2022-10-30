@@ -20,6 +20,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from typing import Any
+
+from aiohttp import ClientResponse
+
+from .utils import parse_errors
 
 
 class PycordException(Exception):
@@ -43,4 +48,34 @@ class ShardingRequired(GatewayException):
 
 
 class InvalidAuth(GatewayException):
+    pass
+
+
+class HTTPException(PycordException):
+    def __init__(self, resp: ClientResponse, data: dict[str, Any] | None) -> None:
+        self._response = resp
+        self.status = resp.status
+
+        if data:
+            self.code = data.get('code', 0)
+            self.error_message = data.get('message', '')
+
+            if errors := data.get('errors'):
+                self.errors = parse_errors(errors)
+                message = self.error_message + '\n'.join(f'In {key}: {err}' for key, err in self.errors.items())
+            else:
+                message = self.error_message
+
+        super().__init__(f'{resp.status} {resp.reason} (code: {self.code}): {message}')
+
+
+class Forbidden(HTTPException):
+    pass
+
+
+class NotFound(HTTPException):
+    pass
+
+
+class InternalError(HTTPException):
     pass

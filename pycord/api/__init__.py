@@ -11,6 +11,7 @@ from aiohttp import BasicAuth, ClientSession
 from pycord._about import __version__
 
 from .. import utils
+from ..errors import Forbidden, HTTPException, InternalError, NotFound
 from ..utils import dumps
 from .execution import Executer
 from .json_decoder import JSONDecoder
@@ -79,22 +80,31 @@ class HTTPClient:
             )
             _log.debug(f'Received back {await r.text()}')
 
+            data = await utils._text_or_json(cr=r, self=self)
+
             if r.status == 429:
                 _log.debug(f'Request to {endpoint} failed: Request returned rate limit')
                 executer = Executer(route=route)
 
                 self._executers.append(executer)
-                _json = await r.json(loads=self._json_decoder)
                 await executer.executed(
-                    reset_after=_json['retry_after'],
+                    reset_after=data['retry_after'],
                     is_global=r.headers.get('X-RateLimit-Scope') == 'global',
                     limit=int(r.headers.get('X-RateLimit-Limit', 10)),
                 )
                 self._executers.remove(executer)
                 continue
 
-            # TODO: Handle normal errors
-            return await utils._text_or_json(cr=r, self=self)
+            elif r.status == 403:
+                raise Forbidden(resp=r, data=data)
+            elif r.status == 404:
+                raise NotFound(resp=r, data=data)
+            elif r.status == 500:
+                raise InternalError(resp=r, data=data)
+            elif r.ok:
+                return data
+            else:
+                raise HTTPException(resp=r, data=data)
 
     async def get_gateway_bot(self) -> dict[str, Any]:
         return await self.request('GET', Route('/gateway/bot'))

@@ -47,3 +47,22 @@ def loads(data: Any) -> Any:
 
 def dumps(data: Any) -> str:
     return msgspec.json.encode(data).decode('utf-8') if msgspec else json.dumps(data)
+
+
+def parse_errors(errors: dict[str, Any], key: str | None = None) -> dict[str, str]:
+    ret = []
+
+    for k, v in errors.items():
+        kie = f'{k}.{key}' if key else k
+
+        if isinstance(v, dict):
+            try:
+                errors_ = v['_errors']
+            except KeyError:
+                ret.append(parse_errors(errors=errors_, key=kie).items())
+            else:
+                ret.append((kie, ''.join(x.get('message') for x in errors_)))
+        else:
+            ret.append((kie, v))
+
+    return dict(ret)
