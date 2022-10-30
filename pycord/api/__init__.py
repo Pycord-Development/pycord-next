@@ -7,7 +7,7 @@ import json
 import logging
 from typing import Any, Optional
 
-from aiohttp import ClientSession
+from aiohttp import BasicAuth, ClientSession
 
 from pycord.__init__ import __version__
 
@@ -21,8 +21,16 @@ _log = logging.getLogger(__name__)
 
 
 class HTTPClient:
-    def __init__(self, token: str, base_url: str = 'https://discord.com/api/v10') -> None:
+    def __init__(
+        self,
+        token: str,
+        base_url: str = 'https://discord.com/api/v10',
+        proxy: str | None = None,
+        proxy_auth: BasicAuth | None = None,
+    ) -> None:
         self.base_url = base_url
+        self._proxy = proxy
+        self._proxy_auth = proxy_auth
         self._headers = {
             'Authorization': f'Bot {token}',
             'User-Agent': f'DiscordBot (https://github.com/pycord/pycord-v3, {__version__})',
@@ -64,7 +72,9 @@ class HTTPClient:
                 await executer.wait()
 
         for _ in range(5):
-            r = await self._session.request(method, endpoint, data=data, headers=headers)
+            r = await self._session.request(
+                method, endpoint, data=data, headers=headers, proxy=self._proxy, proxy_auth=self._proxy_auth
+            )
 
             if r.status == 429:
                 _log.debug(f'Request to {endpoint} failed: Request returned rate limit')
