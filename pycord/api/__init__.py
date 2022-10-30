@@ -3,7 +3,6 @@ pycord.api
 ~~~~~~~~~~
 Implementation of the Discord API.
 """
-import json
 import logging
 from typing import Any, Optional
 
@@ -14,6 +13,8 @@ from pycord.__init__ import __version__
 from .. import utils
 from .execution import Executer
 from .route import BaseRoute, Route
+from ..utils import dumps
+from .json_decoder import JSONDecoder
 
 __all__ = ['Route', 'BaseRoute', 'HTTPClient']
 
@@ -29,6 +30,7 @@ class HTTPClient:
         proxy_auth: BasicAuth | None = None,
     ) -> None:
         self.base_url = base_url
+        self._json_decoder = JSONDecoder()
         self._proxy = proxy
         self._proxy_auth = proxy_auth
         self._headers = {
@@ -61,7 +63,7 @@ class HTTPClient:
 
         if data:
             # TODO: Support msgspec
-            data: str = json.dumps(data)
+            data: str = dumps(data=data)
             headers.update({'Content-Type': 'application/json'})
 
         _log.debug(f'Requesting to {endpoint} with {data}, {headers}')
@@ -81,7 +83,7 @@ class HTTPClient:
                 executer = Executer(route=route)
 
                 self._executers.append(executer)
-                _json = await r.json()
+                _json = await r.json(loads=self._json_decoder)
                 await executer.executed(
                     reset_after=_json['retry_after'],
                     is_global=r.headers.get('X-RateLimit-Scope') == 'global',

@@ -20,30 +20,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-
 from typing import Any
-
-from aiohttp import ClientResponse
-
-try:
-    import msgspec
-except ImportError:
-    import json
-
-    msgspec = None
-
-DISCORD_EPOCH: int = 1420070400000
+from ..utils import loads
 
 
-async def _text_or_json(cr: ClientResponse) -> str | dict[str, Any]:
-    if cr.content_type == 'application/json':
-        return await cr.json(encoding='utf-8')
-    return await cr.text('utf-8')
+class JSONDecoder:
+    def __init__(self, *args, **kwargs) -> None:
+        ...
 
+    def decode(self, s: str) -> Any:
+        return loads(s)
 
-def loads(data: Any) -> Any:
-    return msgspec.json.decode(data) if msgspec else json.loads(data)
-
-
-def dumps(data: Any) -> str:
-    return msgspec.json.encode(data).decode('utf-8') if msgspec else json.dumps(data)
