@@ -20,62 +20,28 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import Any
+"""
+Implementation of Discord's Snowflake ID
+"""
 
-from aiohttp import ClientResponse
+from datetime import datetime, timezone
 
-from .utils import parse_errors
-
-
-class PycordException(Exception):
-    pass
+from .utils import DISCORD_EPOCH
 
 
-class GatewayException(PycordException):
-    pass
+class Snowflake(int):
+    @property
+    def timestamp(self) -> datetime:
+        return datetime.fromtimestamp(((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc)
 
+    @property
+    def worker_id(self) -> int:
+        return (self & 0x3E0000) >> 17
 
-class NoIdentifiesLeft(GatewayException):
-    pass
+    @property
+    def process_id(self) -> int:
+        return (self & 0x1F000) >> 12
 
-
-class DisallowedIntents(GatewayException):
-    pass
-
-
-class ShardingRequired(GatewayException):
-    pass
-
-
-class InvalidAuth(GatewayException):
-    pass
-
-
-class HTTPException(PycordException):
-    def __init__(self, resp: ClientResponse, data: dict[str, Any] | None) -> None:
-        self._response = resp
-        self.status = resp.status
-
-        if data:
-            self.code = data.get('code', 0)
-            self.error_message = data.get('message', '')
-
-            if errors := data.get('errors'):
-                self.errors = parse_errors(errors)
-                message = self.error_message + '\n'.join(f'In {key}: {err}' for key, err in self.errors.items())
-            else:
-                message = self.error_message
-
-        super().__init__(f'{resp.status} {resp.reason} (code: {self.code}): {message}')
-
-
-class Forbidden(HTTPException):
-    pass
-
-
-class NotFound(HTTPException):
-    pass
-
-
-class InternalError(HTTPException):
-    pass
+    @property
+    def increment(self) -> int:
+        return self & 0xFFF

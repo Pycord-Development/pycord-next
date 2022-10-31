@@ -1,26 +1,16 @@
 """
 Pycord
 ~~~~~~
-Discord API Wrapper
+Python's Intuitive Discord API Wrapper
 
-:copyright: 2021-2022 VincentRPS
-:license: MIT, see LICENSE for more details.
+:copyright: 2021-present VincentRPS
+:license: MIT
 """
-__title__: str = 'Pycord'
-__author__: str = 'Created by VincentRPS, developed by the Pycord Team.'
-__version__: str = '3.0.0'
-__license__: str = 'MIT'
-
-# colorama is not type stubbed
-import colorama  # type: ignore
-
-colorama.init()
-
-del colorama
-
-from .apps import *
-from .assets import *
-from .file import *
+from ._about import *
+from .api import *
+from .flags import *
+from .gateway import *
+from .interface import *
+from .snowflake import *
 from .state import *
-from .user import *
 from .utils import *

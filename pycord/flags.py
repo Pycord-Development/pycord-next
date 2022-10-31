@@ -1,4 +1,7 @@
-# Copyright (c) 2021-2022 VincentRPS
+# -*- coding: utf-8 -*-
+# cython: language_level=3
+# Copyright (c) 2021-present VincentRPS
+# Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -16,13 +19,142 @@
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# SOFTWARE
+
+from __future__ import annotations
+
+from typing import Callable, Literal, Type, TypeVar
+
+F = TypeVar('F', bound='Flags')
+
+__all__ = ['Intents']
 
 
-def has_flag(value: int, flag_value: int):
-    return (value & flag_value) == flag_value
+class flag:
+    def __init__(self, func: Callable):
+        self.value: int = func(None)
+        self.__doc__ = func.__doc__
+
+    def __get__(self, instance: F | None, _: Type[F]) -> int | bool:
+        return instance._has_flag(self.value) if instance else self.value
+
+    def __set__(self, instance: F, value: bool) -> None:
+        instance._overwrite_flag(flag=self.value, value=value)
 
 
-class Permissions:
-    # TODO; Finish
-    ...
+class Flags:
+    def __init__(self, **flags_named: bool) -> None:
+        self._flag_overwrites: list[tuple[int, bool]] = []
+
+        for name, value in flags_named.items():
+            if name.startswith('_'):
+                raise AttributeError('Flags cannot be private')
+
+            if not hasattr(self, name):
+                raise AttributeError(f'Flag {repr(name)} does not exist')
+
+            if name == 'as_bit':
+                raise AttributeError('as_bit is not a flag')
+
+            flag_value = getattr(self.__class__, name)
+            self._overwrite_flag(flag_value, value)
+
+    def _has_flag(self, flag: int) -> bool:
+        return next((overwrite[1] for overwrite in self._flag_overwrites if overwrite[0] == flag), False)
+
+    def _overwrite_flag(self, flag: int, value: bool) -> None:
+        if self._has_flag(flag=flag):
+            self._flag_overwrites.remove((flag, value))
+
+        self._flag_overwrites.append((flag, value))
+
+    @staticmethod
+    def _valid_flags(flagcls) -> dict[str, Literal[True]]:
+        return {v: True for v in dir(flagcls) if not v.startswith('_') and v != 'as_bit' and v != 'mro' and v != 'all'}
+
+    @property
+    def as_bit(self) -> int:
+        return sum(overwrite[0] for overwrite in self._flag_overwrites if overwrite[1] is True)
+
+
+class Intents(Flags):
+    @flag
+    def guilds(self) -> bool | int:
+        return 1 << 0
+
+    @flag
+    def guild_members(self) -> bool | int:
+        return 1 << 1
+
+    @flag
+    def guild_bans(self) -> bool | int:
+        return 1 << 2
+
+    @flag
+    def guild_emojis_and_stickers(self) -> bool | int:
+        return 1 << 3
+
+    @flag
+    def guild_integrations(self) -> bool | int:
+        return 1 << 4
+
+    @flag
+    def guild_webhooks(self) -> bool | int:
+        return 1 << 5
+
+    @flag
+    def guild_invites(self) -> bool | int:
+        return 1 << 6
+
+    @flag
+    def guild_voice_states(self) -> bool | int:
+        return 1 << 7
+
+    @flag
+    def guild_presences(self) -> bool | int:
+        return 1 << 8
+
+    @flag
+    def guild_messages(self) -> bool | int:
+        return 1 << 9
+
+    @flag
+    def guild_message_reactions(self) -> bool | int:
+        return 1 << 10
+
+    @flag
+    def guild_message_typing(self) -> bool | int:
+        return 1 << 11
+
+    @flag
+    def direct_messages(self) -> bool | int:
+        return 1 << 12
+
+    @flag
+    def direct_message_reactions(self) -> bool | int:
+        return 1 << 13
+
+    @flag
+    def direct_message_typing(self) -> bool | int:
+        return 1 << 14
+
+    @flag
+    def message_content(self) -> bool | int:
+        return 1 << 15
+
+    @flag
+    def guild_scheduled_events(self) -> bool | int:
+        return 1 << 16
+
+    @flag
+    def auto_moderation_configuration(self) -> bool | int:
+        return 1 << 20
+
+    @flag
+    def auto_moderation_execution(self) -> bool | int:
+        return 1 << 21
+
+    @classmethod
+    def all(cls) -> Intents:
+        valid_intents = Intents._valid_flags(Intents)
+        return cls(**valid_intents)

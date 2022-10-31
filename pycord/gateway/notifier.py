@@ -20,62 +20,27 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import Any
+from __future__ import annotations
 
-from aiohttp import ClientResponse
+import logging
+from typing import TYPE_CHECKING
 
-from .utils import parse_errors
+from .shard import Shard
 
+if TYPE_CHECKING:
+    from .manager import BaseShardManager
 
-class PycordException(Exception):
-    pass
-
-
-class GatewayException(PycordException):
-    pass
+_log = logging.getLogger(__name__)
 
 
-class NoIdentifiesLeft(GatewayException):
-    pass
+class Notifier:
+    def __init__(self, manager: BaseShardManager) -> None:
+        self.manager = manager
 
+    async def shard_died(self, shard: Shard) -> None:
+        _log.debug(f'Shard {shard.id} died, restarting it')
+        self.manager.remove_shard(shard)
 
-class DisallowedIntents(GatewayException):
-    pass
-
-
-class ShardingRequired(GatewayException):
-    pass
-
-
-class InvalidAuth(GatewayException):
-    pass
-
-
-class HTTPException(PycordException):
-    def __init__(self, resp: ClientResponse, data: dict[str, Any] | None) -> None:
-        self._response = resp
-        self.status = resp.status
-
-        if data:
-            self.code = data.get('code', 0)
-            self.error_message = data.get('message', '')
-
-            if errors := data.get('errors'):
-                self.errors = parse_errors(errors)
-                message = self.error_message + '\n'.join(f'In {key}: {err}' for key, err in self.errors.items())
-            else:
-                message = self.error_message
-
-        super().__init__(f'{resp.status} {resp.reason} (code: {self.code}): {message}')
-
-
-class Forbidden(HTTPException):
-    pass
-
-
-class NotFound(HTTPException):
-    pass
-
-
-class InternalError(HTTPException):
-    pass
+        new_shard = Shard(id=shard.id, state=shard._state, session=shard._session, notifier=self)
+        await new_shard.connect(token=self.manager.token)
+        self.manager.add_shard(new_shard)
