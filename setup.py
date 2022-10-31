@@ -29,6 +29,10 @@ with open('requirements.txt') as f:
 
 packages = [
     'pycord',
+    'pycord.types',
+    'pycord.api',
+    'pycord.api.execution',
+    'pycord.gateway'
 ]
 
 extra_requires = {
