@@ -142,9 +142,10 @@ class Shard:
             await asyncio.wait_for(self._hb_received, 5)
         except asyncio.TimeoutError:
             _log.debug(f'shard:{self.id}: heartbeat waiting timed out, reconnecting...')
-            self._receive_task.cancel()
-            await self._ws.close(code=1003)
-            await self._notifier.shard_died(self)
+            self._receive_task.set_result(None)
+            if not self._ws.closed:
+                await self._ws.close(code=1003)
+            await self.connect(self._token, bool(self._resume_gateway_url))
 
     async def _recv(self) -> None:
         async for msg in self._ws:
