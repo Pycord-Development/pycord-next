@@ -79,6 +79,7 @@ class Shard:
         self._receive_task: asyncio.Task[None] | None = None
         self._connection_alive: asyncio.Future[None] = asyncio.Future()
         self._hello_received: asyncio.Future[None] | None = None
+        self._hb_task: asyncio.Task[None] | None = None
 
     async def connect(self, token: str | None = None, resume: bool = False) -> None:
         self._hello_received = asyncio.Future()
@@ -191,7 +192,7 @@ class Shard:
                     if not self._hb_received.done():
                         self._hb_received.set_result(None)
 
-                        asyncio.create_task(self.send_heartbeat())
+                        self._hb_task = asyncio.create_task(self.send_heartbeat())
                 elif op == 7:
                     await self._ws.close(code=1002)
                     await self.connect(token=self._token, resume=True)
@@ -205,8 +206,8 @@ class Shard:
 
     async def handle_close(self, code: int) -> None:
         _log.debug(f'shard:{self.id}: closed with code {code}')
-        if self._hb_received and not self._hb_received.done():
-            self._hb_received.set_result(None)
+        if self._hb_task and  not self._hb_task.done():
+            self._hb_task.set_result(None)
         if code in RESUMABLE:
             await self.connect(self._token, True)
         else:
