@@ -102,7 +102,7 @@ class Shard:
                     else:
                         await self.send_identify()
         except(ClientConnectionError, ClientConnectorError):
-            _log.debug(f'shard:{self.id}:failed to reconnect to discord due to connection errrors, retrying in 10 seconds')
+            _log.debug(f'shard:{self.id}:failed to reconnect to discord due to connection errors, retrying in 10 seconds')
             await asyncio.sleep(10)
             await self.connect(token=token, resume=resume)
 
