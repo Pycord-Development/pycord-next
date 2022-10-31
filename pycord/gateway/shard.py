@@ -91,7 +91,11 @@ class Shard:
                     if resume and self._resume_gateway_url
                     else url.format(version=self.version, base='wss://gateway.discord.gg')
                 )
-
+        except(ClientConnectionError, ClientConnectorError):
+            _log.debug(f'shard:{self.id}:failed to reconnect to discord due to connection errors, retrying in 10 seconds')
+            await asyncio.sleep(10)
+            await self.connect(token=token, resume=resume)
+        else:
                 self._receive_task = asyncio.create_task(self._recv())
 
                 if token:
@@ -101,10 +105,6 @@ class Shard:
                         await self.send_resume()
                     else:
                         await self.send_identify()
-        except(ClientConnectionError, ClientConnectorError):
-            _log.debug(f'shard:{self.id}:failed to reconnect to discord due to connection errors, retrying in 10 seconds')
-            await asyncio.sleep(10)
-            await self.connect(token=token, resume=resume)
 
     async def send(self, data: dict[str, Any]) -> None:
         async with self._rate_limiter:
