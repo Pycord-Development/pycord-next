@@ -55,7 +55,7 @@ setuptools.setup(
     version=__version__,
     packages=packages,
     package_data={
-        'pycord': ['banner.txt', 'bin/*.dll'],
+        'pycord': ['banner.txt', 'ibanner.txt', 'bin/*.dll'],
     },
     project_urls={
         'Documentation': 'https://docs.pycord.dev',
