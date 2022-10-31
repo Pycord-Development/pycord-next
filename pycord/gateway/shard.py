@@ -96,6 +96,7 @@ class Shard:
             _log.debug(f'shard:{self.id}:failed to reconnect to discord due to connection errors, retrying in 10 seconds')
             await asyncio.sleep(10)
             await self.connect(token=token, resume=resume)
+            return
         else:
                 self._receive_task = asyncio.create_task(self._recv())
 
