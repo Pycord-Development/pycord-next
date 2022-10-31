@@ -29,10 +29,9 @@ from platform import system
 from random import random
 from typing import TYPE_CHECKING, Any
 
-from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, ClientConnectorError, ClientConnectionError
+from aiohttp import ClientConnectionError, ClientConnectorError, ClientSession, ClientWebSocketResponse, WSMsgType
 
 from ..errors import DisallowedIntents, InvalidAuth, ShardingRequired
-
 from ..state import State
 from ..utils import dumps, loads
 from .passthrough import PassThrough
@@ -92,21 +91,21 @@ class Shard:
                     if resume and self._resume_gateway_url
                     else url.format(version=self.version, base='wss://gateway.discord.gg')
                 )
-        except(ClientConnectionError, ClientConnectorError):
+        except (ClientConnectionError, ClientConnectorError):
             _log.debug(f'shard:{self.id}:failed to reconnect to discord due to connection errors, retrying in 10 seconds')
             await asyncio.sleep(10)
             await self.connect(token=token, resume=resume)
             return
         else:
-                self._receive_task = asyncio.create_task(self._recv())
+            self._receive_task = asyncio.create_task(self._recv())
 
-                if token:
-                    await self._hello_received
-                    self._token = token
-                    if resume:
-                        await self.send_resume()
-                    else:
-                        await self.send_identify()
+            if token:
+                await self._hello_received
+                self._token = token
+                if resume:
+                    await self.send_resume()
+                else:
+                    await self.send_identify()
 
     async def send(self, data: dict[str, Any]) -> None:
         async with self._rate_limiter:
@@ -207,7 +206,7 @@ class Shard:
 
     async def handle_close(self, code: int) -> None:
         _log.debug(f'shard:{self.id}: closed with code {code}')
-        if self._hb_task and  not self._hb_task.done():
+        if self._hb_task and not self._hb_task.done():
             self._hb_task.set_result(None)
         if code in RESUMABLE:
             await self.connect(self._token, True)

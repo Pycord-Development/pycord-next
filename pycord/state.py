@@ -22,7 +22,8 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+import asyncio
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, TypeVar
 
 from .api import HTTPClient
 
@@ -31,6 +32,30 @@ if TYPE_CHECKING:
     from .gateway import PassThrough
 
 __all__ = ['State']
+
+
+S = TypeVar('S')
+
+
+class StateStore:
+    def __init__(self, stored: S) -> None:
+        self._stored = stored
+        self._store: dict[str, Any] = {}
+
+    async def invoke(self, func: Callable | Coroutine, *args, **kwargs) -> S:
+        if asyncio.iscoroutinefunction(func):
+            return await func(*args, **kwargs)
+        else:
+            return func(*args, **kwargs)
+
+    def select(self, id: str, default: S | None = None) -> S | None:
+        return self._store.get(id, default=default)
+
+    def capture(self, id: str, default: S | None = None) -> S | None:
+        return self._store.pop(id, default=default)
+
+    def insert(self, id: str, data: S) -> None:
+        self._store[id] = data
 
 
 class State:

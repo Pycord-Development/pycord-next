@@ -26,6 +26,7 @@ from __future__ import annotations
 from typing import Callable, Literal, Type, TypeVar
 
 F = TypeVar('F', bound='Flags')
+FF = TypeVar('FF')
 
 __all__ = ['Intents']
 
@@ -71,6 +72,14 @@ class Flags:
     @staticmethod
     def _valid_flags(flagcls) -> dict[str, Literal[True]]:
         return {v: True for v in dir(flagcls) if not v.startswith('_') and v != 'as_bit' and v != 'mro' and v != 'all'}
+
+    @classmethod
+    def _from_value(cls: Type[FF], value: int) -> FF:
+        valid_flag_names = cls._valid_flags(cls)
+        valid_flags: dict[str, int] = {v: getattr(cls, v) for v, n in valid_flag_names.items()}
+        parse: dict[str, Literal[True]] = {name: True for name, v in valid_flags.items() if (value & v)}
+
+        return cls(**parse)
 
     @property
     def as_bit(self) -> int:
