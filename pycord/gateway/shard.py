@@ -214,4 +214,8 @@ class Shard:
             elif code == 4014:
                 raise DisallowedIntents('You aren\'t allowed to carry a priviledged intent wanted')
 
-            await self._notifier.shard_died(self)
+            if code > 4000 or code == 4000:
+                await self._notifier.shard_died(self)
+            else:
+                # the connection most likely died
+                await self.connect(self._token, resume=True)
