@@ -25,6 +25,7 @@ async def spam_channels() -> None:
     )
 
     await asyncio.gather(*tasks)
+    await api.close_session()
 
 
 asyncio.run(spam_channels())
