@@ -29,7 +29,7 @@ from platform import system
 from random import random
 from typing import TYPE_CHECKING, Any
 
-from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType
+from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, ClientConnectorError, ClientConnectionError
 
 from ..errors import DisallowedIntents, InvalidAuth, ShardingRequired
 
@@ -83,23 +83,28 @@ class Shard:
     async def connect(self, token: str | None = None, resume: bool = False) -> None:
         self._hello_received = asyncio.Future()
 
-        async with self._state.shard_concurrency:
-            _log.debug(f'shard:{self.id}: connecting to gateway')
-            self._ws = await self._session.ws_connect(
-                url=url.format(version=self.version, base=self._resume_gateway_url)
-                if resume and self._resume_gateway_url
-                else url.format(version=self.version, base='wss://gateway.discord.gg')
-            )
+        try:
+            async with self._state.shard_concurrency:
+                _log.debug(f'shard:{self.id}: connecting to gateway')
+                self._ws = await self._session.ws_connect(
+                    url=url.format(version=self.version, base=self._resume_gateway_url)
+                    if resume and self._resume_gateway_url
+                    else url.format(version=self.version, base='wss://gateway.discord.gg')
+                )
 
-            self._receive_task = asyncio.create_task(self._recv())
+                self._receive_task = asyncio.create_task(self._recv())
 
-            if token:
-                await self._hello_received
-                self._token = token
-                if resume:
-                    await self.send_resume()
-                else:
-                    await self.send_identify()
+                if token:
+                    await self._hello_received
+                    self._token = token
+                    if resume:
+                        await self.send_resume()
+                    else:
+                        await self.send_identify()
+        except(ClientConnectionError, ClientConnectorError):
+            _log.debug(f'shard:{self.id}:failed to reconnect to discord due to connection errrors, retrying in 10 seconds')
+            await asyncio.sleep(10)
+            await self.connect(token=token, resume=resume)
 
     async def send(self, data: dict[str, Any]) -> None:
         async with self._rate_limiter:
