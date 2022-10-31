@@ -68,8 +68,7 @@ class Shard:
         self._notifier = notifier
         self._state = state
         self._session = session
-        self._inflator = zlib.decompressobj()
-        self._buffer = bytearray()
+        self._inflator: zlib._Decompress | None = None
         self._sequence: int | None = None
         self._ws: ClientWebSocketResponse | None = None
         self._resume_gateway_url: str | None = None
@@ -82,6 +81,7 @@ class Shard:
 
     async def connect(self, token: str | None = None, resume: bool = False) -> None:
         self._hello_received = asyncio.Future()
+        self._inflator = zlib.decompressobj()
 
         try:
             async with self._state.shard_concurrency:
@@ -91,8 +91,9 @@ class Shard:
                     if resume and self._resume_gateway_url
                     else url.format(version=self.version, base='wss://gateway.discord.gg')
                 )
+                _log.debug(f'shard:{self.id}: connected to gateway')
         except (ClientConnectionError, ClientConnectorError):
-            _log.debug(f'shard:{self.id}:failed to reconnect to discord due to connection errors, retrying in 10 seconds')
+            _log.debug(f'shard:{self.id}: failed to connect to discord due to connection errors, retrying in 10 seconds')
             await asyncio.sleep(10)
             await self.connect(token=token, resume=resume)
             return
@@ -138,14 +139,22 @@ class Shard:
             await asyncio.sleep(self._heartbeat_interval)
         self._hb_received = asyncio.Future()
         _log.debug(f'shard:{self.id}: sending heartbeat')
-        await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
+        try:
+            await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
+        except ConnectionResetError:
+            _log.debug(f'shard:{self.id}: failed to send heartbeat due to connection reset, reconnecting...')
+            self._receive_task.cancel()
+            if not self._ws.closed:
+                await self._ws.close(code=1008)
+            await self.connect(self._token, bool(self._resume_gateway_url))
+            return
         try:
             await asyncio.wait_for(self._hb_received, 5)
         except asyncio.TimeoutError:
             _log.debug(f'shard:{self.id}: heartbeat waiting timed out, reconnecting...')
             self._receive_task.cancel()
             if not self._ws.closed:
-                await self._ws.close(code=1003)
+                await self._ws.close(code=1008)
             await self.connect(self._token, bool(self._resume_gateway_url))
 
     async def _recv(self) -> None:
@@ -156,16 +165,13 @@ class Shard:
                 if len(msg.data) < 4 or msg.data[-4:] != ZLIB_SUFFIX:
                     continue
 
-                self._buffer.extend(msg.data)
-
                 try:
-                    text_coded = self._inflator.decompress(self._buffer).decode('utf-8')
-                except:
+                    text_coded = self._inflator.decompress(msg.data).decode('utf-8')
+                except Exception as e:
                     # while being an edge case, the data could sometimes be corrupted.
-                    self._buffer = bytearray()
+                    _log.debug(f'shard:{self.id}: failed to decompress gateway data {msg.data}:{e}')
                     continue
 
-                self._buffer = bytearray()
                 _log.debug(f'shard:{self.id}: received message {text_coded}')
 
                 data: dict[str, Any] = loads(text_coded)
@@ -201,13 +207,12 @@ class Shard:
                     await self._ws.close()
                     await self.connect(token=self._token)
                     return
-
         await self.handle_close(self._ws.close_code)
 
     async def handle_close(self, code: int) -> None:
         _log.debug(f'shard:{self.id}: closed with code {code}')
         if self._hb_task and not self._hb_task.done():
-            self._hb_task.set_result(None)
+            self._hb_task.cancel()
         if code in RESUMABLE:
             await self.connect(self._token, True)
         else:
