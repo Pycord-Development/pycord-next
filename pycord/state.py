@@ -35,8 +35,9 @@ __all__ = ['State']
 
 class State:
     def __init__(self, **options: Any) -> None:
+        self.token = options.get('token', '')
         self.max_messages: int = options.get('max_messages')
-        self.http = HTTPClient(options.get('token', ''), options.get('http_base_url', 'https://discord.com/api/v10'))
+        self.http = HTTPClient(token=self.token, base_url=options.get('http_base_url', 'https://discord.com/api/v10'))
         self.large_threshold: int = options.get('large_threshold', 250)
         self.shard_concurrency: PassThrough | None = None
         self.intents: Intents = options['intents']

@@ -31,6 +31,8 @@ from typing import TYPE_CHECKING, Any
 
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType
 
+from ..errors import DisallowedIntents, InvalidAuth, ShardingRequired
+
 from ..state import State
 from ..utils import dumps, loads
 from .passthrough import PassThrough
@@ -200,4 +202,11 @@ class Shard:
         if code in RESUMABLE:
             await self.connect(self._token, True)
         else:
+            if code == 4004:
+                raise InvalidAuth('Authentication used in gateway is invalid')
+            elif code == 4011:
+                raise ShardingRequired('Discord is requiring you shard your bot')
+            elif code == 4014:
+                raise DisallowedIntents('You aren\'t allowed to carry a priviledged intent wanted')
+
             await self._notifier.shard_died(self)

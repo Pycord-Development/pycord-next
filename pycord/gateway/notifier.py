@@ -39,8 +39,8 @@ class Notifier:
 
     async def shard_died(self, shard: Shard) -> None:
         _log.debug(f'Shard {shard.id} died, restarting it')
-        self.manager.remove_shard(shard)
+        await self.manager.delete_shard(shard=shard)
 
         new_shard = Shard(id=shard.id, state=shard._state, session=shard._session, notifier=self)
-        await new_shard.connect(token=self.manager.token)
+        await new_shard.connect(token=self.manager._state.token)
         self.manager.add_shard(new_shard)

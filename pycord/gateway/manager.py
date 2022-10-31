@@ -32,7 +32,6 @@ from .shard import Shard
 
 
 class BaseShardManager:
-    token: str
     shards: list[Shard]
     session: ClientSession
     _state: State
@@ -40,7 +39,7 @@ class BaseShardManager:
     _max_shards: int
     _shard_start_number: int
 
-    def __init__(self, token: str, state: State, max_shards: int, shard_start_number: int = 0) -> None:
+    def __init__(self, state: State, max_shards: int, shard_start_number: int = 0) -> None:
         ...
 
     def add_shard(self, shard: Shard) -> None:
@@ -66,8 +65,7 @@ class BaseShardManager:
 
 
 class ShardManager(BaseShardManager):
-    def __init__(self, token: str, state: State, max_shards: int, out_of: int, shard_start_number: int = 0) -> None:
-        self.token = token
+    def __init__(self, state: State, max_shards: int, out_of: int, shard_start_number: int = 0) -> None:
         self.shards: list[Shard] = []
         self._state = state
         self._out_of = out_of
@@ -115,7 +113,7 @@ class ShardManager(BaseShardManager):
 
             shard = Shard(id=shard_id, state=self._state, session=self.session, notifier=notifier)
 
-            tasks.append(shard.connect(token=self.token))
+            tasks.append(shard.connect(token=self._state.token))
 
             self.shards.append(shard)
 
