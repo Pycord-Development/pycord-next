@@ -29,6 +29,10 @@ with open('requirements.txt') as f:
 
 packages = [
     'pycord',
+    'pycord.types',
+    'pycord.api',
+    'pycord.api.execution',
+    'pycord.gateway'
 ]
 
 extra_requires = {
@@ -51,7 +55,7 @@ setuptools.setup(
     version=__version__,
     packages=packages,
     package_data={
-        'pycord': ['banner.txt', 'bin/*.dll'],
+        'pycord': ['banner.txt', 'ibanner.txt', 'bin/*.dll'],
     },
     project_urls={
         'Documentation': 'https://docs.pycord.dev',

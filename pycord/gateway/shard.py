@@ -29,7 +29,9 @@ from platform import system
 from random import random
 from typing import TYPE_CHECKING, Any
 
-from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType
+from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType, ClientConnectorError, ClientConnectionError
+
+from ..errors import DisallowedIntents, InvalidAuth, ShardingRequired
 
 from ..state import State
 from ..utils import dumps, loads
@@ -77,27 +79,34 @@ class Shard:
         self._receive_task: asyncio.Task[None] | None = None
         self._connection_alive: asyncio.Future[None] = asyncio.Future()
         self._hello_received: asyncio.Future[None] | None = None
+        self._hb_task: asyncio.Task[None] | None = None
 
     async def connect(self, token: str | None = None, resume: bool = False) -> None:
         self._hello_received = asyncio.Future()
 
-        async with self._state.shard_concurrency:
-            _log.debug(f'shard:{self.id}: connecting to gateway')
-            self._ws = await self._session.ws_connect(
-                url=url.format(version=self.version, base=self._resume_gateway_url)
-                if resume and self._resume_gateway_url
-                else url.format(version=self.version, base='wss://gateway.discord.gg')
-            )
+        try:
+            async with self._state.shard_concurrency:
+                _log.debug(f'shard:{self.id}: connecting to gateway')
+                self._ws = await self._session.ws_connect(
+                    url=url.format(version=self.version, base=self._resume_gateway_url)
+                    if resume and self._resume_gateway_url
+                    else url.format(version=self.version, base='wss://gateway.discord.gg')
+                )
+        except(ClientConnectionError, ClientConnectorError):
+            _log.debug(f'shard:{self.id}:failed to reconnect to discord due to connection errors, retrying in 10 seconds')
+            await asyncio.sleep(10)
+            await self.connect(token=token, resume=resume)
+            return
+        else:
+                self._receive_task = asyncio.create_task(self._recv())
 
-            self._receive_task = asyncio.create_task(self._recv())
-
-            if token:
-                await self._hello_received
-                self._token = token
-                if resume:
-                    await self.send_resume()
-                else:
-                    await self.send_identify()
+                if token:
+                    await self._hello_received
+                    self._token = token
+                    if resume:
+                        await self.send_resume()
+                    else:
+                        await self.send_identify()
 
     async def send(self, data: dict[str, Any]) -> None:
         async with self._rate_limiter:
@@ -136,8 +145,9 @@ class Shard:
         except asyncio.TimeoutError:
             _log.debug(f'shard:{self.id}: heartbeat waiting timed out, reconnecting...')
             self._receive_task.cancel()
-            await self._ws.close(code=1003)
-            await self._notifier.shard_died(self)
+            if not self._ws.closed:
+                await self._ws.close(code=1003)
+            await self.connect(self._token, bool(self._resume_gateway_url))
 
     async def _recv(self) -> None:
         async for msg in self._ws:
@@ -183,7 +193,7 @@ class Shard:
                     if not self._hb_received.done():
                         self._hb_received.set_result(None)
 
-                        asyncio.create_task(self.send_heartbeat())
+                        self._hb_task = asyncio.create_task(self.send_heartbeat())
                 elif op == 7:
                     await self._ws.close(code=1002)
                     await self.connect(token=self._token, resume=True)
@@ -197,7 +207,20 @@ class Shard:
 
     async def handle_close(self, code: int) -> None:
         _log.debug(f'shard:{self.id}: closed with code {code}')
+        if self._hb_task and  not self._hb_task.done():
+            self._hb_task.set_result(None)
         if code in RESUMABLE:
             await self.connect(self._token, True)
         else:
-            await self._notifier.shard_died(self)
+            if code == 4004:
+                raise InvalidAuth('Authentication used in gateway is invalid')
+            elif code == 4011:
+                raise ShardingRequired('Discord is requiring you shard your bot')
+            elif code == 4014:
+                raise DisallowedIntents('You aren\'t allowed to carry a priviledged intent wanted')
+
+            if code > 4000 or code == 4000:
+                await self._notifier.shard_died(self)
+            else:
+                # the connection most likely died
+                await self.connect(self._token, resume=True)
