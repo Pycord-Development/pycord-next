@@ -43,6 +43,6 @@ class Notifier:
         self.manager.remove_shard(shard)
         del shard
 
-        new_shard = Shard(id=shard_id, state=self.manager._state, session=self.manager._session, notifier=self)
+        new_shard = Shard(id=shard_id, state=self.manager._state, session=self.manager.session, notifier=self)
         await new_shard.connect(token=self.manager._state.token)
         self.manager.add_shard(new_shard)
