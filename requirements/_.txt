@@ -2,3 +2,5 @@
 aiohttp~=3.8
 # used for colored logging and the colored banner
 colorlog~=6.7
+# used for enumerate objects
+fastenum~=1.0.4
