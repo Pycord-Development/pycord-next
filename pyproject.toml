@@ -94,7 +94,7 @@ strict = true
 show_error_codes = true
 #allow_untyped_decorators = true
 #allow_untyped_calls = true
-ignore_errors = true
+#ignore_errors = true
 
 [tool.pylint.main]
 extension-pkg-whitelist = [

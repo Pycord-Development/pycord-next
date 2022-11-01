@@ -26,7 +26,7 @@ import pycord
 
 
 def main() -> None:
-    version = pycord.__version__  # type: ignore
+    version = pycord.__version__
     python_version = platform.python_version()
     sys.stderr.write(f'Running on Pycord Version {version},')
     sys.stderr.write(f' with Python version {python_version}.')
