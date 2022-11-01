@@ -27,32 +27,32 @@ from .snowflake import Snowflake
 from .user import User
 
 SCOPE = Literal[
-    'activities.read',
-    'activities.write',
-    'applications.builds.read',
-    'applications.builds.upload',
-    'applications.commands',
-    'applications.commands.update',
-    'applications.commands.permissions.update',
-    'applications.entitlements',
-    'applications.store.update',
-    'bot',
-    'connections',
-    'dm_channels.read',
-    'email',
-    'guilds',
-    'guilds.join',
-    'guilds.members.read',
-    'identify',
-    'messages.send',
-    'relationships.read',
-    'rpc',
-    'rpc.activities.write',
-    'rpc.notifications.read',
-    'rpc.voice.read',
-    'rpc.voice.write',
-    'voice',
-    'webhook.incoming',
+    "activities.read",
+    "activities.write",
+    "applications.builds.read",
+    "applications.builds.upload",
+    "applications.commands",
+    "applications.commands.update",
+    "applications.commands.permissions.update",
+    "applications.entitlements",
+    "applications.store.update",
+    "bot",
+    "connections",
+    "dm_channels.read",
+    "email",
+    "guilds",
+    "guilds.join",
+    "guilds.members.read",
+    "identify",
+    "messages.send",
+    "relationships.read",
+    "rpc",
+    "rpc.activities.write",
+    "rpc.notifications.read",
+    "rpc.voice.read",
+    "rpc.voice.write",
+    "voice",
+    "webhook.incoming",
 ]
 
 
@@ -72,7 +72,7 @@ class IntegrationApplication(TypedDict):
 class Integration(TypedDict):
     id: Snowflake
     name: str
-    type: Literal['twitch', 'youtube', 'discord']
+    type: Literal["twitch", "youtube", "discord"]
     enabled: NotRequired[bool]
     syncing: NotRequired[bool]
     role_id: NotRequired[Snowflake]

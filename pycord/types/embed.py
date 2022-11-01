@@ -22,7 +22,7 @@ from typing import Literal
 
 from typing_extensions import NotRequired, TypedDict
 
-ETYPES = Literal['rich', 'image', 'video', 'gifv', 'article', 'link']
+ETYPES = Literal["rich", "image", "video", "gifv", "article", "link"]
 
 
 class Thumbnail(TypedDict):

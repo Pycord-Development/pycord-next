@@ -100,13 +100,13 @@ class ShardManager(BaseShardManager):
 
         if not self._state.shard_concurrency:
             info = await self._state.http.get_gateway_bot()
-            session_start_limit = info['session_start_limit']
+            session_start_limit = info["session_start_limit"]
 
-            if session_start_limit['remaining'] == 0:
-                raise NoIdentifiesLeft('session_start_limit has been exhausted')
+            if session_start_limit["remaining"] == 0:
+                raise NoIdentifiesLeft("session_start_limit has been exhausted")
 
             self._state.shard_concurrency = PassThrough(
-                session_start_limit['max_concurrency'], 7
+                session_start_limit["max_concurrency"], 7
             )
 
         tasks = []

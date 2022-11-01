@@ -36,7 +36,7 @@ class Notifier:
         self.manager = manager
 
     async def shard_died(self, shard: Shard) -> None:
-        _log.debug(f'Shard {shard.id} died, restarting it')
+        _log.debug(f"Shard {shard.id} died, restarting it")
         shard_id = shard.id
         self.manager.remove_shard(shard)
         del shard

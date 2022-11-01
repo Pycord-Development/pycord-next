@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
 # Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
@@ -31,28 +30,38 @@ from .utils import UNDEFINED, UndefinedType
 
 class User:
     def __init__(self, data: DiscordUser, state: State) -> None:
-        self.id: Snowflake = Snowflake(data['id'])
-        self.username: str = data['username']
-        self.discriminator: str = data['discriminator']
-        self._avatar: str | None = data['avatar']
-        self.bot: bool | UndefinedType = data.get('bot', UNDEFINED)
-        self.system: bool | UndefinedType = data.get('system', UNDEFINED)
-        self.mfa_enabled: bool | UndefinedType = data.get('mfa_enabled', UNDEFINED)
-        self._banner: UndefinedType | str | None = data.get('banner', UNDEFINED)
-        self._accent_color: UndefinedType | int | None = data.get('accent_color', UNDEFINED)
+        self.id: Snowflake = Snowflake(data["id"])
+        self.username: str = data["username"]
+        self.discriminator: str = data["discriminator"]
+        self._avatar: str | None = data["avatar"]
+        self.bot: bool | UndefinedType = data.get("bot", UNDEFINED)
+        self.system: bool | UndefinedType = data.get("system", UNDEFINED)
+        self.mfa_enabled: bool | UndefinedType = data.get("mfa_enabled", UNDEFINED)
+        self._banner: UndefinedType | str | None = data.get("banner", UNDEFINED)
+        self._accent_color: UndefinedType | int | None = data.get(
+            "accent_color", UNDEFINED
+        )
         self.accent_color: UndefinedType | Color | None = (
-            Color(self._accent_color) if self._accent_color not in [UNDEFINED, None] else self._accent_color
+            Color(self._accent_color)
+            if self._accent_color not in [UNDEFINED, None]
+            else self._accent_color
         )
-        self.locale: UndefinedType | LOCALE = data.get('locale', UNDEFINED)
-        self.verified: UndefinedType | bool = data.get('verified', UNDEFINED)
-        self.email: str | None | UndefinedType = data.get('email', UNDEFINED)
-        self._flags: UndefinedType | int = data.get('flags', UNDEFINED)
-        self.flags: UndefinedType | UserFlags = UserFlags(self._flags) if self._flags is not UNDEFINED else UNDEFINED
-        self._premium_type: UndefinedType | int = data.get('premium_type', UNDEFINED)
+        self.locale: UndefinedType | LOCALE = data.get("locale", UNDEFINED)
+        self.verified: UndefinedType | bool = data.get("verified", UNDEFINED)
+        self.email: str | None | UndefinedType = data.get("email", UNDEFINED)
+        self._flags: UndefinedType | int = data.get("flags", UNDEFINED)
+        self.flags: UndefinedType | UserFlags = (
+            UserFlags(self._flags) if self._flags is not UNDEFINED else UNDEFINED
+        )
+        self._premium_type: UndefinedType | int = data.get("premium_type", UNDEFINED)
         self.premium_type: PremiumType | UndefinedType = (
-            PremiumType(self._premium_type) if self._premium - type is not UNDEFINED else UNDEFINED
+            PremiumType(self._premium_type)
+            if self._premium - type is not UNDEFINED
+            else UNDEFINED
         )
-        self._public_flags: UndefinedType | int = data.get('public_flags', UNDEFINED)
+        self._public_flags: UndefinedType | int = data.get("public_flags", UNDEFINED)
         self.public_flags: UndefinedType | UserFlags = (
-            UserFlags(self._public_flags) if self._public_flags is not UNDEFINED else UNDEFINED
+            UserFlags(self._public_flags)
+            if self._public_flags is not UNDEFINED
+            else UNDEFINED
         )

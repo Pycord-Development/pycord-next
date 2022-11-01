@@ -43,8 +43,8 @@ from .passthrough import PassThrough
 if TYPE_CHECKING:
     from .notifier import Notifier
 
-ZLIB_SUFFIX = b'\x00\x00\xff\xff'
-url = '{base}/?v={version}&encoding=json&compress=zlib-stream'
+ZLIB_SUFFIX = b"\x00\x00\xff\xff"
+url = "{base}/?v={version}&encoding=json&compress=zlib-stream"
 _log = logging.getLogger(__name__)
 
 
@@ -96,18 +96,18 @@ class Shard:
 
         try:
             async with self._state.shard_concurrency:
-                _log.debug(f'shard:{self.id}: connecting to gateway')
+                _log.debug(f"shard:{self.id}: connecting to gateway")
                 self._ws = await self._session.ws_connect(
                     url=url.format(version=self.version, base=self._resume_gateway_url)
                     if resume and self._resume_gateway_url
                     else url.format(
-                        version=self.version, base='wss://gateway.discord.gg'
+                        version=self.version, base="wss://gateway.discord.gg"
                     )
                 )
-                _log.debug(f'shard:{self.id}: connected to gateway')
+                _log.debug(f"shard:{self.id}: connected to gateway")
         except (ClientConnectionError, ClientConnectorError):
             _log.debug(
-                f'shard:{self.id}: failed to connect to discord due to connection errors, retrying in 10 seconds'
+                f"shard:{self.id}: failed to connect to discord due to connection errors, retrying in 10 seconds"
             )
             await asyncio.sleep(10)
             await self.connect(token=token, resume=resume)
@@ -126,24 +126,24 @@ class Shard:
     async def send(self, data: dict[str, Any]) -> None:
         async with self._rate_limiter:
             d = dumps(data)
-            _log.debug(f'shard:{self.id}: sending {d}')
+            _log.debug(f"shard:{self.id}: sending {d}")
             await self._ws.send_str(d)
 
     async def send_identify(self) -> None:
         await self.send(
             {
-                'op': 2,
-                'd': {
-                    'token': self._token,
-                    'properties': {
-                        'os': system(),
-                        'browser': 'pycord',
-                        'device': 'pycord',
+                "op": 2,
+                "d": {
+                    "token": self._token,
+                    "properties": {
+                        "os": system(),
+                        "browser": "pycord",
+                        "device": "pycord",
                     },
-                    'compress': True,
-                    'large_threshold': self._state.large_threshold,
-                    'shard': [self.id, self._notifier.manager._out_of],
-                    'intents': self._state.intents.as_bit,
+                    "compress": True,
+                    "large_threshold": self._state.large_threshold,
+                    "shard": [self.id, self._notifier.manager._out_of],
+                    "intents": self._state.intents.as_bit,
                 },
             }
         )
@@ -151,11 +151,11 @@ class Shard:
     async def send_resume(self) -> None:
         await self.send(
             {
-                'op': 6,
-                'd': {
-                    'token': self._token,
-                    'session_id': self.session_id,
-                    'seq': self._sequence,
+                "op": 6,
+                "d": {
+                    "token": self._token,
+                    "session_id": self.session_id,
+                    "seq": self._sequence,
                 },
             }
         )
@@ -166,12 +166,12 @@ class Shard:
         else:
             await asyncio.sleep(self._heartbeat_interval)
         self._hb_received = asyncio.Future()
-        _log.debug(f'shard:{self.id}: sending heartbeat')
+        _log.debug(f"shard:{self.id}: sending heartbeat")
         try:
-            await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
+            await self._ws.send_str(dumps({"op": 1, "d": self._sequence}))
         except ConnectionResetError:
             _log.debug(
-                f'shard:{self.id}: failed to send heartbeat due to connection reset, reconnecting...'
+                f"shard:{self.id}: failed to send heartbeat due to connection reset, reconnecting..."
             )
             self._receive_task.cancel()
             if not self._ws.closed:
@@ -181,7 +181,7 @@ class Shard:
         try:
             await asyncio.wait_for(self._hb_received, 5)
         except asyncio.TimeoutError:
-            _log.debug(f'shard:{self.id}: heartbeat waiting timed out, reconnecting...')
+            _log.debug(f"shard:{self.id}: heartbeat waiting timed out, reconnecting...")
             self._receive_task.cancel()
             if not self._ws.closed:
                 await self._ws.close(code=1008)
@@ -196,33 +196,33 @@ class Shard:
                     continue
 
                 try:
-                    text_coded = self._inflator.decompress(msg.data).decode('utf-8')
+                    text_coded = self._inflator.decompress(msg.data).decode("utf-8")
                 except Exception as e:
                     # while being an edge case, the data could sometimes be corrupted.
                     _log.debug(
-                        f'shard:{self.id}: failed to decompress gateway data {msg.data}:{e}'
+                        f"shard:{self.id}: failed to decompress gateway data {msg.data}:{e}"
                     )
                     continue
 
-                _log.debug(f'shard:{self.id}: received message {text_coded}')
+                _log.debug(f"shard:{self.id}: received message {text_coded}")
 
                 data: dict[str, Any] = loads(text_coded)
 
-                self._sequence = data.get('s')
+                self._sequence = data.get("s")
 
-                op: int = data.get('op')
-                d: dict[str, Any] | int | None = data.get('d')
-                t: str | None = data.get('t')
+                op: int = data.get("op")
+                d: dict[str, Any] | int | None = data.get("d")
+                t: str | None = data.get("t")
 
                 if op == 0:
-                    if t == 'READY':
-                        self.session_id = d['session_id']
-                        self._resume_gateway_url = d['resume_gateway_url']
-                        self._state.raw_user = d['user']
+                    if t == "READY":
+                        self.session_id = d["session_id"]
+                        self._resume_gateway_url = d["resume_gateway_url"]
+                        self._state.raw_user = d["user"]
                 elif op == 1:
-                    await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
+                    await self._ws.send_str(dumps({"op": 1, "d": self._sequence}))
                 elif op == 10:
-                    self._heartbeat_interval = d['heartbeat_interval'] / 1000
+                    self._heartbeat_interval = d["heartbeat_interval"] / 1000
 
                     asyncio.create_task(self.send_heartbeat(jitter=True))
                     self._hello_received.set_result(True)
@@ -242,19 +242,19 @@ class Shard:
         await self.handle_close(self._ws.close_code)
 
     async def handle_close(self, code: int) -> None:
-        _log.debug(f'shard:{self.id}: closed with code {code}')
+        _log.debug(f"shard:{self.id}: closed with code {code}")
         if self._hb_task and not self._hb_task.done():
             self._hb_task.cancel()
         if code in RESUMABLE:
             await self.connect(self._token, True)
         else:
             if code == 4004:
-                raise InvalidAuth('Authentication used in gateway is invalid')
+                raise InvalidAuth("Authentication used in gateway is invalid")
             elif code == 4011:
-                raise ShardingRequired('Discord is requiring you shard your bot')
+                raise ShardingRequired("Discord is requiring you shard your bot")
             elif code == 4014:
                 raise DisallowedIntents(
-                    'You aren\'t allowed to carry a priviledged intent wanted'
+                    "You aren't allowed to carry a priviledged intent wanted"
                 )
 
             if code > 4000 or code == 4000:

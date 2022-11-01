@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
 # Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
@@ -279,12 +278,12 @@ class MessageActivityType(Enum):
 
 
 class EmbedType(Enum):
-    rich = 'rich'
-    image = 'image'
-    video = 'video'
-    gif = 'gifv'
-    article = 'article'
-    link = 'link'
+    rich = "rich"
+    image = "image"
+    video = "video"
+    gif = "gifv"
+    article = "article"
+    link = "link"
 
 
 class GuildScheduledEventPrivacyLevel(Enum):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
 # Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
@@ -30,7 +29,7 @@ class Color:
 
     def __init__(self, value: int):
         if not isinstance(value, int):
-            raise TypeError('Expected a integer.')
+            raise TypeError("Expected a integer.")
 
         self.value: int = value
 

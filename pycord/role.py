@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
 # Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
@@ -31,25 +30,35 @@ from .utils import UNDEFINED, UndefinedType
 class RoleTags:
     def __init__(self, data: DiscordRoleTags) -> None:
         self.bot_id: UndefinedType | Snowflake = (
-            Snowflake(data.get('bot_id')) if data.get('bot_id', UNDEFINED) is not UNDEFINED else UNDEFINED
+            Snowflake(data.get("bot_id"))
+            if data.get("bot_id", UNDEFINED) is not UNDEFINED
+            else UNDEFINED
         )
         self.integration_id: UndefinedType | Snowflake = (
-            Snowflake(data.get('integration_id')) if data.get('integration_id', UNDEFINED) is not UNDEFINED else UNDEFINED
+            Snowflake(data.get("integration_id"))
+            if data.get("integration_id", UNDEFINED) is not UNDEFINED
+            else UNDEFINED
         )
-        self.premium_subscriber: UndefinedType | None = data.get('premium_subscriber', UNDEFINED)
+        self.premium_subscriber: UndefinedType | None = data.get(
+            "premium_subscriber", UNDEFINED
+        )
 
 
 class Role:
     def __init__(self, data: DiscordRole, state: State) -> None:
-        self.id: Snowflake = Snowflake(data['id'])
-        self.name: str = data['name']
-        self.color: Color = Color(data['color'])
-        self.hoist: bool = data['hoist']
-        self.icon: str | None | UndefinedType = data.get('icon', UNDEFINED)
-        self.unicode_emoji: str | None | UndefinedType = data.get('unicode_emoji', UNDEFINED)
-        self.position: int = data['position']
-        self.permissions: Permissions = Permissions._from_value(data['permissions'])
-        self.managed: bool = data['managed']
-        self.mentionable: bool = data['mentionable']
-        self._tags: dict[str, str | None] | UndefinedType = data.get('tags', UNDEFINED)
-        self.tags: RoleTags | UndefinedType = RoleTags(self._tags) if self._tags is not UNDEFINED else UNDEFINED
+        self.id: Snowflake = Snowflake(data["id"])
+        self.name: str = data["name"]
+        self.color: Color = Color(data["color"])
+        self.hoist: bool = data["hoist"]
+        self.icon: str | None | UndefinedType = data.get("icon", UNDEFINED)
+        self.unicode_emoji: str | None | UndefinedType = data.get(
+            "unicode_emoji", UNDEFINED
+        )
+        self.position: int = data["position"]
+        self.permissions: Permissions = Permissions._from_value(data["permissions"])
+        self.managed: bool = data["managed"]
+        self.mentionable: bool = data["mentionable"]
+        self._tags: dict[str, str | None] | UndefinedType = data.get("tags", UNDEFINED)
+        self.tags: RoleTags | UndefinedType = (
+            RoleTags(self._tags) if self._tags is not UNDEFINED else UNDEFINED
+        )

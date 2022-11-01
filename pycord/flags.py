@@ -24,10 +24,18 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Literal, TypeVar
 
-F = TypeVar('F', bound='Flags')
-FF = TypeVar('FF')
+F = TypeVar("F", bound="Flags")
+FF = TypeVar("FF")
 
-__all__ = ['Intents', 'Permissions', 'ChannelFlags', 'MessageFlags', 'SystemChannelFlags', 'ApplicationFlags', 'UserFlags']
+__all__ = [
+    "Intents",
+    "Permissions",
+    "ChannelFlags",
+    "MessageFlags",
+    "SystemChannelFlags",
+    "ApplicationFlags",
+    "UserFlags",
+]
 
 
 class flag:
@@ -47,14 +55,14 @@ class Flags:
         self._flag_overwrites: list[tuple[int, bool]] = []
 
         for name, value in flags_named.items():
-            if name.startswith('_'):
-                raise AttributeError('Flags cannot be private')
+            if name.startswith("_"):
+                raise AttributeError("Flags cannot be private")
 
             if not hasattr(self, name):
-                raise AttributeError(f'Flag {repr(name)} does not exist')
+                raise AttributeError(f"Flag {repr(name)} does not exist")
 
-            if name == 'as_bit':
-                raise AttributeError('as_bit is not a flag')
+            if name == "as_bit":
+                raise AttributeError("as_bit is not a flag")
 
             flag_value = getattr(self.__class__, name)
             self._overwrite_flag(flag_value, value)
@@ -80,7 +88,7 @@ class Flags:
         return {
             v: True
             for v in dir(flagcls)
-            if not v.startswith('_') and v != 'as_bit' and v != 'mro' and v != 'all'
+            if not v.startswith("_") and v != "as_bit" and v != "mro" and v != "all"
         }
 
     @classmethod

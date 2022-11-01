@@ -22,7 +22,7 @@ from typing import Optional
 
 from pycord.types import Snowflake
 
-__all__ = ['Route', 'BaseRoute']
+__all__ = ["Route", "BaseRoute"]
 
 
 class BaseRoute:

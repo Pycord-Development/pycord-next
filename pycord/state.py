@@ -30,11 +30,11 @@ if TYPE_CHECKING:
     from .flags import Intents
     from .gateway import PassThrough
 
-__all__ = ['State']
+__all__ = ["State"]
 
 
-S = TypeVar('S')
-D = TypeVar('D')
+S = TypeVar("S")
+D = TypeVar("D")
 
 
 # TODO: Fix types
@@ -61,17 +61,17 @@ class StateStore:
 
 class State:
     def __init__(self, **options: Any) -> None:
-        self.token = options.get('token', '')
-        self.max_messages: int = options.get('max_messages')
+        self.token = options.get("token", "")
+        self.max_messages: int = options.get("max_messages")
         self.http = HTTPClient(
             token=self.token,
-            base_url=options.get('http_base_url', 'https://discord.com/api/v10'),
+            base_url=options.get("http_base_url", "https://discord.com/api/v10"),
         )
-        self.large_threshold: int = options.get('large_threshold', 250)
+        self.large_threshold: int = options.get("large_threshold", 250)
         self.shard_concurrency: PassThrough | None = None
-        self.intents: Intents = options['intents']
+        self.intents: Intents = options["intents"]
         self.raw_user: dict[str, Any] | None = None
-        self.storer = options.get('storer', StateStore)
+        self.storer = options.get("storer", StateStore)
 
     def reset(self) -> None:
         pass
