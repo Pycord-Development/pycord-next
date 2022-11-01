@@ -4,9 +4,10 @@ pycord.api
 Implementation of the Discord API.
 """
 import logging
-from typing import Any
+import sys
+from typing import Any, Optional
 
-from aiohttp import BasicAuth, ClientSession
+from aiohttp import BasicAuth, ClientSession, __version__ as aiohttp_version
 
 from pycord._about import __version__
 
@@ -36,7 +37,9 @@ class HTTPClient:
         self._proxy_auth = proxy_auth
         self._headers = {
             'Authorization': f'Bot {token}',
-            'User-Agent': f'DiscordBot (https://github.com/pycord/pycord-v3, {__version__})',
+            'User-Agent': (
+                'DiscordBot (https://github.com/pycord/pycord-v3, {0})' ' Python/{1[0]}.{1[1]} aiohttp/{2}'
+            ).format(__version__, sys.version_info, aiohttp_version),
         }
 
         self._session: None | ClientSession = None

@@ -104,7 +104,7 @@ class Message(TypedDict):
     tts: bool
     mention_everyone: bool
     mentions: list[User]
-    mention_role: list[Role]
+    mention_roles: list[Role]
     mention_channels: NotRequired[list[ChannelMention]]
     attachments: list[Attachment]
     embeds: list[Embed]

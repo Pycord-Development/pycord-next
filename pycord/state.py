@@ -34,8 +34,10 @@ __all__ = ['State']
 
 
 S = TypeVar('S')
+D = TypeVar('D')
 
 
+# TODO: Fix types
 class StateStore:
     def __init__(self, stored: S) -> None:
         self._stored = stored
@@ -47,10 +49,10 @@ class StateStore:
         else:
             return func(*args, **kwargs)
 
-    def select(self, id: str, default: S | None = None) -> S | None:
+    def select(self, id: str, default: D | None = None) -> S | D | None:
         return self._store.get(id, default=default)
 
-    def capture(self, id: str, default: S | None = None) -> S | None:
+    def capture(self, id: str, default: D | None = None) -> S | D | None:
         return self._store.pop(id, default=default)
 
     def insert(self, id: str, data: S) -> None:
@@ -69,6 +71,7 @@ class State:
         self.shard_concurrency: PassThrough | None = None
         self.intents: Intents = options['intents']
         self.raw_user: dict[str, Any] | None = None
+        self.storer = options.get('storer', StateStore)
 
     def reset(self) -> None:
         pass
