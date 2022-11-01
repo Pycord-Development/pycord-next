@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -39,7 +37,9 @@ class BaseShardManager:
     _max_shards: int
     _shard_start_number: int
 
-    def __init__(self, state: State, max_shards: int, shard_start_number: int = 0) -> None:
+    def __init__(
+        self, state: State, max_shards: int, shard_start_number: int = 0
+    ) -> None:
         ...
 
     def add_shard(self, shard: Shard) -> None:
@@ -65,7 +65,9 @@ class BaseShardManager:
 
 
 class ShardManager(BaseShardManager):
-    def __init__(self, state: State, max_shards: int, out_of: int, shard_start_number: int = 0) -> None:
+    def __init__(
+        self, state: State, max_shards: int, out_of: int, shard_start_number: int = 0
+    ) -> None:
         self.shards: list[Shard] = []
         self._state = state
         self._out_of = out_of
@@ -103,7 +105,9 @@ class ShardManager(BaseShardManager):
             if session_start_limit['remaining'] == 0:
                 raise NoIdentifiesLeft('session_start_limit has been exhausted')
 
-            self._state.shard_concurrency = PassThrough(session_start_limit['max_concurrency'], 7)
+            self._state.shard_concurrency = PassThrough(
+                session_start_limit['max_concurrency'], 7
+            )
 
         tasks = []
 
@@ -111,7 +115,9 @@ class ShardManager(BaseShardManager):
             if shard_id < self._shard_start_number:
                 continue
 
-            shard = Shard(id=shard_id, state=self._state, session=self.session, notifier=notifier)
+            shard = Shard(
+                id=shard_id, state=self._state, session=self.session, notifier=notifier
+            )
 
             tasks.append(shard.connect(token=self._state.token))
 

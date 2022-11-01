@@ -1,6 +1,6 @@
 # MIT License
 
-# Copyright (c) 2021 VincentRPS
+# Copyright (c) 2022 Pycord-Development
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,13 @@ requirements = []
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-packages = ['pycord', 'pycord.types', 'pycord.api', 'pycord.api.execution', 'pycord.gateway']
+packages = [
+    'pycord',
+    'pycord.types',
+    'pycord.api',
+    'pycord.api.execution',
+    'pycord.gateway',
+]
 
 extra_requires = {
     'speed': [

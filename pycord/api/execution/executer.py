@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +19,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Optional
 
 from ..route import BaseRoute
 
@@ -29,11 +26,13 @@ from ..route import BaseRoute
 class Executer:
     def __init__(self, route: BaseRoute) -> None:
         self.route = route
-        self.is_global: Optional[bool] = None
-        self.holding_queue: Optional[asyncio.Queue[asyncio.Event]] = None
+        self.is_global: bool | None = None
+        self.holding_queue: asyncio.Queue[asyncio.Event] | None = None
         self.rate_limited: bool = False
 
-    async def executed(self, reset_after: int | float, limit: int, is_global: bool) -> None:
+    async def executed(
+        self, reset_after: int | float, limit: int, is_global: bool
+    ) -> None:
         self.rate_limited = True
         self.is_global = is_global
         self._reset_after = reset_after

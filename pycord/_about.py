@@ -17,11 +17,13 @@ class VersionInfo(typing.NamedTuple):
     serial: int
 
 
-version_info: VersionInfo = VersionInfo(major=3, minor=0, micro=0, releaselevel='alpha', serial=0)
+version_info: VersionInfo = VersionInfo(
+    major=3, minor=0, micro=0, releaselevel='alpha', serial=0
+)
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-__all__: typing.List[str] = [
+__all__: list[str] = [
     '__title__',
     '__author__',
     '__license__',

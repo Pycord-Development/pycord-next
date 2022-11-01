@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +21,8 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Coroutine, TypeVar
+from collections.abc import Callable, Coroutine
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from .api import HTTPClient
 
@@ -62,7 +61,10 @@ class State:
     def __init__(self, **options: Any) -> None:
         self.token = options.get('token', '')
         self.max_messages: int = options.get('max_messages')
-        self.http = HTTPClient(token=self.token, base_url=options.get('http_base_url', 'https://discord.com/api/v10'))
+        self.http = HTTPClient(
+            token=self.token,
+            base_url=options.get('http_base_url', 'https://discord.com/api/v10'),
+        )
         self.large_threshold: int = options.get('large_threshold', 250)
         self.shard_concurrency: PassThrough | None = None
         self.intents: Intents = options['intents']

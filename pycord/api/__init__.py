@@ -4,7 +4,7 @@ pycord.api
 Implementation of the Discord API.
 """
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from aiohttp import BasicAuth, ClientSession
 
@@ -50,7 +50,12 @@ class HTTPClient:
         self._session = None
 
     async def request(
-        self, method: str, route: BaseRoute, data: Optional[dict[str, Any]] = None, *, reason: Optional[str] = None
+        self,
+        method: str,
+        route: BaseRoute,
+        data: dict[str, Any] | None = None,
+        *,
+        reason: str | None = None,
     ) -> None:
         endpoint = route.merge(self.base_url)
 
@@ -76,7 +81,12 @@ class HTTPClient:
 
         for _ in range(5):
             r = await self._session.request(
-                method, endpoint, data=data, headers=headers, proxy=self._proxy, proxy_auth=self._proxy_auth
+                method,
+                endpoint,
+                data=data,
+                headers=headers,
+                proxy=self._proxy,
+                proxy_auth=self._proxy_auth,
             )
             _log.debug(f'Received back {await r.text()}')
 

@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -62,7 +60,9 @@ class HTTPException(PycordException):
 
             if errors := data.get('errors'):
                 self.errors = parse_errors(errors)
-                message = self.error_message + '\n'.join(f'In {key}: {err}' for key, err in self.errors.items())
+                message = self.error_message + '\n'.join(
+                    f'In {key}: {err}' for key, err in self.errors.items()
+                )
             else:
                 message = self.error_message
 
