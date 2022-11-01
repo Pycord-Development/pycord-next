@@ -67,6 +67,7 @@ class State:
         self.shard_concurrency: PassThrough | None = None
         self.intents: Intents = options['intents']
         self.raw_user: dict[str, Any] | None = None
+        self.storer = options.get('storer', StateStore)
 
     def reset(self) -> None:
         pass
