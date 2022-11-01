@@ -20,31 +20,24 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-"""
-Implementation of Discord's Snowflake ID
-"""
-
-from datetime import datetime, timezone
-
-from .utils import DISCORD_EPOCH
+from .enums import MembershipState
+from .snowflake import Snowflake
+from .types import Team as DiscordTeam, TeamMember as DiscordTeamMember
+from .user import User
 
 
-class Snowflake(int):
-    @property
-    def timestamp(self) -> datetime:
-        return datetime.fromtimestamp(((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc)
+class TeamMember:
+    def __init__(self, data: DiscordTeamMember) -> None:
+        self.team_id: Snowflake = Snowflake(data['team_id'])
+        self.user = User(data['user'])
+        self.permissions: list[str] = data['permissions']
+        self.membership_state: MembershipState = MembershipState(data['membership_state'])
 
-    @property
-    def worker_id(self) -> int:
-        return (self & 0x3E0000) >> 17
 
-    @property
-    def process_id(self) -> int:
-        return (self & 0x1F000) >> 12
-
-    @property
-    def increment(self) -> int:
-        return self & 0xFFF
-
-    def __hash__(self) -> int:
-        return self >> 22
+class Team:
+    def __init__(self, data: DiscordTeam) -> None:
+        self.id: Snowflake = Snowflake(data['id'])
+        self.icon: str | None = data['icon']
+        self.members: list[TeamMember] = [TeamMember(d) for d in data['members']]
+        self.name: str = data['name']
+        self.owner_id: Snowflake = Snowflake(data['owner_user_id'])

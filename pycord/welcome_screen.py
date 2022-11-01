@@ -20,31 +20,20 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-"""
-Implementation of Discord's Snowflake ID
-"""
-
-from datetime import datetime, timezone
-
-from .utils import DISCORD_EPOCH
+from .snowflake import Snowflake
+from .types import WelcomeScreen as DiscordWelcomeScreen, WelcomeScreenChannel as DiscordWelcomeScreenChannel
 
 
-class Snowflake(int):
-    @property
-    def timestamp(self) -> datetime:
-        return datetime.fromtimestamp(((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc)
+class WelcomeScreenChannel:
+    def __init__(self, data: DiscordWelcomeScreenChannel) -> None:
+        self.channel_id: Snowflake = Snowflake(data['channel_id'])
+        self.description: str = data['description']
+        self.emoji_id: Snowflake | None = Snowflake(data['emoji_id']) if data['emoji_id'] is not None else None
+        self.emoji_name: str | None = data['emoji_name']
 
-    @property
-    def worker_id(self) -> int:
-        return (self & 0x3E0000) >> 17
 
-    @property
-    def process_id(self) -> int:
-        return (self & 0x1F000) >> 12
-
-    @property
-    def increment(self) -> int:
-        return self & 0xFFF
-
-    def __hash__(self) -> int:
-        return self >> 22
+class WelcomeScreen:
+    def __init__(self, data: DiscordWelcomeScreen) -> None:
+        self.description: str | None = data['description']
+        self.welcome_channels: list[WelcomeScreenChannel] = []
+        self.welcome_channels.extend(WelcomeScreenChannel(welcome_channel) for welcome_channel in data['welcome_channels'])
