@@ -20,10 +20,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from .enums import StickerFormatType, StickerType
 from .role import Role
 from .snowflake import Snowflake
-from .state import State
 from .types import (
     Attachment as DiscordAttachment,
     Emoji as DiscordEmoji,
@@ -33,6 +36,9 @@ from .types import (
 )
 from .user import User
 from .utils import UNDEFINED, UndefinedType
+
+if TYPE_CHECKING:
+    from .state import State
 
 
 class Emoji:

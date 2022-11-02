@@ -20,12 +20,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from __future__ import annotations
+
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from .enums import ChannelType, OverwriteType, VideoQualityMode
 from .flags import ChannelFlags, Permissions
 from .snowflake import Snowflake
-from .state import State
 from .types import (
     Channel as DiscordChannel,
     DefaultReaction as DiscordDefaultReaction,
@@ -36,6 +38,9 @@ from .types import (
 )
 from .user import User
 from .utils import UNDEFINED, UndefinedType
+
+if TYPE_CHECKING:
+    from .state import State
 
 
 class _Overwrite:
@@ -62,10 +67,10 @@ class ThreadMetadata:
 
 class ThreadMember:
     def __init__(self, member: DiscordThreadMember) -> None:
-        self.id: Snowflake | UndefinedType = Snowflake(member.get('id')) if member.get('id') != None else UNDEFINED
-        self.user_id: Snowflake | UndefinedType = (
-            Snowflake(member.get('user_id')) if member.get('user_id') != None else UNDEFINED
-        )
+        self._id: str | None = member.get('id')
+        self.id: Snowflake | UndefinedType = Snowflake(self._id) if self._id is not None else UNDEFINED
+        self._user_id: str | None = member.get('user_id')
+        self.user_id: Snowflake | UndefinedType = Snowflake(self._user_id) if self._user_id is not None else UNDEFINED
         self.join_timestamp: datetime = datetime.fromisoformat(member['join_timestamp'])
         self.flags: int = member['flags']
 
@@ -81,7 +86,8 @@ class ForumTag:
 
 class DefaultReaction:
     def __init__(self, data: DiscordDefaultReaction) -> None:
-        self.emoji_id: Snowflake | None = Snowflake(data['emoji_id']) if data['emoji_id'] is not None else None
+        self._emoji_id: str | None = data.get('emoji_id')
+        self.emoji_id: Snowflake | None = Snowflake(self._emoji_id) if self._emoji_id is not None else None
         self.emoji_name: str | None = data['emoji_name']
 
 

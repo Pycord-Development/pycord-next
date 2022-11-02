@@ -20,6 +20,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from __future__ import annotations
+
 from typing import Any
 
 from .enums import (
@@ -72,21 +74,24 @@ class Guild:
             self.explicit_content_filter: ExplicitContentFilterLevel = ExplicitContentFilterLevel(
                 data['explicit_content_filter']
             )
-            self._roles: list[dict[str, Any]] = data.get('roles')
+            self._roles: list[dict[str, Any]] = data.get('roles', [])
             self._process_roles()
-            self._emojis: list[dict[str, Any]] = data.get('emojis')
+            self._emojis: list[dict[str, Any]] = data.get('emojis', [])
             self._process_emojis()
             self.features: list[GUILD_FEATURE] = data['features']
             self.mfa_level: MFALevel = MFALevel(data['mfa_level'])
+            self._application_id: str | None = data.get('application_id')
             self.application_id: Snowflake | None = (
-                Snowflake(data.get('system_channel_id')) if data.get('system_channel_id') is not None else None
+                Snowflake(self._application_id) if self._application_id is not None else None
             )
+            self._system_channel_id: str | None = data.get('system_channel_id')
             self.system_channel_id: Snowflake | None = (
-                Snowflake(data.get('system_channel_id')) if data.get('system_channel_id') is not None else None
+                Snowflake(self._system_channel_id) if self._system_channel_id is not None else None
             )
             self.system_channel_flags: SystemChannelFlags = SystemChannelFlags(data['system_channel_flags'])
+            self._rules_channel_id: str | None = data.get('rules_channel_id')
             self.rules_channel_id: Snowflake | None = (
-                Snowflake(data.get('rules_channel_id')) if data.get('rules_channel_id') is not None else None
+                Snowflake(self._rules_channel_id) if self._rules_channel_id is not None else None
             )
             self.max_presences: int | UndefinedType = data.get('max_presences', UNDEFINED)
             self.max_members: int | UndefinedType = data.get('max_members', UNDEFINED)
@@ -96,18 +101,18 @@ class Guild:
             self.premium_tier: PremiumTier = PremiumTier(data['premium_tier'])
             self.premium_subscription_count: int | UndefinedType = data.get('premium_subscription_count', UNDEFINED)
             self.perferred_locale: LOCALE = data['locale']
+            self._public_updates_channel_id: str | None = data['public_updates_channel_id']
             self.public_updates_channel_id: Snowflake | None = (
-                Snowflake(data['public_updates_channel_id']) if data['public_updates_channel_id'] is not None else None
+                Snowflake(self._public_updates_channel_id) if self._public_updates_channel_id is not None else None
             )
             self.max_video_channel_users: int | UndefinedType = data.get('max_video_channel_users', UNDEFINED)
             self.approximate_member_count: int | UndefinedType = data.get('approximate_member_count', UNDEFINED)
             self.approximate_presence_count: int | UndefinedType = data.get('approximate_presence_count', UNDEFINED)
+            self._welcome_screen = data.get('welcome_screen', UNDEFINED)
             self.welcome_screen: WelcomeScreen | UndefinedType = (
-                WelcomeScreen(data.get('welcome_screen'))
-                if data.get('welcome_screen', UNDEFINED) is not UNDEFINED
-                else UNDEFINED
+                WelcomeScreen(self._welcome_screen) if self._welcome_screen is not UNDEFINED else UNDEFINED
             )
-            self.nsfw_level: NSFWLevel = NSFWLevel(data.get('nsfw_level'))
+            self.nsfw_level: NSFWLevel = NSFWLevel(data.get('nsfw_level', 0))
             self.stickers: list[Sticker] = [Sticker(d, self._state) for d in data.get('stickers', [])]
             self.premium_progress_bar_enabled: bool = data['premium_progress_bar_enabled']
         else:

@@ -20,7 +20,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from __future__ import annotations
+
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from .application import Application
 from .channel import Channel
@@ -30,7 +33,6 @@ from .flags import MessageFlags
 from .media import Attachment, Emoji, Sticker, StickerItem
 from .member import Member
 from .snowflake import Snowflake
-from .state import State
 from .types import (
     ChannelMention as DiscordChannelMention,
     Message as DiscordMessage,
@@ -41,6 +43,9 @@ from .types import (
 )
 from .user import User
 from .utils import UNDEFINED, UndefinedType
+
+if TYPE_CHECKING:
+    from .state import State
 
 
 class ChannelMention:

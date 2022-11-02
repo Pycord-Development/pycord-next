@@ -23,9 +23,15 @@
 from __future__ import annotations
 
 import asyncio
+from collections import OrderedDict
 from typing import TYPE_CHECKING, Any, Callable, Coroutine, TypeVar
 
 from .api import HTTPClient
+from .channel import Channel
+from .gateway.ping import Ping
+from .guild import Guild
+from .member import Member
+from .message import Message
 
 if TYPE_CHECKING:
     from .flags import Intents
@@ -37,11 +43,27 @@ __all__ = ['State']
 T = TypeVar('T')
 
 
+class LimitedDict(OrderedDict):
+    _limit: int = 1
+
+    def __setitem__(self, *args, **kwargs) -> None:
+        self._check_limit()
+        super().__setitem__(*args, **kwargs)
+
+    def _check_limit(self) -> None:
+        if len(self.items()) == self._limit:
+            del self[next(iter(self))]
+
+
 # TODO: Fix types
 class StateStore:
-    def __init__(self, stored: T) -> None:
+    def __init__(self, stored: T, limit: int | None = None) -> None:
         self._stored = stored
-        self._store: dict[str, Any] = {}
+        if limit:
+            self._store = LimitedDict()
+            self._store._limit = limit
+        else:
+            self._store: dict[str, Any] = {}
 
     async def invoke(self, func: Callable | Coroutine, *args, **kwargs) -> T:
         if asyncio.iscoroutinefunction(func):
@@ -49,29 +71,60 @@ class StateStore:
         else:
             return func(*args, **kwargs)
 
-    def select(self, id: str) -> T | None:
+    def select(self, id: str | int) -> T | None:
         return self._store.get(id)
 
-    def capture(self, id: str) -> T:
+    def capture(self, id: str | int) -> T:
         return self._store.pop(id)
 
-    def insert(self, id: str, data: T) -> None:
+    def insert(self, id: str | int, data: T) -> None:
         self._store[id] = data
+
+    def exists(self, id: str | int) -> bool:
+        return self.select(id=id) is not None
+
+
+class CacheManager:
+    def __init__(self, max_messages: int) -> None:
+        self.guilds: StateStore = StateStore(Guild)
+        self.members: StateStore = StateStore(Member)
+        self.messages: StateStore = StateStore(Message, limit=max_messages)
+        self.channels: StateStore = StateStore(Channel)
+
+    def reset(self, max_messages: int) -> None:
+        self.guilds: StateStore = StateStore(Guild)
+        self.members: StateStore = StateStore(Member)
+        self.messages: StateStore = StateStore(Message, limit=max_messages)
+        self.channels: StateStore = StateStore(Channel)
 
 
 class State:
     def __init__(self, **options: Any) -> None:
         self.token = options.get('token', '')
-        self.max_messages: int = options.get('max_messages')
+        self.max_messages: int = options.get('max_messages', 1000)
         self.http = HTTPClient(token=self.token, base_url=options.get('http_base_url', 'https://discord.com/api/v10'))
         self.large_threshold: int = options.get('large_threshold', 250)
         self.shard_concurrency: PassThrough | None = None
         self.intents: Intents = options['intents']
         self.raw_user: dict[str, Any] | None = None
-        self.storer = options.get('storer', StateStore)
+        self.cache: CacheManager = options.get('cache', CacheManager(max_messages=self.max_messages))
+        self.ping = Ping()
 
     def reset(self) -> None:
-        pass
+        self.cache.reset(max_messages=self.max_messages)
 
     async def _process_event(self, type: str, data: dict[str, Any]) -> None:
-        ...
+        args = []
+
+        if type in {'GUILD_CREATE', 'GUILD_UPDATE'}:
+            guild = Guild(data=data, state=self)
+            args.append(guild)
+            self.cache.guilds.insert(int(data['id']), guild)
+        elif type == 'GUILD_DELETE':
+            if self.cache.guilds.exists(int(data['id'])):
+                args.append(self.cache.guilds.select(int(data['id'])))
+                self.cache.guilds.capture(int(data['id']))
+            else:
+                args.append(int(data['id']))
+
+        await self.ping.dispatch(type, *args)
