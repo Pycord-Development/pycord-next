@@ -34,29 +34,28 @@ if TYPE_CHECKING:
 __all__ = ['State']
 
 
-S = TypeVar('S')
-D = TypeVar('D')
+T = TypeVar('T')
 
 
 # TODO: Fix types
 class StateStore:
-    def __init__(self, stored: S) -> None:
+    def __init__(self, stored: T) -> None:
         self._stored = stored
         self._store: dict[str, Any] = {}
 
-    async def invoke(self, func: Callable | Coroutine, *args, **kwargs) -> S:
+    async def invoke(self, func: Callable | Coroutine, *args, **kwargs) -> T:
         if asyncio.iscoroutinefunction(func):
             return await func(*args, **kwargs)
         else:
             return func(*args, **kwargs)
 
-    def select(self, id: str, default: D | None = None) -> S | D | None:
-        return self._store.get(id, default=default)
+    def select(self, id: str) -> T | None:
+        return self._store.get(id)
 
-    def capture(self, id: str, default: D | None = None) -> S | D | None:
-        return self._store.pop(id, default=default)
+    def capture(self, id: str) -> T:
+        return self._store.pop(id)
 
-    def insert(self, id: str, data: S) -> None:
+    def insert(self, id: str, data: T) -> None:
         self._store[id] = data
 
 
@@ -73,3 +72,6 @@ class State:
 
     def reset(self) -> None:
         pass
+
+    async def _process_event(self, type: str, data: dict[str, Any]) -> None:
+        ...
