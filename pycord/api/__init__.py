@@ -38,7 +38,7 @@ class HTTPClient:
         self._headers = {
             'Authorization': f'Bot {token}',
             'User-Agent': (
-                'DiscordBot (https://github.com/pycord/pycord-v3, {0})' ' Python/{1[0]}.{1[1]} aiohttp/{2}'
+                'DiscordBot (https://pycord.dev, {0}) Python/{1[0]}.{1[1]} aiohttp/{2}'
             ).format(__version__, sys.version_info, aiohttp_version),
         }
 
