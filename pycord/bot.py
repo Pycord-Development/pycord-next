@@ -37,6 +37,7 @@ class Bot:
     def __init__(
         self,
         intents: Intents,
+        print_banner_on_startup: bool = True,
         logging_flavor: int | str | dict[str, Any] | None = None,
         max_messages: int = 1000,
         shards: int = 1,
@@ -47,6 +48,7 @@ class Bot:
         self._shards: int = shards
         self._logging_flavor: int | str | dict[str, Any] = logging_flavor
         self.user: User | None = None
+        self._print_banner = print_banner_on_startup
 
     async def _run_async(self, token: str) -> None:
         start_logging(flavor=self._logging_flavor)
@@ -60,7 +62,8 @@ class Bot:
 
         self.user = self._state.user
 
-        print_banner(self._state._session_start_limit['remaining'], self._shards, bot_name=self.user.name)
+        if self._print_banner:
+            print_banner(self._state._session_start_limit['remaining'], self._shards, bot_name=self.user.name)
 
         try:
             await asyncio.Future()
