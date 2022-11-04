@@ -70,6 +70,7 @@ setuptools.setup(
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython',
         'Framework :: AsyncIO',
