@@ -23,10 +23,14 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from .flags import Permissions
 from .snowflake import Snowflake
-from .state import State
+
+if TYPE_CHECKING:
+    from .state import State
+
 from .types import GuildMember
 from .user import User
 from .utils import UNDEFINED, UndefinedType

@@ -83,7 +83,7 @@ class ShardManager(BaseShardManager):
 
     async def delete_shard(self, shard: Shard) -> None:
         shard._receive_task.cancel()
-        shard._hb_task.set_result(None)
+        shard._hb_task.cancel()
 
         await shard._ws.close()
         self.remove_shard(shard)
@@ -104,6 +104,7 @@ class ShardManager(BaseShardManager):
                 raise NoIdentifiesLeft('session_start_limit has been exhausted')
 
             self._state.shard_concurrency = PassThrough(session_start_limit['max_concurrency'], 7)
+            self._state._session_start_limit = session_start_limit
 
         tasks = []
 

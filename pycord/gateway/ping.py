@@ -35,11 +35,11 @@ class Ping:
     async def dispatch(self, name_: str, *args, **kwargs) -> None:
         name = f'on_{name_.lower()}'
 
-        for ping in self._pings[name]:
+        for ping in self._pings.get(name, []):
             wrap = self._wrap(ping, *args, **kwargs)
             asyncio.create_task(wrap)
 
-        for ping in self._temporary_pings[name]:
+        for ping in self._temporary_pings.get(name, []):
             wrap = self._wrap(ping, *args, **kwargs)
             asyncio.create_task(wrap)
             self._temporary_pings[name].remove(ping)

@@ -167,7 +167,7 @@ class Intents(Flags):
     @classmethod
     def all(cls) -> Intents:
         valid_intents = cls._valid_flags(Intents)
-        return int(**valid_intents)
+        return Intents(**valid_intents)
 
 
 class Permissions(Flags):

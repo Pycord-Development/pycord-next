@@ -32,10 +32,11 @@ from .gateway.ping import Ping
 from .guild import Guild
 from .member import Member
 from .message import Message
+from .user import User
 
 if TYPE_CHECKING:
     from .flags import Intents
-    from .gateway import PassThrough
+    from .gateway import PassThrough, ShardManager
 
 __all__ = ['State']
 
@@ -83,6 +84,9 @@ class StateStore:
     def exists(self, id: str | int) -> bool:
         return self.select(id=id) is not None
 
+    def all(self) -> list[T]:
+        return [v for _, v in self._store.items()]
+
 
 class CacheManager:
     def __init__(self, max_messages: int) -> None:
@@ -100,15 +104,21 @@ class CacheManager:
 
 class State:
     def __init__(self, **options: Any) -> None:
-        self.token = options.get('token', '')
+        self.options = options
         self.max_messages: int = options.get('max_messages', 1000)
-        self.http = HTTPClient(token=self.token, base_url=options.get('http_base_url', 'https://discord.com/api/v10'))
         self.large_threshold: int = options.get('large_threshold', 250)
         self.shard_concurrency: PassThrough | None = None
         self.intents: Intents = options['intents']
+        self.user: User | None = None
         self.raw_user: dict[str, Any] | None = None
         self.cache: CacheManager = options.get('cache', CacheManager(max_messages=self.max_messages))
         self.ping = Ping()
+        self.shard_managers: list[ShardManager] = []
+        self._session_start_limit: dict[str, Any] | None = None
+
+    def bot_init(self, token: str) -> None:
+        self.token = token
+        self.http = HTTPClient(token=token, base_url=self.options.get('http_base_url', 'https://discord.com/api/v10'))
 
     def reset(self) -> None:
         self.cache.reset(max_messages=self.max_messages)
@@ -126,5 +136,11 @@ class State:
                 self.cache.guilds.capture(int(data['id']))
             else:
                 args.append(int(data['id']))
+        elif type == 'READY':
+            user = User(data['user'], self)
+            self.user = user
+
+            if hasattr(self, '_raw_user_fut'):
+                self._raw_user_fut.set_result(None)
 
         await self.ping.dispatch(type, *args)

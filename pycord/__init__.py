@@ -9,6 +9,7 @@ Python's Intuitive Discord API Wrapper
 from ._about import *
 from .api import *
 from .application import *
+from .bot import *
 from .channel import *
 from .color import *
 from .embed import *

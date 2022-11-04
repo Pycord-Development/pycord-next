@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 class Emoji:
     def __init__(self, data: DiscordEmoji, state: State) -> None:
         self.id: Snowflake | None = Snowflake(data['id']) if data['id'] is not None else None
-        self.name: str | None = Snowflake(data['name']) if data['name'] is not None else None
+        self.name: str | None = data.get('name')
         self._roles: list[Snowflake] = [Snowflake(iden) for iden in data.get('roles', [])]
         self.roles: list[Role] = []
         self._user: DiscordUser | UndefinedType = data.get('user', UNDEFINED)
@@ -70,7 +70,7 @@ class StickerItem:
 class Sticker:
     def __init__(self, data: DiscordSticker, state: State) -> None:
         self.id: Snowflake | None = Snowflake(data['id'])
-        self.pack_id: Snowflake | None = Snowflake(data['pack_id']) if data['pack_id'] is not None else None
+        self.pack_id: Snowflake | None = Snowflake(data.get('pack_id')) if data.get('pack_id') is not None else None
         self.name: str = data['name']
         self.description: str | None = data['description']
         self.tags: list[str] = data['tags'].split(',')

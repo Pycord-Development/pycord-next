@@ -22,7 +22,7 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .enums import (
     DefaultMessageNotificationLevel,
@@ -36,7 +36,10 @@ from .flags import Permissions, SystemChannelFlags
 from .media import Emoji, Sticker
 from .role import Role
 from .snowflake import Snowflake
-from .state import State
+
+if TYPE_CHECKING:
+    from .state import State
+
 from .types import GUILD_FEATURE, LOCALE, Guild as DiscordGuild
 from .utils import UNDEFINED, UndefinedType
 from .welcome_screen import WelcomeScreen
@@ -46,7 +49,7 @@ class Guild:
     def __init__(self, data: DiscordGuild, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self._state = state
-        if data.get('unavailable') is None:
+        if not data.get('unavailable'):
             self.unavailable: bool = False
             self.name: str = data['name']
             # TODO: Asset classes
@@ -88,7 +91,7 @@ class Guild:
             self.system_channel_id: Snowflake | None = (
                 Snowflake(self._system_channel_id) if self._system_channel_id is not None else None
             )
-            self.system_channel_flags: SystemChannelFlags = SystemChannelFlags(data['system_channel_flags'])
+            self.system_channel_flags: SystemChannelFlags = SystemChannelFlags._from_value(data['system_channel_flags'])
             self._rules_channel_id: str | None = data.get('rules_channel_id')
             self.rules_channel_id: Snowflake | None = (
                 Snowflake(self._rules_channel_id) if self._rules_channel_id is not None else None
@@ -100,7 +103,7 @@ class Guild:
             self._banner: str | None = data.get('banner')
             self.premium_tier: PremiumTier = PremiumTier(data['premium_tier'])
             self.premium_subscription_count: int | UndefinedType = data.get('premium_subscription_count', UNDEFINED)
-            self.perferred_locale: LOCALE = data['locale']
+            self.preferred_locale: LOCALE = data['preferred_locale']
             self._public_updates_channel_id: str | None = data['public_updates_channel_id']
             self.public_updates_channel_id: Snowflake | None = (
                 Snowflake(self._public_updates_channel_id) if self._public_updates_channel_id is not None else None

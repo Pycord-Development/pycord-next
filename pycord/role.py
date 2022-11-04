@@ -22,10 +22,15 @@
 # SOFTWARE
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from .color import Color
 from .flags import Permissions
 from .snowflake import Snowflake
-from .state import State
+
+if TYPE_CHECKING:
+    from .state import State
+
 from .types import Role as DiscordRole, RoleTags as DiscordRoleTags
 from .utils import UNDEFINED, UndefinedType
 

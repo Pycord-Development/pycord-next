@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 class User:
     def __init__(self, data: DiscordUser, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
-        self.username: str = data['username']
+        self.name: str = data['username']
         self.discriminator: str = data['discriminator']
         self._avatar: str | None = data['avatar']
         self.bot: bool | UndefinedType = data.get('bot', UNDEFINED)
@@ -53,10 +53,12 @@ class User:
         self.verified: UndefinedType | bool = data.get('verified', UNDEFINED)
         self.email: str | None | UndefinedType = data.get('email', UNDEFINED)
         self._flags: UndefinedType | int = data.get('flags', UNDEFINED)
-        self.flags: UndefinedType | UserFlags = UserFlags(self._flags) if self._flags is not UNDEFINED else UNDEFINED
+        self.flags: UndefinedType | UserFlags = (
+            UserFlags._from_value(self._flags) if self._flags is not UNDEFINED else UNDEFINED
+        )
         self._premium_type: UndefinedType | int = data.get('premium_type', UNDEFINED)
         self.premium_type: PremiumType | UndefinedType = (
-            PremiumType(self._premium_type) if self._premium - type is not UNDEFINED else UNDEFINED
+            PremiumType(self._premium_type) if self._premium_type is not UNDEFINED else UNDEFINED
         )
         self._public_flags: UndefinedType | int = data.get('public_flags', UNDEFINED)
         self.public_flags: UndefinedType | UserFlags = (
