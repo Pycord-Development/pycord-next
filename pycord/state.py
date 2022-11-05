@@ -26,6 +26,8 @@ import asyncio
 from collections import OrderedDict
 from typing import TYPE_CHECKING, Any, Callable, Coroutine, TypeVar
 
+from aiohttp import BasicAuth
+
 from .api import HTTPClient
 from .channel import Channel
 from .gateway.ping import Ping
@@ -116,9 +118,14 @@ class State:
         self.shard_managers: list[ShardManager] = []
         self._session_start_limit: dict[str, Any] | None = None
 
-    def bot_init(self, token: str) -> None:
+    def bot_init(self, token: str, proxy: str | None = None, proxy_auth: BasicAuth | None = None) -> None:
         self.token = token
-        self.http = HTTPClient(token=token, base_url=self.options.get('http_base_url', 'https://discord.com/api/v10'))
+        self.http = HTTPClient(
+            token=token,
+            base_url=self.options.get('http_base_url', 'https://discord.com/api/v10'),
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+        )
 
     def reset(self) -> None:
         self.cache.reset(max_messages=self.max_messages)

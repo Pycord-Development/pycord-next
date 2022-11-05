@@ -22,7 +22,7 @@
 # SOFTWARE
 import asyncio
 
-from aiohttp import ClientSession
+from aiohttp import BasicAuth, ClientSession
 
 from ..errors import NoIdentifiesLeft
 from ..state import State
@@ -38,6 +38,8 @@ class BaseShardManager:
     _out_of: int
     _max_shards: int
     _shard_start_number: int
+    proxy: str | None
+    proxy_auth: BasicAuth | None
 
     def __init__(self, state: State, max_shards: int, shard_start_number: int = 0) -> None:
         ...
@@ -65,12 +67,22 @@ class BaseShardManager:
 
 
 class ShardManager(BaseShardManager):
-    def __init__(self, state: State, max_shards: int, out_of: int, shard_start_number: int = 0) -> None:
+    def __init__(
+        self,
+        state: State,
+        max_shards: int,
+        out_of: int,
+        shard_start_number: int = 0,
+        proxy: str | None = None,
+        proxy_auth: BasicAuth | None = None,
+    ) -> None:
         self.shards: list[Shard] = []
         self._state = state
         self._out_of = out_of
         self._max_shards = max_shards
         self._shard_start_number = shard_start_number
+        self.proxy = proxy
+        self.proxy_auth = proxy_auth
 
     def add_shard(self, shard: Shard) -> None:
         self.shards.insert(shard.id, shard)

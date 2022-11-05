@@ -89,7 +89,9 @@ class Shard:
                 self._ws = await self._session.ws_connect(
                     url=url.format(version=self.version, base=self._resume_gateway_url)
                     if resume and self._resume_gateway_url
-                    else url.format(version=self.version, base='wss://gateway.discord.gg')
+                    else url.format(version=self.version, base='wss://gateway.discord.gg'),
+                    proxy=self._notifier.manager.proxy,
+                    proxy_auth=self._notifier.manager.proxy_auth,
                 )
                 _log.debug(f'shard:{self.id}: connected to gateway')
         except (ClientConnectionError, ClientConnectorError):
