@@ -38,7 +38,7 @@ from .user import User
 
 if TYPE_CHECKING:
     from .flags import Intents
-    from .gateway import PassThrough, ShardManager
+    from .gateway import PassThrough, ShardCluster, ShardManager
 
 __all__ = ['State']
 
@@ -116,9 +116,11 @@ class State:
         self.cache: CacheManager = options.get('cache', CacheManager(max_messages=self.max_messages))
         self.ping = Ping()
         self.shard_managers: list[ShardManager] = []
+        self.shard_clusters: list[ShardCluster] = []
         self._session_start_limit: dict[str, Any] | None = None
+        self._clustered: bool | None = None
 
-    def bot_init(self, token: str, proxy: str | None = None, proxy_auth: BasicAuth | None = None) -> None:
+    def bot_init(self, token: str, clustered: bool, proxy: str | None = None, proxy_auth: BasicAuth | None = None) -> None:
         self.token = token
         self.http = HTTPClient(
             token=token,
@@ -126,6 +128,7 @@ class State:
             proxy=proxy,
             proxy_auth=proxy_auth,
         )
+        self._clustered = clustered
 
     def reset(self) -> None:
         self.cache.reset(max_messages=self.max_messages)

@@ -25,6 +25,7 @@ from typing import Any, TypeVar
 
 from aiohttp import BasicAuth
 
+from .errors import OverfilledShardsException
 from .flags import Intents
 from .gateway import ShardManager
 from .guild import Guild
@@ -58,7 +59,7 @@ class Bot:
 
     async def _run_async(self, token: str) -> None:
         start_logging(flavor=self._logging_flavor)
-        self._state.bot_init(token=token, proxy=self._proxy, proxy_auth=self._proxy_auth)
+        self._state.bot_init(token=token, clustered=False, proxy=self._proxy, proxy_auth=self._proxy_auth)
         sharder = ShardManager(self._state, self._shards, self._shards, proxy=self._proxy, proxy_auth=self._proxy_auth)
         await sharder.start()
         self._state.shard_managers.append(sharder)
@@ -85,6 +86,19 @@ class Bot:
     def run(self, token: str) -> None:
         asyncio.run(self._run_async(token=token))
 
+    async def _run_cluster(self, token: str, clusters: int, start_value: int | None = None) -> None:
+        start_logging(flavor=self._logging_flavor)
+        self._state.bot_init(token=token, clustered=True, proxy=self._proxy, proxy_auth=self._proxy_auth)
+
+    def cluster(self, token: str, clusters: int, start_value: int | None = None) -> None:
+        if clusters > self._shards:
+            raise OverfilledShardsException('Cannot have more clusters than shards')
+
+        if start_value >= self._shards:
+            raise OverfilledShardsException('Cannot have a higher value than shards')
+
+        asyncio.run(self._run_cluster(token=token, clusters=clusters, start_value=start_value))
+
     def listen(self, name: str) -> T:
         def wrapper(func: T) -> T:
             self._state.ping.add_listener(name=name, func=func)
@@ -93,5 +107,5 @@ class Bot:
         return wrapper
 
     @property
-    def guilds(self) -> list[Guild]:
-        return self._state.cache.guilds.all()
+    async def guilds(self) -> list[Guild]:
+        return await self._state.cache.guilds.invoke(self._state.cache.guilds.all)
