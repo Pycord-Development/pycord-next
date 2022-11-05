@@ -37,7 +37,7 @@ class HTTPClient:
         self._proxy_auth = proxy_auth
         self._headers = {
             'Authorization': f'Bot {token}',
-            'User-Agent': ('DiscordBot (https://pycord.dev, {0}) Python/{1[0]}.{1[1]} aiohttp/{2}').format(
+            'User-Agent': 'DiscordBot (https://pycord.dev, {0}) Python/{1[0]}.{1[1]} aiohttp/{2}'.format(
                 __version__, sys.version_info, aiohttp_version
             ),
         }
