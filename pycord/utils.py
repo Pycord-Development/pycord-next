@@ -21,7 +21,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-from typing import Any, Literal
+from itertools import accumulate
+from typing import Any, Iterator, Literal, Sequence, TypeVar
 
 from aiohttp import ClientResponse
 
@@ -33,6 +34,7 @@ except ImportError:
     msgspec = None
 
 DISCORD_EPOCH: int = 1420070400000
+S = TypeVar("S", bound=Sequence)
 
 
 class UndefinedType:
@@ -88,3 +90,24 @@ def parse_errors(errors: dict[str, Any], key: str | None = None) -> dict[str, st
             ret.append((kie, v))
 
     return dict(ret)
+
+
+def chunk(items: S, n: int) -> Iterator[S]:
+    """Groups ``items`` into ``n`` chunks.
+
+    Parameters
+    ----------
+    items: S
+        A :class:`Sequence` of items to chunk.
+    n: int
+        The total number of chunks to create.
+
+    Returns
+    -------
+    Iterator[S]
+        An iterator of :class:`Sequence`s of items. Each :class:`Sequence` represents a chunk.
+    """
+    per_section, extras = divmod(len(items), n)
+    sections = list(accumulate([0] + extras * [per_section + 1] + (n - extras) * [per_section]))
+    for start, end in zip(sections, sections[1:]):
+        yield items[start:end]  # type: ignore
