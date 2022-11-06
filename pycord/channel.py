@@ -152,3 +152,55 @@ class Channel:
             'default_thread_rate_limit_per_user', UndefinedType
         )
         self.default_sort_order: int | None | UndefinedType = data.get('default_sort_order', UndefinedType)
+
+
+class MessageableChannel(Channel):
+    ...
+
+
+class AudioChannel(Channel):
+    ...
+
+
+class TextChannel(Channel):
+    ...
+
+
+class DMChannel(Channel):
+    ...
+
+
+class VoiceChannel(Channel):
+    ...
+
+
+class GroupDMChannel(Channel):
+    ...
+
+
+class CategoryChannel(Channel):
+    ...
+
+
+class AnnouncementChannel(Channel):
+    ...
+
+
+class AnnouncementThread(Channel):
+    ...
+
+
+class Thread(Channel):
+    ...
+
+
+class StageChannel(Channel):
+    ...
+
+
+class DirectoryChannel(Channel):
+    ...
+
+
+class ForumChannel(Channel):
+    ...
