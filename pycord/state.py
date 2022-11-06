@@ -39,6 +39,7 @@ from .snowflake import Snowflake
 from .user import User
 
 if TYPE_CHECKING:
+    from .commands.command import Command
     from .flags import Intents
     from .gateway import PassThrough, ShardCluster, ShardManager
 
@@ -136,6 +137,7 @@ class State:
         self.ping = Ping()
         self.shard_managers: list[ShardManager] = []
         self.shard_clusters: list[ShardCluster] = []
+        self.commands: list[Command] = []
         self._session_start_limit: dict[str, Any] | None = None
         self._clustered: bool | None = None
         # makes sure that multiple clusters don't start at once
@@ -345,4 +347,4 @@ class State:
             user = User(data['user'], self)
             self.user = user
 
-        await self.ping.dispatch(type, *args)
+        await self.ping.dispatch(type, *args, commands=self.commands)

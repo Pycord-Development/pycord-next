@@ -20,38 +20,27 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-import asyncio
-from typing import Coroutine
+from typing import TypeVar
+
+from ..state import State
+from .command import Command
+
+T = TypeVar('T')
 
 
-class Ping:
-    def __init__(self) -> None:
-        self._pings: dict[str, list[Coroutine]] = {}
-        self._temporary_pings: dict[str, list[Coroutine]] = {}
+class Group:
+    def __init__(self, name: str, state: State) -> None:
+        self.commands: list[Command] = []
+        # nested groups
+        self.groups: list["Group"] = []
 
-    async def _wrap(self, func: Coroutine, *args, **kwargs) -> None:
-        await func(*args, **kwargs)
+        self.name = name
+        self._state = state
 
-    async def dispatch(self, name_: str, *args, **kwargs) -> None:
-        name = f'on_{name_.lower()}'
+    def command(self, name: str) -> T:
+        def wrapper(func: T) -> T:
+            command = Command(func, name=name, state=self._state, group=self)
+            self._state.commands.append(command)
+            return func
 
-        commands = kwargs.pop('commands', [])
-
-        for ping in self._pings.get(name, []):
-            wrap = self._wrap(ping, *args, **kwargs)
-            asyncio.create_task(wrap)
-
-        for ping in self._temporary_pings.get(name, []):
-            wrap = self._wrap(ping, *args, **kwargs)
-            asyncio.create_task(wrap)
-            self._temporary_pings[name].remove(ping)
-
-        for command in commands:
-            if command._processor_event == name:
-                asyncio.create_task(command.invoke(*args, **kwargs))
-
-    def add_listener(self, name: str, func: Coroutine) -> None:
-        if self._pings.get(name):
-            self._pings[name].append(func)
-        else:
-            self._pings = {name: [func]}
+        return wrapper

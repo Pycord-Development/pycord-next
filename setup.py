@@ -27,7 +27,7 @@ requirements = []
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-packages = ['pycord', 'pycord.types', 'pycord.api', 'pycord.api.execution', 'pycord.gateway']
+packages = ['pycord', 'pycord.types', 'pycord.api', 'pycord.api.execution', 'pycord.gateway', 'pycord.commands']
 
 extra_requires = {
     'speed': [
