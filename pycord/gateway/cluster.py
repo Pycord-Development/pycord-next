@@ -26,6 +26,7 @@ from multiprocessing import Process
 from aiohttp import BasicAuth
 
 from ..state import State
+from ..utils import chunk
 from .manager import ShardManager
 
 
@@ -33,29 +34,33 @@ class ShardCluster(Process):
     def __init__(
         self,
         state: State,
-        shards: int,
-        starts_at: int | None,
+        shards: list[int],
         amount: int,
+        managers: int,
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
     ) -> None:
         self.shard_managers: list[ShardManager] = []
         self._state = state
         self._shards = shards
-        self._starts_at = starts_at
         self._amount = amount
+        self._managers = managers
         self._proxy = proxy
         self._proxy_auth = proxy_auth
-        super().__init__(daemon=True)
+        super().__init__()
 
     async def _run(self) -> None:
+        await self._state._cluster_lock.acquire()
         # this is guessing that `i` is a shard manager
         tasks = []
-        for _ in range(...):
-            manager = ShardManager(self._state, self._shards, self._amount, self._starts_at, self._proxy, self._proxy_auth)
+        for sharder in list(chunk(self._shards, self._managers)):
+            manager = ShardManager(self._state, sharder, self._amount, self._proxy, self._proxy_auth)
             tasks.append(manager.start())
             self.shard_managers.append(manager)
-        await asyncio.gather(*tasks)
+            asyncio.create_task(manager.start())
+        self._state._cluster_lock.release()
+        self.keep_alive = asyncio.Future()
+        await self.keep_alive
 
     def run(self) -> None:
         asyncio.create_task(self._run())
