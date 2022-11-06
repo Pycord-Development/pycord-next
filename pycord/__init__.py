@@ -28,3 +28,4 @@ from .team import *
 from .user import *
 from .utils import *
 from .welcome_screen import *
+from .commands import *
