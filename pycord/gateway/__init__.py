@@ -1,3 +1,8 @@
+"""
+pycord.gateway
+~~~~~~~~~~~~~~
+Advanced Implementation of the Discord Gateway
+"""
 from .cluster import *
 from .manager import *
 from .notifier import *
