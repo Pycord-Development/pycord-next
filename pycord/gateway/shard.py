@@ -125,7 +125,7 @@ class Shard:
                     'properties': {'os': system(), 'browser': 'pycord', 'device': 'pycord'},
                     'compress': True,
                     'large_threshold': self._state.large_threshold,
-                    'shard': [self.id, self._notifier.manager._out_of],
+                    'shard': [self.id, self._notifier.manager.amount],
                     'intents': self._state.intents.as_bit,
                 },
             }

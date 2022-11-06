@@ -31,56 +31,19 @@ from .passthrough import PassThrough
 from .shard import Shard
 
 
-class BaseShardManager:
-    shards: list[Shard]
-    session: ClientSession
-    _state: State
-    _out_of: int
-    _max_shards: int
-    _shard_start_number: int
-    proxy: str | None
-    proxy_auth: BasicAuth | None
-
-    def __init__(self, state: State, max_shards: int, shard_start_number: int = 0) -> None:
-        ...
-
-    def add_shard(self, shard: Shard) -> None:
-        ...
-
-    def remove_shard(self, shard: Shard) -> None:
-        ...
-
-    def remove_shards(self) -> None:
-        ...
-
-    async def delete_shard(self, shard: Shard) -> None:
-        ...
-
-    async def delete_shards(self) -> None:
-        ...
-
-    async def start(self) -> None:
-        ...
-
-    async def shutdown(self) -> None:
-        ...
-
-
-class ShardManager(BaseShardManager):
+class ShardManager:
     def __init__(
         self,
         state: State,
-        max_shards: int,
-        out_of: int,
-        shard_start_number: int = 0,
+        shards: list[int],
+        amount: int,
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
     ) -> None:
         self.shards: list[Shard] = []
+        self.amount = amount
+        self._shards = shards
         self._state = state
-        self._out_of = out_of
-        self._max_shards = max_shards
-        self._shard_start_number = shard_start_number
         self.proxy = proxy
         self.proxy_auth = proxy_auth
 
@@ -120,10 +83,7 @@ class ShardManager(BaseShardManager):
 
         tasks = []
 
-        for shard_id in range(self._max_shards):
-            if shard_id < self._shard_start_number:
-                continue
-
+        for shard_id in self._shards:
             shard = Shard(id=shard_id, state=self._state, session=self.session, notifier=notifier)
 
             tasks.append(shard.connect(token=self._state.token))

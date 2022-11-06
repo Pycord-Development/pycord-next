@@ -34,13 +34,13 @@ from .gateway.ping import Ping
 from .guild import Guild
 from .member import Member
 from .message import Message
-from .user import User
-from .snowflake import Snowflake
 from .role import Role
+from .snowflake import Snowflake
+from .user import User
 
 if TYPE_CHECKING:
     from .flags import Intents
-    from .gateway import PassThrough, ShardManager
+    from .gateway import PassThrough, ShardCluster, ShardManager
 
 __all__ = ['State']
 
@@ -135,9 +135,14 @@ class State:
         self.cache: CacheManager = options.get('cache', CacheManager(max_messages=self.max_messages))
         self.ping = Ping()
         self.shard_managers: list[ShardManager] = []
+        self.shard_clusters: list[ShardCluster] = []
         self._session_start_limit: dict[str, Any] | None = None
+        self._clustered: bool | None = None
+        # makes sure that multiple clusters don't start at once
+        self._cluster_lock: asyncio.Lock = asyncio.Lock()
+        self._ready: bool = False
 
-    def bot_init(self, token: str, proxy: str | None = None, proxy_auth: BasicAuth | None = None) -> None:
+    def bot_init(self, token: str, clustered: bool, proxy: str | None = None, proxy_auth: BasicAuth | None = None) -> None:
         self.token = token
         self.http = HTTPClient(
             token=token,
@@ -145,6 +150,7 @@ class State:
             proxy=proxy,
             proxy_auth=proxy_auth,
         )
+        self._clustered = clustered
 
     def reset(self) -> None:
         self.cache.reset(max_messages=self.max_messages)
@@ -327,11 +333,14 @@ class State:
             args.append(arg)
         # SECTION: misc #
         elif type == 'READY':
-            user = User(data['user'], self)
-            self.user = user
+            if not self._ready:
+                user = User(data['user'], self)
+                self.user = user
 
-            if hasattr(self, '_raw_user_fut'):
-                self._raw_user_fut.set_result(None)
+                if hasattr(self, '_raw_user_fut'):
+                    self._raw_user_fut.set_result(None)
+
+                self._ready = True
         elif type == 'USER_UPDATE':
             user = User(data['user'], self)
             self.user = user
