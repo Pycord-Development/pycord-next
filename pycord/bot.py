@@ -58,6 +58,10 @@ class Bot:
         self._proxy = proxy
         self._proxy_auth = proxy_auth
 
+    @property
+    def user(self) -> User:
+        return self._state.user
+
     async def _run_async(self, token: str) -> None:
         start_logging(flavor=self._logging_flavor)
         self._state.bot_init(token=token, clustered=False, proxy=self._proxy, proxy_auth=self._proxy_auth)
@@ -67,8 +71,6 @@ class Bot:
         while not self._state.raw_user:
             self._state._raw_user_fut: asyncio.Future[None] = asyncio.Future()
             await self._state._raw_user_fut
-
-        self.user = self._state.user
 
         if self._print_banner:
             print_banner(
@@ -125,8 +127,6 @@ class Bot:
         while not self._state.raw_user:
             self._state._raw_user_fut: asyncio.Future[None] = asyncio.Future()
             await self._state._raw_user_fut
-
-        self.user = self._state.user
 
         if self._print_banner:
             print_banner(
