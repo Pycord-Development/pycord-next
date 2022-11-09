@@ -54,7 +54,7 @@ class HTTPClient:
 
     async def request(
         self, method: str, route: BaseRoute, data: Optional[dict[str, Any]] = None, *, reason: Optional[str] = None
-    ) -> None:
+    ) -> str | dict[str, Any] | bytes:
         endpoint = route.merge(self.base_url)
 
         if self._session is None:

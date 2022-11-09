@@ -111,3 +111,10 @@ def chunk(items: S, n: int) -> Iterator[S]:
     sections = list(accumulate([0] + extras * [per_section + 1] + (n - extras) * [per_section]))
     for start, end in zip(sections, sections[1:]):
         yield items[start:end]  # type: ignore
+
+
+def remove_undefined(**kwargs) -> dict[str, Any]:
+    for k, v in kwargs.items():
+        if v is UNDEFINED:
+            kwargs.pop(k)
+    return kwargs

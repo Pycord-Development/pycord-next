@@ -12,6 +12,7 @@ from .application import *
 from .bot import *
 from .channel import *
 from .color import *
+from .commands import *
 from .embed import *
 from .enums import *
 from .flags import *
@@ -28,4 +29,3 @@ from .team import *
 from .user import *
 from .utils import *
 from .welcome_screen import *
-from .commands import *
