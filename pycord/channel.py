@@ -23,8 +23,9 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
+from .embed import Embed
 from .enums import ChannelType, OverwriteType, VideoQualityMode
 from .flags import ChannelFlags, Permissions
 from .snowflake import Snowflake
@@ -47,8 +48,8 @@ class _Overwrite:
     def __init__(self, overwrite: DiscordOverwrite) -> None:
         self.id: Snowflake = Snowflake(overwrite['id'])
         self.type: OverwriteType = OverwriteType(overwrite['type'])
-        self.allow: Permissions = Permissions(overwrite['allow'])
-        self.deny: Permissions = Permissions(overwrite['deny'])
+        self.allow: Permissions = Permissions._from_value(overwrite['allow'])
+        self.deny: Permissions = Permissions._from_value(overwrite['deny'])
 
 
 class ThreadMetadata:
@@ -93,6 +94,7 @@ class DefaultReaction:
 
 class Channel:
     def __init__(self, data: DiscordChannel, state: State) -> None:
+        self._state = state
         self.id: Snowflake = Snowflake(data['id'])
         self.type: ChannelType = ChannelType(data['type'])
         self.guild_id: Snowflake | UndefinedType = (
@@ -103,8 +105,8 @@ class Channel:
         self.name: str | UndefinedType = data.get('name', UNDEFINED)
         self.topic: str | None | UndefinedType = data.get('topic', UNDEFINED)
         self.nsfw: bool | UndefinedType = data.get('nsfw', UNDEFINED)
-        self.last_message_id: int | None | UndefinedType = (
-            Snowflake(data.get('last_message_id')) if data.get('last_message_id', UNDEFINED) is not UNDEFINED else UNDEFINED
+        self.last_message_id: int | None = (
+            Snowflake(data.get('last_message_id')) if data.get('last_message_id') is not None else None
         )
         self.bitrate: int | UndefinedType = data.get('bitrate', UNDEFINED)
         self.user_limit: int | UndefinedType = data.get('user_limit', UNDEFINED)
@@ -155,26 +157,37 @@ class Channel:
 
 
 class MessageableChannel(Channel):
-    ...
+    async def send(
+        self,
+        content: str | UndefinedType = UNDEFINED,
+        nonce: int | str | UndefinedType = UNDEFINED,
+        tts: bool | UndefinedType = UNDEFINED,
+        embeds: list[Embed] | UndefinedType = UNDEFINED,
+        sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
+        flags: int | UndefinedType = UNDEFINED,
+    ) -> None:
+        await self._state.http.create_message(
+            channel_id=self.id, content=content, nonce=nonce, tts=tts, embeds=embeds, sticker_ids=sticker_ids, flags=flags
+        )
 
 
 class AudioChannel(Channel):
     ...
 
 
-class TextChannel(Channel):
+class TextChannel(MessageableChannel):
     ...
 
 
-class DMChannel(Channel):
+class DMChannel(MessageableChannel):
     ...
 
 
-class VoiceChannel(Channel):
+class VoiceChannel(MessageableChannel):
     ...
 
 
-class GroupDMChannel(Channel):
+class GroupDMChannel(MessageableChannel):
     ...
 
 
@@ -182,15 +195,15 @@ class CategoryChannel(Channel):
     ...
 
 
-class AnnouncementChannel(Channel):
+class AnnouncementChannel(MessageableChannel):
     ...
 
 
-class AnnouncementThread(Channel):
+class AnnouncementThread(MessageableChannel):
     ...
 
 
-class Thread(Channel):
+class Thread(MessageableChannel):
     ...
 
 
@@ -204,3 +217,32 @@ class DirectoryChannel(Channel):
 
 class ForumChannel(Channel):
     ...
+
+
+def identify_channel(
+    data: dict[str, Any], state: State
+) -> TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel:
+    type = data['type']
+
+    if type == 0:
+        return TextChannel(data, state)
+    elif type == 1:
+        return DMChannel(data, state)
+    elif type == 2:
+        return VoiceChannel(data, state)
+    elif type == 3:
+        return GroupDMChannel(data, state)
+    elif type == 4:
+        return CategoryChannel(data, state)
+    elif type == 5:
+        return AnnouncementChannel(data, state)
+    elif type == 10:
+        return AnnouncementThread(data, state)
+    elif type in (11, 12):
+        return Thread(data, state)
+    elif type == 13:
+        return StageChannel(data, state)
+    elif type == 14:
+        return DirectoryChannel(data, state)
+    elif type == 15:
+        return ForumChannel(data, state)

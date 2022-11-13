@@ -114,7 +114,4 @@ def chunk(items: S, n: int) -> Iterator[S]:
 
 
 def remove_undefined(**kwargs) -> dict[str, Any]:
-    for k, v in kwargs.items():
-        if v is UNDEFINED:
-            kwargs.pop(k)
-    return kwargs
+    return {k: v for k, v in kwargs.items() if v is not UNDEFINED}

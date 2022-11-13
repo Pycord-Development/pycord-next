@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, Any, Callable, Coroutine, TypeVar
 from aiohttp import BasicAuth
 
 from .api import HTTPClient
-from .channel import Channel
+from .channel import Channel, identify_channel
 from .gateway.ping import Ping
 from .guild import Guild
 from .member import Member
@@ -80,14 +80,14 @@ class StateStore:
     def _select(self, id: str | int) -> T | None:
         return self._store.get(id)
 
-    def _capture(self, id: str | int) -> T:
-        return self._store.pop(id)
+    def _capture(self, id: str | int) -> T | None:
+        return self._store.pop(id, None)
 
     def _insert(self, id: str | int, data: T) -> None:
         self._store[id] = data
 
     def _exists(self, id: str | int) -> bool:
-        return self.select(id=id) is not None
+        return self._select(id=id) is not None
 
     def _all(self) -> list[T]:
         return [v for _, v in self._store.items()]
@@ -95,7 +95,7 @@ class StateStore:
     async def select(self, id: str | int) -> T | None:
         return await self.invoke(self._select, id)
 
-    async def capture(self, id: str | int) -> T:
+    async def capture(self, id: str | int) -> T | None:
         return await self.invoke(self._capture, id)
 
     async def insert(self, id: str | int, data: T) -> None:
@@ -165,6 +165,10 @@ class State:
             guild = Guild(data=data, state=self)
             args.append(guild)
             await self.cache.guilds.insert(guild.id, data=data)
+
+            for channel in data['channels']:
+                ch = identify_channel(data=channel, state=self)
+                await self.cache.channels.insert(ch.id, ch)
         elif type == 'GUILD_UPDATE':
             guild = Guild(data=data, state=self)
             args.append(guild)
@@ -198,11 +202,13 @@ class State:
             args.append(User(data['user'], self))
         elif type == 'GUILD_MEMBER_ADD':
             member = Member(data, self)
+            guild_id = data['guild_id']
             self.cache.members.insert(f'{member.user.id}:{guild_id}', member)
             args.append(member)
         elif type == 'GUILD_MEMBER_UPDATE':
             member = Member(data, self)
             args.append(member)
+            guild_id = data['guild_id']
             if await self.cache.members.exists(f'{member.user.id}:{guild_id}'):
                 args.append(await self.cache.members.capture(f'{member.user.id}:{guild_id}'))
             else:

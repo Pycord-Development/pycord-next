@@ -38,7 +38,7 @@ from .utils import UNDEFINED, UndefinedType
 
 class Member:
     def __init__(self, data: GuildMember, state: State) -> None:
-        self.user: User | UndefinedType = User(data.get('user')) if data.get('user') is not None else UNDEFINED
+        self.user: User | UndefinedType = User(data.get('user'), state) if data.get('user') is not None else UNDEFINED
         self.nick: str | None | UndefinedType = data.get('nick', UNDEFINED)
         self._avatar: str | None | UndefinedType = data.get('avatar', UNDEFINED)
         self.roles: list[Snowflake] = [Snowflake(s) for s in data['roles']]

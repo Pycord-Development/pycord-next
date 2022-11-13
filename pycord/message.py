@@ -22,11 +22,24 @@
 # SOFTWARE
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime
 from typing import TYPE_CHECKING
 
 from .application import Application
-from .channel import Channel
+from .channel import (
+    AnnouncementChannel,
+    AnnouncementThread,
+    CategoryChannel,
+    DirectoryChannel,
+    DMChannel,
+    ForumChannel,
+    GroupDMChannel,
+    StageChannel,
+    TextChannel,
+    Thread,
+    VoiceChannel,
+)
 from .embed import Embed
 from .enums import ChannelType, InteractionType, MessageActivityType, MessageType
 from .flags import MessageFlags
@@ -96,17 +109,20 @@ class MessageInteraction:
 
 class Message:
     def __init__(self, data: DiscordMessage, state: State) -> None:
+        self._state = state
         self.id: Snowflake = Snowflake(data['id'])
         self.channel_id: Snowflake = Snowflake(data['channel_id'])
-        self.author: User = User(data['user'], state=state)
+        self.author: User = User(data['author'], state=state)
         self.content: str = data['content']
         self.timestamp: datetime = datetime.fromisoformat(data['timestamp'])
-        self.edited_timestamp: datetime = datetime.fromisoformat(data['edited_timestamp'])
+        self.edited_timestamp: datetime | None = (
+            datetime.fromisoformat(data['edited_timestamp']) if data['edited_timestamp'] is not None else None
+        )
         self.tts: bool = data['tts']
-        self.mentions: list[User] = [User(d) for d in data['mentions']]
+        self.mentions: list[User] = [User(d, state) for d in data['mentions']]
         self.mention_roles: list[Snowflake] = [Snowflake(i) for i in data['mention_roles']]
         self.mention_channels: list[ChannelMention] = [ChannelMention(d) for d in data.get('mention_channels', [])]
-        self.attachments: list[Attachment] = [Attachment(a) for a in data['attachments']]
+        self.attachments: list[Attachment] = [Attachment(a, state) for a in data['attachments']]
         self.embeds: list[Embed] = [Embed._from_data(e) for e in data['embeds']]
         self.reactions: list[Reaction] = [Reaction(r) for r in data.get('reactions', [])]
         self.nonce: UndefinedType | int | str = data.get('nonce', UNDEFINED)
@@ -129,16 +145,29 @@ class Message:
             MessageFlags._from_value(data.get('flags')) if data.get('flags') is not None else UNDEFINED
         )
         self.referenced_message: Message | UndefinedType = (
-            Message(data.get('referenced_message')) if data.get('referenced_message') is not None else UNDEFINED
+            Message(data.get('referenced_message'), state) if data.get('referenced_message') is not None else UNDEFINED
         )
         self.interaction: MessageInteraction | UndefinedType = (
             MessageInteraction(data.get('interaction')) if data.get('interaction') is not None else UNDEFINED
         )
-        self.thread: Channel | UndefinedType = (
-            Channel(data.get('thread'), state=state) if data.get('thread') is not None else UNDEFINED
+        self.thread: Thread | UndefinedType = (
+            Thread(data.get('thread'), state=state) if data.get('thread') is not None else UNDEFINED
         )
         # TODO: Work on components
         # self.components
         self.sticker_items: list[StickerItem] = [StickerItem(si) for si in data.get('sticker_items', [])]
         self.stickers: list[Sticker] = [Sticker(s) for s in data.get('stickers', [])]
         self.position: UndefinedType | int = data.get('position', UndefinedType)
+        asyncio.create_task(self._retreive_channel())
+
+    async def _retreive_channel(self) -> None:
+        exists = await self._state.cache.channels.exists(self.channel_id)
+
+        if exists:
+            self.channel: TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = await self._state.cache.channels.select(
+                self.channel_id
+            )
+        else:
+            self.channel: TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = (
+                None
+            )

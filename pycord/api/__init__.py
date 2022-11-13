@@ -20,13 +20,14 @@ from ..utils import dumps
 from .execution import Executer
 from .json_decoder import JSONDecoder
 from .route import BaseRoute, Route
+from .routers import *
 
 __all__ = ['Route', 'BaseRoute', 'HTTPClient']
 
 _log = logging.getLogger(__name__)
 
 
-class HTTPClient:
+class HTTPClient(ApplicationCommands, Messages):
     def __init__(
         self,
         token: str,

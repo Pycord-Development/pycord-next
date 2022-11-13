@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 from datetime import datetime
+from typing import Any
 
 from .color import Color
 from .types import (
@@ -33,7 +34,7 @@ from .types import (
     Thumbnail as DiscordThumbnail,
     Video as DiscordVideo,
 )
-from .utils import UNDEFINED, UndefinedType
+from .utils import UNDEFINED, UndefinedType, remove_undefined
 
 
 # pure data classes, no user interaction.
@@ -66,6 +67,9 @@ class Thumbnail:
         self.width = data.get('width', UndefinedType)
         return self
 
+    def _to_data(self) -> dict[str, Any]:
+        return remove_undefined(url=self.url)
+
 
 class Image:
     def __init__(self, url: str) -> None:
@@ -82,6 +86,9 @@ class Image:
         self.width = data.get('width', UndefinedType)
         return self
 
+    def _to_data(self) -> dict[str, Any]:
+        return remove_undefined(url=self.url)
+
 
 class Footer:
     def __init__(self, text: str, icon_url: str | UndefinedType = UNDEFINED) -> None:
@@ -94,6 +101,9 @@ class Footer:
         self = cls(data['text'], data.get('icon_url', UNDEFINED))
         self.proxy_icon_url = data.get('proxy_icon_url', UNDEFINED)
         return self
+
+    def _to_data(self) -> dict[str, Any]:
+        return remove_undefined(text=self.text, icon_url=self.icon_url)
 
 
 class Author:
@@ -109,9 +119,12 @@ class Author:
         self.proxy_icon_url = data.get('proxy_icon_url', UNDEFINED)
         return self
 
+    def _to_data(self) -> dict[str, Any]:
+        return remove_undefined(name=self.name, url=self.url, icon_url=self.icon_url)
+
 
 class Field:
-    def __init__(self, name: str, value: str, inline: bool | UndefinedType = False) -> None:
+    def __init__(self, name: str, value: str, inline: bool | UndefinedType = UNDEFINED) -> None:
         self.name = name
         self.value = value
         self.inline = inline
@@ -119,6 +132,9 @@ class Field:
     @classmethod
     def _from_data(cls, data: DiscordField) -> "Field":
         return cls(data['name'], data['value'], data.get('field', UNDEFINED))
+
+    def _to_data(self) -> dict[str, Any]:
+        return remove_undefined(name=self.name, value=self.value, inline=self.inline)
 
 
 # settable:
@@ -133,14 +149,14 @@ class Embed:
         self,
         *,
         title: str,
-        description: str | None = None,
-        url: str | None = None,
-        timestamp: datetime | None = None,
-        color: Color | None = None,
-        thumbnail: Thumbnail | None = None,
-        author: Author | None = None,
-        footer: Footer | None = None,
-        image: Image | None = None,
+        description: str | UndefinedType = UNDEFINED,
+        url: str | UndefinedType = None,
+        timestamp: datetime | UndefinedType = UNDEFINED,
+        color: Color | UndefinedType = UNDEFINED,
+        thumbnail: Thumbnail | UndefinedType = UNDEFINED,
+        author: Author | UndefinedType = UNDEFINED,
+        footer: Footer | UndefinedType = UNDEFINED,
+        image: Image | UndefinedType = UNDEFINED,
         fields: list[Field] = None
     ) -> None:
         if fields is None:
@@ -167,7 +183,7 @@ class Embed:
         image = Image._from_data(data.get('thumbnail')) if data.get('thumbnail') is not None else None
         fields = [Field._from_data(field) for field in data.get('fields', [])]
 
-        return cls(
+        self = cls(
             title=data.get('title'),
             description=data.get('description'),
             url=data.get('url'),
@@ -176,8 +192,30 @@ class Embed:
             footer=footer,
             image=image,
             thumbnail=thumbnail,
-            video=video,
-            provider=provider,
             author=author,
+            fields=fields,
+        )
+        self.video = video
+        self.provider = provider
+
+    def _to_data(self) -> dict[str, Any]:
+        color = self.color.value if self.color else None
+        thumbnail = self.thumbnail._to_data() if self.thumbnail else UNDEFINED
+        author = self.author._to_data() if self.author else UNDEFINED
+        footer = self.footer._to_data() if self.footer else UNDEFINED
+        image = self.image._to_data() if self.image else UNDEFINED
+        fields = [field._to_data() for field in self.fields]
+        timestamp = self.timestamp.isoformat() if self.timestamp else UNDEFINED
+
+        return remove_undefined(
+            title=self.title,
+            description=self.description,
+            url=self.url,
+            color=color,
+            timestamp=timestamp,
+            thumbnail=thumbnail,
+            footer=footer,
+            author=author,
+            image=image,
             fields=fields,
         )

@@ -62,5 +62,5 @@ class User:
         )
         self._public_flags: UndefinedType | int = data.get('public_flags', UNDEFINED)
         self.public_flags: UndefinedType | UserFlags = (
-            UserFlags(self._public_flags) if self._public_flags is not UNDEFINED else UNDEFINED
+            UserFlags._from_value(self._public_flags) if self._public_flags is not UNDEFINED else UNDEFINED
         )

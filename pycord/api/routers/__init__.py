@@ -8,3 +8,4 @@ Implementation of Discord API Routes
 """
 from .application_commands import *
 from .base import *
+from .messages import *

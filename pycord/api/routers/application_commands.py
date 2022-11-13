@@ -46,8 +46,8 @@ class ApplicationCommands(BaseRouter):
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         options: list[ApplicationCommandOption] | UndefinedType = UNDEFINED,
         default_member_permissions: str | None | UndefinedType = UNDEFINED,
-        dm_permission: UNDEFINED | bool | None = UNDEFINED,
-        default_permission: bool | UNDEFINED = UNDEFINED,
+        dm_permission: UndefinedType | bool | None = UNDEFINED,
+        default_permission: bool | UndefinedType = UNDEFINED,
         type: ATYPE | UndefinedType = UNDEFINED,
     ):
         data = remove_undefined(
