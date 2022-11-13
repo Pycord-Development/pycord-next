@@ -129,3 +129,4 @@ class Guild:
         for emoji in self._emojis:
             emo = Emoji(emoji, state=self._state)
             emo._inject_roles(self.roles)
+            self.emojis.append(emo)
