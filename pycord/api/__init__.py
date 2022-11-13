@@ -2,6 +2,9 @@
 pycord.api
 ~~~~~~~~~~
 Implementation of the Discord API.
+
+:copyright: 2021-present VincentRPS
+:license: MIT
 """
 import logging
 import sys

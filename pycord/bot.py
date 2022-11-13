@@ -166,4 +166,4 @@ class Bot:
 
     @property
     async def guilds(self) -> list[Guild]:
-        return await self._state.cache.guilds.invoke(self._state.cache.guilds.all)
+        return await self._state.cache.guilds.all()

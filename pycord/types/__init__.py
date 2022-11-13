@@ -2,6 +2,9 @@
 pycord.types
 ~~~~~~~~~~~~
 Typing's for the Discord API.
+
+:copyright: 2021-present VincentRPS
+:license: MIT
 """
 from .application import *
 from .application_commands import *
