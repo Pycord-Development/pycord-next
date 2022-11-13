@@ -20,31 +20,35 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-"""
-Implementation of Discord's Snowflake ID
-"""
+from __future__ import annotations
 
-from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Coroutine, TypeVar
 
-from .utils import DISCORD_EPOCH
+if TYPE_CHECKING:
+    from ...bot import Bot
+
+T = TypeVar('T')
 
 
-class Snowflake(int):
-    @property
-    def timestamp(self) -> datetime:
-        return datetime.fromtimestamp(((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc)
+class Gear:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self._listener_functions: dict[str, list[Coroutine]] = {}
+        self.bot: Bot
 
-    @property
-    def worker_id(self) -> int:
-        return (self & 0x3E0000) >> 17
+    def listen(self, name: str) -> T:
+        def wrapper(func: T) -> T:
+            if self._listener_functions.get(name):
+                self._listener_functions[name].append(func)
+            else:
+                self._listener_functions[name] = [func]
+            return func
 
-    @property
-    def process_id(self) -> int:
-        return (self & 0x1F000) >> 12
+        return wrapper
 
-    @property
-    def increment(self) -> int:
-        return self & 0xFFF
+    def attach(self, bot: Bot) -> None:
+        for name, funcs in self._listener_functions.items():
+            for func in funcs:
+                bot._state.ping.add_listener(name, func)
 
-    def __hash__(self) -> int:
-        return self >> 22
+        self.bot = bot

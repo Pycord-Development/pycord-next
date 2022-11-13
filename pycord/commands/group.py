@@ -20,31 +20,27 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-"""
-Implementation of Discord's Snowflake ID
-"""
+from typing import TypeVar
 
-from datetime import datetime, timezone
+from ..state import State
+from .command import Command
 
-from .utils import DISCORD_EPOCH
+T = TypeVar('T')
 
 
-class Snowflake(int):
-    @property
-    def timestamp(self) -> datetime:
-        return datetime.fromtimestamp(((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc)
+class Group:
+    def __init__(self, name: str, state: State) -> None:
+        self.commands: list[Command] = []
+        # nested groups
+        self.groups: list["Group"] = []
 
-    @property
-    def worker_id(self) -> int:
-        return (self & 0x3E0000) >> 17
+        self.name = name
+        self._state = state
 
-    @property
-    def process_id(self) -> int:
-        return (self & 0x1F000) >> 12
+    def command(self, name: str) -> T:
+        def wrapper(func: T) -> T:
+            command = Command(func, name=name, state=self._state, group=self)
+            self._state.commands.append(command)
+            return func
 
-    @property
-    def increment(self) -> int:
-        return self & 0xFFF
-
-    def __hash__(self) -> int:
-        return self >> 22
+        return wrapper

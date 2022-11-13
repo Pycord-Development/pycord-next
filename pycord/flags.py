@@ -28,7 +28,7 @@ from typing import Callable, Literal, Type, TypeVar
 F = TypeVar('F', bound='Flags')
 FF = TypeVar('FF')
 
-__all__ = ['Intents']
+__all__ = ['Intents', 'Permissions', 'ChannelFlags', 'MessageFlags', 'SystemChannelFlags', 'ApplicationFlags', 'UserFlags']
 
 
 class flag:
@@ -74,7 +74,8 @@ class Flags:
         return {v: True for v in dir(flagcls) if not v.startswith('_') and v != 'as_bit' and v != 'mro' and v != 'all'}
 
     @classmethod
-    def _from_value(cls: Type[FF], value: int) -> FF:
+    def _from_value(cls: Type[FF], value: int | str) -> FF:
+        value = int(value)
         valid_flag_names = cls._valid_flags(cls)
         valid_flags: dict[str, int] = {v: getattr(cls, v) for v, n in valid_flag_names.items()}
         parse: dict[str, Literal[True]] = {name: True for name, v in valid_flags.items() if (value & v)}
@@ -165,5 +166,333 @@ class Intents(Flags):
 
     @classmethod
     def all(cls) -> Intents:
-        valid_intents = Intents._valid_flags(Intents)
-        return cls(**valid_intents)
+        valid_intents = cls._valid_flags(Intents)
+        return Intents(**valid_intents)
+
+
+class Permissions(Flags):
+    @flag
+    def create_instant_invite(self) -> bool | int:
+        return 1 << 0
+
+    @flag
+    def kick_members(self) -> bool | int:
+        return 1 << 1
+
+    @flag
+    def ban_member(self) -> bool | int:
+        return 1 << 2
+
+    @flag
+    def administrator(self) -> bool | int:
+        return 1 << 3
+
+    @flag
+    def manage_channels(self) -> bool | int:
+        return 1 << 4
+
+    @flag
+    def manage_guild(self) -> bool | int:
+        return 1 << 5
+
+    @flag
+    def add_reactions(self) -> bool | int:
+        return 1 << 6
+
+    @flag
+    def view_audit_log(self) -> bool | int:
+        return 1 << 7
+
+    @flag
+    def priority_speaker(self) -> bool | int:
+        return 1 << 8
+
+    @flag
+    def stream(self) -> int | bool:
+        return 1 << 9
+
+    @flag
+    def view_channel(self) -> int | bool:
+        return 1 << 10
+
+    @flag
+    def send_messages(self) -> int | bool:
+        return 1 << 11
+
+    @flag
+    def send_tts_messages(self) -> int | bool:
+        return 1 << 12
+
+    @flag
+    def manage_messages(self) -> bool | int:
+        return 1 << 13
+
+    @flag
+    def embed_links(self) -> bool | int:
+        return 1 << 14
+
+    @flag
+    def attach_files(self) -> bool | int:
+        return 1 << 15
+
+    @flag
+    def read_message_history(self) -> bool | int:
+        return 1 << 16
+
+    @flag
+    def mention_everyone(self) -> bool | int:
+        return 1 << 17
+
+    @flag
+    def use_external_emojis(self) -> bool | int:
+        return 1 << 18
+
+    @flag
+    def view_guild_insights(self) -> bool | int:
+        return 1 << 19
+
+    @flag
+    def connect(self) -> bool | int:
+        return 1 << 20
+
+    @flag
+    def speak(self) -> bool | int:
+        return 1 << 21
+
+    @flag
+    def mute_members(self) -> bool | int:
+        return 1 << 22
+
+    @flag
+    def deafen_members(self) -> bool | int:
+        return 1 << 23
+
+    @flag
+    def move_members(self) -> bool | int:
+        return 1 << 24
+
+    @flag
+    def use_vad(self) -> bool | int:
+        return 1 << 25
+
+    @flag
+    def change_nickname(self) -> bool | int:
+        return 1 << 26
+
+    @flag
+    def manage_nicknames(self) -> bool | int:
+        return 1 << 27
+
+    @flag
+    def manage_roles(self) -> bool | int:
+        return 1 << 28
+
+    @flag
+    def manage_webhooks(self) -> bool | int:
+        return 1 << 29
+
+    @flag
+    def manage_emojis_and_stickers(self) -> bool | int:
+        return 1 << 30
+
+    @flag
+    def use_application_commands(self) -> bool | int:
+        return 1 << 31
+
+    @flag
+    def request_to_speak(self) -> bool | int:
+        return 1 << 32
+
+    @flag
+    def manage_events(self) -> bool | int:
+        return 1 << 33
+
+    @flag
+    def manage_threads(self) -> bool | int:
+        return 1 << 34
+
+    @flag
+    def create_public_threads(self) -> bool | int:
+        return 1 << 35
+
+    @flag
+    def create_private_threads(self) -> bool | int:
+        return 1 << 36
+
+    @flag
+    def use_external_stickers(self) -> bool | int:
+        return 1 << 37
+
+    @flag
+    def send_messages_in_threads(self) -> bool | int:
+        return 1 << 38
+
+    @flag
+    def use_embedded_activities(self) -> bool | int:
+        return 1 << 39
+
+    @flag
+    def moderate_members(self) -> bool | int:
+        return 1 << 40
+
+
+class SystemChannelFlags(Flags):
+    @flag
+    def suppress_join_notifications(self) -> bool | int:
+        return 1 << 0
+
+    @flag
+    def suppress_premium_subscriptions(self) -> bool | int:
+        return 1 << 1
+
+    @flag
+    def suppress_guild_reminder_notifications(self) -> bool | int:
+        return 1 << 2
+
+    @flag
+    def suppress_guild_reminder_notifications(self) -> bool | int:
+        return 1 << 3
+
+
+class ApplicationFlags(Flags):
+    @flag
+    def gateway_presence(self) -> bool | None:
+        return 1 << 12
+
+    @flag
+    def gateway_presence_limited(self) -> bool | int:
+        return 1 << 13
+
+    @flag
+    def gateway_guild_members(self) -> bool | int:
+        return 1 << 14
+
+    @flag
+    def gateway_guild_members_limited(self) -> bool | int:
+        return 1 << 15
+
+    @flag
+    def verification_pending_guild_limit(self) -> bool | int:
+        return 1 << 16
+
+    @flag
+    def embedded(self) -> bool | int:
+        return 1 << 17
+
+    @flag
+    def gateway_message_content(self) -> bool | int:
+        return 1 << 18
+
+    @flag
+    def gateway_message_content_limited(self) -> bool | int:
+        return 1 << 19
+
+    @flag
+    def application_command_badge(self) -> bool | int:
+        return 1 << 23
+
+
+class ChannelFlags(Flags):
+    @flag
+    def pinned(self) -> bool | int:
+        return 1 << 1
+
+    @flag
+    def require_tag(self) -> bool | int:
+        return 1 << 4
+
+
+class MessageFlags(Flags):
+    @flag
+    def crossposted(self) -> bool | int:
+        return 1 << 0
+
+    @flag
+    def is_crossposted(self) -> bool | int:
+        return 1 << 1
+
+    @flag
+    def suppress_embeds(self) -> bool | int:
+        return 1 << 2
+
+    @flag
+    def source_message_deleted(self) -> bool | int:
+        return 1 << 3
+
+    @flag
+    def urgent(self) -> bool | int:
+        return 1 << 4
+
+    @flag
+    def has_thread(self) -> bool | int:
+        return 1 << 5
+
+    @flag
+    def ephemeral(self) -> bool | int:
+        return 1 << 6
+
+    @flag
+    def loading(self) -> bool | int:
+        return 1 << 7
+
+    @flag
+    def failed_to_mention_some_roles_in_thread(self) -> bool | int:
+        return 1 << 8
+
+
+class UserFlags(Flags):
+    @flag
+    def staff(self) -> bool | int:
+        return 1 << 0
+
+    @flag
+    def partner(self) -> bool | int:
+        return 1 << 1
+
+    @flag
+    def hypesquad(self) -> bool | int:
+        return 1 << 2
+
+    @flag
+    def bug_hunter_level_1(self) -> bool | int:
+        return 1 << 3
+
+    @flag
+    def hypesquad_online_house_1(self) -> bool | int:
+        return 1 << 6
+
+    @flag
+    def hypesquad_online_house_2(self) -> bool | int:
+        return 1 << 7
+
+    @flag
+    def hypesquad_online_house_3(self) -> bool | int:
+        return 1 << 8
+
+    @flag
+    def premium_early_supporter(self) -> bool | int:
+        return 1 << 9
+
+    @flag
+    def team_pseudo_user(self) -> bool | int:
+        return 1 << 10
+
+    @flag
+    def bug_hunter_level_2(self) -> bool | int:
+        return 1 << 14
+
+    @flag
+    def verified_bot(self) -> bool | int:
+        return 1 << 16
+
+    @flag
+    def verified_developer(self) -> bool | int:
+        return 1 << 17
+
+    @flag
+    def certified_moderator(self) -> bool | int:
+        return 1 << 18
+
+    @flag
+    def bot_http_interactions(self) -> bool | int:
+        return 1 << 19

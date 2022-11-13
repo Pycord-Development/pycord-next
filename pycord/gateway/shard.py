@@ -89,7 +89,9 @@ class Shard:
                 self._ws = await self._session.ws_connect(
                     url=url.format(version=self.version, base=self._resume_gateway_url)
                     if resume and self._resume_gateway_url
-                    else url.format(version=self.version, base='wss://gateway.discord.gg')
+                    else url.format(version=self.version, base='wss://gateway.discord.gg'),
+                    proxy=self._notifier.manager.proxy,
+                    proxy_auth=self._notifier.manager.proxy_auth,
                 )
                 _log.debug(f'shard:{self.id}: connected to gateway')
         except (ClientConnectionError, ClientConnectorError):
@@ -123,7 +125,7 @@ class Shard:
                     'properties': {'os': system(), 'browser': 'pycord', 'device': 'pycord'},
                     'compress': True,
                     'large_threshold': self._state.large_threshold,
-                    'shard': [self.id, self._notifier.manager._out_of],
+                    'shard': [self.id, self._notifier.manager.amount],
                     'intents': self._state.intents.as_bit,
                 },
             }
@@ -187,6 +189,7 @@ class Shard:
                         self.session_id = d['session_id']
                         self._resume_gateway_url = d['resume_gateway_url']
                         self._state.raw_user = d['user']
+                    asyncio.create_task(self._state._process_event(t, d))
                 elif op == 1:
                     await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
                 elif op == 10:

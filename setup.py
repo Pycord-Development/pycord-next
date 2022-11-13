@@ -27,7 +27,15 @@ requirements = []
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-packages = ['pycord', 'pycord.types', 'pycord.api', 'pycord.api.execution', 'pycord.gateway']
+packages = [
+    'pycord',
+    'pycord.types',
+    'pycord.api',
+    'pycord.api.execution',
+    'pycord.gateway',
+    'pycord.commands',
+    'pycord.api.routers',
+]
 
 extra_requires = {
     'speed': [
@@ -70,6 +78,7 @@ setuptools.setup(
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython',
         'Framework :: AsyncIO',

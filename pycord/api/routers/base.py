@@ -20,31 +20,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-"""
-Implementation of Discord's Snowflake ID
-"""
+from typing import Any
 
-from datetime import datetime, timezone
-
-from .utils import DISCORD_EPOCH
+from ..route import BaseRoute
 
 
-class Snowflake(int):
-    @property
-    def timestamp(self) -> datetime:
-        return datetime.fromtimestamp(((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc)
-
-    @property
-    def worker_id(self) -> int:
-        return (self & 0x3E0000) >> 17
-
-    @property
-    def process_id(self) -> int:
-        return (self & 0x1F000) >> 12
-
-    @property
-    def increment(self) -> int:
-        return self & 0xFFF
-
-    def __hash__(self) -> int:
-        return self >> 22
+class BaseRouter:
+    async def request(
+        self, method: str, route: BaseRoute, data: dict[str, Any] | None = None, *, reason: str | None = None
+    ) -> None:
+        ...

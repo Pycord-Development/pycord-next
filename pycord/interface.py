@@ -24,6 +24,7 @@ import datetime
 import importlib.resources
 import logging
 import logging.config
+import os
 import platform
 import string
 import sys
@@ -93,18 +94,31 @@ def get_day_prefix(num: int) -> str:
     return day_prefixes[int(n[len(n) - 1])]
 
 
-def print_banner(module: Optional[str] = 'pycord'):
-    banner = importlib.resources.read_text(module, 'banner.txt')
-    info_banner = importlib.resources.read_text(module, 'ibanner.txt')
+def print_banner(concurrency: int, shard_count: int, bot_name: str = 'Your bot', module: Optional[str] = 'pycord'):
+    banners = importlib.resources.files(module)
+
+    for trav in banners.iterdir():
+        if trav.name == 'banner.txt':
+            banner = trav.read_text()
+        elif trav.name == 'ibanner.txt':
+            info_banner = trav.read_text()
+
     today = datetime.date.today()
 
     args = {
         'copyright': __copyright__,
         'version': __version__,
         'license': __license__,
-        'current_time': today.strftime(f'%B the %d{get_day_prefix(today.day)} of %Y'),
+        # the # prefix only works on windows, and the - prefix only works on linux/unix systems
+        'current_time': today.strftime(f'%B the %#d{get_day_prefix(today.day)} of %Y')
+        if os.name == 'nt'
+        else today.strftime(f'%B the %-d{get_day_prefix(today.day)} of %Y'),
         'py_version': platform.python_version(),
         'git_sha': __git_sha1__[:8],
+        'botname': bot_name,
+        'concurrency': concurrency,
+        'shardcount': shard_count,
+        'sp': '' if shard_count == 1 else 's',
     }
     args |= colorlog.escape_codes.escape_codes
 

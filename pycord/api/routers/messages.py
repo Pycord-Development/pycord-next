@@ -20,31 +20,33 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-"""
-Implementation of Discord's Snowflake ID
-"""
 
-from datetime import datetime, timezone
+from ...embed import Embed
+from ...snowflake import Snowflake
+from ...types.message import Message
+from ...utils import UNDEFINED, UndefinedType, remove_undefined
+from ..route import Route
+from .base import BaseRouter
 
-from .utils import DISCORD_EPOCH
 
+class Messages(BaseRouter):
+    async def create_message(
+        self,
+        channel_id: Snowflake,
+        content: str | UndefinedType = UNDEFINED,
+        nonce: int | str | UndefinedType = UNDEFINED,
+        tts: bool | UndefinedType = UNDEFINED,
+        embeds: list[Embed] | UndefinedType = UNDEFINED,
+        sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
+        flags: int | UndefinedType = UNDEFINED,
+    ) -> Message:
+        if embeds is not UNDEFINED:
+            embeds = [embed._to_data() for embed in embeds]
 
-class Snowflake(int):
-    @property
-    def timestamp(self) -> datetime:
-        return datetime.fromtimestamp(((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc)
-
-    @property
-    def worker_id(self) -> int:
-        return (self & 0x3E0000) >> 17
-
-    @property
-    def process_id(self) -> int:
-        return (self & 0x1F000) >> 12
-
-    @property
-    def increment(self) -> int:
-        return self & 0xFFF
-
-    def __hash__(self) -> int:
-        return self >> 22
+        return await self.request(
+            'POST',
+            Route(f'/channels/{channel_id}/messages', channel_id=channel_id),
+            data=remove_undefined(
+                content=content, embeds=embeds, nonce=nonce, tts=tts, sticker_ids=sticker_ids, flags=flags
+            ),
+        )

@@ -31,6 +31,10 @@ class PycordException(Exception):
     pass
 
 
+class BotException(PycordException):
+    pass
+
+
 class GatewayException(PycordException):
     pass
 
@@ -78,4 +82,8 @@ class NotFound(HTTPException):
 
 
 class InternalError(HTTPException):
+    pass
+
+
+class OverfilledShardsException(BotException):
     pass

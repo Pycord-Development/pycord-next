@@ -20,31 +20,24 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-"""
-Implementation of Discord's Snowflake ID
-"""
+from __future__ import annotations
 
-from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Coroutine
 
-from .utils import DISCORD_EPOCH
+if TYPE_CHECKING:
+    from ..state import State
+    from .group import Group
 
 
-class Snowflake(int):
-    @property
-    def timestamp(self) -> datetime:
-        return datetime.fromtimestamp(((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc)
+class Command:
+    _processor_event: str
 
-    @property
-    def worker_id(self) -> int:
-        return (self & 0x3E0000) >> 17
+    def __init__(self, callback: Coroutine, name: str, state: State, group: Group | None = None) -> None:
+        self._callback = callback
 
-    @property
-    def process_id(self) -> int:
-        return (self & 0x1F000) >> 12
+        self.name = name
+        self.group = group
+        self._state = state
 
-    @property
-    def increment(self) -> int:
-        return self & 0xFFF
-
-    def __hash__(self) -> int:
-        return self >> 22
+    async def _invoke(self, *args, **kwargs) -> None:
+        pass

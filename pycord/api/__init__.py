@@ -2,11 +2,15 @@
 pycord.api
 ~~~~~~~~~~
 Implementation of the Discord API.
+
+:copyright: 2021-present VincentRPS
+:license: MIT
 """
 import logging
+import sys
 from typing import Any, Optional
 
-from aiohttp import BasicAuth, ClientSession
+from aiohttp import BasicAuth, ClientSession, __version__ as aiohttp_version
 
 from pycord._about import __version__
 
@@ -16,13 +20,14 @@ from ..utils import dumps
 from .execution import Executer
 from .json_decoder import JSONDecoder
 from .route import BaseRoute, Route
+from .routers import *
 
 __all__ = ['Route', 'BaseRoute', 'HTTPClient']
 
 _log = logging.getLogger(__name__)
 
 
-class HTTPClient:
+class HTTPClient(ApplicationCommands, Messages):
     def __init__(
         self,
         token: str,
@@ -36,7 +41,9 @@ class HTTPClient:
         self._proxy_auth = proxy_auth
         self._headers = {
             'Authorization': f'Bot {token}',
-            'User-Agent': f'DiscordBot (https://github.com/pycord/pycord-v3, {__version__})',
+            'User-Agent': 'DiscordBot (https://pycord.dev, {0}) Python/{1[0]}.{1[1]} aiohttp/{2}'.format(
+                __version__, sys.version_info, aiohttp_version
+            ),
         }
 
         self._session: None | ClientSession = None
@@ -51,7 +58,7 @@ class HTTPClient:
 
     async def request(
         self, method: str, route: BaseRoute, data: Optional[dict[str, Any]] = None, *, reason: Optional[str] = None
-    ) -> None:
+    ) -> str | dict[str, Any] | bytes:
         endpoint = route.merge(self.base_url)
 
         if self._session is None:
