@@ -53,7 +53,6 @@ class Bot:
         self._state: State = State(intents=self.intents, max_messages=self.max_messages)
         self._shards = shards
         self._logging_flavor: int | str | dict[str, Any] = logging_flavor
-        self.user: User | None = None
         self._print_banner = print_banner_on_startup
         self._proxy = proxy
         self._proxy_auth = proxy_auth
@@ -65,7 +64,8 @@ class Bot:
     async def _run_async(self, token: str) -> None:
         start_logging(flavor=self._logging_flavor)
         self._state.bot_init(token=token, clustered=False, proxy=self._proxy, proxy_auth=self._proxy_auth)
-        sharder = ShardManager(self._state, self._shards, self._shards, proxy=self._proxy, proxy_auth=self._proxy_auth)
+        shards = self._shards if isinstance(self._shards, list) else list(range(self._shards))
+        sharder = ShardManager(self._state, shards, self._shards, proxy=self._proxy, proxy_auth=self._proxy_auth)
         await sharder.start()
         self._state.shard_managers.append(sharder)
         while not self._state.raw_user:
