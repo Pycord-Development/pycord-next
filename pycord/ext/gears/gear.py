@@ -34,6 +34,7 @@ class Gear:
     def __init__(self, name: str) -> None:
         self.name = name
         self._listener_functions: dict[str, list[Coroutine]] = {}
+        self.bot: Bot
 
     def listen(self, name: str) -> T:
         def wrapper(func: T) -> T:
@@ -49,3 +50,5 @@ class Gear:
         for name, funcs in self._listener_functions.items():
             for func in funcs:
                 bot._state.ping.add_listener(name, func)
+
+        self.bot = bot
