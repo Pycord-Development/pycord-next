@@ -66,7 +66,7 @@ class AutoModAction:
 
 
 class AutoModRule:
-    def __init__(self, data: DiscordAutoModerationRule, state: State):
+    def __init__(self, data: DiscordAutoModerationRule, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self.guild_id: Snowflake = Snowflake(data['guild_id'])
         self.name: str = data['name']

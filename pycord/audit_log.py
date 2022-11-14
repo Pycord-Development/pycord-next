@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 
 
 class OptionalAuditEntryInfo:
-    def __init__(self, data: DiscordOptionalAuditEntryInfo):
+    def __init__(self, data: DiscordOptionalAuditEntryInfo) -> None:
         self.application_id: Snowflake | UndefinedType = (
             Snowflake(data['application_id']) if 'application_id' in data else UNDEFINED
         )
@@ -77,7 +77,7 @@ class OptionalAuditEntryInfo:
 
 
 class AuditLogChange:
-    def __init__(self, data: DiscordAuditLogChange):
+    def __init__(self, data: DiscordAuditLogChange) -> None:
         self.key: str = data['key']
         self.new_value: Any | UndefinedType = data.get('new_value', UNDEFINED)
         self.old_value: Any | UndefinedType = data.get('old_value', UNDEFINED)
