@@ -23,7 +23,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .enums import GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventStatus
 from .member import Member
@@ -45,9 +45,7 @@ class ScheduledEventUser:
     def __init__(self, data: dict[str, Any], state: State) -> None:
         self.guild_scheduled_event_id: Snowflake = Snowflake(data['guild_scheduled_event_id'])
         self.user: User = User(data['user'], state)
-        self.member: Member | UndefinedType = (
-            Member(data['member'], state) if data.get('member') is not None else UNDEFINED
-        )
+        self.member: Member | UndefinedType = Member(data['member'], state) if data.get('member') is not None else UNDEFINED
 
 
 class ScheduledEvent:

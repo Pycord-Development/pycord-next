@@ -22,7 +22,7 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .channel import Channel
 from .enums import (
@@ -38,9 +38,14 @@ from .media import Emoji, Sticker
 from .role import Role
 from .snowflake import Snowflake
 from .types import (
+    GUILD_FEATURE,
+    LOCALE,
     Ban as DiscordBan,
-    Guild as DiscordGuild, GUILD_FEATURE, GuildPreview as DiscordGuildPreview, LOCALE, UnavailableGuild,
-    Widget as DiscordWidget, WidgetSettings as DiscordWidgetSettings,
+    Guild as DiscordGuild,
+    GuildPreview as DiscordGuildPreview,
+    UnavailableGuild,
+    Widget as DiscordWidget,
+    WidgetSettings as DiscordWidgetSettings,
 )
 from .user import User
 from .utils import UNDEFINED, UndefinedType
@@ -73,9 +78,7 @@ class Guild:
             self.widget_enabled: bool | UndefinedType = data.get('widget_enabled', UNDEFINED)
             self._widget_channel_id: str | None | UndefinedType = data.get('widget_channel_id')
             self.widget_channel_id: UndefinedType | Snowflake | None = (
-                Snowflake(self._widget_channel_id) if isinstance(
-                    self._widget_channel_id, str
-                ) else self._widget_channel_id
+                Snowflake(self._widget_channel_id) if isinstance(self._widget_channel_id, str) else self._widget_channel_id
             )
             self.verification_level: VerificationLevel = VerificationLevel(data['verification_level'])
             self.default_message_notifications: DefaultMessageNotificationLevel = DefaultMessageNotificationLevel(

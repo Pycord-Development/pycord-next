@@ -29,8 +29,12 @@ from typing import TYPE_CHECKING
 from .application import Application
 from .snowflake import Snowflake
 from .types import (
-    Account as DiscordAccount, Integration as DiscordIntegration, INTEGRATION_EXPIRE_BEHAVIOR, INTEGRATION_TYPE,
-    IntegrationApplication as DiscordIntegrationApplication, SCOPE,
+    INTEGRATION_EXPIRE_BEHAVIOR,
+    INTEGRATION_TYPE,
+    SCOPE,
+    Account as DiscordAccount,
+    Integration as DiscordIntegration,
+    IntegrationApplication as DiscordIntegrationApplication,
 )
 from .user import User
 from .utils import UNDEFINED, UndefinedType
@@ -61,19 +65,14 @@ class Integration:
         self.type: INTEGRATION_TYPE = data['type']
         self.enabled: bool | UndefinedType = data.get('enabled', UNDEFINED)
         self.syncing: bool | UndefinedType = data.get('syncing', UNDEFINED)
-        self.role_id: Snowflake | UndefinedType = (
-            Snowflake(data['role_id']) if data.get('role_id') else UNDEFINED
-        )
+        self.role_id: Snowflake | UndefinedType = Snowflake(data['role_id']) if data.get('role_id') else UNDEFINED
         self.enable_emoticons: bool | UndefinedType = data.get('enable_emoticons', UNDEFINED)
         self.expire_behavior: INTEGRATION_EXPIRE_BEHAVIOR | UndefinedType = data.get('expire_behavior', UNDEFINED)
         self.expire_grace_period: int | UndefinedType = data.get('expire_grace_period', UNDEFINED)
-        self.user: User | UndefinedType = (
-            User(data['user'], state) if data.get('user') is not None else UNDEFINED
-        )
+        self.user: User | UndefinedType = User(data['user'], state) if data.get('user') is not None else UNDEFINED
         self.account: Account = Account(data['account'])
         self.synced_at: UndefinedType | datetime = (
-            datetime.fromisoformat(data['synced_at'])
-            if data.get('synced_at') is not None else UNDEFINED
+            datetime.fromisoformat(data['synced_at']) if data.get('synced_at') is not None else UNDEFINED
         )
         self.subscriber_count: int | UndefinedType = data.get('subscriber_count', UNDEFINED)
         self.revoked: bool | UndefinedType = data.get('revoked', UNDEFINED)

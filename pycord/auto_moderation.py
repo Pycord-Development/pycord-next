@@ -45,7 +45,8 @@ class AutoModTriggerMetadata:
         self.regex_patterns: list[str] | UndefinedType = data.get('regex_patterns', UNDEFINED)
         self.presets: list[AutoModKeywordPresetType] | UndefinedType = (
             [AutoModKeywordPresetType(preset) for preset in data['presets']]
-            if data.get('presets') is not None else UNDEFINED
+            if data.get('presets') is not None
+            else UNDEFINED
         )
         self.allow_list: list[str] | UndefinedType = data.get('allow_list', UNDEFINED)
         self.mention_total_limit: int | UndefinedType = data.get('mention_total_limit', UNDEFINED)

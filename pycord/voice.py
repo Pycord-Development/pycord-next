@@ -39,13 +39,9 @@ class VoiceState:
         self.guild_id: Snowflake | UndefinedType = (
             Snowflake(data['guild_id']) if data.get('guild_id') is not None else UNDEFINED
         )
-        self.channel_id: Snowflake | None = (
-            Snowflake(data['channel_id']) if data.get('channel_id') is not None else None
-        )
+        self.channel_id: Snowflake | None = Snowflake(data['channel_id']) if data.get('channel_id') is not None else None
         self.user_id: Snowflake = Snowflake(data['user_id'])
-        self.member: Member | UndefinedType = (
-            Member(data['member'], state) if data.get('member') is not None else UNDEFINED
-        )
+        self.member: Member | UndefinedType = Member(data['member'], state) if data.get('member') is not None else UNDEFINED
         self.session_id: str = data['session_id']
         self.deaf: bool = data['deaf']
         self.mute: bool = data['mute']
@@ -56,5 +52,6 @@ class VoiceState:
         self.suppress: bool = data['suppress']
         self.request_to_speak: datetime | UndefinedType = (
             datetime.fromisoformat(data['request_to_speak_timestamp'])
-            if data.get('request_to_speak_timestamp') is not None else None
+            if data.get('request_to_speak_timestamp') is not None
+            else None
         )

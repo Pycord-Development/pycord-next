@@ -41,7 +41,5 @@ class StageInstance:
         self.topic: str = data['topic']
         self.privacy_level: StageInstancePrivacyLevel = StageInstancePrivacyLevel(data['privacy_level'])
         self.guild_scheduled_event_id: UndefinedType | Snowflake = (
-            Snowflake(data['guild_scheduled_event_id']) if data.get(
-                'guild_scheduled_event_id'
-                ) is not None else UNDEFINED
+            Snowflake(data['guild_scheduled_event_id']) if data.get('guild_scheduled_event_id') is not None else UNDEFINED
         )

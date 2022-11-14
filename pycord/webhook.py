@@ -45,9 +45,7 @@ class Webhook:
         self.channel_id: Snowflake | None | UndefinedType = (
             Snowflake(data['channel_id']) if data.get('channel_id') is not None else None
         )
-        self.user: User | UndefinedType = (
-            User(data['user'], state) if data.get('user') is not None else UNDEFINED
-        )
+        self.user: User | UndefinedType = User(data['user'], state) if data.get('user') is not None else UNDEFINED
         self.name: str | None = data['name']
         self._avatar: str | None = data['avatar']
         self.token: str | UndefinedType = data.get('token', UNDEFINED)

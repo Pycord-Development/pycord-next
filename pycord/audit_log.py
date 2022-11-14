@@ -23,7 +23,7 @@
 
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .auto_moderation import AutoModRule
 from .channel import Thread
@@ -31,10 +31,15 @@ from .enums import AuditLogEvent
 from .scheduled_event import ScheduledEvent
 from .snowflake import Snowflake
 from .types import (
-    ApplicationCommand as DiscordApplicationCommand, AUDIT_LOG_EVENT_TYPE, AuditLog as DiscordAuditLog,
-    AuditLogChange as DiscordAuditLogChange, AuditLogEntry as DiscordAuditLogEntry,
-    AutoModerationRule as DiscordAutoModerationRule, Integration as DiscordIntegration,
-    OptionalAuditEntryInfo as DiscordOptionalAuditEntryInfo, Webhook as DiscordWebhook,
+    AUDIT_LOG_EVENT_TYPE,
+    ApplicationCommand as DiscordApplicationCommand,
+    AuditLog as DiscordAuditLog,
+    AuditLogChange as DiscordAuditLogChange,
+    AuditLogEntry as DiscordAuditLogEntry,
+    AutoModerationRule as DiscordAutoModerationRule,
+    Integration as DiscordIntegration,
+    OptionalAuditEntryInfo as DiscordOptionalAuditEntryInfo,
+    Webhook as DiscordWebhook,
 )
 from .user import User
 from .utils import UNDEFINED, UndefinedType
@@ -51,29 +56,17 @@ class OptionalAuditEntryInfo:
         self.auto_moderation_rule_name: str | UndefinedType = data.get('auto_moderation_rule_name', UNDEFINED)
         self.auto_moderation_rule_trigger_type: str | UndefinedType = data.get(
             'auto_moderation_rule_trigger_type', UNDEFINED
-            )
-        self.channel_id: Snowflake | UndefinedType = (
-            Snowflake(data['channel_id']) if 'channel_id' in data else UNDEFINED
         )
-        self.count: int | UndefinedType = (
-            int(data['count']) if 'count' in data else UNDEFINED
-        )
+        self.channel_id: Snowflake | UndefinedType = Snowflake(data['channel_id']) if 'channel_id' in data else UNDEFINED
+        self.count: int | UndefinedType = int(data['count']) if 'count' in data else UNDEFINED
         self.delete_member_days: int | UndefinedType = (
             int(data['delete_member_days']) if 'delete_member_days' in data else UNDEFINED
         )
-        self.id: Snowflake | UndefinedType = (
-            Snowflake(data['id']) if 'id' in data else UNDEFINED
-        )
-        self.members_removed: int | UndefinedType = (
-            int(data['members_removed']) if 'members_removed' in data else UNDEFINED
-        )
-        self.message_id: Snowflake | UndefinedType = (
-            Snowflake(data['message_id']) if 'message_id' in data else UNDEFINED
-        )
+        self.id: Snowflake | UndefinedType = Snowflake(data['id']) if 'id' in data else UNDEFINED
+        self.members_removed: int | UndefinedType = int(data['members_removed']) if 'members_removed' in data else UNDEFINED
+        self.message_id: Snowflake | UndefinedType = Snowflake(data['message_id']) if 'message_id' in data else UNDEFINED
         self.role_name: str | UndefinedType = data.get('role_name', UNDEFINED)
-        self.type: int | UndefinedType = (
-            int(data['type']) if 'type' in data else UNDEFINED
-        )
+        self.type: int | UndefinedType = int(data['type']) if 'type' in data else UNDEFINED
 
 
 class AuditLogChange:
@@ -101,9 +94,7 @@ class AuditLog:
         # TODO: use models for these
         self._application_commands: list[DiscordApplicationCommand] = data['application_commands']
         self.audit_log_entries: list[AuditLogEntry] = [AuditLogEntry(entry) for entry in data['audit_log_entries']]
-        self.auto_moderation_rules: list[AutoModRule] = [
-            AutoModRule(rule, state) for rule in data['auto_moderation_rules']
-        ]
+        self.auto_moderation_rules: list[AutoModRule] = [AutoModRule(rule, state) for rule in data['auto_moderation_rules']]
         self.guild_scheduled_events: list[ScheduledEvent] = [
             ScheduledEvent(event, state) for event in data['guild_scheduled_events']
         ]

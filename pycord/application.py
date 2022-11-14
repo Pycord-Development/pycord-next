@@ -27,7 +27,7 @@ from typing import TYPE_CHECKING
 from .flags import ApplicationFlags, Permissions
 from .snowflake import Snowflake
 from .team import Team
-from .types import Application as DiscordApplication, InstallParams as DiscordInstallParams, SCOPE
+from .types import SCOPE, Application as DiscordApplication, InstallParams as DiscordInstallParams
 from .user import User
 from .utils import UNDEFINED, UndefinedType
 
