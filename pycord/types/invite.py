@@ -48,5 +48,4 @@ class Invite(TypedDict):
     approximate_presence_count: NotRequired[int]
     approximate_member_count: NotRequired[int]
     expires_at: NotRequired[str]
-    stage_instance: NotRequired[InviteStageInstance]
     guild_scheduled_event: NotRequired[GuildScheduledEvent]
