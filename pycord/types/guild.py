@@ -85,6 +85,7 @@ class GuildPreview(TypedDict):
 class Guild(TypedDict):
     id: Snowflake
     name: str
+    unavailable: NotRequired[bool]
     icon: str | None
     icon_hash: NotRequired[str | None]
     splash: str | None
