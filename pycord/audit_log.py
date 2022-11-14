@@ -25,6 +25,7 @@ from __future__ import annotations
 
 from typing import Any, TYPE_CHECKING
 
+from .auto_moderation import AutoModRule
 from .channel import Thread
 from .enums import AuditLogEvent
 from .scheduled_event import ScheduledEvent
@@ -100,7 +101,9 @@ class AuditLog:
         # TODO: use models for these
         self._application_commands: list[DiscordApplicationCommand] = data['application_commands']
         self.audit_log_entries: list[AuditLogEntry] = [AuditLogEntry(entry) for entry in data['audit_log_entries']]
-        self._auto_moderation_rules: list[DiscordAutoModerationRule] = data['auto_moderation_rules']
+        self.auto_moderation_rules: list[AutoModRule] = [
+            AutoModRule(rule, state) for rule in data['auto_moderation_rules']
+        ]
         self.guild_scheduled_events: list[ScheduledEvent] = [
             ScheduledEvent(event, state) for event in data['guild_scheduled_events']
         ]
