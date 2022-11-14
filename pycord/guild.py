@@ -40,13 +40,13 @@ from .snowflake import Snowflake
 if TYPE_CHECKING:
     from .state import State
 
-from .types import GUILD_FEATURE, LOCALE, Guild as DiscordGuild
+from .types import GUILD_FEATURE, LOCALE, Guild as DiscordGuild, UnavailableGuild
 from .utils import UNDEFINED, UndefinedType
 from .welcome_screen import WelcomeScreen
 
 
 class Guild:
-    def __init__(self, data: DiscordGuild, state: State) -> None:
+    def __init__(self, data: DiscordGuild | UnavailableGuild, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self._state = state
         if not data.get('unavailable'):
