@@ -20,33 +20,30 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing_extensions import NotRequired, TypedDict
+from __future__ import annotations
 
-from .application import Application
-from .channel import Channel
-from .guild import Guild
-from .guild_scheduled_event import GuildScheduledEvent
+from datetime import datetime
+from typing import TYPE_CHECKING
+
+from .snowflake import Snowflake
+from .types import GuildTemplate as DiscordGuildTemplate
 from .user import User
 
-
-class InviteMetadata(TypedDict):
-    uses: int
-    max_uses: int
-    max_age: int
-    temporary: bool
-    created_at: str
+if TYPE_CHECKING:
+    from .state import State
 
 
-class Invite(TypedDict):
-    code: str
-    guild: NotRequired[Guild]
-    channel: Channel | None
-    inviter: NotRequired[User]
-    target_type: NotRequired[int]
-    target_user: NotRequired[User]
-    target_application: NotRequired[Application]
-    approximate_presence_count: NotRequired[int]
-    approximate_member_count: NotRequired[int]
-    expires_at: NotRequired[str]
-    stage_instance: NotRequired[InviteStageInstance]
-    guild_scheduled_event: NotRequired[GuildScheduledEvent]
+class GuildTemplate:
+    def __init__(self, data: DiscordGuildTemplate, state: State) -> None:
+        self.code: str = data['code']
+        self.name: str = data['name']
+        self.description: str | None = data['description']
+        self.usage_count: int = data['usage_count']
+        self.creator_id: Snowflake = Snowflake(data['creator_id'])
+        self.creator: User = User(data['creator'], state)
+        self.created_at: datetime = datetime.fromisoformat(data['created_at'])
+        self.updated_at: datetime = datetime.fromisoformat(data['updated_at'])
+        self.source_guild_id: Snowflake = Snowflake(data['source_guild_id'])
+        # TODO: maybe make this a Guild object?
+        self.serialized_source_guild: dict = data['serialized_source_guild']
+        self.is_dirty: bool | None = data['is_dirty']

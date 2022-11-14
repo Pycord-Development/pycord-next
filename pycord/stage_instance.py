@@ -20,33 +20,28 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing_extensions import NotRequired, TypedDict
+from __future__ import annotations
 
-from .application import Application
-from .channel import Channel
-from .guild import Guild
-from .guild_scheduled_event import GuildScheduledEvent
-from .user import User
+from typing import TYPE_CHECKING
 
+from .enums import StageInstancePrivacyLevel
+from .snowflake import Snowflake
+from .types import StageInstance as DiscordStageInstance
+from .utils import UNDEFINED, UndefinedType
 
-class InviteMetadata(TypedDict):
-    uses: int
-    max_uses: int
-    max_age: int
-    temporary: bool
-    created_at: str
+if TYPE_CHECKING:
+    from .state import State
 
 
-class Invite(TypedDict):
-    code: str
-    guild: NotRequired[Guild]
-    channel: Channel | None
-    inviter: NotRequired[User]
-    target_type: NotRequired[int]
-    target_user: NotRequired[User]
-    target_application: NotRequired[Application]
-    approximate_presence_count: NotRequired[int]
-    approximate_member_count: NotRequired[int]
-    expires_at: NotRequired[str]
-    stage_instance: NotRequired[InviteStageInstance]
-    guild_scheduled_event: NotRequired[GuildScheduledEvent]
+class StageInstance:
+    def __init__(self, data: DiscordStageInstance, state: State) -> None:
+        self.id: Snowflake = Snowflake(data['id'])
+        self.guild_id: Snowflake = Snowflake(data['guild_id'])
+        self.channel_id: Snowflake = Snowflake(data['channel_id'])
+        self.topic: str = data['topic']
+        self.privacy_level: StageInstancePrivacyLevel = StageInstancePrivacyLevel(data['privacy_level'])
+        self.guild_scheduled_event_id: UndefinedType | Snowflake = (
+            Snowflake(data['guild_scheduled_event_id']) if data.get(
+                'guild_scheduled_event_id'
+                ) is not None else UNDEFINED
+        )

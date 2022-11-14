@@ -22,8 +22,9 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any, TYPE_CHECKING
 
+from .channel import Channel
 from .enums import (
     DefaultMessageNotificationLevel,
     ExplicitContentFilterLevel,
@@ -36,13 +37,17 @@ from .flags import Permissions, SystemChannelFlags
 from .media import Emoji, Sticker
 from .role import Role
 from .snowflake import Snowflake
+from .types import (
+    Ban as DiscordBan,
+    Guild as DiscordGuild, GUILD_FEATURE, GuildPreview as DiscordGuildPreview, LOCALE, UnavailableGuild,
+    Widget as DiscordWidget, WidgetSettings as DiscordWidgetSettings,
+)
+from .user import User
+from .utils import UNDEFINED, UndefinedType
+from .welcome_screen import WelcomeScreen
 
 if TYPE_CHECKING:
     from .state import State
-
-from .types import GUILD_FEATURE, LOCALE, Guild as DiscordGuild, UnavailableGuild
-from .utils import UNDEFINED, UndefinedType
-from .welcome_screen import WelcomeScreen
 
 
 class Guild:
@@ -68,7 +73,9 @@ class Guild:
             self.widget_enabled: bool | UndefinedType = data.get('widget_enabled', UNDEFINED)
             self._widget_channel_id: str | None | UndefinedType = data.get('widget_channel_id')
             self.widget_channel_id: UndefinedType | Snowflake | None = (
-                Snowflake(self._widget_channel_id) if isinstance(self._widget_channel_id, str) else self._widget_channel_id
+                Snowflake(self._widget_channel_id) if isinstance(
+                    self._widget_channel_id, str
+                ) else self._widget_channel_id
             )
             self.verification_level: VerificationLevel = VerificationLevel(data['verification_level'])
             self.default_message_notifications: DefaultMessageNotificationLevel = DefaultMessageNotificationLevel(
@@ -130,3 +137,40 @@ class Guild:
             emo = Emoji(emoji, state=self._state)
             emo._inject_roles(self.roles)
             self.emojis.append(emo)
+
+
+class GuildPreview:
+    def __init__(self, data: DiscordGuildPreview, state: State) -> None:
+        self.id: Snowflake = Snowflake(data['id'])
+        self.name: str = data['name']
+        # TODO: Asset classes
+        self._icon: str | None = data['icon']
+        self._splash: str | None = data['splash']
+        self._discovery_splash: str | None = data['discovery_splash']
+        self.emojis: list[Emoji] = [Emoji(emoji, state) for emoji in data['emojis']]
+        self.features: list[GUILD_FEATURE] = data['features']
+        self.approximate_member_count: int = data['approximate_member_count']
+        self.approximate_presence_count: int = data['approximate_presence_count']
+        self.description: str | None = data['description']
+        self.stickers: list[Sticker] = [Sticker(sticker, state) for sticker in data['stickers']]
+
+
+class WidgetSettings:
+    def __init__(self, data: DiscordWidgetSettings) -> None:
+        self.enabled: bool = data['enabled']
+        self.channel_id: Snowflake | None = Snowflake(data['channel_id']) if data['channel_id'] is not None else None
+
+
+class Widget:
+    def __init__(self, data: DiscordWidget, state: State) -> None:
+        self.id: Snowflake = Snowflake(data['id'])
+        self.name: str = data['name']
+        self.instant_invite: str | None = data['instant_invite']
+        self.channels: list[Channel] = [Channel(channel, state) for channel in data['channels']]
+        self.members: list[User] = [User(user, state) for user in data['members']]
+
+
+class Ban:
+    def __init__(self, data: DiscordBan, state: State) -> None:
+        self.user: User = User(data['user'], state)
+        self.reason: str | None = data['reason']

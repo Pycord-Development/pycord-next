@@ -291,7 +291,7 @@ class GuildScheduledEventPrivacyLevel(Enum):
     GUILD_ONLY = 2
 
 
-class GuildScheduledEventEntityTypes(Enum):
+class GuildScheduledEventEntityType(Enum):
     STAGE_INSTANCE = 1
     VOICE = 2
     EXTERNAL = 3
