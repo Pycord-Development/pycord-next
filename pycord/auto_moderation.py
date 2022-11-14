@@ -25,14 +25,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from .enums import AutoModActionType, AutoModEventType, AutoModKeywordPresetType, AutoModTriggerType
 from .snowflake import Snowflake
 from .types import (
-    AutoModerationRule as DiscordAutoModerationRule,
-    AutoModerationTriggerMetadata as DiscordAutoModerationTriggerMetadata,
     AutoModerationAction as DiscordAutoModerationAction,
     AutoModerationActionMetadata as DiscordAutoModerationActionMetadata,
+    AutoModerationRule as DiscordAutoModerationRule,
+    AutoModerationTriggerMetadata as DiscordAutoModerationTriggerMetadata,
 )
-from .enums import AutoModEventType, AutoModTriggerType, AutoModKeywordPresetType, AutoModActionType
 from .utils import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
