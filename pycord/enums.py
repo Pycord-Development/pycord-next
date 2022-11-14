@@ -196,14 +196,14 @@ class AuditLogEvent(Enum):
     AUTO_MODERATION_USER_COMMUNICATION_DISABLED = 145
 
 
-class TriggerType(Enum):
+class AutoModTriggerType(Enum):
     KEYWORD = 1
     SPAM = 3
     KEYWORD_PRESET = 4
     MENTION_SPAM = 5
 
 
-class KeywordPresetType(Enum):
+class AutoModKeywordPresetType(Enum):
     PROFANITY = 1
     SEXUAL_CONTENT = 2
     SLURS = 3
@@ -213,7 +213,7 @@ class AutoModEventType(Enum):
     MESSAGE_SEND = 1
 
 
-class ActionType(Enum):
+class AutoModActionType(Enum):
     BLOCK_MESSAGE = 1
     SEND_ALERT_MESSAGE = 2
     TIMEOUT = 3
@@ -291,7 +291,7 @@ class GuildScheduledEventPrivacyLevel(Enum):
     GUILD_ONLY = 2
 
 
-class GuildScheduledEventEntityTypes(Enum):
+class GuildScheduledEventEntityType(Enum):
     STAGE_INSTANCE = 1
     VOICE = 2
     EXTERNAL = 3

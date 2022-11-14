@@ -356,7 +356,7 @@ class SystemChannelFlags(Flags):
 
 class ApplicationFlags(Flags):
     @flag
-    def gateway_presence(self) -> bool | None:
+    def gateway_presence(self) -> bool | int:
         return 1 << 12
 
     @flag
@@ -390,6 +390,10 @@ class ApplicationFlags(Flags):
     @flag
     def application_command_badge(self) -> bool | int:
         return 1 << 23
+
+    @flag
+    def active(self) -> bool | int:
+        return 1 << 24
 
 
 class ChannelFlags(Flags):
@@ -496,3 +500,7 @@ class UserFlags(Flags):
     @flag
     def bot_http_interactions(self) -> bool | int:
         return 1 << 19
+
+    @flag
+    def active_developer(self) -> bool | int:
+        return 1 << 22
