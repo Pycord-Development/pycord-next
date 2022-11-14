@@ -88,7 +88,7 @@ class AuditLogEntry:
         self._changes: list[AuditLogChange] = [AuditLogChange(change) for change in data.get('changes', [])]
         self.user_id: Snowflake = Snowflake(data['user_id']) if data['user_id'] is not None else UNDEFINED
         self.id: Snowflake = Snowflake(data['id'])
-        self.action_type: AUDIT_LOG_EVENT_TYPE = AuditLogEvent(data['action_type'])
+        self.action_type: AuditLogEvent = AuditLogEvent(data['action_type'])
         self.options: OptionalAuditEntryInfo | UndefinedType = (
             OptionalAuditEntryInfo(data['options']) if data.get('options') is not None else UNDEFINED
         )
