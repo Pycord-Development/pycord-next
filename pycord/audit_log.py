@@ -23,25 +23,17 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
-from .enums import AuditLogEvent
-from .snowflake import Snowflake
-from .scheduled_event import ScheduledEvent
 from .channel import Thread
+from .enums import AuditLogEvent
+from .scheduled_event import ScheduledEvent
+from .snowflake import Snowflake
 from .types import (
-    AuditLog as DiscordAuditLog,
-    ApplicationCommand as DiscordApplicationCommand,
-    AuditLogChange as DiscordAuditLogChange,
-    AuditLogEntry as DiscordAuditLogEntry,
-    AutoModerationRule as DiscordAutoModerationRule,
-    GuildScheduledEvent as DiscordGuildScheduledEvent,
-    Integration as DiscordIntegration,
-    Channel as DiscordChannel,
-    User as DiscordUser,
-    Webhook as DiscordWebhook,
-    OptionalAuditEntryInfo as DiscordOptionalAuditEntryInfo,
-    AUDIT_LOG_EVENT_TYPE,
+    ApplicationCommand as DiscordApplicationCommand, AUDIT_LOG_EVENT_TYPE, AuditLog as DiscordAuditLog,
+    AuditLogChange as DiscordAuditLogChange, AuditLogEntry as DiscordAuditLogEntry,
+    AutoModerationRule as DiscordAutoModerationRule, Integration as DiscordIntegration,
+    OptionalAuditEntryInfo as DiscordOptionalAuditEntryInfo, Webhook as DiscordWebhook,
 )
 from .user import User
 from .utils import UNDEFINED, UndefinedType
