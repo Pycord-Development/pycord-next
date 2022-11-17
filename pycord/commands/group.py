@@ -20,7 +20,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import TypeVar
+from typing import Coroutine, TypeVar
 
 from ..state import State
 from .command import Command
@@ -29,18 +29,34 @@ T = TypeVar('T')
 
 
 class Group:
-    def __init__(self, name: str, state: State) -> None:
+    def __init__(self, func: Coroutine | None, name: str, state: State) -> None:
         self.commands: list[Command] = []
         # nested groups
         self.groups: list["Group"] = []
 
         self.name = name
-        self._state = state
+        self._callback = func
+        self.__state = state
+        self._pending_commands: list[Command] = []
+
+    @property
+    def _state(self) -> State:
+        return self.__state
+
+    @_state.setter
+    def _state(self, state: State) -> None:
+        self.__state = state
+
+        for command in self._pending_commands:
+            self._state.commands.append(command)
 
     def command(self, name: str) -> T:
         def wrapper(func: T) -> T:
             command = Command(func, name=name, state=self._state, group=self)
-            self._state.commands.append(command)
+            if self._state:
+                self._state.commands.append(command)
+            else:
+                self._pending_commands.append(command)
             return func
 
         return wrapper

@@ -22,7 +22,9 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Coroutine, TypeVar
+from typing import TYPE_CHECKING, Any, Coroutine, Type, TypeVar
+
+from ...commands import Command, Group
 
 if TYPE_CHECKING:
     from ...bot import Bot
@@ -35,6 +37,7 @@ class Gear:
         self.name = name
         self._listener_functions: dict[str, list[Coroutine]] = {}
         self.bot: Bot
+        self._commands: list[Command | Group] = []
 
     def listen(self, name: str) -> T:
         def wrapper(func: T) -> T:
@@ -46,9 +49,31 @@ class Gear:
 
         return wrapper
 
+    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+        def wrapper(func: T) -> T:
+            command = cls(func, name, None, **kwargs)
+            self._commands.append(command)
+
+        return wrapper
+
+    def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
+        def wrapper(func: T) -> T:
+            r = cls(func, name, None, **kwargs)
+            self._commands.append(r)
+            return r
+
+        return wrapper
+
     def attach(self, bot: Bot) -> None:
         for name, funcs in self._listener_functions.items():
             for func in funcs:
                 bot._state.ping.add_listener(name, func)
+
+        for cmd in self._commands:
+            if isinstance(cmd, Command):
+                cmd._state = bot._state
+                cmd._state.commands.append(cmd)
+            elif isinstance(cmd, Group):
+                cmd._state = bot._state
 
         self.bot = bot

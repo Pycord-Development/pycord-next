@@ -21,10 +21,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Any, TypeVar
+from typing import Any, Type, TypeVar
 
 from aiohttp import BasicAuth
 
+from .commands import Command, Group
 from .errors import NoIdentifiesLeft, OverfilledShardsException
 from .flags import Intents
 from .gateway import PassThrough, ShardCluster, ShardManager
@@ -161,6 +162,19 @@ class Bot:
         def wrapper(func: T) -> T:
             self._state.ping.add_listener(name=name, func=func)
             return func
+
+        return wrapper
+
+    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+        def wrapper(func: T) -> T:
+            command = cls(func, name, state=self._state, **kwargs)
+            self._state.commands.append(command)
+
+        return wrapper
+
+    def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
+        def wrapper(func: T) -> T:
+            return cls(func, name, state=self._state, **kwargs)
 
         return wrapper
 
