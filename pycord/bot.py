@@ -169,6 +169,7 @@ class Bot:
         def wrapper(func: T) -> T:
             command = cls(func, name, state=self._state, **kwargs)
             self._state.commands.append(command)
+            return command
 
         return wrapper
 

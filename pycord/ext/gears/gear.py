@@ -53,6 +53,7 @@ class Gear:
         def wrapper(func: T) -> T:
             command = cls(func, name, None, **kwargs)
             self._commands.append(command)
+            return command
 
         return wrapper
 
