@@ -161,10 +161,10 @@ class Message:
         asyncio.create_task(self._retreive_channel())
 
     async def _retreive_channel(self) -> None:
-        exists = await self._state.cache.channels.exists(self.channel_id)
+        exists = await self._state.cache.channel.obj.exists(self.channel_id)
 
         if exists:
-            self.channel: TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = await self._state.cache.channels.select(
+            self.channel: TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = await self._state.cache.channel.obj.get(
                 self.channel_id
             )
         else:
