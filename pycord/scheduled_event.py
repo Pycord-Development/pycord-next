@@ -25,7 +25,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from .enums import GuildScheduledEventEntityTypes, GuildScheduledEventPrivacyLevel, GuildScheduledEventStatus
+from .enums import GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventStatus
+from .member import Member
 from .snowflake import Snowflake
 from .types import EntityMetadata as DiscordEntityMetadata, GuildScheduledEvent
 from .user import User
@@ -38,6 +39,13 @@ if TYPE_CHECKING:
 class EntityMetadata:
     def __init__(self, data: DiscordEntityMetadata) -> None:
         self.location: UndefinedType | str = data.get('location', UNDEFINED)
+
+
+class ScheduledEventUser:
+    def __init__(self, data: dict[str, Any], state: State) -> None:
+        self.guild_scheduled_event_id: Snowflake = Snowflake(data['guild_scheduled_event_id'])
+        self.user: User = User(data['user'], state)
+        self.member: Member | UndefinedType = Member(data['member'], state) if data.get('member') is not None else UNDEFINED
 
 
 class ScheduledEvent:
@@ -59,7 +67,7 @@ class ScheduledEvent:
         )
         self.privacy_level: GuildScheduledEventPrivacyLevel = GuildScheduledEventPrivacyLevel(data['privacy_level'])
         self.status: GuildScheduledEventStatus = GuildScheduledEventStatus(data['status'])
-        self.entity_type: GuildScheduledEventEntityTypes = GuildScheduledEventEntityTypes(data['entity_type'])
+        self.entity_type: GuildScheduledEventEntityType = GuildScheduledEventEntityType(data['entity_type'])
         self._entity_id: str | None = data.get('entity_id')
         self.entity_id: Snowflake | None = Snowflake(self._entity_id) if self._entity_id is not None else None
         self._entity_metadata: dict[str, Any] | UndefinedType = data.get('entity_metadata', UNDEFINED)

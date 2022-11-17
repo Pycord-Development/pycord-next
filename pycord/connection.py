@@ -21,45 +21,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-from typing import Literal
+from __future__ import annotations
 
-from typing_extensions import TypedDict
+from typing import TYPE_CHECKING
 
+from .enums import VisibilityType
 from .snowflake import Snowflake
+from .types import SERVICE, Connection as DiscordConnection, Integration as DiscordIntegration
+from .utils import UNDEFINED, UndefinedType
 
-AUTO_MODERATION_TRIGGER_TYPES = Literal[1, 3, 4, 5]
-AUTO_MODERATION_KEYWORD_PRESET_TYPES = Literal[1, 2, 3]
-AUTO_MODERATION_EVENT_TYPES = Literal[1]
-AUTO_MODERATION_ACTION_TYPES = Literal[1, 2, 3]
-
-
-class AutoModerationActionMetadata(TypedDict):
-    channel_id: Snowflake
-    duration_seconds: int
+if TYPE_CHECKING:
+    from .state import State
 
 
-class AutoModerationAction(TypedDict):
-    type: AUTO_MODERATION_ACTION_TYPES
-    metadata: AutoModerationActionMetadata
-
-
-class AutoModerationTriggerMetadata(TypedDict):
-    keyword_filter: list[str]
-    regex_patterns: list[str]
-    presets: list[AUTO_MODERATION_KEYWORD_PRESET_TYPES]
-    allow_list: list[str]
-    mention_total_limit: int
-
-
-class AutoModerationRule(TypedDict):
-    id: Snowflake
-    guild_id: Snowflake
-    name: str
-    creator_id: Snowflake
-    event_type: AUTO_MODERATION_EVENT_TYPES
-    trigger_type: AUTO_MODERATION_TRIGGER_TYPES
-    trigger_metadata: AutoModerationTriggerMetadata
-    actions: list[AutoModerationAction]
-    enabled: bool
-    exempt_roles: list[Snowflake]
-    exempt_channels: list[Snowflake]
+class Connection:
+    def __init__(self, data: DiscordConnection, state: State) -> None:
+        self.id: Snowflake = Snowflake(data['id'])
+        self.name: str = data['name']
+        self.type: SERVICE = data['type']
+        self.revoked: bool | UndefinedType = data.get('revoked', UNDEFINED)
+        self._integrations: list[DiscordIntegration] | UndefinedType = data.get('integrations', UNDEFINED)
+        self.verified: bool = data['verified']
+        self.friend_sync: bool = data['friend_sync']
+        self.show_activity: bool = data['show_activity']
+        self.two_way_linked: bool = data['two_way_link']
+        self.visibility: VisibilityType = VisibilityType(data['visibility'])

@@ -65,7 +65,7 @@ class Application(TypedDict):
     verify_key: str
     team: Team | None
     guild_id: NotRequired[Snowflake]
-    privacy_sku_id: NotRequired[Snowflake]
+    primary_sku_id: NotRequired[Snowflake]
     slug: NotRequired[str]
     cover_image: NotRequired[str]
     flags: NotRequired[int]

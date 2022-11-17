@@ -45,14 +45,14 @@ class Emoji:
     def __init__(self, data: DiscordEmoji, state: State) -> None:
         self.id: Snowflake | None = Snowflake(data['id']) if data['id'] is not None else None
         self.name: str | None = data.get('name')
-        self._roles: list[Snowflake] = [Snowflake(iden) for iden in data.get('roles', [])]
+        self._roles: list[Snowflake] = [Snowflake(role) for role in data.get('roles', [])]
         self.roles: list[Role] = []
         self._user: DiscordUser | UndefinedType = data.get('user', UNDEFINED)
         self.user: UndefinedType | User = User(self._user, state) if self._user is not UNDEFINED else UNDEFINED
         self.require_colons: UndefinedType | bool = data.get('require_colons', UNDEFINED)
         self.managed: UndefinedType | bool = data.get('managed', UNDEFINED)
         self.animated: UndefinedType | bool = data.get('animated', UNDEFINED)
-        self.available: UndefinedType | bool = data.get('availabke', UNDEFINED)
+        self.available: UndefinedType | bool = data.get('available', UNDEFINED)
 
     def _inject_roles(self, roles: list[Role]) -> None:
         for role in roles:
