@@ -44,6 +44,8 @@ class flag:
 
 
 class Flags:
+    _IGNORED: list[str] = []
+
     def __init__(self, **flags_named: bool) -> None:
         self._flag_overwrites: list[tuple[int, bool]] = []
 
@@ -71,7 +73,11 @@ class Flags:
 
     @staticmethod
     def _valid_flags(flagcls) -> dict[str, Literal[True]]:
-        return {v: True for v in dir(flagcls) if not v.startswith('_') and v != 'as_bit' and v != 'mro' and v != 'all'}
+        return {
+            v: True
+            for v in dir(flagcls)
+            if not v.startswith('_') and v != 'as_bit' and v != 'mro' and v not in flagcls._IGNORED
+        }
 
     @classmethod
     def _from_value(cls: Type[FF], value: int | str) -> FF:
@@ -88,6 +94,8 @@ class Flags:
 
 
 class Intents(Flags):
+    _IGNORED: list[str] = ['all', 'unpriv', 'priv']
+
     @flag
     def guilds(self) -> bool | int:
         return 1 << 0
@@ -167,7 +175,19 @@ class Intents(Flags):
     @classmethod
     def all(cls) -> Intents:
         valid_intents = cls._valid_flags(Intents)
-        return Intents(**valid_intents)
+        return cls(**valid_intents)
+
+    @classmethod
+    def priv(cls) -> Intents:
+        return cls(message_content=True, guild_members=True, guild_presences=True)
+
+    @classmethod
+    def unpriv(cls) -> Intents:
+        self = cls.all()
+        self.message_content = False
+        self.guild_members = False
+        self.guild_presences = False
+        return self
 
 
 class Permissions(Flags):
