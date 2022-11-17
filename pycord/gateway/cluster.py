@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +52,9 @@ class ShardCluster(Process):
         # this is guessing that `i` is a shard manager
         tasks = []
         for sharder in list(chunk(self._shards, self._managers)):
-            manager = ShardManager(self._state, sharder, self._amount, self._proxy, self._proxy_auth)
+            manager = ShardManager(
+                self._state, sharder, self._amount, self._proxy, self._proxy_auth
+            )
             tasks.append(manager.start())
             self.shard_managers.append(manager)
             asyncio.create_task(manager.start())

@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -38,26 +36,29 @@ from .utils import UNDEFINED, UndefinedType
 
 class Member:
     def __init__(self, data: GuildMember, state: State) -> None:
-        self.user: User | UndefinedType = User(data.get('user'), state) if data.get('user') is not None else UNDEFINED
-        self.nick: str | None | UndefinedType = data.get('nick', UNDEFINED)
-        self._avatar: str | None | UndefinedType = data.get('avatar', UNDEFINED)
-        self.roles: list[Snowflake] = [Snowflake(s) for s in data['roles']]
-        self.joined_at: datetime = datetime.fromisoformat(data['joined_at'])
-        self.premium_since: None | UndefinedType | datetime = (
-            datetime.fromisoformat(data.get('premium_since'))
-            if data.get('premium_since', UNDEFINED) not in [UNDEFINED, None]
-            else data.get('premium_since', UNDEFINED)
+        self.user: User | UndefinedType = (
+            User(data.get("user"), state) if data.get("user") is not None else UNDEFINED
         )
-        self.deaf: bool = data.get('deaf', False)
-        self.mute: bool = data['mute']
-        self.pending: UndefinedType | bool = data.get('pending', UNDEFINED)
+        self.nick: str | None | UndefinedType = data.get("nick", UNDEFINED)
+        self._avatar: str | None | UndefinedType = data.get("avatar", UNDEFINED)
+        self.roles: list[Snowflake] = [Snowflake(s) for s in data["roles"]]
+        self.joined_at: datetime = datetime.fromisoformat(data["joined_at"])
+        self.premium_since: None | UndefinedType | datetime = (
+            datetime.fromisoformat(data.get("premium_since"))
+            if data.get("premium_since", UNDEFINED) not in [UNDEFINED, None]
+            else data.get("premium_since", UNDEFINED)
+        )
+        self.deaf: bool = data.get("deaf", False)
+        self.mute: bool = data["mute"]
+        self.pending: UndefinedType | bool = data.get("pending", UNDEFINED)
         self.permissions: Permissions | UndefinedType = (
-            Permissions._from_value(data.get('permissions'))
-            if data.get('permissions', UNDEFINED) is not UNDEFINED
+            Permissions._from_value(data.get("permissions"))
+            if data.get("permissions", UNDEFINED) is not UNDEFINED
             else UNDEFINED
         )
         self.communication_disabled_until: None | UndefinedType | datetime = (
-            datetime.fromisoformat(data.get('communication_disabled_until'))
-            if data.get('communication_disabled_until', UNDEFINED) not in [UNDEFINED, None]
-            else data.get('communication_disabled_until', UNDEFINED)
+            datetime.fromisoformat(data.get("communication_disabled_until"))
+            if data.get("communication_disabled_until", UNDEFINED)
+            not in [UNDEFINED, None]
+            else data.get("communication_disabled_until", UNDEFINED)
         )

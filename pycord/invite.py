@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,37 +38,55 @@ if TYPE_CHECKING:
 
 class InviteMetadata:
     def __init__(self, data: DiscordInviteMetadata) -> None:
-        self.uses: int = data['uses']
-        self.max_uses: int = data['max_uses']
-        self.max_age: int = data['max_age']
-        self.temporary: bool = data['temporary']
-        self.created_at: datetime = datetime.fromisoformat(data['created_at'])
+        self.uses: int = data["uses"]
+        self.max_uses: int = data["max_uses"]
+        self.max_age: int = data["max_age"]
+        self.temporary: bool = data["temporary"]
+        self.created_at: datetime = datetime.fromisoformat(data["created_at"])
 
 
 class Invite:
     def __init__(self, data: DiscordInvite, state: State) -> None:
-        self.code: str = data['code']
-        self.guild: Guild | UndefinedType = Guild(data['guild'], state) if data.get('guild') is not None else UNDEFINED
-        self.channel: Channel | None = Channel(data['channel'], state) if data.get('channel') is not None else None
-        self.inviter: User | UndefinedType = User(data['inviter'], state) if data.get('inviter') is not None else UNDEFINED
+        self.code: str = data["code"]
+        self.guild: Guild | UndefinedType = (
+            Guild(data["guild"], state) if data.get("guild") is not None else UNDEFINED
+        )
+        self.channel: Channel | None = (
+            Channel(data["channel"], state) if data.get("channel") is not None else None
+        )
+        self.inviter: User | UndefinedType = (
+            User(data["inviter"], state)
+            if data.get("inviter") is not None
+            else UNDEFINED
+        )
         self.target_type: int | UndefinedType = (
-            InviteTargetType(data['target_type']) if data.get('target_type') is not None else UNDEFINED
+            InviteTargetType(data["target_type"])
+            if data.get("target_type") is not None
+            else UNDEFINED
         )
         self.target_user: User | UndefinedType = (
-            User(data['target_user'], state) if data.get('target_user') is not None else UNDEFINED
+            User(data["target_user"], state)
+            if data.get("target_user") is not None
+            else UNDEFINED
         )
         self.target_application: Application | UndefinedType = (
-            Application(data['target_application'], state) if data.get('target_application') is not None else UNDEFINED
+            Application(data["target_application"], state)
+            if data.get("target_application") is not None
+            else UNDEFINED
         )
-        self.approximate_presence_count: int | UndefinedType = data.get('approximate_presence_count', UNDEFINED)
-        self.approximate_member_count: int | UndefinedType = data.get('approximate_member_count', UNDEFINED)
+        self.approximate_presence_count: int | UndefinedType = data.get(
+            "approximate_presence_count", UNDEFINED
+        )
+        self.approximate_member_count: int | UndefinedType = data.get(
+            "approximate_member_count", UNDEFINED
+        )
         self.expires_at: datetime | None = (
-            datetime.fromisoformat(data['expires_at'])
-            if data.get('expires_at') is not None
-            else data.get('expires_at', UNDEFINED)
+            datetime.fromisoformat(data["expires_at"])
+            if data.get("expires_at") is not None
+            else data.get("expires_at", UNDEFINED)
         )
         self.guild_scheduled_event: ScheduledEvent | UndefinedType = (
-            ScheduledEvent(data['guild_scheduled_event'], state)
-            if data.get('guild_scheduled_event') is not None
+            ScheduledEvent(data["guild_scheduled_event"], state)
+            if data.get("guild_scheduled_event") is not None
             else UNDEFINED
         )

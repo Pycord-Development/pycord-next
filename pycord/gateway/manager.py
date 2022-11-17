@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -73,18 +71,22 @@ class ShardManager:
 
         if not self._state.shard_concurrency:
             info = await self._state.http.get_gateway_bot()
-            session_start_limit = info['session_start_limit']
+            session_start_limit = info["session_start_limit"]
 
-            if session_start_limit['remaining'] == 0:
-                raise NoIdentifiesLeft('session_start_limit has been exhausted')
+            if session_start_limit["remaining"] == 0:
+                raise NoIdentifiesLeft("session_start_limit has been exhausted")
 
-            self._state.shard_concurrency = PassThrough(session_start_limit['max_concurrency'], 7)
+            self._state.shard_concurrency = PassThrough(
+                session_start_limit["max_concurrency"], 7
+            )
             self._state._session_start_limit = session_start_limit
 
         tasks = []
 
         for shard_id in self._shards:
-            shard = Shard(id=shard_id, state=self._state, session=self.session, notifier=notifier)
+            shard = Shard(
+                id=shard_id, state=self._state, session=self.session, notifier=notifier
+            )
 
             tasks.append(shard.connect(token=self._state.token))
 

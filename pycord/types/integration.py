@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,34 +27,34 @@ from .snowflake import Snowflake
 from .user import User
 
 SCOPE = Literal[
-    'activities.read',
-    'activities.write',
-    'applications.builds.read',
-    'applications.builds.upload',
-    'applications.commands',
-    'applications.commands.update',
-    'applications.commands.permissions.update',
-    'applications.entitlements',
-    'applications.store.update',
-    'bot',
-    'connections',
-    'dm_channels.read',
-    'email',
-    'guilds',
-    'guilds.join',
-    'guilds.members.read',
-    'identify',
-    'messages.send',
-    'relationships.read',
-    'rpc',
-    'rpc.activities.write',
-    'rpc.notifications.read',
-    'rpc.voice.read',
-    'rpc.voice.write',
-    'voice',
-    'webhook.incoming',
+    "activities.read",
+    "activities.write",
+    "applications.builds.read",
+    "applications.builds.upload",
+    "applications.commands",
+    "applications.commands.update",
+    "applications.commands.permissions.update",
+    "applications.entitlements",
+    "applications.store.update",
+    "bot",
+    "connections",
+    "dm_channels.read",
+    "email",
+    "guilds",
+    "guilds.join",
+    "guilds.members.read",
+    "identify",
+    "messages.send",
+    "relationships.read",
+    "rpc",
+    "rpc.activities.write",
+    "rpc.notifications.read",
+    "rpc.voice.read",
+    "rpc.voice.write",
+    "voice",
+    "webhook.incoming",
 ]
-INTEGRATION_TYPE = Literal['twitch', 'youtube', 'discord']
+INTEGRATION_TYPE = Literal["twitch", "youtube", "discord"]
 INTEGRATION_EXPIRE_BEHAVIOR = Literal[0, 1]
 
 

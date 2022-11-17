@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -44,9 +42,14 @@ class Messages(BaseRouter):
             embeds = [embed._to_data() for embed in embeds]
 
         return await self.request(
-            'POST',
-            Route(f'/channels/{channel_id}/messages', channel_id=channel_id),
+            "POST",
+            Route(f"/channels/{channel_id}/messages", channel_id=channel_id),
             data=remove_undefined(
-                content=content, embeds=embeds, nonce=nonce, tts=tts, sticker_ids=sticker_ids, flags=flags
+                content=content,
+                embeds=embeds,
+                nonce=nonce,
+                tts=tts,
+                sticker_ids=sticker_ids,
+                flags=flags,
             ),
         )

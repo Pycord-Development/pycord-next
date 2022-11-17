@@ -3,7 +3,7 @@ Pycord
 ~~~~~~
 Python's Intuitive Discord API Wrapper
 
-:copyright: 2021-present VincentRPS
+:copyright: 2021-present Pycord Development
 :license: MIT
 """
 from ._about import *

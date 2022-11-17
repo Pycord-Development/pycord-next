@@ -19,8 +19,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+from collections.abc import Iterator, Sequence
 from itertools import accumulate
-from typing import Any, Iterator, Literal, Sequence, TypeVar
+from typing import Any, Literal, TypeVar
 
 from aiohttp import ClientResponse
 
@@ -106,7 +107,9 @@ def chunk(items: S, n: int) -> Iterator[S]:
         An iterator of :class:`Sequence`s of items. Each :class:`Sequence` represents a chunk.
     """
     per_section, extras = divmod(len(items), n)
-    sections = list(accumulate([0] + extras * [per_section + 1] + (n - extras) * [per_section]))
+    sections = list(
+        accumulate([0] + extras * [per_section + 1] + (n - extras) * [per_section])
+    )
     for start, end in zip(sections, sections[1:]):
         yield items[start:end]  # type: ignore
 

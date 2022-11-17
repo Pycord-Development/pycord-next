@@ -3,12 +3,12 @@ pycord.api
 ~~~~~~~~~~
 Implementation of the Discord API.
 
-:copyright: 2021-present VincentRPS
+:copyright: 2021-present Pycord Development
 :license: MIT
 """
 import logging
 import sys
-from typing import Any, Optional
+from typing import Any
 
 from aiohttp import BasicAuth, ClientSession, __version__ as aiohttp_version
 
@@ -22,7 +22,7 @@ from .json_decoder import JSONDecoder
 from .route import BaseRoute, Route
 from .routers import *
 
-__all__ = ['Route', 'BaseRoute', 'HTTPClient']
+__all__ = ["Route", "BaseRoute", "HTTPClient"]
 
 _log = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class HTTPClient(ApplicationCommands, Messages):
     def __init__(
         self,
         token: str,
-        base_url: str = 'https://discord.com/api/v10',
+        base_url: str = "https://discord.com/api/v10",
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
     ) -> None:
@@ -40,8 +40,8 @@ class HTTPClient(ApplicationCommands, Messages):
         self._proxy = proxy
         self._proxy_auth = proxy_auth
         self._headers = {
-            'Authorization': f'Bot {token}',
-            'User-Agent': 'DiscordBot (https://pycord.dev, {0}) Python/{1[0]}.{1[1]} aiohttp/{2}'.format(
+            "Authorization": f"Bot {token}",
+            "User-Agent": "DiscordBot (https://pycord.dev, {0}) Python/{1[0]}.{1[1]} aiohttp/{2}".format(
                 __version__, sys.version_info, aiohttp_version
             ),
         }
@@ -57,7 +57,12 @@ class HTTPClient(ApplicationCommands, Messages):
         self._session = None
 
     async def request(
-        self, method: str, route: BaseRoute, data: Optional[dict[str, Any]] = None, *, reason: Optional[str] = None
+        self,
+        method: str,
+        route: BaseRoute,
+        data: dict[str, Any] | None = None,
+        *,
+        reason: str | None = None,
     ) -> str | dict[str, Any] | bytes:
         endpoint = route.merge(self.base_url)
 
@@ -67,37 +72,42 @@ class HTTPClient(ApplicationCommands, Messages):
         headers = self._headers.copy()
 
         if reason:
-            headers['X-Audit-Log-Reason'] = reason
+            headers["X-Audit-Log-Reason"] = reason
 
         if data:
             # TODO: Support msgspec
             data: str = dumps(data=data)
-            headers.update({'Content-Type': 'application/json'})
+            headers.update({"Content-Type": "application/json"})
 
-        _log.debug(f'Requesting to {endpoint} with {data}, {headers}')
+        _log.debug(f"Requesting to {endpoint} with {data}, {headers}")
 
         for executer in self._executers:
             if executer.is_global or executer.route == route:
-                _log.debug(f'Pausing request to {endpoint}: Found rate limit executer')
+                _log.debug(f"Pausing request to {endpoint}: Found rate limit executer")
                 await executer.wait()
 
         for _ in range(5):
             r = await self._session.request(
-                method, endpoint, data=data, headers=headers, proxy=self._proxy, proxy_auth=self._proxy_auth
+                method,
+                endpoint,
+                data=data,
+                headers=headers,
+                proxy=self._proxy,
+                proxy_auth=self._proxy_auth,
             )
-            _log.debug(f'Received back {await r.text()}')
+            _log.debug(f"Received back {await r.text()}")
 
             data = await utils._text_or_json(cr=r, self=self)
 
             if r.status == 429:
-                _log.debug(f'Request to {endpoint} failed: Request returned rate limit')
+                _log.debug(f"Request to {endpoint} failed: Request returned rate limit")
                 executer = Executer(route=route)
 
                 self._executers.append(executer)
                 await executer.executed(
-                    reset_after=data['retry_after'],
-                    is_global=r.headers.get('X-RateLimit-Scope') == 'global',
-                    limit=int(r.headers.get('X-RateLimit-Limit', 10)),
+                    reset_after=data["retry_after"],
+                    is_global=r.headers.get("X-RateLimit-Scope") == "global",
+                    limit=int(r.headers.get("X-RateLimit-Limit", 10)),
                 )
                 self._executers.remove(executer)
                 continue
@@ -114,4 +124,4 @@ class HTTPClient(ApplicationCommands, Messages):
                 raise HTTPException(resp=r, data=data)
 
     async def get_gateway_bot(self) -> dict[str, Any]:
-        return await self.request('GET', Route('/gateway/bot'))
+        return await self.request("GET", Route("/gateway/bot"))

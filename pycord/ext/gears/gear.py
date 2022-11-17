@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +20,15 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Coroutine, Type, TypeVar
+from collections.abc import Coroutine
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from ...commands import Command, Group
 
 if TYPE_CHECKING:
     from ...bot import Bot
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class Gear:
@@ -49,7 +48,7 @@ class Gear:
 
         return wrapper
 
-    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+    def command(self, name: str, cls: type[Command], **kwargs: Any) -> T:
         def wrapper(func: T) -> T:
             command = cls(func, name, None, **kwargs)
             self._commands.append(command)
@@ -57,7 +56,7 @@ class Gear:
 
         return wrapper
 
-    def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
+    def group(self, name: str, cls: type[Group], **kwargs: Any) -> T:
         def wrapper(func: T) -> T:
             r = cls(func, name, None, **kwargs)
             self._commands.append(r)

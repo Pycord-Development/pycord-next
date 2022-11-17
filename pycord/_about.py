@@ -2,9 +2,9 @@ import logging
 import typing
 
 __title__: str = "pycord"
-__author__: str = "VincentRPS & Pycord"
+__author__: str = "Pycord Development"
 __license__: str = "MIT"
-__copyright__: str = "Copyright 2021-present VincentRPS"
+__copyright__: str = "Copyright 2021-present Pycord Development"
 __version__: str = "3.0.0"
 __git_sha1__: str = "HEAD"
 

@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Coroutine
+from collections.abc import Coroutine
 
 
 class Ping:
@@ -33,9 +31,9 @@ class Ping:
         await func(*args, **kwargs)
 
     async def dispatch(self, name_: str, *args, **kwargs) -> None:
-        name = f'on_{name_.lower()}'
+        name = f"on_{name_.lower()}"
 
-        commands = kwargs.pop('commands', [])
+        commands = kwargs.pop("commands", [])
 
         for ping in self._pings.get(name, []):
             wrap = self._wrap(ping, *args, **kwargs)

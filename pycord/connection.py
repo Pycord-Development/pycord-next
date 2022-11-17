@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +25,11 @@ from typing import TYPE_CHECKING
 
 from .enums import VisibilityType
 from .snowflake import Snowflake
-from .types import SERVICE, Connection as DiscordConnection, Integration as DiscordIntegration
+from .types import (
+    SERVICE,
+    Connection as DiscordConnection,
+    Integration as DiscordIntegration,
+)
 from .utils import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
@@ -36,13 +38,15 @@ if TYPE_CHECKING:
 
 class Connection:
     def __init__(self, data: DiscordConnection, state: State) -> None:
-        self.id: Snowflake = Snowflake(data['id'])
-        self.name: str = data['name']
-        self.type: SERVICE = data['type']
-        self.revoked: bool | UndefinedType = data.get('revoked', UNDEFINED)
-        self._integrations: list[DiscordIntegration] | UndefinedType = data.get('integrations', UNDEFINED)
-        self.verified: bool = data['verified']
-        self.friend_sync: bool = data['friend_sync']
-        self.show_activity: bool = data['show_activity']
-        self.two_way_linked: bool = data['two_way_link']
-        self.visibility: VisibilityType = VisibilityType(data['visibility'])
+        self.id: Snowflake = Snowflake(data["id"])
+        self.name: str = data["name"]
+        self.type: SERVICE = data["type"]
+        self.revoked: bool | UndefinedType = data.get("revoked", UNDEFINED)
+        self._integrations: list[DiscordIntegration] | UndefinedType = data.get(
+            "integrations", UNDEFINED
+        )
+        self.verified: bool = data["verified"]
+        self.friend_sync: bool = data["friend_sync"]
+        self.show_activity: bool = data["show_activity"]
+        self.two_way_linked: bool = data["two_way_link"]
+        self.visibility: VisibilityType = VisibilityType(data["visibility"])
