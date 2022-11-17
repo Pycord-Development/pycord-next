@@ -35,6 +35,8 @@ packages = [
     'pycord.gateway',
     'pycord.commands',
     'pycord.api.routers',
+    'pycord.ext',
+    'pycord.ext.gears',
 ]
 
 extra_requires = {
