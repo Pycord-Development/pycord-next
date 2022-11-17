@@ -48,7 +48,7 @@ class Member:
             if data.get('premium_since', UNDEFINED) not in [UNDEFINED, None]
             else data.get('premium_since', UNDEFINED)
         )
-        self.deaf: bool = data['deaf']
+        self.deaf: bool = data.get('deaf', False)
         self.mute: bool = data['mute']
         self.pending: UndefinedType | bool = data.get('pending', UNDEFINED)
         self.permissions: Permissions | UndefinedType = (

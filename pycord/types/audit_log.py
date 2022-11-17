@@ -34,7 +34,7 @@ from .snowflake import Snowflake
 from .user import User
 from .webhook import Webhook
 
-ACTION_TYPE = Literal[
+AUDIT_LOG_EVENT_TYPE = Literal[
     1,
     10,
     11,
@@ -92,7 +92,7 @@ ACTION_TYPE = Literal[
 ]
 
 
-class Change(TypedDict):
+class AuditLogChange(TypedDict):
     new_value: NotRequired[Any]
     old_value: NotRequired[Any]
     key: str
@@ -106,25 +106,25 @@ class OptionalAuditEntryInfo(TypedDict):
     count: str
     delete_member_days: str
     id: Snowflake
-    members_removes: str
+    members_removed: str
     message_id: Snowflake
     role_name: str
     type: str
 
 
-class Entry(TypedDict):
+class AuditLogEntry(TypedDict):
     target_id: str | None
-    changes: NotRequired[Change]
+    changes: NotRequired[AuditLogChange]
     user_id: Snowflake | None
     id: Snowflake
-    action_type: ACTION_TYPE
+    action_type: AUDIT_LOG_EVENT_TYPE
     options: NotRequired[OptionalAuditEntryInfo]
     reason: NotRequired[str]
 
 
 class AuditLog(TypedDict):
     application_commands: list[ApplicationCommand]
-    audit_log_entries: list[Entry]
+    audit_log_entries: list[AuditLogEntry]
     auto_moderation_rules: list[AutoModerationRule]
     guild_scheduled_events: list[GuildScheduledEvent]
     integrations: list[Integration]
