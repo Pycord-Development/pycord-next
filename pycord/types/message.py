@@ -88,7 +88,7 @@ class MessageReference(TypedDict):
 
 class MessageInteraction(TypedDict):
     id: Snowflake
-    type: int[1, 2, 3, 4, 5]
+    type: Literal[1, 2, 3, 4, 5]
     name: str
     user: User
     member: NotRequired[GuildMember]

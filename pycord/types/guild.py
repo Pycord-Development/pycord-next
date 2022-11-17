@@ -123,6 +123,11 @@ class Guild(TypedDict):
     premium_progress_bar_enabled: bool
 
 
+class WidgetSettings(TypedDict):
+    enabled: bool
+    channel_id: Snowflake | None
+
+
 class Widget(TypedDict):
     id: Snowflake
     name: str

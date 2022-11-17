@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 # cython: language_level=3
+# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,21 +23,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Literal, TypeVar
+from typing import Callable, Literal, Type, TypeVar
 
-F = TypeVar("F", bound="Flags")
-FF = TypeVar("FF")
+F = TypeVar('F', bound='Flags')
+FF = TypeVar('FF')
 
-__all__ = [
-    "Intents",
-    "Permissions",
-    "ChannelFlags",
-    "MessageFlags",
-    "SystemChannelFlags",
-    "ApplicationFlags",
-    "UserFlags",
-]
+__all__ = ['Intents', 'Permissions', 'ChannelFlags', 'MessageFlags', 'SystemChannelFlags', 'ApplicationFlags', 'UserFlags']
 
 
 class flag:
@@ -43,7 +36,7 @@ class flag:
         self.value: int = func(None)
         self.__doc__ = func.__doc__
 
-    def __get__(self, instance: F | None, _: type[F]) -> int | bool:
+    def __get__(self, instance: F | None, _: Type[F]) -> int | bool:
         return instance._has_flag(self.value) if instance else self.value
 
     def __set__(self, instance: F, value: bool) -> None:
@@ -51,31 +44,26 @@ class flag:
 
 
 class Flags:
+    _IGNORED: list[str] = []
+
     def __init__(self, **flags_named: bool) -> None:
         self._flag_overwrites: list[tuple[int, bool]] = []
 
         for name, value in flags_named.items():
-            if name.startswith("_"):
-                raise AttributeError("Flags cannot be private")
+            if name.startswith('_'):
+                raise AttributeError('Flags cannot be private')
 
             if not hasattr(self, name):
-                raise AttributeError(f"Flag {repr(name)} does not exist")
+                raise AttributeError(f'Flag {repr(name)} does not exist')
 
-            if name == "as_bit":
-                raise AttributeError("as_bit is not a flag")
+            if name == 'as_bit':
+                raise AttributeError('as_bit is not a flag')
 
             flag_value = getattr(self.__class__, name)
             self._overwrite_flag(flag_value, value)
 
     def _has_flag(self, flag: int) -> bool:
-        return next(
-            (
-                overwrite[1]
-                for overwrite in self._flag_overwrites
-                if overwrite[0] == flag
-            ),
-            False,
-        )
+        return next((overwrite[1] for overwrite in self._flag_overwrites if overwrite[0] == flag), False)
 
     def _overwrite_flag(self, flag: int, value: bool) -> None:
         if self._has_flag(flag=flag):
@@ -88,30 +76,26 @@ class Flags:
         return {
             v: True
             for v in dir(flagcls)
-            if not v.startswith("_") and v != "as_bit" and v != "mro" and v != "all"
+            if not v.startswith('_') and v != 'as_bit' and v != 'mro' and v not in flagcls._IGNORED
         }
 
     @classmethod
     def _from_value(cls: Type[FF], value: int | str) -> FF:
         value = int(value)
         valid_flag_names = cls._valid_flags(cls)
-        valid_flags: dict[str, int] = {
-            v: getattr(cls, v) for v, n in valid_flag_names.items()
-        }
-        parse: dict[str, Literal[True]] = {
-            name: True for name, v in valid_flags.items() if (value & v)
-        }
+        valid_flags: dict[str, int] = {v: getattr(cls, v) for v, n in valid_flag_names.items()}
+        parse: dict[str, Literal[True]] = {name: True for name, v in valid_flags.items() if (value & v)}
 
         return cls(**parse)
 
     @property
     def as_bit(self) -> int:
-        return sum(
-            overwrite[0] for overwrite in self._flag_overwrites if overwrite[1] is True
-        )
+        return sum(overwrite[0] for overwrite in self._flag_overwrites if overwrite[1] is True)
 
 
 class Intents(Flags):
+    _IGNORED: list[str] = ['all', 'unpriv', 'priv']
+
     @flag
     def guilds(self) -> bool | int:
         return 1 << 0
@@ -191,7 +175,19 @@ class Intents(Flags):
     @classmethod
     def all(cls) -> Intents:
         valid_intents = cls._valid_flags(Intents)
-        return int(**valid_intents)
+        return cls(**valid_intents)
+
+    @classmethod
+    def priv(cls) -> Intents:
+        return cls(message_content=True, guild_members=True, guild_presences=True)
+
+    @classmethod
+    def unpriv(cls) -> Intents:
+        self = cls.all()
+        self.message_content = False
+        self.guild_members = False
+        self.guild_presences = False
+        return self
 
 
 class Permissions(Flags):
@@ -380,7 +376,7 @@ class SystemChannelFlags(Flags):
 
 class ApplicationFlags(Flags):
     @flag
-    def gateway_presence(self) -> bool | None:
+    def gateway_presence(self) -> bool | int:
         return 1 << 12
 
     @flag
@@ -414,6 +410,10 @@ class ApplicationFlags(Flags):
     @flag
     def application_command_badge(self) -> bool | int:
         return 1 << 23
+
+    @flag
+    def active(self) -> bool | int:
+        return 1 << 24
 
 
 class ChannelFlags(Flags):
@@ -520,3 +520,7 @@ class UserFlags(Flags):
     @flag
     def bot_http_interactions(self) -> bool | int:
         return 1 << 19
+
+    @flag
+    def active_developer(self) -> bool | int:
+        return 1 << 22

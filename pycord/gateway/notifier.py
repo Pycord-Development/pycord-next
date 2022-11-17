@@ -26,13 +26,13 @@ from typing import TYPE_CHECKING
 from .shard import Shard
 
 if TYPE_CHECKING:
-    from .manager import BaseShardManager
+    from .manager import ShardManager
 
 _log = logging.getLogger(__name__)
 
 
 class Notifier:
-    def __init__(self, manager: BaseShardManager) -> None:
+    def __init__(self, manager: ShardManager) -> None:
         self.manager = manager
 
     async def shard_died(self, shard: Shard) -> None:

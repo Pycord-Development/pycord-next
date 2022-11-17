@@ -22,16 +22,17 @@ from typing_extensions import NotRequired, TypedDict
 
 from .application import Application
 from .channel import Channel
-from .guild import Guild, GuildMember
+from .guild import Guild
 from .guild_scheduled_event import GuildScheduledEvent
 from .user import User
 
 
-class InviteStageInstance(TypedDict):
-    members: list[GuildMember]
-    participant_count: int
-    speaker_count: int
-    topic: str
+class InviteMetadata(TypedDict):
+    uses: int
+    max_uses: int
+    max_age: int
+    temporary: bool
+    created_at: str
 
 
 class Invite(TypedDict):
@@ -45,5 +46,4 @@ class Invite(TypedDict):
     approximate_presence_count: NotRequired[int]
     approximate_member_count: NotRequired[int]
     expires_at: NotRequired[str]
-    stage_instance: NotRequired[InviteStageInstance]
     guild_scheduled_event: NotRequired[GuildScheduledEvent]

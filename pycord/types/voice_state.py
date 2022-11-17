@@ -38,7 +38,8 @@ class VoiceState(TypedDict):
     self_mute: bool
     self_stream: NotRequired[bool]
     self_video: bool
-    request_to_speak_timestamp: str
+    suppress: bool
+    request_to_speak_timestamp: str | None
 
 
 class VoiceRegion(TypedDict):

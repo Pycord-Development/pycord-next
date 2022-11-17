@@ -20,7 +20,6 @@
 # SOFTWARE
 from typing import Literal
 
-from tomlkit import string
 from typing_extensions import NotRequired, TypedDict
 
 from .application_commands import ATYPE, ApplicationCommandOptionChoice
@@ -103,7 +102,7 @@ class Interaction(TypedDict):
     token: str
     version: int
     message: NotRequired[Message]
-    app_permissions: string
+    app_permissions: str
     locale: LOCALE
     guild_locale: LOCALE
 
