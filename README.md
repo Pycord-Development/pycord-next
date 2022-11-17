@@ -31,6 +31,7 @@ If instead, you wanted to do a manual install (incase of something like developm
 ```sh
     # Git command
     git clone https://github.com/pycord-development/pycord-v3
+    cd pycord-v3
 
     pip install .
 ```
