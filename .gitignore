@@ -16,3 +16,4 @@ test.py
 *.inv
 ci.py
 .env
+testing/

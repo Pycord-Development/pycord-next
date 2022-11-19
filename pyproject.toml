@@ -61,16 +61,15 @@ speed = [
 
 [tool.setuptools]
 packages = [
-    "discord",
-    "discord.types",
-    "discord.sinks",
-    "discord.ui",
-    "discord.webhook",
-    "discord.commands",
-    "discord.ext.commands",
-    "discord.ext.tasks",
-    "discord.ext.pages",
-    "discord.ext.bridge",
+    'pycord',
+    'pycord.types',
+    'pycord.api',
+    'pycord.api.execution',
+    'pycord.gateway',
+    'pycord.commands',
+    'pycord.api.routers',
+    'pycord.ext',
+    'pycord.ext.gears',
 ]
 
 [tool.setuptools.dynamic]
@@ -116,10 +115,6 @@ disable = [
 [tool.pylint.format]
 indent-string = '    '
 max-line-length = 120
-
-[tool.pytest.ini_options]
-addopts = "--cov=discord --cov-branch --cov-report=xml --cov-report=term"
-asyncio_mode = "auto"
 
 [tool.coverage.report]
 exclude_lines = [
