@@ -55,7 +55,7 @@ class ApplicationCommandInteractionDataOption(TypedDict):
     name: str
     type: ATYPE
     value: NotRequired[str | int | float]
-    options: NotRequired[list["ApplicationCommandInteractionDataOption"]]
+    options: NotRequired[list['ApplicationCommandInteractionDataOption']]
     focused: NotRequired[bool]
 
 

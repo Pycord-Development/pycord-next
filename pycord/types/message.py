@@ -118,7 +118,7 @@ class Message(TypedDict):
     application_id: NotRequired[Snowflake]
     message_reference: NotRequired[MessageReference]
     flags: NotRequired[int]
-    referenced_message: NotRequired["Message"]
+    referenced_message: NotRequired['Message']
     interaction: NotRequired[MessageInteraction]
     thread: NotRequired[Channel]
     components: NotRequired[list[Component]]

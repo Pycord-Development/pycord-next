@@ -277,12 +277,12 @@ class MessageActivityType(Enum):
 
 
 class EmbedType(Enum):
-    rich = "rich"
-    image = "image"
-    video = "video"
-    gif = "gifv"
-    article = "article"
-    link = "link"
+    rich = 'rich'
+    image = 'image'
+    video = 'video'
+    gif = 'gifv'
+    article = 'article'
+    link = 'link'
 
 
 class GuildScheduledEventPrivacyLevel(Enum):

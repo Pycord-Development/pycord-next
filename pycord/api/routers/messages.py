@@ -42,8 +42,8 @@ class Messages(BaseRouter):
             embeds = [embed._to_data() for embed in embeds]
 
         return await self.request(
-            "POST",
-            Route(f"/channels/{channel_id}/messages", channel_id=channel_id),
+            'POST',
+            Route(f'/channels/{channel_id}/messages', channel_id=channel_id),
             data=remove_undefined(
                 content=content,
                 embeds=embeds,

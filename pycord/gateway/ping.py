@@ -31,9 +31,9 @@ class Ping:
         await func(*args, **kwargs)
 
     async def dispatch(self, name_: str, *args, **kwargs) -> None:
-        name = f"on_{name_.lower()}"
+        name = f'on_{name_.lower()}'
 
-        commands = kwargs.pop("commands", [])
+        commands = kwargs.pop('commands', [])
 
         for ping in self._pings.get(name, []):
             wrap = self._wrap(ping, *args, **kwargs)

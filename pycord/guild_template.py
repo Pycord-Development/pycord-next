@@ -33,15 +33,15 @@ if TYPE_CHECKING:
 
 class GuildTemplate:
     def __init__(self, data: DiscordGuildTemplate, state: State) -> None:
-        self.code: str = data["code"]
-        self.name: str = data["name"]
-        self.description: str | None = data["description"]
-        self.usage_count: int = data["usage_count"]
-        self.creator_id: Snowflake = Snowflake(data["creator_id"])
-        self.creator: User = User(data["creator"], state)
-        self.created_at: datetime = datetime.fromisoformat(data["created_at"])
-        self.updated_at: datetime = datetime.fromisoformat(data["updated_at"])
-        self.source_guild_id: Snowflake = Snowflake(data["source_guild_id"])
+        self.code: str = data['code']
+        self.name: str = data['name']
+        self.description: str | None = data['description']
+        self.usage_count: int = data['usage_count']
+        self.creator_id: Snowflake = Snowflake(data['creator_id'])
+        self.creator: User = User(data['creator'], state)
+        self.created_at: datetime = datetime.fromisoformat(data['created_at'])
+        self.updated_at: datetime = datetime.fromisoformat(data['updated_at'])
+        self.source_guild_id: Snowflake = Snowflake(data['source_guild_id'])
         # TODO: maybe make this a Guild object?
-        self.serialized_source_guild: dict = data["serialized_source_guild"]
-        self.is_dirty: bool | None = data["is_dirty"]
+        self.serialized_source_guild: dict = data['serialized_source_guild']
+        self.is_dirty: bool | None = data['is_dirty']

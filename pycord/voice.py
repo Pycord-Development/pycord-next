@@ -35,31 +35,31 @@ if TYPE_CHECKING:
 class VoiceState:
     def __init__(self, data: DiscordVoiceState, state: State) -> None:
         self.guild_id: Snowflake | UndefinedType = (
-            Snowflake(data["guild_id"])
-            if data.get("guild_id") is not None
+            Snowflake(data['guild_id'])
+            if data.get('guild_id') is not None
             else UNDEFINED
         )
         self.channel_id: Snowflake | None = (
-            Snowflake(data["channel_id"])
-            if data.get("channel_id") is not None
+            Snowflake(data['channel_id'])
+            if data.get('channel_id') is not None
             else None
         )
-        self.user_id: Snowflake = Snowflake(data["user_id"])
+        self.user_id: Snowflake = Snowflake(data['user_id'])
         self.member: Member | UndefinedType = (
-            Member(data["member"], state)
-            if data.get("member") is not None
+            Member(data['member'], state)
+            if data.get('member') is not None
             else UNDEFINED
         )
-        self.session_id: str = data["session_id"]
-        self.deaf: bool = data["deaf"]
-        self.mute: bool = data["mute"]
-        self.self_deaf: bool = data["self_deaf"]
-        self.self_mute: bool = data["self_mute"]
-        self.self_stream: bool | UndefinedType = data.get("self_stream", UNDEFINED)
-        self.self_video: bool = data["self_video"]
-        self.suppress: bool = data["suppress"]
+        self.session_id: str = data['session_id']
+        self.deaf: bool = data['deaf']
+        self.mute: bool = data['mute']
+        self.self_deaf: bool = data['self_deaf']
+        self.self_mute: bool = data['self_mute']
+        self.self_stream: bool | UndefinedType = data.get('self_stream', UNDEFINED)
+        self.self_video: bool = data['self_video']
+        self.suppress: bool = data['suppress']
         self.request_to_speak: datetime | UndefinedType = (
-            datetime.fromisoformat(data["request_to_speak_timestamp"])
-            if data.get("request_to_speak_timestamp") is not None
+            datetime.fromisoformat(data['request_to_speak_timestamp'])
+            if data.get('request_to_speak_timestamp') is not None
             else None
         )

@@ -39,55 +39,55 @@ if TYPE_CHECKING:
 
 class InstallParams:
     def __init__(self, data: DiscordInstallParams) -> None:
-        self.scopes: list[SCOPE] = data["scopes"]
-        self.permissions: Permissions = Permissions._from_value(data["permissions"])
+        self.scopes: list[SCOPE] = data['scopes']
+        self.permissions: Permissions = Permissions._from_value(data['permissions'])
 
 
 class Application:
     def __init__(self, data: DiscordApplication, state: State) -> None:
-        self.id: Snowflake = Snowflake(data["id"])
-        self.name: str = data["name"]
-        self.icon: str | None = data["icon"]
-        self.description: str = data["description"]
-        self.rpc_origins: list[str] | UndefinedType = data.get("rpc_origins", UNDEFINED)
-        self.bot_public: bool = data["bot_public"]
-        self.bot_require_code_grant: bool = data["bot_require_code_grant"]
+        self.id: Snowflake = Snowflake(data['id'])
+        self.name: str = data['name']
+        self.icon: str | None = data['icon']
+        self.description: str = data['description']
+        self.rpc_origins: list[str] | UndefinedType = data.get('rpc_origins', UNDEFINED)
+        self.bot_public: bool = data['bot_public']
+        self.bot_require_code_grant: bool = data['bot_require_code_grant']
         self.terms_of_service_url: str | UndefinedType = data.get(
-            "terms_of_service_url", UNDEFINED
+            'terms_of_service_url', UNDEFINED
         )
         self.privacy_policy_url: str | UndefinedType = data.get(
-            "privacy_policy_url", UNDEFINED
+            'privacy_policy_url', UNDEFINED
         )
         self.owner: User | UndefinedType = (
-            User(data.get("owner"), state)
-            if data.get("owner") is not None
+            User(data.get('owner'), state)
+            if data.get('owner') is not None
             else UNDEFINED
         )
-        self.verify_key: str = data.get("verify_key")
+        self.verify_key: str = data.get('verify_key')
         self.team: Team | None = (
-            Team(data.get("team")) if data.get("team") is not None else None
+            Team(data.get('team')) if data.get('team') is not None else None
         )
         self.guild_id: Snowflake | UndefinedType = (
-            Snowflake(data.get("guild_id"))
-            if data.get("guild_id") is not None
+            Snowflake(data.get('guild_id'))
+            if data.get('guild_id') is not None
             else UNDEFINED
         )
         self.primary_sku_id: Snowflake | UndefinedType = (
-            Snowflake(data.get("primary_sku_id"))
-            if data.get("primary_sku_id") is not None
+            Snowflake(data.get('primary_sku_id'))
+            if data.get('primary_sku_id') is not None
             else UNDEFINED
         )
-        self.slug: str | UndefinedType = data.get("slug", UNDEFINED)
-        self._cover_image: str | UndefinedType = data.get("cover_image", UNDEFINED)
+        self.slug: str | UndefinedType = data.get('slug', UNDEFINED)
+        self._cover_image: str | UndefinedType = data.get('cover_image', UNDEFINED)
         self.flags: ApplicationFlags | UndefinedType = (
-            ApplicationFlags._from_value(data.get("flags"))
-            if data.get("flags") is not None
+            ApplicationFlags._from_value(data.get('flags'))
+            if data.get('flags') is not None
             else UNDEFINED
         )
-        self.tags: list[str] | UndefinedType = data.get("tags", UNDEFINED)
+        self.tags: list[str] | UndefinedType = data.get('tags', UNDEFINED)
         self.install_params: InstallParams | UndefinedType = (
-            InstallParams(data.get("install_params"))
-            if data.get("install_params") is not None
+            InstallParams(data.get('install_params'))
+            if data.get('install_params') is not None
             else UNDEFINED
         )
-        self.custom_install_url: str | UndefinedType = data.get("custom_install_url")
+        self.custom_install_url: str | UndefinedType = data.get('custom_install_url')

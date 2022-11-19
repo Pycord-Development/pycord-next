@@ -38,15 +38,15 @@ if TYPE_CHECKING:
 
 class Connection:
     def __init__(self, data: DiscordConnection, state: State) -> None:
-        self.id: Snowflake = Snowflake(data["id"])
-        self.name: str = data["name"]
-        self.type: SERVICE = data["type"]
-        self.revoked: bool | UndefinedType = data.get("revoked", UNDEFINED)
+        self.id: Snowflake = Snowflake(data['id'])
+        self.name: str = data['name']
+        self.type: SERVICE = data['type']
+        self.revoked: bool | UndefinedType = data.get('revoked', UNDEFINED)
         self._integrations: list[DiscordIntegration] | UndefinedType = data.get(
-            "integrations", UNDEFINED
+            'integrations', UNDEFINED
         )
-        self.verified: bool = data["verified"]
-        self.friend_sync: bool = data["friend_sync"]
-        self.show_activity: bool = data["show_activity"]
-        self.two_way_linked: bool = data["two_way_link"]
-        self.visibility: VisibilityType = VisibilityType(data["visibility"])
+        self.verified: bool = data['verified']
+        self.friend_sync: bool = data['friend_sync']
+        self.show_activity: bool = data['show_activity']
+        self.two_way_linked: bool = data['two_way_link']
+        self.visibility: VisibilityType = VisibilityType(data['visibility'])

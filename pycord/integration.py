@@ -43,56 +43,56 @@ if TYPE_CHECKING:
 
 class Account:
     def __init__(self, data: DiscordAccount) -> None:
-        self.id: str = data["id"]
-        self.name: str = data["name"]
+        self.id: str = data['id']
+        self.name: str = data['name']
 
 
 class IntegrationApplication:
     def __init__(self, data: DiscordIntegrationApplication, state: State) -> None:
-        self.id: Snowflake = Snowflake(data["id"])
-        self.name: str = data["name"]
-        self.icon: str | None = data["icon"]
-        self.description: str | None = data["description"]
+        self.id: Snowflake = Snowflake(data['id'])
+        self.name: str = data['name']
+        self.icon: str | None = data['icon']
+        self.description: str | None = data['description']
         self.bot: User | UndefinedType = (
-            User(data["bot"], state) if data.get("bot") is not None else UNDEFINED
+            User(data['bot'], state) if data.get('bot') is not None else UNDEFINED
         )
 
 
 class Integration:
     def __init__(self, data: DiscordIntegration, state: State) -> None:
-        self.id: Snowflake = Snowflake(data["id"])
-        self.name: str = data["name"]
-        self.type: INTEGRATION_TYPE = data["type"]
-        self.enabled: bool | UndefinedType = data.get("enabled", UNDEFINED)
-        self.syncing: bool | UndefinedType = data.get("syncing", UNDEFINED)
+        self.id: Snowflake = Snowflake(data['id'])
+        self.name: str = data['name']
+        self.type: INTEGRATION_TYPE = data['type']
+        self.enabled: bool | UndefinedType = data.get('enabled', UNDEFINED)
+        self.syncing: bool | UndefinedType = data.get('syncing', UNDEFINED)
         self.role_id: Snowflake | UndefinedType = (
-            Snowflake(data["role_id"]) if data.get("role_id") else UNDEFINED
+            Snowflake(data['role_id']) if data.get('role_id') else UNDEFINED
         )
         self.enable_emoticons: bool | UndefinedType = data.get(
-            "enable_emoticons", UNDEFINED
+            'enable_emoticons', UNDEFINED
         )
         self.expire_behavior: INTEGRATION_EXPIRE_BEHAVIOR | UndefinedType = data.get(
-            "expire_behavior", UNDEFINED
+            'expire_behavior', UNDEFINED
         )
         self.expire_grace_period: int | UndefinedType = data.get(
-            "expire_grace_period", UNDEFINED
+            'expire_grace_period', UNDEFINED
         )
         self.user: User | UndefinedType = (
-            User(data["user"], state) if data.get("user") is not None else UNDEFINED
+            User(data['user'], state) if data.get('user') is not None else UNDEFINED
         )
-        self.account: Account = Account(data["account"])
+        self.account: Account = Account(data['account'])
         self.synced_at: UndefinedType | datetime = (
-            datetime.fromisoformat(data["synced_at"])
-            if data.get("synced_at") is not None
+            datetime.fromisoformat(data['synced_at'])
+            if data.get('synced_at') is not None
             else UNDEFINED
         )
         self.subscriber_count: int | UndefinedType = data.get(
-            "subscriber_count", UNDEFINED
+            'subscriber_count', UNDEFINED
         )
-        self.revoked: bool | UndefinedType = data.get("revoked", UNDEFINED)
+        self.revoked: bool | UndefinedType = data.get('revoked', UNDEFINED)
         self.application: Application | UndefinedType = (
-            IntegrationApplication(data["application"], state)
-            if data.get("application") is not None
+            IntegrationApplication(data['application'], state)
+            if data.get('application') is not None
             else UNDEFINED
         )
-        self.scopes: list[SCOPE] | UndefinedType = data.get("scopes", UNDEFINED)
+        self.scopes: list[SCOPE] | UndefinedType = data.get('scopes', UNDEFINED)

@@ -24,14 +24,14 @@ from typing import TypeVar
 from ..state import State
 from .command import Command
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class Group:
     def __init__(self, func: Coroutine | None, name: str, state: State) -> None:
         self.commands: list[Command] = []
         # nested groups
-        self.groups: list["Group"] = []
+        self.groups: list['Group'] = []
 
         self.name = name
         self._callback = func

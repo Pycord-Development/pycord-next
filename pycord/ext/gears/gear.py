@@ -28,7 +28,7 @@ from ...commands import Command, Group
 if TYPE_CHECKING:
     from ...bot import Bot
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class Gear:

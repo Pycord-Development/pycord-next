@@ -31,17 +31,17 @@ class ApplicationCommands(BaseRouter):
     ):
         if with_localizations:
             return await self.request(
-                "GET",
+                'GET',
                 Route(
-                    "/applications/{application_id}/commands?=with_localizations=true",
+                    '/applications/{application_id}/commands?=with_localizations=true',
                     application_id=application_id,
                 ),
             )
         else:
             return await self.request(
-                "GET",
+                'GET',
                 Route(
-                    "/applications/{application_id}/commands",
+                    '/applications/{application_id}/commands',
                     application_id=application_id,
                 ),
             )
@@ -72,9 +72,9 @@ class ApplicationCommands(BaseRouter):
         )
 
         return await self.request(
-            "POST",
+            'POST',
             Route(
-                "/applications/{application_id}/commands", application_id=application_id
+                '/applications/{application_id}/commands', application_id=application_id
             ),
             data=data,
         )

@@ -32,7 +32,7 @@ class PassThrough:
         self.loop: AbstractEventLoop = get_running_loop()
         self.pending_reset: bool = False
 
-    async def __aenter__(self) -> "PassThrough":
+    async def __aenter__(self) -> 'PassThrough':
         while self.current == 0:
             future = self.loop.create_future()
             self._reserved.append(future)

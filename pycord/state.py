@@ -46,10 +46,10 @@ if TYPE_CHECKING:
     from .flags import Intents
     from .gateway import PassThrough, ShardCluster, ShardManager
 
-__all__ = ["State"]
+__all__ = ['State']
 
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class StoresGuild(TypedDict):
@@ -137,7 +137,7 @@ class Single:
 
     async def bulk_remove(self, sf: Snowflake, sfs: list[Snowflake]) -> None:
         if not self.listable:
-            raise KeyError("This object cannot be listed")
+            raise KeyError('This object cannot be listed')
 
         for o in self._parent.stores[sf][self._name]:
             if (
@@ -171,39 +171,39 @@ class Single:
         guild = self._parent.stores.get(sf)
 
         if guild is None:
-            self._parent.stores[sf] = {"obj": ups["obj"]}
+            self._parent.stores[sf] = {'obj': ups['obj']}
 
         for n, v in ups.items():
             if not esf:
                 self._parent.stores[sf][n] = v
-            elif n == "apendv":
-                await self.add(v["sf"], v["obj"])
-            elif n == "remv":
+            elif n == 'apendv':
+                await self.add(v['sf'], v['obj'])
+            elif n == 'remv':
                 await self.bulk_remove(sf, v)
 
 
 class GuildStore:
     def __init__(self) -> None:
         self.stores: dict[str, StoresGuild] = {}
-        self.obj: Single = Single("obj", self, Guild, listable=False)
-        self.members: Single = Single("members", self, Member)
-        self.channels: Single = Single("channels", self, Channel)
-        self.roles: Single = Single("roles", self, Role)
-        self.emojis: Single = Single("emojis", self, Emoji)
-        self.auto_mod_rules: Single = Single("auto_mod_rules", self, AutoModRule)
-        self.scheduled_events: Single = Single("scheduled_event", self, ScheduledEvent)
-        self.stage_instances: Single = Single("stage_instances", self, StageInstance)
-        self.stickers: Single = Single("stickers", self, Sticker)
-        self.integrations: Single = Single("integrations", self, Integration)
+        self.obj: Single = Single('obj', self, Guild, listable=False)
+        self.members: Single = Single('members', self, Member)
+        self.channels: Single = Single('channels', self, Channel)
+        self.roles: Single = Single('roles', self, Role)
+        self.emojis: Single = Single('emojis', self, Emoji)
+        self.auto_mod_rules: Single = Single('auto_mod_rules', self, AutoModRule)
+        self.scheduled_events: Single = Single('scheduled_event', self, ScheduledEvent)
+        self.stage_instances: Single = Single('stage_instances', self, StageInstance)
+        self.stickers: Single = Single('stickers', self, Sticker)
+        self.integrations: Single = Single('integrations', self, Integration)
 
 
 class ChannelStore:
     def __init__(self, max_messages: int | None) -> None:
         self.stores: dict[str, StoresChannel] = {}
-        self.obj: Single = Single("obj", self, Channel, listable=False)
-        self.messages: Single = Single("messages", self, Message, maximum=max_messages)
-        self.voice_states: Single = Single("voice_states", self, VoiceState)
-        self.threads: Single = Single("threads", self, Thread)
+        self.obj: Single = Single('obj', self, Channel, listable=False)
+        self.messages: Single = Single('messages', self, Message, maximum=max_messages)
+        self.voice_states: Single = Single('voice_states', self, VoiceState)
+        self.threads: Single = Single('threads', self, Thread)
 
 
 class CacheManager:
@@ -219,14 +219,14 @@ class CacheManager:
 class State:
     def __init__(self, **options: Any) -> None:
         self.options = options
-        self.max_messages: int | None = options.get("max_messages", 1000)
-        self.large_threshold: int = options.get("large_threshold", 250)
+        self.max_messages: int | None = options.get('max_messages', 1000)
+        self.large_threshold: int = options.get('large_threshold', 250)
         self.shard_concurrency: PassThrough | None = None
-        self.intents: Intents = options["intents"]
+        self.intents: Intents = options['intents']
         self.user: User | None = None
         self.raw_user: dict[str, Any] | None = None
         self.cache: CacheManager = options.get(
-            "cache", CacheManager(max_messages=self.max_messages)
+            'cache', CacheManager(max_messages=self.max_messages)
         )
         self.ping = Ping()
         self.shard_managers: list[ShardManager] = []
@@ -248,7 +248,7 @@ class State:
         self.token = token
         self.http = HTTPClient(
             token=token,
-            base_url=self.options.get("http_base_url", "https://discord.com/api/v10"),
+            base_url=self.options.get('http_base_url', 'https://discord.com/api/v10'),
             proxy=proxy,
             proxy_auth=proxy_auth,
         )
@@ -261,33 +261,33 @@ class State:
         args = []
 
         # SECTION: guilds #
-        if type == "GUILD_CREATE":
+        if type == 'GUILD_CREATE':
             guild = Guild(data, state=self)
             channels: list[Channel] = [
-                identify_channel(c, self) for c in data["channels"]
+                identify_channel(c, self) for c in data['channels']
             ]
             threads: list[Thread] = [
-                identify_channel(c, self) for c in data["channels"]
+                identify_channel(c, self) for c in data['channels']
             ]
             stage_instances: list[StageInstance] = [
-                StageInstance(st, self) for st in data["stage_instances"]
+                StageInstance(st, self) for st in data['stage_instances']
             ]
             guild_scheduled_events: list[ScheduledEvent] = [
-                ScheduledEvent(se, self) for se in data["guild_scheduled_events"]
+                ScheduledEvent(se, self) for se in data['guild_scheduled_events']
             ]
             await self.cache.guild.obj.add(
                 sf=guild.id,
                 obj={
-                    "obj": guild,
-                    "members": [],
-                    "channels": channels,
-                    "roles": guild.roles,
-                    "emojis": guild.emojis,
-                    "stickers": guild.stickers,
-                    "auto_mod_rules": [],
-                    "scheduled_events": guild_scheduled_events,
-                    "stage_instances": stage_instances,
-                    "integrations": [],
+                    'obj': guild,
+                    'members': [],
+                    'channels': channels,
+                    'roles': guild.roles,
+                    'emojis': guild.emojis,
+                    'stickers': guild.stickers,
+                    'auto_mod_rules': [],
+                    'scheduled_events': guild_scheduled_events,
+                    'stage_instances': stage_instances,
+                    'integrations': [],
                 },
             )
 
@@ -297,15 +297,15 @@ class State:
 
             for channel in channels:
                 obj: StoresChannel = {
-                    "obj": channel,
-                    "messages": [],
-                    "voice_states": [],
-                    "threads": [],
+                    'obj': channel,
+                    'messages': [],
+                    'voice_states': [],
+                    'threads': [],
                 }
                 await self.cache.channel.obj.add(channel.id, obj)
 
             args.append(guild)
-        elif type == "GUILD_UPDATE":
+        elif type == 'GUILD_UPDATE':
             guild = Guild(data=data, state=self)
             args.append(guild)
 
@@ -313,33 +313,33 @@ class State:
                 args.append(await self.cache.guild.obj.get(guild.id))
 
             await self.cache.guild.obj.upsert(guild.id, ups=data)
-        elif type == "GUILD_DELETE":
-            await self.cache.guild.obj.remove(data["guild_id"])
-        elif type == "GUILD_BAN_ADD":
-            guild_id: Snowflake = Snowflake(data["guild_id"])
+        elif type == 'GUILD_DELETE':
+            await self.cache.guild.obj.remove(data['guild_id'])
+        elif type == 'GUILD_BAN_ADD':
+            guild_id: Snowflake = Snowflake(data['guild_id'])
             if self.cache.guilds.exists(guild_id):
                 args.append(await self.cache.guild.obj.get(guild_id))
             else:
                 args.append(guild_id)
 
-            args.append(User(data["user"], self))
-        elif type == "GUILD_BAN_REMOVE":
-            guild_id: Snowflake = Snowflake(data["guild_id"])
+            args.append(User(data['user'], self))
+        elif type == 'GUILD_BAN_REMOVE':
+            guild_id: Snowflake = Snowflake(data['guild_id'])
             if await self.cache.guild.obj.exists(guild_id):
                 args.append(await self.cache.guild.obj.get(guild_id))
             else:
                 args.append(guild_id)
 
-            args.append(User(data["user"], self))
-        elif type == "GUILD_MEMBER_ADD":
+            args.append(User(data['user'], self))
+        elif type == 'GUILD_MEMBER_ADD':
             member = Member(data, self)
-            guild_id = data["guild_id"]
+            guild_id = data['guild_id']
             await self.cache.guild.members.add(Snowflake(guild_id), member)
             args.append(member)
-        elif type == "GUILD_MEMBER_UPDATE":
+        elif type == 'GUILD_MEMBER_UPDATE':
             member = Member(data, self)
             args.append(member)
-            guild_id = Snowflake(data["guild_id"])
+            guild_id = Snowflake(data['guild_id'])
             args.append(guild_id)
 
             if await self.cache.guild.members.exists(member.user.id):
@@ -347,15 +347,15 @@ class State:
             else:
                 args.append(None)
             await self.cache.guild.members.add(guild_id, member)
-        elif type == "GUILD_MEMBER_REMOVE":
-            guild_id: Snowflake = Snowflake(data["guild_id"])
-            member_id: Snowflake = Snowflake(data["user"]["id"])
+        elif type == 'GUILD_MEMBER_REMOVE':
+            guild_id: Snowflake = Snowflake(data['guild_id'])
+            member_id: Snowflake = Snowflake(data['user']['id'])
             if await self.cache.guild.obj.exists(guild_id):
                 args.append(await self.cache.guild.obj.get(guild_id))
             else:
                 args.append(guild_id)
 
-            args.append(User(data["user"], self))
+            args.append(User(data['user'], self))
 
             if await self.cache.guild.members.exists(guild_id, member_id):
                 args.append(await self.cache.guild.members.get(guild_id, member_id))
@@ -363,17 +363,17 @@ class State:
                 args.append(None)
 
             await self.cache.guild.members.remove(guild_id, member_id)
-        elif type == "GUILD_MEMBERS_CHUNK":
-            guild_id: Snowflake = Snowflake(data["guild_id"])
+        elif type == 'GUILD_MEMBERS_CHUNK':
+            guild_id: Snowflake = Snowflake(data['guild_id'])
             ms: list[Member] = []
-            for member_data in data["members"]:
+            for member_data in data['members']:
                 member = Member(member_data, self)
-                await self.cache.guild.members.add(member_data["id"], member)
+                await self.cache.guild.members.add(member_data['id'], member)
                 ms.append(member)
             args.append(ms)
-        elif type == "GUILD_ROLE_CREATE":
-            guild_id: Snowflake = Snowflake(data["guild_id"])
-            role = Role(data["role"], self)
+        elif type == 'GUILD_ROLE_CREATE':
+            guild_id: Snowflake = Snowflake(data['guild_id'])
+            role = Role(data['role'], self)
 
             await self.cache.guild.roles.add(role.id, role)
 
@@ -383,9 +383,9 @@ class State:
                 args.append(await self.cache.guild.obj.get(guild_id))
             else:
                 args.append(guild_id)
-        elif type == "GUILD_ROLE_UPDATE":
-            guild_id: Snowflake = Snowflake(data["guild_id"])
-            role = Role(data["role"], self)
+        elif type == 'GUILD_ROLE_UPDATE':
+            guild_id: Snowflake = Snowflake(data['guild_id'])
+            role = Role(data['role'], self)
 
             args.append(role)
 
@@ -396,15 +396,15 @@ class State:
             else:
                 args.append(None)
 
-            await self.cache.roles.insert(f"{role.id}:{guild_id}", role)
+            await self.cache.roles.insert(f'{role.id}:{guild_id}', role)
 
             if await self.cache.guild.obj.exists(guild_id):
                 args.append(await self.cache.guild.obj.get(guild_id))
             else:
                 args.append(guild_id)
-        elif type == "GUILD_ROLE_DELETE":
-            guild_id: Snowflake = Snowflake(data["guild_id"])
-            role_id: Snowflake = Snowflake(data["role_id"])
+        elif type == 'GUILD_ROLE_DELETE':
+            guild_id: Snowflake = Snowflake(data['guild_id'])
+            role_id: Snowflake = Snowflake(data['role_id'])
 
             if await self.cache.guild.roles.exists(guild_id, role_id):
                 args.append(await self.cache.guild.roles.get(guild_id, role_id))
@@ -418,19 +418,19 @@ class State:
                 args.append(guild_id)
         # SECTION: channels #
         # TODO: threads
-        elif type == "CHANNEL_CREATE":
+        elif type == 'CHANNEL_CREATE':
             channel = Channel(data, self)
             args.append(channel)
             if channel.guild_id:
                 await self.cache.guild.channels.add(channel.guild_id, channel)
             obj: StoresChannel = {
-                "obj": channel,
-                "messages": [],
-                "voice_states": [],
-                "threads": [],
+                'obj': channel,
+                'messages': [],
+                'voice_states': [],
+                'threads': [],
             }
             await self.cache.channel.obj.add(channel, obj)
-        elif type == "CHANNEL_UPDATE":
+        elif type == 'CHANNEL_UPDATE':
             channel = Channel(data, self)
             args.append(channel)
             if await self.cache.channel.obj.exists(channel.id):
@@ -439,7 +439,7 @@ class State:
             else:
                 args.append(None)
             await self.cache.channel.obj.add(channel.id, channel)
-        elif type == "CHANNEL_DELETE":
+        elif type == 'CHANNEL_DELETE':
             channel = Channel(data, self)
 
             if await self.cache.channel.obj.exists(channel.id):
@@ -447,20 +447,20 @@ class State:
                 await self.cache.channel.obj.remove(channel.id)
             else:
                 args.append(None)
-        elif type == "CHANNEL_PINS_UPDATE":
-            channel_id: Snowflake = Snowflake(data.get("channel_id"))
+        elif type == 'CHANNEL_PINS_UPDATE':
+            channel_id: Snowflake = Snowflake(data.get('channel_id'))
 
             if await self.cache.channel.obj.exists(channel_id):
                 args.append(await self.cache.channel.obj.get(channel_id))
             else:
                 args.append(channel_id)
         # SECTION: messages #
-        elif type == "MESSAGE_CREATE":
+        elif type == 'MESSAGE_CREATE':
             message = Message(data, self)
 
             await self.cache.channel.messages.add(message.id, message)
             args.append(message)
-        elif type == "MESSAGE_UPDATE":
+        elif type == 'MESSAGE_UPDATE':
             message = Message(data, self)
             args.append(message)
 
@@ -474,17 +474,17 @@ class State:
                 args.append(None)
 
             await self.cache.messages.add(message.channel_id, message)
-        elif type == "MESSAGE_DELETE":
-            message_id: Snowflake = Snowflake(data["id"])
+        elif type == 'MESSAGE_DELETE':
+            message_id: Snowflake = Snowflake(data['id'])
 
             if await self.cache.messages.exists(message_id):
                 args.append(await self.cache.channel.messages.get(message_id))
                 await self.cache.channel.messages.remove(message_id)
             else:
                 args.append(message_id)
-        elif type == "MESSAGE_DELETE_BULK":
+        elif type == 'MESSAGE_DELETE_BULK':
             arg: list[Message | int] = []
-            for id in data["ids"]:
+            for id in data['ids']:
                 message_id: Snowflake = Snowflake(id)
 
                 if await self.cache.messages.exists(message_id):
@@ -495,17 +495,17 @@ class State:
             args.append(arg)
         # SECTION: automod #
         # SECTION: misc #
-        elif type == "READY":
+        elif type == 'READY':
             if not self._ready:
-                user = User(data["user"], self)
+                user = User(data['user'], self)
                 self.user = user
 
-                if hasattr(self, "_raw_user_fut"):
+                if hasattr(self, '_raw_user_fut'):
                     self._raw_user_fut.set_result(None)
 
                 self._ready = True
-        elif type == "USER_UPDATE":
-            user = User(data["user"], self)
+        elif type == 'USER_UPDATE':
+            user = User(data['user'], self)
             self.user = user
 
         await self.ping.dispatch(type, *args, commands=self.commands)

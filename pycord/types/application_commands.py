@@ -61,7 +61,7 @@ class ApplicationCommandOption(TypedDict):
     description_localizations: NotRequired[dict[LOCALE, str] | None]
     required: NotRequired[bool]
     choices: NotRequired[ApplicationCommandOptionChoice]
-    options: NotRequired[list["ApplicationCommandOption"]]
+    options: NotRequired[list['ApplicationCommandOption']]
     channel_types: NotRequired[list[CTYPE]]
     min_value: NotRequired[int]
     max_value: NotRequired[int]

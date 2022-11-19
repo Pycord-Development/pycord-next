@@ -21,75 +21,75 @@
 # SOFTWARE.
 import setuptools
 
-__version__ = "3.0.0"
+__version__ = '3.0.0'
 
 requirements = []
-with open("requirements.txt") as f:
+with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 packages = [
-    "pycord",
-    "pycord.types",
-    "pycord.api",
-    "pycord.api.execution",
-    "pycord.gateway",
-    "pycord.commands",
-    "pycord.api.routers",
-    "pycord.ext",
-    "pycord.ext.gears",
+    'pycord',
+    'pycord.types',
+    'pycord.api',
+    'pycord.api.execution',
+    'pycord.gateway',
+    'pycord.commands',
+    'pycord.api.routers',
+    'pycord.ext',
+    'pycord.ext.gears',
 ]
 
 extra_requires = {
-    "speed": [
-        "msgspec~=0.9.1",  # Faster alternative to the normal json module.
-        "aiodns~=3.0",  # included in aiohttp speed.
-        "Brotli~=1.0.9",  # included in aiohttp speed.
-        "ciso8601~=2.2.0",  # Faster datetime parsing.
+    'speed': [
+        'msgspec~=0.9.1',  # Faster alternative to the normal json module.
+        'aiodns~=3.0',  # included in aiohttp speed.
+        'Brotli~=1.0.9',  # included in aiohttp speed.
+        'ciso8601~=2.2.0',  # Faster datetime parsing.
     ],
-    "docs": [
-        "sphinx~=4.4.0",
-        "sphinxawesome-theme~=3.3.7",
-        "sphinx-hoverxref~=1.0.1",
+    'docs': [
+        'sphinx~=4.4.0',
+        'sphinxawesome-theme~=3.3.7',
+        'sphinx-hoverxref~=1.0.1',
     ],
 }
 
 setuptools.setup(
-    name="py-cord",
+    name='py-cord',
     version=__version__,
     packages=packages,
     package_data={
-        "pycord": ["banner.txt", "ibanner.txt", "bin/*.dll"],
+        'pycord': ['banner.txt', 'ibanner.txt', 'bin/*.dll'],
     },
     project_urls={
-        "Documentation": "https://docs.pycord.dev",
-        "Issue Tracker": "https://github.com/pycord/pycord-v3/issues",
-        "Pull Request Tracker": "https://github.com/pycord/pycord-v3/pulls",
+        'Documentation': 'https://docs.pycord.dev',
+        'Issue Tracker': 'https://github.com/pycord/pycord-v3/issues',
+        'Pull Request Tracker': 'https://github.com/pycord/pycord-v3/pulls',
     },
-    url="https://github.com/pycord/pycord-v3",
-    license="MIT",
-    author="Pycord Development",
-    long_description=open("README.md").read(),
-    long_description_content_type="text/markdown",
+    url='https://github.com/pycord/pycord-v3',
+    license='MIT',
+    author='Pycord Development',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     install_requires=requirements,
     extras_require=extra_requires,
     description="Python's Intuitive Discord API Wrapper",
-    python_requires=">=3.10",
+    python_requires='>=3.10',
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
-        "License :: OSI Approved :: MIT License",
-        "Intended Audience :: Developers",
-        "Natural Language :: English",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: Implementation :: CPython",
-        "Framework :: AsyncIO",
-        "Framework :: aiohttp",
-        "Topic :: Communications :: Chat",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet",
-        "Topic :: Software Development :: Libraries",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Utilities",
+        'Development Status :: 2 - Pre-Alpha',
+        'License :: OSI Approved :: MIT License',
+        'Intended Audience :: Developers',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Framework :: AsyncIO',
+        'Framework :: aiohttp',
+        'Topic :: Communications :: Chat',
+        'Topic :: Internet :: WWW/HTTP',
+        'Topic :: Internet',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Utilities',
     ],
 )

@@ -5,7 +5,7 @@ from typing import Any
 import pycord
 
 logging.basicConfig(level=logging.DEBUG)
-api = pycord.HTTPClient("token")
+api = pycord.HTTPClient('token')
 GUILD_ID = 0
 
 
@@ -14,9 +14,9 @@ async def spam_channels() -> None:
 
     tasks: list[asyncio.Task] = [
         api.request(
-            "POST",
-            pycord.Route("/guilds/{guild_id}/channels", guild_id=GUILD_ID),
-            {"name": "rate-limit-test"},
+            'POST',
+            pycord.Route('/guilds/{guild_id}/channels', guild_id=GUILD_ID),
+            {'name': 'rate-limit-test'},
         )
         for _ in range(50)
     ]
@@ -26,7 +26,7 @@ async def spam_channels() -> None:
 
     tasks.extend(
         api.request(
-            "DELETE", pycord.Route("/channels/{channel_id}", channel_id=channel["id"])
+            'DELETE', pycord.Route('/channels/{channel_id}', channel_id=channel['id'])
         )
         for channel in channels
     )

@@ -22,7 +22,7 @@ from typing import Optional
 
 from pycord.types import Snowflake
 
-__all__ = ["Route", "BaseRoute"]
+__all__ = ['Route', 'BaseRoute']
 
 
 class BaseRoute:
@@ -75,7 +75,7 @@ class Route(BaseRoute):
             **self.parameters,
         )
 
-    def __eq__(self, route: "Route") -> bool:
+    def __eq__(self, route: 'Route') -> bool:
         return (
             route.channel_id == self.channel_id
             or route.guild_id == self.guild_id

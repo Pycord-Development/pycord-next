@@ -38,16 +38,16 @@ from .utils import UNDEFINED, UndefinedType, remove_undefined
 # pure data classes, no user interaction.
 class Provider:
     def __init__(self, data: DiscordProvider) -> None:
-        self.name: UndefinedType | str = data.get("name", UNDEFINED)
-        self.url: UndefinedType | str = data.get("url", UNDEFINED)
+        self.name: UndefinedType | str = data.get('name', UNDEFINED)
+        self.url: UndefinedType | str = data.get('url', UNDEFINED)
 
 
 class Video:
     def __init__(self, data: DiscordVideo) -> None:
-        self.url: UndefinedType | str = data.get("url", UNDEFINED)
-        self.proxy_url: UndefinedType | str = data.get("proxy_url", UNDEFINED)
-        self.width: UndefinedType | int = data.get("width", UNDEFINED)
-        self.height: UndefinedType | int = data.get("height", UNDEFINED)
+        self.url: UndefinedType | str = data.get('url', UNDEFINED)
+        self.proxy_url: UndefinedType | str = data.get('proxy_url', UNDEFINED)
+        self.width: UndefinedType | int = data.get('width', UNDEFINED)
+        self.height: UndefinedType | int = data.get('height', UNDEFINED)
 
 
 class Thumbnail:
@@ -58,11 +58,11 @@ class Thumbnail:
         self.width: UndefinedType | int = UNDEFINED
 
     @classmethod
-    def _from_data(cls, data: DiscordThumbnail) -> "Thumbnail":
-        self = cls(data["url"])
-        self.proxy_url = data.get("proxy_url", UndefinedType)
-        self.height = data.get("height", UndefinedType)
-        self.width = data.get("width", UndefinedType)
+    def _from_data(cls, data: DiscordThumbnail) -> 'Thumbnail':
+        self = cls(data['url'])
+        self.proxy_url = data.get('proxy_url', UndefinedType)
+        self.height = data.get('height', UndefinedType)
+        self.width = data.get('width', UndefinedType)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -77,11 +77,11 @@ class Image:
         self.width: UndefinedType | int = UNDEFINED
 
     @classmethod
-    def _from_data(cls, data: DiscordImage) -> "Image":
-        self = cls(data["url"])
-        self.proxy_url = data.get("proxy_url", UndefinedType)
-        self.height = data.get("height", UndefinedType)
-        self.width = data.get("width", UndefinedType)
+    def _from_data(cls, data: DiscordImage) -> 'Image':
+        self = cls(data['url'])
+        self.proxy_url = data.get('proxy_url', UndefinedType)
+        self.height = data.get('height', UndefinedType)
+        self.width = data.get('width', UndefinedType)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -95,9 +95,9 @@ class Footer:
         self.proxy_icon_url: UndefinedType | str = UNDEFINED
 
     @classmethod
-    def _from_data(cls, data: DiscordFooter) -> "Footer":
-        self = cls(data["text"], data.get("icon_url", UNDEFINED))
-        self.proxy_icon_url = data.get("proxy_icon_url", UNDEFINED)
+    def _from_data(cls, data: DiscordFooter) -> 'Footer':
+        self = cls(data['text'], data.get('icon_url', UNDEFINED))
+        self.proxy_icon_url = data.get('proxy_icon_url', UNDEFINED)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -117,9 +117,9 @@ class Author:
         self.proxy_icon_url: UndefinedType | str = UNDEFINED
 
     @classmethod
-    def _from_data(cls, data: DiscordAuthor) -> "Author":
-        self = cls(data["name"], data.get("icon_url", UNDEFINED, data["url"]))
-        self.proxy_icon_url = data.get("proxy_icon_url", UNDEFINED)
+    def _from_data(cls, data: DiscordAuthor) -> 'Author':
+        self = cls(data['name'], data.get('icon_url', UNDEFINED, data['url']))
+        self.proxy_icon_url = data.get('proxy_icon_url', UNDEFINED)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -135,8 +135,8 @@ class Field:
         self.inline = inline
 
     @classmethod
-    def _from_data(cls, data: DiscordField) -> "Field":
-        return cls(data["name"], data["value"], data.get("field", UNDEFINED))
+    def _from_data(cls, data: DiscordField) -> 'Field':
+        return cls(data['name'], data['value'], data.get('field', UNDEFINED))
 
     def _to_data(self) -> dict[str, Any]:
         return remove_undefined(name=self.name, value=self.value, inline=self.inline)
@@ -179,39 +179,39 @@ class Embed:
 
     @classmethod
     def _from_data(cls, data: DiscordEmbed) -> None:
-        color = Color(data.get("color")) if data.get("color") is not None else None
+        color = Color(data.get('color')) if data.get('color') is not None else None
         thumbnail = (
-            Thumbnail._from_data(data.get("thumbnail"))
-            if data.get("thumbnail") is not None
+            Thumbnail._from_data(data.get('thumbnail'))
+            if data.get('thumbnail') is not None
             else None
         )
-        video = Video(data.get("video")) if data.get("video") is not None else None
+        video = Video(data.get('video')) if data.get('video') is not None else None
         provider = (
-            Provider(data.get("provider")) if data.get("provider") is not None else None
+            Provider(data.get('provider')) if data.get('provider') is not None else None
         )
         author = (
-            Author._from_data(data.get("author"))
-            if data.get("author") is not None
+            Author._from_data(data.get('author'))
+            if data.get('author') is not None
             else None
         )
         footer = (
-            Footer._from_data(data.get("footer"))
-            if data.get("footer") is not None
+            Footer._from_data(data.get('footer'))
+            if data.get('footer') is not None
             else None
         )
         image = (
-            Image._from_data(data.get("thumbnail"))
-            if data.get("thumbnail") is not None
+            Image._from_data(data.get('thumbnail'))
+            if data.get('thumbnail') is not None
             else None
         )
-        fields = [Field._from_data(field) for field in data.get("fields", [])]
+        fields = [Field._from_data(field) for field in data.get('fields', [])]
 
         self = cls(
-            title=data.get("title"),
-            description=data.get("description"),
-            url=data.get("url"),
-            timestamp=datetime.fromisoformat(data.get("timestamp"))
-            if data.get("timestamp") is not None
+            title=data.get('title'),
+            description=data.get('description'),
+            url=data.get('url'),
+            timestamp=datetime.fromisoformat(data.get('timestamp'))
+            if data.get('timestamp') is not None
             else None,
             color=color,
             footer=footer,

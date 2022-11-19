@@ -33,15 +33,15 @@ if TYPE_CHECKING:
 
 class StageInstance:
     def __init__(self, data: DiscordStageInstance, state: State) -> None:
-        self.id: Snowflake = Snowflake(data["id"])
-        self.guild_id: Snowflake = Snowflake(data["guild_id"])
-        self.channel_id: Snowflake = Snowflake(data["channel_id"])
-        self.topic: str = data["topic"]
+        self.id: Snowflake = Snowflake(data['id'])
+        self.guild_id: Snowflake = Snowflake(data['guild_id'])
+        self.channel_id: Snowflake = Snowflake(data['channel_id'])
+        self.topic: str = data['topic']
         self.privacy_level: StageInstancePrivacyLevel = StageInstancePrivacyLevel(
-            data["privacy_level"]
+            data['privacy_level']
         )
         self.guild_scheduled_event_id: UndefinedType | Snowflake = (
-            Snowflake(data["guild_scheduled_event_id"])
-            if data.get("guild_scheduled_event_id") is not None
+            Snowflake(data['guild_scheduled_event_id'])
+            if data.get('guild_scheduled_event_id') is not None
             else UNDEFINED
         )

@@ -100,7 +100,7 @@ class Channel(TypedDict):
     default_sort_order: NotRequired[int | None]
 
 
-AMTYPE = Literal["roles", "users", "everyone"]
+AMTYPE = Literal['roles', 'users', 'everyone']
 
 
 class AllowedMentions(TypedDict):

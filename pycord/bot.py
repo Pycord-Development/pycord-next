@@ -33,7 +33,7 @@ from .state import State
 from .user import User
 from .utils import chunk
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class Bot:
@@ -85,7 +85,7 @@ class Bot:
 
         if self._print_banner:
             print_banner(
-                self._state._session_start_limit["remaining"],
+                self._state._session_start_limit['remaining'],
                 self._shards if isinstance(self._shards, int) else len(self._shards),
                 bot_name=self.user.name,
             )
@@ -120,13 +120,13 @@ class Bot:
         )
 
         info = await self._state.http.get_gateway_bot()
-        session_start_limit = info["session_start_limit"]
+        session_start_limit = info['session_start_limit']
 
-        if session_start_limit["remaining"] == 0:
-            raise NoIdentifiesLeft("session_start_limit has been exhausted")
+        if session_start_limit['remaining'] == 0:
+            raise NoIdentifiesLeft('session_start_limit has been exhausted')
 
         self._state.shard_concurrency = PassThrough(
-            session_start_limit["max_concurrency"], 7
+            session_start_limit['max_concurrency'], 7
         )
         self._state._session_start_limit = session_start_limit
 
@@ -156,7 +156,7 @@ class Bot:
 
         if self._print_banner:
             print_banner(
-                concurrency=self._state._session_start_limit["remaining"],
+                concurrency=self._state._session_start_limit['remaining'],
                 shard_count=self._shards
                 if isinstance(self._shards, int)
                 else len(self._shards),
@@ -175,7 +175,7 @@ class Bot:
         shards = self._shards if isinstance(self._shards, int) else len(self._shards)
 
         if clusters > shards:
-            raise OverfilledShardsException("Cannot have more clusters than shards")
+            raise OverfilledShardsException('Cannot have more clusters than shards')
 
         if not amount:
             amount = shards
@@ -185,11 +185,11 @@ class Bot:
 
         if amount < shards:
             raise OverfilledShardsException(
-                "Cannot have a higher shard count than shard amount"
+                'Cannot have a higher shard count than shard amount'
             )
 
         if managers > shards:
-            raise OverfilledShardsException("Cannot have more managers than shards")
+            raise OverfilledShardsException('Cannot have more managers than shards')
 
         asyncio.run(
             self._run_cluster(
