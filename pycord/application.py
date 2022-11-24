@@ -29,7 +29,7 @@ from .snowflake import Snowflake
 from .team import Team
 from .types import SCOPE, Application as DiscordApplication, InstallParams as DiscordInstallParams
 from .user import User
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State

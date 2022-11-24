@@ -55,7 +55,7 @@ from .types import (
     Reaction as DiscordReaction,
 )
 from .user import User
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State

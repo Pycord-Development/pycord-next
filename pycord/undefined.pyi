@@ -20,26 +20,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import Any, Literal
+from enum import Enum, auto
 
-from .enums import StageInstancePrivacyLevel
-from .snowflake import Snowflake
-from .types import StageInstance as DiscordStageInstance
-from .undefined import UNDEFINED, UndefinedType
+class UndefinedType(Enum):
+    UNDEFINED = auto()
 
-if TYPE_CHECKING:
-    from .state import State
+    def __bool__(self) -> Literal[False]: ...
 
-
-class StageInstance:
-    def __init__(self, data: DiscordStageInstance, state: State) -> None:
-        self.id: Snowflake = Snowflake(data['id'])
-        self.guild_id: Snowflake = Snowflake(data['guild_id'])
-        self.channel_id: Snowflake = Snowflake(data['channel_id'])
-        self.topic: str = data['topic']
-        self.privacy_level: StageInstancePrivacyLevel = StageInstancePrivacyLevel(data['privacy_level'])
-        self.guild_scheduled_event_id: UndefinedType | Snowflake = (
-            Snowflake(data['guild_scheduled_event_id']) if data.get('guild_scheduled_event_id') is not None else UNDEFINED
-        )
+UNDEFINED: Literal[UndefinedType.UNDEFINED] = UndefinedType.UNDEFINED

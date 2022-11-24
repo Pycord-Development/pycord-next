@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from .state import State
 
 from .types import Role as DiscordRole, RoleTags as DiscordRoleTags
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 
 class RoleTags:
