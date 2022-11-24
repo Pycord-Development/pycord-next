@@ -20,10 +20,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import Coroutine, TypeVar
+from __future__ import annotations
 
-from ..state import State
+from typing import TYPE_CHECKING, Coroutine, TypeVar
+
 from .command import Command
+
+if TYPE_CHECKING:
+    from ..state import State
 
 T = TypeVar('T')
 

@@ -28,10 +28,11 @@ from typing import TYPE_CHECKING
 
 from aiohttp import BasicAuth
 
-if TYPE_CHECKING:
-    from ..state import State
 from ..utils import chunk
 from .manager import ShardManager
+
+if TYPE_CHECKING:
+    from ..state import State
 
 
 class ShardCluster(Process):
