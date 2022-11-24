@@ -32,12 +32,12 @@ from typing import TYPE_CHECKING, Any
 from aiohttp import ClientConnectionError, ClientConnectorError, ClientSession, ClientWebSocketResponse, WSMsgType
 
 from ..errors import DisallowedIntents, InvalidAuth, ShardingRequired
-from ..state import State
 from ..utils import dumps, loads
 from .passthrough import PassThrough
 
 if TYPE_CHECKING:
     from .notifier import Notifier
+    from ..state import State
 
 ZLIB_SUFFIX = b'\x00\x00\xff\xff'
 url = '{base}/?v={version}&encoding=json&compress=zlib-stream'
