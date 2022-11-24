@@ -76,11 +76,11 @@ class Flags:
         return {
             v: True
             for v in dir(flagcls)
-            if not v.startswith('_') and v != 'as_bit' and v != 'mro' and v not in flagcls._IGNORED
+            if not v.startswith('_') and v != 'as_bit' and v != 'from_value' and v != 'mro' and v not in flagcls._IGNORED
         }
 
     @classmethod
-    def _from_value(cls: Type[FF], value: int | str) -> FF:
+    def from_value(cls: Type[FF], value: int | str) -> FF:
         value = int(value)
         valid_flag_names = cls._valid_flags(cls)
         valid_flags: dict[str, int] = {v: getattr(cls, v) for v, n in valid_flag_names.items()}
