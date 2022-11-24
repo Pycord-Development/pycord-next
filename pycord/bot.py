@@ -80,7 +80,7 @@ class Bot:
                 bot_name=self.user.name,
             )
 
-        await self.run_until_exited()
+        await self._run_until_exited()
 
     async def _run_until_exited(self) -> None:
         try:
@@ -136,7 +136,7 @@ class Bot:
                 bot_name=self._state.user.name,
             )
 
-        await self.run_until_exited()
+        await self._run_until_exited()
 
     def cluster(self, token: str, clusters: int, amount: int | None = None, managers: int | None = None) -> None:
         shards = self._shards if isinstance(self._shards, int) else len(self._shards)
