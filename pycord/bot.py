@@ -82,7 +82,7 @@ class Bot:
 
         await self.run_until_exited()
 
-    async def run_until_exited(self) -> None:
+    async def _run_until_exited(self) -> None:
         try:
             await asyncio.Future()
         except (asyncio.CancelledError, KeyboardInterrupt):
