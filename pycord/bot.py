@@ -90,9 +90,9 @@ class Bot:
                 bot_name=self.user.name,
             )
 
-        await self.run_until_exited()
+        await self._run_until_exited()
 
-    async def run_until_exited(self) -> None:
+    async def _run_until_exited(self) -> None:
         try:
             await asyncio.Future()
         except (asyncio.CancelledError, KeyboardInterrupt):
@@ -163,7 +163,7 @@ class Bot:
                 bot_name=self._state.user.name,
             )
 
-        await self.run_until_exited()
+        await self._run_until_exited()
 
     def cluster(
         self,
