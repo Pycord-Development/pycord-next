@@ -42,7 +42,7 @@ from .types import (
     Webhook as DiscordWebhook,
 )
 from .user import User
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State
@@ -78,9 +78,9 @@ class AuditLogChange:
 
 class AuditLogEntry:
     def __init__(self, data: DiscordAuditLogEntry) -> None:
-        self.target_id: Snowflake = Snowflake(data['target_id']) if data['target_id'] is not None else UNDEFINED
+        self.target_id: Snowflake | UndefinedType = Snowflake(data['target_id']) if data['target_id'] is not None else UNDEFINED
         self._changes: list[AuditLogChange] = [AuditLogChange(change) for change in data.get('changes', [])]
-        self.user_id: Snowflake = Snowflake(data['user_id']) if data['user_id'] is not None else UNDEFINED
+        self.user_id: Snowflake | UndefinedType = Snowflake(data['user_id']) if data['user_id'] is not None else UNDEFINED
         self.id: Snowflake = Snowflake(data['id'])
         self.action_type: AuditLogEvent = AuditLogEvent(data['action_type'])
         self.options: OptionalAuditEntryInfo | UndefinedType = (

@@ -20,26 +20,33 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import Any, Literal, NoReturn
 
-from .enums import StageInstancePrivacyLevel
-from .snowflake import Snowflake
-from .types import StageInstance as DiscordStageInstance
-from .undefined import UNDEFINED, UndefinedType
+class UndefinedType:
+    __slots__ = ()
 
-if TYPE_CHECKING:
-    from .state import State
+    def __bool__(self) -> Literal[False]:
+        return False
+
+    def __getstate__(self) -> Any:
+        return False
+
+    def __repr__(self) -> str:
+        return 'UNDEFINED'
+
+    def __reduce__(self) -> str:
+        return 'UNDEFINED'
+
+    def __str__(self) -> str:
+        return 'UNDEFINED'
+
+UNDEFINED = UndefinedType()
 
 
-class StageInstance:
-    def __init__(self, data: DiscordStageInstance, state: State) -> None:
-        self.id: Snowflake = Snowflake(data['id'])
-        self.guild_id: Snowflake = Snowflake(data['guild_id'])
-        self.channel_id: Snowflake = Snowflake(data['channel_id'])
-        self.topic: str = data['topic']
-        self.privacy_level: StageInstancePrivacyLevel = StageInstancePrivacyLevel(data['privacy_level'])
-        self.guild_scheduled_event_id: UndefinedType | Snowflake = (
-            Snowflake(data['guild_scheduled_event_id']) if data.get('guild_scheduled_event_id') is not None else UNDEFINED
-        )
+def __new__(cls: type[UndefinedType]) -> UndefinedType:
+    return UNDEFINED
+
+
+UndefinedType.__new__ = __new__
+del __new__
