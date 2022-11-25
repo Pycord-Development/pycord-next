@@ -12,7 +12,7 @@
 </div>
 
 <p align='center'>
- Python's Intuitive API Wrapper
+ The API Wrapper for <b>Modern Discord Bots.</b>
 </p>
 
 Welcome! This is the repository for the pre-alpha and heavy conception next major version of Pycord.
