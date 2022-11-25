@@ -33,7 +33,7 @@ from .types import (
     AutoModerationRule as DiscordAutoModerationRule,
     AutoModerationTriggerMetadata as DiscordAutoModerationTriggerMetadata,
 )
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State

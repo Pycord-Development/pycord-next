@@ -22,7 +22,8 @@
 # SOFTWARE
 from ...snowflake import Snowflake
 from ...types import ATYPE, ApplicationCommandOption
-from ...utils import UNDEFINED, UndefinedType, remove_undefined
+from ...undefined import UNDEFINED, UndefinedType
+from ...utils import remove_undefined
 from ..route import Route
 from .base import BaseRouter
 

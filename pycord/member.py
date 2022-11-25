@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 from .types import GuildMember
 from .user import User
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 
 class Member:

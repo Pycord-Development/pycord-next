@@ -29,7 +29,7 @@ from .enums import PremiumType
 from .flags import UserFlags
 from .snowflake import Snowflake
 from .types import LOCALE, User as DiscordUser
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State
