@@ -84,6 +84,16 @@ class Gear:
         return wrapper
 
     def attach(self, bot: Bot) -> None:
+        """
+        Attaches this Gear to a bot.
+
+        Parameters
+        ----------
+
+        bot: :class:`pycord.Bot`
+            The bot to attach onto
+        """
+
         for name, funcs in self._listener_functions.items():
             for func in funcs:
                 bot._state.ping.add_listener(name, func)
