@@ -142,7 +142,7 @@ class Message:
             MessageReference(data.get('message_reference')) if data.get('message_reference') is not None else UNDEFINED
         )
         self.flags: MessageFlags | UndefinedType = (
-            MessageFlags._from_value(data.get('flags')) if data.get('flags') is not None else UNDEFINED
+            MessageFlags.from_value(data.get('flags')) if data.get('flags') is not None else UNDEFINED
         )
         self.referenced_message: Message | UndefinedType = (
             Message(data.get('referenced_message'), state) if data.get('referenced_message') is not None else UNDEFINED

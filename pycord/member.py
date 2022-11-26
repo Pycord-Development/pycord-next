@@ -52,7 +52,7 @@ class Member:
         self.mute: bool = data['mute']
         self.pending: UndefinedType | bool = data.get('pending', UNDEFINED)
         self.permissions: Permissions | UndefinedType = (
-            Permissions._from_value(data.get('permissions'))
+            Permissions.from_value(data.get('permissions'))
             if data.get('permissions', UNDEFINED) is not UNDEFINED
             else UNDEFINED
         )

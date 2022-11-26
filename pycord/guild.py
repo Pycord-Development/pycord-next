@@ -69,7 +69,7 @@ class Guild:
             self._discovery_splash: str | None = data['discovery_splash']
             self.owner: bool | UndefinedType = data.get('owner', UNDEFINED)
             self.owner_id: Snowflake = Snowflake(data.get('owner_id'))
-            self.permissions: Permissions = Permissions._from_value(data.get('permissions', 0))
+            self.permissions: Permissions = Permissions.from_value(data.get('permissions', 0))
             self._afk_channel_id: str | None = data.get('afk_channel_id')
             self.afk_channel_id: Snowflake | None = (
                 Snowflake(self._afk_channel_id) if self._afk_channel_id is not None else None
@@ -101,7 +101,7 @@ class Guild:
             self.system_channel_id: Snowflake | None = (
                 Snowflake(self._system_channel_id) if self._system_channel_id is not None else None
             )
-            self.system_channel_flags: SystemChannelFlags = SystemChannelFlags._from_value(data['system_channel_flags'])
+            self.system_channel_flags: SystemChannelFlags = SystemChannelFlags.from_value(data['system_channel_flags'])
             self._rules_channel_id: str | None = data.get('rules_channel_id')
             self.rules_channel_id: Snowflake | None = (
                 Snowflake(self._rules_channel_id) if self._rules_channel_id is not None else None
