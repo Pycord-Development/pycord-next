@@ -181,7 +181,7 @@ class DMChannel(MessageableChannel):
     ...
 
 
-class VoiceChannel(MessageableChannel):
+class VoiceChannel(MessageableChannel, AudioChannel):
     ...
 
 
@@ -205,7 +205,7 @@ class Thread(MessageableChannel):
     ...
 
 
-class StageChannel(Channel):
+class StageChannel(AudioChannel, Channel):
     ...
 
 
