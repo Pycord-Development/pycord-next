@@ -57,7 +57,13 @@ class HTTPClient(ApplicationCommands, Messages):
         self._session = None
 
     async def request(
-        self, method: str, route: BaseRoute, data: Optional[dict[str, Any]] = None, *, reason: Optional[str] = None, query_params: Optional[dict[str, str]] = None,
+        self,
+        method: str,
+        route: BaseRoute,
+        data: Optional[dict[str, Any]] = None,
+        *,
+        reason: Optional[str] = None,
+        query_params: Optional[dict[str, str]] = None,
     ) -> str | dict[str, Any] | bytes:
         endpoint = route.merge(self.base_url)
 
@@ -83,7 +89,13 @@ class HTTPClient(ApplicationCommands, Messages):
 
         for _ in range(5):
             r = await self._session.request(
-                method, endpoint, data=data, headers=headers, proxy=self._proxy, proxy_auth=self._proxy_auth, params=query_params
+                method,
+                endpoint,
+                data=data,
+                headers=headers,
+                proxy=self._proxy,
+                proxy_auth=self._proxy_auth,
+                params=query_params,
             )
             _log.debug(f'Received back {await r.text()}')
 

@@ -21,8 +21,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-from typing import Literal
 from enum import Enum, auto
+from typing import Literal
 
 class UndefinedType(Enum):
     UNDEFINED = auto()

@@ -23,6 +23,7 @@
 
 from typing import Any, Literal
 
+
 class UndefinedType:
     __slots__ = ()
 
@@ -40,6 +41,7 @@ class UndefinedType:
 
     def __str__(self) -> str:
         return 'UNDEFINED'
+
 
 UNDEFINED = UndefinedType()
 

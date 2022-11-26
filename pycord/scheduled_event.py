@@ -29,8 +29,8 @@ from .enums import GuildScheduledEventEntityType, GuildScheduledEventPrivacyLeve
 from .member import Member
 from .snowflake import Snowflake
 from .types import EntityMetadata as DiscordEntityMetadata, GuildScheduledEvent
-from .user import User
 from .undefined import UNDEFINED, UndefinedType
+from .user import User
 
 if TYPE_CHECKING:
     from .state import State

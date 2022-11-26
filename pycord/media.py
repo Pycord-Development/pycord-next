@@ -34,8 +34,8 @@ from .types import (
     StickerItem as DiscordStickerItem,
     User as DiscordUser,
 )
-from .user import User
 from .undefined import UNDEFINED, UndefinedType
+from .user import User
 
 if TYPE_CHECKING:
     from .state import State

@@ -27,6 +27,12 @@ from ..route import BaseRoute
 
 class BaseRouter:
     async def request(
-        self, method: str, route: BaseRoute, data: dict[str, Any] | None = None, *, reason: str | None = None, query_params: dict[str, str] | None = None,
+        self,
+        method: str,
+        route: BaseRoute,
+        data: dict[str, Any] | None = None,
+        *,
+        reason: str | None = None,
+        query_params: dict[str, str] | None = None,
     ) -> None:
         ...

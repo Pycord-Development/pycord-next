@@ -54,8 +54,8 @@ from .types import (
     MessageReference as DiscordMessageReference,
     Reaction as DiscordReaction,
 )
-from .user import User
 from .undefined import UNDEFINED, UndefinedType
+from .user import User
 
 if TYPE_CHECKING:
     from .state import State
@@ -148,7 +148,7 @@ class Message:
             Message(data.get('referenced_message'), state) if data.get('referenced_message') is not None else UNDEFINED
         )
         self.interaction: MessageInteraction | UndefinedType = (
-            MessageInteraction(data.get('interaction')) if data.get('interaction') is not None else UNDEFINED
+            MessageInteraction(data.get('interaction'), state) if data.get('interaction') is not None else UNDEFINED
         )
         self.thread: Thread | UndefinedType = (
             Thread(data.get('thread'), state=state) if data.get('thread') is not None else UNDEFINED

@@ -37,8 +37,8 @@ from .types import (
     ThreadMember as DiscordThreadMember,
     ThreadMetadata as DiscordThreadMetadata,
 )
-from .user import User
 from .undefined import UNDEFINED, UndefinedType
+from .user import User
 
 if TYPE_CHECKING:
     from .state import State

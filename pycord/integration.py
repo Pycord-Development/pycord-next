@@ -36,8 +36,8 @@ from .types import (
     Integration as DiscordIntegration,
     IntegrationApplication as DiscordIntegrationApplication,
 )
-from .user import User
 from .undefined import UNDEFINED, UndefinedType
+from .user import User
 
 if TYPE_CHECKING:
     from .state import State

@@ -33,11 +33,29 @@ T = TypeVar('T')
 
 
 class Gear:
+    """
+    The Gear. Pycord's reinterpretation of Cogs in a way which is easier for both developers and library developers.
+    It removes the old subclass-based system with a new instance-based system.
+
+    Parameters
+    ----------
+    name: :class:`str`
+        The name of this Gear.
+
+    Attributes
+    ----------
+    bot: Union[:class:`pycord.Bot`, None]
+        The bot this Gear is attached to.
+    """
+
     def __init__(self, name: str) -> None:
         self.name = name
         self._listener_functions: dict[str, list[Coroutine]] = {}
         self.bot: Bot
         self._commands: list[Command | Group] = []
+
+    async def on_attach(self, *args, **kwargs) -> None:
+        ...
 
     def listen(self, name: str) -> T:
         def wrapper(func: T) -> T:
@@ -78,3 +96,5 @@ class Gear:
                 cmd._state = bot._state
 
         self.bot = bot
+
+        self.bot._state.gears.append(self)

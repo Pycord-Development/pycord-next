@@ -32,8 +32,8 @@ if TYPE_CHECKING:
     from .state import State
 
 from .types import GuildMember
-from .user import User
 from .undefined import UNDEFINED, UndefinedType
+from .user import User
 
 
 class Member:

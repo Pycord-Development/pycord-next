@@ -28,8 +28,8 @@ from .enums import WebhookType
 from .guild import Guild
 from .snowflake import Snowflake
 from .types import Webhook as DiscordWebhook
-from .user import User
 from .undefined import UNDEFINED, UndefinedType
+from .user import User
 
 if TYPE_CHECKING:
     from .state import State

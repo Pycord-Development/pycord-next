@@ -26,7 +26,7 @@ from typing import Any, Iterator, Literal, Sequence, TypeVar
 
 from aiohttp import ClientResponse
 
-from .undefined import UndefinedType, UNDEFINED
+from .undefined import UNDEFINED, UndefinedType
 
 try:
     import msgspec

@@ -28,8 +28,10 @@ from typing import TYPE_CHECKING
 from aiohttp import BasicAuth, ClientSession
 
 from ..errors import NoIdentifiesLeft
+
 if TYPE_CHECKING:
     from ..state import State
+
 from .notifier import Notifier
 from .passthrough import PassThrough
 from .shard import Shard

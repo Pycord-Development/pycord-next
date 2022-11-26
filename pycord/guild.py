@@ -47,8 +47,8 @@ from .types import (
     Widget as DiscordWidget,
     WidgetSettings as DiscordWidgetSettings,
 )
-from .user import User
 from .undefined import UNDEFINED, UndefinedType
+from .user import User
 from .welcome_screen import WelcomeScreen
 
 if TYPE_CHECKING:
