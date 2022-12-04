@@ -22,7 +22,7 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Coroutine, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, TypeVar
 
 from .command import Command
 
@@ -30,10 +30,12 @@ if TYPE_CHECKING:
     from ..state import State
 
 T = TypeVar('T')
+CoroFunc = Callable[..., Coroutine[Any, Any, Any]]
+CoroFuncT = TypeVar('CoroFuncT', bound=Callable[..., Any])
 
 
 class Group:
-    def __init__(self, func: Coroutine | None, name: str, state: State) -> None:
+    def __init__(self, func: CoroFunc | None, name: str, state: State) -> None:
         self.commands: list[Command] = []
         # nested groups
         self.groups: list["Group"] = []
@@ -54,8 +56,8 @@ class Group:
         for command in self._pending_commands:
             self._state.commands.append(command)
 
-    def command(self, name: str) -> T:
-        def wrapper(func: T) -> T:
+    def command(self, name: str) -> Callable[[CoroFuncT], CoroFuncT]:
+        def wrapper(func: CoroFuncT) -> CoroFuncT:
             command = Command(func, name=name, state=self._state, group=self)
             if self._state:
                 self._state.commands.append(command)

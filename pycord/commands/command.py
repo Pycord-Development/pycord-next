@@ -22,17 +22,19 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Coroutine
+from typing import TYPE_CHECKING, Any, Callable, Coroutine
 
 if TYPE_CHECKING:
     from ..state import State
     from .group import Group
 
+CoroFunc = Callable[..., Coroutine[Any, Any, Any]]
+
 
 class Command:
     _processor_event: str
 
-    def __init__(self, callback: Coroutine, name: str, state: State, group: Group | None = None) -> None:
+    def __init__(self, callback: CoroFunc, name: str, state: State, group: Group | None = None) -> None:
         self._callback = callback
 
         self.name = name
