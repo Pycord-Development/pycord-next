@@ -60,17 +60,21 @@ class HTTPException(PycordException):
         self._response = resp
         self.status = resp.status
 
+        exec_msg = f'{resp.status} {resp.reason}'
         if data:
             self.code = data.get('code', 0)
             self.error_message = data.get('message', '')
 
+            message: Any | str
             if errors := data.get('errors'):
                 self.errors = parse_errors(errors)
                 message = self.error_message + '\n'.join(f'In {key}: {err}' for key, err in self.errors.items())
             else:
                 message = self.error_message
 
-        super().__init__(f'{resp.status} {resp.reason} (code: {self.code}): {message}')
+            exec_msg += f' (code: {self.code}): {message}'
+
+        super().__init__(exec_msg)
 
 
 class Forbidden(HTTPException):
