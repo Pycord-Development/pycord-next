@@ -63,6 +63,9 @@ class ShardManager:
         self.shards.clear()
 
     async def delete_shard(self, shard: Shard) -> None:
+        if not shard._receive_task or not shard._hb_task or not shard._ws:
+            return
+
         shard._receive_task.cancel()
         shard._hb_task.cancel()
 

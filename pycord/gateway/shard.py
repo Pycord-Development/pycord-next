@@ -27,13 +27,14 @@ import logging
 import zlib
 from platform import system
 from random import random
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast, Mapping
 
 from aiohttp import ClientConnectionError, ClientConnectorError, ClientSession, ClientWebSocketResponse, WSMsgType
 
 from ..errors import DisallowedIntents, InvalidAuth, ShardingRequired
 from ..utils import dumps, loads
 from .passthrough import PassThrough
+from ..types import gateway
 
 if TYPE_CHECKING:
     from ..state import State
@@ -68,7 +69,7 @@ class Shard:
         self._notifier = notifier
         self._state = state
         self._session = session
-        self._inflator: zlib._Decompress | None = None
+        self._inflator: zlib._Decompress = zlib.decompressobj()
         self._sequence: int | None = None
         self._ws: ClientWebSocketResponse | None = None
         self._resume_gateway_url: str | None = None
@@ -76,14 +77,16 @@ class Shard:
         self._hb_received: asyncio.Future[None] | None = None
         self._receive_task: asyncio.Task[None] | None = None
         self._connection_alive: asyncio.Future[None] = asyncio.Future()
-        self._hello_received: asyncio.Future[None] | None = None
+        self._hello_received: asyncio.Future[bool] | None = None
         self._hb_task: asyncio.Task[None] | None = None
 
     async def connect(self, token: str | None = None, resume: bool = False) -> None:
         self._hello_received = asyncio.Future()
-        self._inflator = zlib.decompressobj()
 
         try:
+            if not self._state.shard_concurrency:
+                return
+
             async with self._state.shard_concurrency:
                 _log.debug(f'shard:{self.id}: connecting to gateway')
                 self._ws = await self._session.ws_connect(
@@ -111,6 +114,9 @@ class Shard:
                     await self.send_identify()
 
     async def send(self, data: dict[str, Any]) -> None:
+        if not self._ws:
+            return
+
         async with self._rate_limiter:
             d = dumps(data)
             _log.debug(f'shard:{self.id}: sending {d}')
@@ -135,6 +141,9 @@ class Shard:
         await self.send({'op': 6, 'd': {'token': self._token, 'session_id': self.session_id, 'seq': self._sequence}})
 
     async def send_heartbeat(self, jitter: bool = False) -> None:
+        if self._heartbeat_interval is None or not self._receive_task or not self._ws:
+            return
+
         if jitter:
             await asyncio.sleep(self._heartbeat_interval * random())
         else:
@@ -160,6 +169,9 @@ class Shard:
             await self.connect(self._token, bool(self._resume_gateway_url))
 
     async def _recv(self) -> None:
+        if not self._ws or not self._hello_received or not self._hb_received:
+            return
+
         async for msg in self._ws:
             if msg.type == WSMsgType.CLOSED:
                 break
@@ -176,24 +188,30 @@ class Shard:
 
                 _log.debug(f'shard:{self.id}: received message {text_coded}')
 
-                data: dict[str, Any] = loads(text_coded)
+                data = cast(gateway.GatewayEvent, loads(text_coded))
 
                 self._sequence = data.get('s')
 
-                op: int = data.get('op')
-                d: dict[str, Any] | int | None = data.get('d')
-                t: str | None = data.get('t')
+                op: int = data['op']
+                d: Mapping[str, Any] | int | None = data.get('d')
+                event = cast(gateway.GatewayEvent, data)
 
-                if op == 0:
-                    if t == 'READY':
-                        self.session_id = d['session_id']
-                        self._resume_gateway_url = d['resume_gateway_url']
-                        self._state.raw_user = d['user']
-                    asyncio.create_task(self._state._process_event(t, d))
+                if data['op'] == 0:
+                    data = cast(gateway.GatewayDispatchEvent, data)
+                    event_data = event['d']
+
+                    if event.get('t') == 'READY':
+                        event_data = cast(gateway.GatewayReadyData, event_data)
+
+                        self.session_id = event_data['session_id']
+                        self._resume_gateway_url = event_data['resume_gateway_url']
+                        self._state.raw_user = event_data['user']
+                    asyncio.create_task(self._state._process_event(data['t'], d))
                 elif op == 1:
                     await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
                 elif op == 10:
-                    self._heartbeat_interval = d['heartbeat_interval'] / 1000
+                    hello_data = cast(gateway.GatewayHelloData, d)
+                    self._heartbeat_interval = hello_data['heartbeat_interval'] / 1000
 
                     asyncio.create_task(self.send_heartbeat(jitter=True))
                     self._hello_received.set_result(True)
@@ -210,7 +228,9 @@ class Shard:
                     await self._ws.close()
                     await self.connect(token=self._token)
                     return
-        await self.handle_close(self._ws.close_code)
+        
+        if (close_code := self._ws.close_code):
+            await self.handle_close(close_code)
 
     async def handle_close(self, code: int) -> None:
         _log.debug(f'shard:{self.id}: closed with code {code}')

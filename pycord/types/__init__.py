@@ -13,6 +13,7 @@ from .auto_moderation import *
 from .channel import *
 from .component import *
 from .embed import *
+from .gateway import *
 from .guild import *
 from .guild_scheduled_event import *
 from .guild_template import *

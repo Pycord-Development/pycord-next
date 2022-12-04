@@ -21,15 +21,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Coroutine
+from typing import Any, Callable, Coroutine
 
+CoroFunc = Callable[..., Coroutine[Any, Any, Any]]
 
 class Ping:
     def __init__(self) -> None:
-        self._pings: dict[str, list[Coroutine]] = {}
-        self._temporary_pings: dict[str, list[Coroutine]] = {}
+        self._pings: dict[str, list[CoroFunc]] = {}
+        self._temporary_pings: dict[str, list[CoroFunc]] = {}
 
-    async def _wrap(self, func: Coroutine, *args, **kwargs) -> None:
+    async def _wrap(self, func: CoroFunc, *args, **kwargs) -> None:
         await func(*args, **kwargs)
 
     async def dispatch(self, name_: str, *args, **kwargs) -> None:
@@ -50,7 +51,7 @@ class Ping:
             if command._processor_event == name:
                 asyncio.create_task(command.invoke(*args, **kwargs))
 
-    def add_listener(self, name: str, func: Coroutine) -> None:
+    def add_listener(self, name: str, func: CoroFunc) -> None:
         if self._pings.get(name):
             self._pings[name].append(func)
         else:

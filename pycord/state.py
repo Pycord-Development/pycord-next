@@ -23,7 +23,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, TypedDict, TypeVar
+from typing import TYPE_CHECKING, Any, TypedDict, TypeVar, Mapping
 
 from aiohttp import BasicAuth
 
@@ -42,6 +42,7 @@ from .snowflake import Snowflake
 from .stage_instance import StageInstance
 from .user import User
 from .voice import VoiceState
+from .types.user import User
 
 if TYPE_CHECKING:
     from .commands.command import Command
@@ -210,7 +211,7 @@ class State:
         self.shard_concurrency: PassThrough | None = None
         self.intents: Intents = options['intents']
         self.user: User | None = None
-        self.raw_user: dict[str, Any] | None = None
+        self.raw_user: User | None = None
         self.cache: CacheManager = options.get('cache', CacheManager(max_messages=self.max_messages))
         self.ping = Ping()
         self.shard_managers: list[ShardManager] = []
@@ -236,7 +237,7 @@ class State:
     def reset(self, max_messages: int | None) -> None:
         self.cache.reset(max_messages=max_messages)
 
-    async def _process_event(self, type: str, data: dict[str, Any]) -> None:
+    async def _process_event(self, type: str, data: Mapping[str, Any]) -> None:
         args = []
 
         # SECTION: guilds #
