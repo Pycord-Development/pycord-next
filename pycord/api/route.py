@@ -28,8 +28,8 @@ __all__ = ['Route', 'BaseRoute']
 
 
 class BaseRoute:
-    guild_id = Optional[int]
-    channel_id = Optional[int]
+    guild_id: Optional[int]
+    channel_id: Optional[int]
     webhook_id: Optional[int]
     webhook_token: Optional[str]
 
@@ -45,7 +45,7 @@ class BaseRoute:
         ...
 
     def merge(self, url: str) -> str:
-        pass
+        ...
 
 
 class Route(BaseRoute):
@@ -61,9 +61,9 @@ class Route(BaseRoute):
         self.path = path
 
         # major parameters
-        self.guild_id = guild_id
-        self.channel_id = channel_id
-        self.webhook_id = webhook_id
+        self.guild_id = int(guild_id) if guild_id else None
+        self.channel_id = int(channel_id) if channel_id else None
+        self.webhook_id = int(webhook_id) if webhook_id else None
         self.webhook_token = webhook_token
 
         self.parameters = parameters

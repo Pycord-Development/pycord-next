@@ -53,6 +53,9 @@ class HTTPClient(ApplicationCommands, Messages):
         self._session = ClientSession()
 
     async def close_session(self) -> None:
+        if not self._session:
+            return
+
         await self._session.close()
         self._session = None
 
@@ -70,15 +73,12 @@ class HTTPClient(ApplicationCommands, Messages):
         if self._session is None:
             await self.create_session()
 
+        session = cast(ClientSession, self._session)
+
         headers = self._headers.copy()
 
         if reason:
             headers['X-Audit-Log-Reason'] = reason
-
-        if data:
-            # TODO: Support msgspec
-            data: str = dumps(data=data)
-            headers.update({'Content-Type': 'application/json'})
 
         _log.debug(f'Requesting to {endpoint} with {data}, {headers}')
 
@@ -88,26 +88,26 @@ class HTTPClient(ApplicationCommands, Messages):
                 await executer.wait()
 
         for _ in range(5):
-            r = await self._session.request(
+            r = await session.request(
                 method,
                 endpoint,
-                data=data,
+                json=data,
                 headers=headers,
                 proxy=self._proxy,
                 proxy_auth=self._proxy_auth,
                 params=query_params,
             )
-            _log.debug(f'Received back {await r.text()}')
 
-            data = await utils._text_or_json(cr=r, self=self)
+            received_data: str | dict[str, Any] = await utils._text_or_json(cr=r, self=self)
+            _log.debug(f'Received back {received_data}')
 
-            if r.status == 429:
+            if r.status == 429 and isinstance(received_data, dict):
                 _log.debug(f'Request to {endpoint} failed: Request returned rate limit')
                 executer = Executer(route=route)
 
                 self._executers.append(executer)
                 await executer.executed(
-                    reset_after=data['retry_after'],
+                    reset_after=received_data['retry_after'],
                     is_global=r.headers.get('X-RateLimit-Scope') == 'global',
                     limit=int(r.headers.get('X-RateLimit-Limit', 10)),
                 )
@@ -121,9 +121,12 @@ class HTTPClient(ApplicationCommands, Messages):
             elif r.status == 500:
                 raise InternalError(resp=r, data=data)
             elif r.ok:
-                return data
+                return received_data
             else:
                 raise HTTPException(resp=r, data=data)
 
+        raise RuntimeError("Failed to make an HTTP request 5 times.")
+
     async def get_gateway_bot(self) -> dict[str, Any]:
-        return await self.request('GET', Route('/gateway/bot'))
+        data = await self.request('GET', Route('/gateway/bot'))
+        return cast(dict[str, Any], data)

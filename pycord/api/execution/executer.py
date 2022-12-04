@@ -52,15 +52,15 @@ class Executer:
                 else:
                     await asyncio.sleep(5)
 
-            requests_passed + 1
+            requests_passed += 1
             e = await self.holding_queue.get()
             e.set()
 
     async def wait(self) -> None:
-        if not self.rate_limited:
+        if not self.rate_limited or not self.holding_queue:
             return
 
         event = asyncio.Event()
 
-        self.holding_queue.put(event)
+        await self.holding_queue.put(event)
         await event.wait()

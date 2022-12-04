@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 from .color import Color
 from .types import (
@@ -63,9 +63,9 @@ class Thumbnail:
     @classmethod
     def _from_data(cls, data: DiscordThumbnail) -> "Thumbnail":
         self = cls(data['url'])
-        self.proxy_url = data.get('proxy_url', UndefinedType)
-        self.height = data.get('height', UndefinedType)
-        self.width = data.get('width', UndefinedType)
+        self.proxy_url = data.get('proxy_url', UNDEFINED)
+        self.height = data.get('height', UNDEFINED)
+        self.width = data.get('width', UNDEFINED)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -82,9 +82,9 @@ class Image:
     @classmethod
     def _from_data(cls, data: DiscordImage) -> "Image":
         self = cls(data['url'])
-        self.proxy_url = data.get('proxy_url', UndefinedType)
-        self.height = data.get('height', UndefinedType)
-        self.width = data.get('width', UndefinedType)
+        self.proxy_url = data.get('proxy_url', UNDEFINED)
+        self.height = data.get('height', UNDEFINED)
+        self.width = data.get('width', UNDEFINED)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -116,7 +116,7 @@ class Author:
 
     @classmethod
     def _from_data(cls, data: DiscordAuthor) -> "Author":
-        self = cls(data['name'], data.get('icon_url', UNDEFINED, data['url']))
+        self = cls(data['name'], data.get('icon_url', UNDEFINED), data.get('url', UNDEFINED))
         self.proxy_icon_url = data.get('proxy_icon_url', UNDEFINED)
         return self
 
@@ -151,14 +151,16 @@ class Embed:
         *,
         title: str,
         description: str | UndefinedType = UNDEFINED,
-        url: str | UndefinedType = None,
+        url: str | UndefinedType = UNDEFINED,
         timestamp: datetime | UndefinedType = UNDEFINED,
         color: Color | UndefinedType = UNDEFINED,
         thumbnail: Thumbnail | UndefinedType = UNDEFINED,
         author: Author | UndefinedType = UNDEFINED,
         footer: Footer | UndefinedType = UNDEFINED,
         image: Image | UndefinedType = UNDEFINED,
-        fields: list[Field] = None
+        video: Video | UndefinedType = UNDEFINED,
+        provider: Provider | UndefinedType = UNDEFINED,
+        fields: list[Field] | None = None
     ) -> None:
         if fields is None:
             fields = []
@@ -172,34 +174,37 @@ class Embed:
         self.url = url
         self.timestamp = timestamp
         self.color = color
+        self.video = video
+        self.provider = provider
 
     @classmethod
     def _from_data(cls, data: DiscordEmbed) -> None:
-        color = Color(data.get('color')) if data.get('color') is not None else None
-        thumbnail = Thumbnail._from_data(data.get('thumbnail')) if data.get('thumbnail') is not None else None
-        video = Video(data.get('video')) if data.get('video') is not None else None
-        provider = Provider(data.get('provider')) if data.get('provider') is not None else None
-        author = Author._from_data(data.get('author')) if data.get('author') is not None else None
-        footer = Footer._from_data(data.get('footer')) if data.get('footer') is not None else None
-        image = Image._from_data(data.get('thumbnail')) if data.get('thumbnail') is not None else None
+        timestamp = datetime.fromisoformat(raw_timestamp) if (raw_timestamp := data.get('timestamp')) is not None else UNDEFINED
+        color = Color(raw_color) if (raw_color := data.get('color')) is not None else UNDEFINED
+        thumbnail = Thumbnail._from_data(raw_thumbnail) if (raw_thumbnail := data.get('thumbnail') )is not None else UNDEFINED
+        video = Video(raw_video) if (raw_video := data.get('video')) is not None else UNDEFINED
+        provider = Provider(raw_provider) if (raw_provider := data.get('provider')) is not None else UNDEFINED
+        author = Author._from_data(raw_author) if (raw_author := data.get('author')) is not None else UNDEFINED
+        footer = Footer._from_data(raw_footer) if (raw_footer := data.get('footer')) is not None else UNDEFINED
+        image = Image._from_data(raw_image) if (raw_image := data.get('image')) is not None else UNDEFINED
         fields = [Field._from_data(field) for field in data.get('fields', [])]
 
         self = cls(
-            title=data.get('title'),
-            description=data.get('description'),
-            url=data.get('url'),
-            timestamp=datetime.fromisoformat(data.get('timestamp')) if data.get('timestamp') is not None else None,
+            title=data.get('title', ''),
+            description=data.get('description', UNDEFINED),
+            url=data.get('url', UNDEFINED),
+            timestamp=timestamp,
             color=color,
             footer=footer,
             image=image,
             thumbnail=thumbnail,
             author=author,
             fields=fields,
+            video=video,
+            provider=provider,
         )
-        self.video = video
-        self.provider = provider
 
-    def _to_data(self) -> dict[str, Any]:
+    def _to_data(self) -> DiscordEmbed:
         color = self.color.value if self.color else None
         thumbnail = self.thumbnail._to_data() if self.thumbnail else UNDEFINED
         author = self.author._to_data() if self.author else UNDEFINED
@@ -208,15 +213,18 @@ class Embed:
         fields = [field._to_data() for field in self.fields]
         timestamp = self.timestamp.isoformat() if self.timestamp else UNDEFINED
 
-        return remove_undefined(
-            title=self.title,
-            description=self.description,
-            url=self.url,
-            color=color,
-            timestamp=timestamp,
-            thumbnail=thumbnail,
-            footer=footer,
-            author=author,
-            image=image,
-            fields=fields,
+        return cast(
+            DiscordEmbed,
+            remove_undefined(
+                title=self.title,
+                description=self.description,
+                url=self.url,
+                color=color,
+                timestamp=timestamp,
+                thumbnail=thumbnail,
+                footer=footer,
+                author=author,
+                image=image,
+                fields=fields,
+            )
         )

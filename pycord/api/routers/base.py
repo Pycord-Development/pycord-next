@@ -34,5 +34,5 @@ class BaseRouter:
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,
-    ) -> None:
+    ) -> str | dict[str, Any] | bytes:
         ...

@@ -20,9 +20,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from typing import cast
 
 from ...embed import Embed
 from ...snowflake import Snowflake
+from ...types.embed import Embed as DiscordEmbed
 from ...types.message import Message
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
@@ -41,13 +43,16 @@ class Messages(BaseRouter):
         sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
         flags: int | UndefinedType = UNDEFINED,
     ) -> Message:
+        processed_embeds: list[DiscordEmbed] | UndefinedType = UNDEFINED
         if embeds is not UNDEFINED:
-            embeds = [embed._to_data() for embed in embeds]
+            processed_embeds = [embed._to_data() for embed in embeds]
 
-        return await self.request(
+        msg = await self.request(
             'POST',
             Route(f'/channels/{channel_id}/messages', channel_id=channel_id),
             data=remove_undefined(
-                content=content, embeds=embeds, nonce=nonce, tts=tts, sticker_ids=sticker_ids, flags=flags
+                content=content, embeds=processed_embeds, nonce=nonce, tts=tts, sticker_ids=sticker_ids, flags=flags
             ),
         )
+
+        return cast(Message, msg)
