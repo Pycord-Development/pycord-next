@@ -10,9 +10,9 @@ __git_sha1__: str = 'HEAD'
 
 
 class VersionInfo(typing.NamedTuple):
-    major: str
-    minor: str
-    micro: str
+    major: int
+    minor: int
+    micro: int
     releaselevel: typing.Literal['alpha', 'beta', 'candidate', 'final']
     serial: int
 
