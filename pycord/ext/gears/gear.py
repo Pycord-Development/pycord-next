@@ -22,7 +22,7 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Coroutine, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, Type, TypeVar
 
 from ...commands import Command, Group
 
@@ -30,6 +30,10 @@ if TYPE_CHECKING:
     from ...bot import Bot
 
 T = TypeVar('T')
+CoroFunc = Callable[..., Coroutine[Any, Any, Any]]
+CoroFuncT = TypeVar('CoroFuncT', bound=Callable[..., Any])
+CommandT = TypeVar('CommandT', bound=Command)
+GroupT = TypeVar('GroupT', bound=Group)
 
 
 class Gear:
@@ -50,15 +54,15 @@ class Gear:
 
     def __init__(self, name: str) -> None:
         self.name = name
-        self._listener_functions: dict[str, list[Coroutine]] = {}
+        self._listener_functions: dict[str, list[CoroFunc]] = {}
         self.bot: Bot
         self._commands: list[Command | Group] = []
 
     async def on_attach(self, *args, **kwargs) -> None:
         ...
 
-    def listen(self, name: str) -> T:
-        def wrapper(func: T) -> T:
+    def listen(self, name: str) -> Callable[[CoroFuncT], CoroFuncT]:
+        def wrapper(func: CoroFuncT) -> CoroFuncT:
             if self._listener_functions.get(name):
                 self._listener_functions[name].append(func)
             else:
@@ -67,17 +71,19 @@ class Gear:
 
         return wrapper
 
-    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
-        def wrapper(func: T) -> T:
-            command = cls(func, name, None, **kwargs)
+    def command(self, name: str, cls: Type[CommandT], **kwargs: Any) -> Callable[[CoroFunc], CommandT]:
+        def wrapper(func: CoroFunc) -> CommandT:
+            # no idea why state is None here
+            command = cls(func, name, None, **kwargs)  # pyright: ignore
             self._commands.append(command)
             return command
 
         return wrapper
 
-    def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
-        def wrapper(func: T) -> T:
-            r = cls(func, name, None, **kwargs)
+    def group(self, name: str, cls: Type[GroupT], **kwargs: Any) -> Callable[[CoroFunc], GroupT]:
+        def wrapper(func: CoroFunc) -> GroupT:
+            # see above
+            r = cls(func, name, None, **kwargs)  # pyright: ignore
             self._commands.append(r)
             return r
 
