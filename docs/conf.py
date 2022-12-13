@@ -10,8 +10,9 @@ import os
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Pycord'
-copyright = '2022, Pycord'
-author = 'VincentRPS'
+
+copyright = '2021-present, Pycord Development'
+author = 'Pycord Development'
 release = '3.0.0'
 
 # -- General configuration ---------------------------------------------------

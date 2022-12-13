@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -77,12 +75,17 @@ class StoresChannel(TypedDict):
 
 class SingleStoreParent:
     stores: dict[str, StoresGuild | StoresChannel]
-    obj: "Single"
+    obj: Single
 
 
 class Single:
     def __init__(
-        self, name: str, parent: SingleStoreParent, typ: T, listable: bool = True, maximum: int | None = None
+        self,
+        name: str,
+        parent: SingleStoreParent,
+        typ: T,
+        listable: bool = True,
+        maximum: int | None = None,
     ) -> None:
         self._parent = parent
         self._name = name
@@ -125,7 +128,12 @@ class Single:
     async def remove(self, sf: Snowflake, obj_sf: Snowflake | None = None) -> None:
         if obj_sf:
             for o in self._parent.stores[sf][self._name]:
-                if isinstance(o, Member) and o.user.id == obj_sf or not isinstance(o, Member) and o.id == obj_sf:
+                if (
+                    isinstance(o, Member)
+                    and o.user.id == obj_sf
+                    or not isinstance(o, Member)
+                    and o.id == obj_sf
+                ):
                     self._parent.stores[sf][self._name].remove(o)
                     break
         elif self._parent.stores.get(sf):
@@ -136,7 +144,12 @@ class Single:
             raise KeyError('This object cannot be listed')
 
         for o in self._parent.stores[sf][self._name]:
-            if isinstance(o, Member) and o.user.id in sfs or not isinstance(o, Member) and o.id in sfs:
+            if (
+                isinstance(o, Member)
+                and o.user.id in sfs
+                or not isinstance(o, Member)
+                and o.id in sfs
+            ):
                 self._parent.stores[sf][self._name].remove(o)
 
     async def all(self, guild_id: Snowflake | None) -> list[T]:
@@ -150,7 +163,12 @@ class Single:
             o = self._parent.stores.get(guild_id)
             return None if o is None else o[self._name]
         for o in self._parent.stores[guild_id][self._name]:
-            if isinstance(o, Member) and o.user.id == sf or not isinstance(o, Member) and o.id == sf:
+            if (
+                isinstance(o, Member)
+                and o.user.id == sf
+                or not isinstance(o, Member)
+                and o.id == sf
+            ):
                 return o
 
     async def upsert(self, sf: Snowflake, esf: Snowflake | None = None, **ups) -> None:
@@ -211,7 +229,9 @@ class State:
         self.intents: Intents = options['intents']
         self.user: User | None = None
         self.raw_user: dict[str, Any] | None = None
-        self.cache: CacheManager = options.get('cache', CacheManager(max_messages=self.max_messages))
+        self.cache: CacheManager = options.get(
+            'cache', CacheManager(max_messages=self.max_messages)
+        )
         self.ping = Ping()
         self.shard_managers: list[ShardManager] = []
         self.shard_clusters: list[ShardCluster] = []
@@ -223,7 +243,13 @@ class State:
         self._cluster_lock: asyncio.Lock = asyncio.Lock()
         self._ready: bool = False
 
-    def bot_init(self, token: str, clustered: bool, proxy: str | None = None, proxy_auth: BasicAuth | None = None) -> None:
+    def bot_init(
+        self,
+        token: str,
+        clustered: bool,
+        proxy: str | None = None,
+        proxy_auth: BasicAuth | None = None,
+    ) -> None:
         self.token = token
         self.http = HTTPClient(
             token=token,
@@ -242,9 +268,15 @@ class State:
         # SECTION: guilds #
         if type == 'GUILD_CREATE':
             guild = Guild(data, state=self)
-            channels: list[Channel] = [identify_channel(c, self) for c in data['channels']]
-            threads: list[Thread] = [identify_channel(c, self) for c in data['channels']]
-            stage_instances: list[StageInstance] = [StageInstance(st, self) for st in data['stage_instances']]
+            channels: list[Channel] = [
+                identify_channel(c, self) for c in data['channels']
+            ]
+            threads: list[Thread] = [
+                identify_channel(c, self) for c in data['channels']
+            ]
+            stage_instances: list[StageInstance] = [
+                StageInstance(st, self) for st in data['stage_instances']
+            ]
             guild_scheduled_events: list[ScheduledEvent] = [
                 ScheduledEvent(se, self) for se in data['guild_scheduled_events']
             ]
@@ -269,7 +301,12 @@ class State:
                     await self.cache.channel.threads.add(thread.id, thread)
 
             for channel in channels:
-                obj: StoresChannel = {'obj': channel, 'messages': [], 'voice_states': [], 'threads': []}
+                obj: StoresChannel = {
+                    'obj': channel,
+                    'messages': [],
+                    'voice_states': [],
+                    'threads': [],
+                }
                 await self.cache.channel.obj.add(channel.id, obj)
 
             args.append(guild)
@@ -358,7 +395,9 @@ class State:
             args.append(role)
 
             if await self.cache.guild.roles.exists(role.id):
-                args.append(await self.cache.guild.roles.get(guild_id=guild_id, sf=role.id))
+                args.append(
+                    await self.cache.guild.roles.get(guild_id=guild_id, sf=role.id)
+                )
             else:
                 args.append(None)
 
@@ -389,7 +428,12 @@ class State:
             args.append(channel)
             if channel.guild_id:
                 await self.cache.guild.channels.add(channel.guild_id, channel)
-            obj: StoresChannel = {'obj': channel, 'messages': [], 'voice_states': [], 'threads': []}
+            obj: StoresChannel = {
+                'obj': channel,
+                'messages': [],
+                'voice_states': [],
+                'threads': [],
+            }
             await self.cache.channel.obj.add(channel, obj)
         elif type == 'CHANNEL_UPDATE':
             channel = Channel(data, self)
@@ -426,7 +470,11 @@ class State:
             args.append(message)
 
             if await self.cache.channel.messages.exists(message.channel_id, message.id):
-                args.append(await self.cache.channel.messages.get(message.channel_id, message.id))
+                args.append(
+                    await self.cache.channel.messages.get(
+                        message.channel_id, message.id
+                    )
+                )
             else:
                 args.append(None)
 

@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -37,11 +35,21 @@ if TYPE_CHECKING:
 class VoiceState:
     def __init__(self, data: DiscordVoiceState, state: State) -> None:
         self.guild_id: Snowflake | UndefinedType = (
-            Snowflake(data['guild_id']) if data.get('guild_id') is not None else UNDEFINED
+            Snowflake(data['guild_id'])
+            if data.get('guild_id') is not None
+            else UNDEFINED
         )
-        self.channel_id: Snowflake | None = Snowflake(data['channel_id']) if data.get('channel_id') is not None else None
+        self.channel_id: Snowflake | None = (
+            Snowflake(data['channel_id'])
+            if data.get('channel_id') is not None
+            else None
+        )
         self.user_id: Snowflake = Snowflake(data['user_id'])
-        self.member: Member | UndefinedType = Member(data['member'], state) if data.get('member') is not None else UNDEFINED
+        self.member: Member | UndefinedType = (
+            Member(data['member'], state)
+            if data.get('member') is not None
+            else UNDEFINED
+        )
         self.session_id: str = data['session_id']
         self.deaf: bool = data['deaf']
         self.mute: bool = data['mute']

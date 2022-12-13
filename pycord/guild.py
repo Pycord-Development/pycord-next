@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -72,20 +70,30 @@ class Guild:
             self.permissions: Permissions = Permissions.from_value(data.get('permissions', 0))
             self._afk_channel_id: str | None = data.get('afk_channel_id')
             self.afk_channel_id: Snowflake | None = (
-                Snowflake(self._afk_channel_id) if self._afk_channel_id is not None else None
+                Snowflake(self._afk_channel_id)
+                if self._afk_channel_id is not None
+                else None
             )
             self.afk_timeout: int = data.get('afk_timeout')
-            self.widget_enabled: bool | UndefinedType = data.get('widget_enabled', UNDEFINED)
-            self._widget_channel_id: str | None | UndefinedType = data.get('widget_channel_id')
+            self.widget_enabled: bool | UndefinedType = data.get(
+                'widget_enabled', UNDEFINED
+            )
+            self._widget_channel_id: str | None | UndefinedType = data.get(
+                'widget_channel_id'
+            )
             self.widget_channel_id: UndefinedType | Snowflake | None = (
-                Snowflake(self._widget_channel_id) if isinstance(self._widget_channel_id, str) else self._widget_channel_id
+                Snowflake(self._widget_channel_id)
+                if isinstance(self._widget_channel_id, str)
+                else self._widget_channel_id
             )
-            self.verification_level: VerificationLevel = VerificationLevel(data['verification_level'])
-            self.default_message_notifications: DefaultMessageNotificationLevel = DefaultMessageNotificationLevel(
-                data['default_message_notifications']
+            self.verification_level: VerificationLevel = VerificationLevel(
+                data['verification_level']
             )
-            self.explicit_content_filter: ExplicitContentFilterLevel = ExplicitContentFilterLevel(
-                data['explicit_content_filter']
+            self.default_message_notifications: DefaultMessageNotificationLevel = (
+                DefaultMessageNotificationLevel(data['default_message_notifications'])
+            )
+            self.explicit_content_filter: ExplicitContentFilterLevel = (
+                ExplicitContentFilterLevel(data['explicit_content_filter'])
             )
             self._roles: list[dict[str, Any]] = data.get('roles', [])
             self._process_roles()
@@ -95,39 +103,68 @@ class Guild:
             self.mfa_level: MFALevel = MFALevel(data['mfa_level'])
             self._application_id: str | None = data.get('application_id')
             self.application_id: Snowflake | None = (
-                Snowflake(self._application_id) if self._application_id is not None else None
+                Snowflake(self._application_id)
+                if self._application_id is not None
+                else None
             )
             self._system_channel_id: str | None = data.get('system_channel_id')
             self.system_channel_id: Snowflake | None = (
-                Snowflake(self._system_channel_id) if self._system_channel_id is not None else None
+                Snowflake(self._system_channel_id)
+                if self._system_channel_id is not None
+                else None
             )
-            self.system_channel_flags: SystemChannelFlags = SystemChannelFlags.from_value(data['system_channel_flags'])
+            self.system_channel_flags: SystemChannelFlags = (
+                SystemChannelFlags._from_value(data['system_channel_flags'])
+            )
+
             self._rules_channel_id: str | None = data.get('rules_channel_id')
             self.rules_channel_id: Snowflake | None = (
-                Snowflake(self._rules_channel_id) if self._rules_channel_id is not None else None
+                Snowflake(self._rules_channel_id)
+                if self._rules_channel_id is not None
+                else None
             )
-            self.max_presences: int | UndefinedType = data.get('max_presences', UNDEFINED)
+            self.max_presences: int | UndefinedType = data.get(
+                'max_presences', UNDEFINED
+            )
             self.max_members: int | UndefinedType = data.get('max_members', UNDEFINED)
             self.vanity_url: str | None = data.get('vanity_url_code')
             self.description: str | None = data.get('description')
             self._banner: str | None = data.get('banner')
             self.premium_tier: PremiumTier = PremiumTier(data['premium_tier'])
-            self.premium_subscription_count: int | UndefinedType = data.get('premium_subscription_count', UNDEFINED)
-            self.preferred_locale: LOCALE = data['preferred_locale']
-            self._public_updates_channel_id: str | None = data['public_updates_channel_id']
-            self.public_updates_channel_id: Snowflake | None = (
-                Snowflake(self._public_updates_channel_id) if self._public_updates_channel_id is not None else None
+            self.premium_subscription_count: int | UndefinedType = data.get(
+                'premium_subscription_count', UNDEFINED
             )
-            self.max_video_channel_users: int | UndefinedType = data.get('max_video_channel_users', UNDEFINED)
-            self.approximate_member_count: int | UndefinedType = data.get('approximate_member_count', UNDEFINED)
-            self.approximate_presence_count: int | UndefinedType = data.get('approximate_presence_count', UNDEFINED)
+            self.preferred_locale: LOCALE = data['preferred_locale']
+            self._public_updates_channel_id: str | None = data[
+                'public_updates_channel_id'
+            ]
+            self.public_updates_channel_id: Snowflake | None = (
+                Snowflake(self._public_updates_channel_id)
+                if self._public_updates_channel_id is not None
+                else None
+            )
+            self.max_video_channel_users: int | UndefinedType = data.get(
+                'max_video_channel_users', UNDEFINED
+            )
+            self.approximate_member_count: int | UndefinedType = data.get(
+                'approximate_member_count', UNDEFINED
+            )
+            self.approximate_presence_count: int | UndefinedType = data.get(
+                'approximate_presence_count', UNDEFINED
+            )
             self._welcome_screen = data.get('welcome_screen', UNDEFINED)
             self.welcome_screen: WelcomeScreen | UndefinedType = (
-                WelcomeScreen(self._welcome_screen) if self._welcome_screen is not UNDEFINED else UNDEFINED
+                WelcomeScreen(self._welcome_screen)
+                if self._welcome_screen is not UNDEFINED
+                else UNDEFINED
             )
             self.nsfw_level: NSFWLevel = NSFWLevel(data.get('nsfw_level', 0))
-            self.stickers: list[Sticker] = [Sticker(d, self._state) for d in data.get('stickers', [])]
-            self.premium_progress_bar_enabled: bool = data['premium_progress_bar_enabled']
+            self.stickers: list[Sticker] = [
+                Sticker(d, self._state) for d in data.get('stickers', [])
+            ]
+            self.premium_progress_bar_enabled: bool = data[
+                'premium_progress_bar_enabled'
+            ]
         else:
             self.unavailable: bool = True
 
@@ -155,13 +192,17 @@ class GuildPreview:
         self.approximate_member_count: int = data['approximate_member_count']
         self.approximate_presence_count: int = data['approximate_presence_count']
         self.description: str | None = data['description']
-        self.stickers: list[Sticker] = [Sticker(sticker, state) for sticker in data['stickers']]
+        self.stickers: list[Sticker] = [
+            Sticker(sticker, state) for sticker in data['stickers']
+        ]
 
 
 class WidgetSettings:
     def __init__(self, data: DiscordWidgetSettings) -> None:
         self.enabled: bool = data['enabled']
-        self.channel_id: Snowflake | None = Snowflake(data['channel_id']) if data['channel_id'] is not None else None
+        self.channel_id: Snowflake | None = (
+            Snowflake(data['channel_id']) if data['channel_id'] is not None else None
+        )
 
 
 class Widget:
@@ -169,7 +210,9 @@ class Widget:
         self.id: Snowflake = Snowflake(data['id'])
         self.name: str = data['name']
         self.instant_invite: str | None = data['instant_invite']
-        self.channels: list[Channel] = [Channel(channel, state) for channel in data['channels']]
+        self.channels: list[Channel] = [
+            Channel(channel, state) for channel in data['channels']
+        ]
         self.members: list[User] = [User(user, state) for user in data['members']]
 
 

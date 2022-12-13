@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +20,8 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Coroutine
+from collections.abc import Coroutine
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..state import State
@@ -32,7 +31,9 @@ if TYPE_CHECKING:
 class Command:
     _processor_event: str
 
-    def __init__(self, callback: Coroutine, name: str, state: State, group: Group | None = None) -> None:
+    def __init__(
+        self, callback: Coroutine, name: str, state: State, group: Group | None = None
+    ) -> None:
         self._callback = callback
 
         self.name = name

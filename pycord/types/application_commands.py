@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -63,7 +61,7 @@ class ApplicationCommandOption(TypedDict):
     description_localizations: NotRequired[dict[LOCALE, str] | None]
     required: NotRequired[bool]
     choices: NotRequired[ApplicationCommandOptionChoice]
-    options: NotRequired[list["ApplicationCommandOption"]]
+    options: NotRequired[list['ApplicationCommandOption']]
     channel_types: NotRequired[list[CTYPE]]
     min_value: NotRequired[int]
     max_value: NotRequired[int]

@@ -1,6 +1,6 @@
 # MIT License
 
-# Copyright (c) 2021 VincentRPS
+# Copyright (c) 2021-present Pycord Development
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -67,7 +67,7 @@ setuptools.setup(
     },
     url='https://github.com/pycord/pycord-v3',
     license='MIT',
-    author='VincentRPS & Pycord Development',
+    author='Pycord Development',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     install_requires=requirements,

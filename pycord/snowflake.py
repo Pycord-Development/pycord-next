@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,9 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-"""
-Implementation of Discord's Snowflake ID
-"""
+"""Implementation of Discord's Snowflake ID"""
 
 from datetime import datetime, timezone
 
@@ -32,7 +28,9 @@ from .utils import DISCORD_EPOCH
 class Snowflake(int):
     @property
     def timestamp(self) -> datetime:
-        return datetime.fromtimestamp(((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc)
+        return datetime.fromtimestamp(
+            ((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc
+        )
 
     @property
     def worker_id(self) -> int:

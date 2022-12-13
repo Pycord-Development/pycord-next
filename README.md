@@ -15,19 +15,23 @@
  The API Wrapper for <b>Modern Discord Bots.</b>
 </p>
 
-Welcome! This is the repository for the pre-alpha and heavy conception next major version of Pycord.
+Welcome! This is the repository for the pre-alpha and heavy conception next major
+version of Pycord.
 
 ## Installation
 
-Pycord v3 is not yet published onto PyPi, so for now you'll have to install via git.
-To do this, you should install [git](https://git-scm.com) if not already installed.
+Pycord v3 is not yet published onto PyPi, so for now you'll have to install via git. To
+do this, you should install [git](https://git-scm.com) if not already installed.
 
 An automatic install should look something like
+
 ```sh
     pip install -U git+https://github.com/pycord-development/pycord-v3
 ```
 
-If instead, you wanted to do a manual install (incase of something like development), you could do the following
+If instead, you wanted to do a manual install (incase of something like development),
+you could do the following
+
 ```sh
     # Git command
     git clone https://github.com/pycord-development/pycord-v3
@@ -38,16 +42,23 @@ If instead, you wanted to do a manual install (incase of something like developm
 
 ## Stability
 
-While we are working and striving for stability throughout v3, its still quite a new library so breakages can still happen especially with us still being in a pre-alpha stage.
+While we are working and striving for stability throughout v3, its still quite a new
+library so breakages can still happen especially with us still being in a pre-alpha
+stage.
 
 ## Breaking Changes
 
-v3 is a new **major version** of pycord, meaning breaking changes have occurred. Although a much larger amount than v2, v3 introduces a new paradigm for Pycord bots and ensures code quality for developers (of the library.)
+v3 is a new **major version** of pycord, meaning breaking changes have occurred.
+Although a much larger amount than v2, v3 introduces a new paradigm for Pycord bots and
+ensures code quality for developers (of the library.)
 
-Every aspect of v2 has been remade and improved upon to make your development experience quicker, easier, and mucho gracias.
-Breaking changes are everywhere, from typings to Python version increases.
+Every aspect of v2 has been remade and improved upon to make your development experience
+quicker, easier, and mucho gracias. Breaking changes are everywhere, from typings to
+Python version increases.
 
-That being said, if you want to move your bot to v3 you'll have to rewrite it. We've made sure to make the rewriting experience easier though, providing less boilerplate than v2 and letting you do anything in smaller snippets.
+That being said, if you want to move your bot to v3 you'll have to rewrite it. We've
+made sure to make the rewriting experience easier though, providing less boilerplate
+than v2 and letting you do anything in smaller snippets.
 
 ## Code Example
 

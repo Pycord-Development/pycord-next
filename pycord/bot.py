@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Any, Type, TypeVar
+from typing import Any, TypeVar
 
 from aiohttp import BasicAuth
 
@@ -64,9 +62,21 @@ class Bot:
 
     async def _run_async(self, token: str) -> None:
         start_logging(flavor=self._logging_flavor)
-        self._state.bot_init(token=token, clustered=False, proxy=self._proxy, proxy_auth=self._proxy_auth)
-        shards = self._shards if isinstance(self._shards, list) else list(range(self._shards))
-        sharder = ShardManager(self._state, shards, self._shards, proxy=self._proxy, proxy_auth=self._proxy_auth)
+        self._state.bot_init(
+            token=token, clustered=False, proxy=self._proxy, proxy_auth=self._proxy_auth
+        )
+        shards = (
+            self._shards
+            if isinstance(self._shards, list)
+            else list(range(self._shards))
+        )
+        sharder = ShardManager(
+            self._state,
+            shards,
+            self._shards,
+            proxy=self._proxy,
+            proxy_auth=self._proxy_auth,
+        )
         await sharder.start()
         self._state.shard_managers.append(sharder)
         while not self._state.raw_user:
@@ -101,9 +111,13 @@ class Bot:
     def run(self, token: str) -> None:
         asyncio.run(self._run_async(token=token))
 
-    async def _run_cluster(self, token: str, clusters: int, amount: int, managers: int) -> None:
+    async def _run_cluster(
+        self, token: str, clusters: int, amount: int, managers: int
+    ) -> None:
         start_logging(flavor=self._logging_flavor)
-        self._state.bot_init(token=token, clustered=True, proxy=self._proxy, proxy_auth=self._proxy_auth)
+        self._state.bot_init(
+            token=token, clustered=True, proxy=self._proxy, proxy_auth=self._proxy_auth
+        )
 
         info = await self._state.http.get_gateway_bot()
         session_start_limit = info['session_start_limit']
@@ -111,16 +125,27 @@ class Bot:
         if session_start_limit['remaining'] == 0:
             raise NoIdentifiesLeft('session_start_limit has been exhausted')
 
-        self._state.shard_concurrency = PassThrough(session_start_limit['max_concurrency'], 7)
+        self._state.shard_concurrency = PassThrough(
+            session_start_limit['max_concurrency'], 7
+        )
         self._state._session_start_limit = session_start_limit
 
-        shards = self._shards if isinstance(self._shards, list) else list(range(self._shards))
+        shards = (
+            self._shards
+            if isinstance(self._shards, list)
+            else list(range(self._shards))
+        )
 
         sorts = list(chunk(shards, clusters))
 
         for cluster in sorts:
             cluster_class = ShardCluster(
-                self._state, cluster, amount, managers, proxy=self._proxy, proxy_auth=self._proxy_auth
+                self._state,
+                cluster,
+                amount,
+                managers,
+                proxy=self._proxy,
+                proxy_auth=self._proxy_auth,
             )
             cluster_class.run()
             self._state.shard_clusters.append(cluster_class)
@@ -132,13 +157,21 @@ class Bot:
         if self._print_banner:
             print_banner(
                 concurrency=self._state._session_start_limit['remaining'],
-                shard_count=self._shards if isinstance(self._shards, int) else len(self._shards),
+                shard_count=self._shards
+                if isinstance(self._shards, int)
+                else len(self._shards),
                 bot_name=self._state.user.name,
             )
 
         await self._run_until_exited()
 
-    def cluster(self, token: str, clusters: int, amount: int | None = None, managers: int | None = None) -> None:
+    def cluster(
+        self,
+        token: str,
+        clusters: int,
+        amount: int | None = None,
+        managers: int | None = None,
+    ) -> None:
         shards = self._shards if isinstance(self._shards, int) else len(self._shards)
 
         if clusters > shards:
@@ -151,12 +184,18 @@ class Bot:
             managers = 1
 
         if amount < shards:
-            raise OverfilledShardsException('Cannot have a higher shard count than shard amount')
+            raise OverfilledShardsException(
+                'Cannot have a higher shard count than shard amount'
+            )
 
         if managers > shards:
             raise OverfilledShardsException('Cannot have more managers than shards')
 
-        asyncio.run(self._run_cluster(token=token, clusters=clusters, amount=amount, managers=managers))
+        asyncio.run(
+            self._run_cluster(
+                token=token, clusters=clusters, amount=amount, managers=managers
+            )
+        )
 
     def listen(self, name: str) -> T:
         def wrapper(func: T) -> T:
@@ -165,7 +204,7 @@ class Bot:
 
         return wrapper
 
-    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+    def command(self, name: str, cls: type[Command], **kwargs: Any) -> T:
         def wrapper(func: T) -> T:
             command = cls(func, name, state=self._state, **kwargs)
             self._state.commands.append(command)
@@ -173,7 +212,7 @@ class Bot:
 
         return wrapper
 
-    def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
+    def group(self, name: str, cls: type[Group], **kwargs: Any) -> T:
         def wrapper(func: T) -> T:
             return cls(func, name, state=self._state, **kwargs)
 

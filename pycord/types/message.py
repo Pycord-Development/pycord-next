@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -120,7 +118,7 @@ class Message(TypedDict):
     application_id: NotRequired[Snowflake]
     message_reference: NotRequired[MessageReference]
     flags: NotRequired[int]
-    referenced_message: NotRequired["Message"]
+    referenced_message: NotRequired['Message']
     interaction: NotRequired[MessageInteraction]
     thread: NotRequired[Channel]
     components: NotRequired[list[Component]]

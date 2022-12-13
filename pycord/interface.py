@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +28,6 @@ import string
 import sys
 import time
 import warnings
-from typing import Optional, Union
 
 import colorlog
 
@@ -53,7 +50,7 @@ day_prefixes: dict[int, str] = {
 }
 
 
-def start_logging(flavor: Union[None, int, str, dict], debug: bool = False):
+def start_logging(flavor: None | int | str | dict, debug: bool = False):
     if len(logging.root.handlers) != 0:
         return  # the user is most likely using logging.basicConfig, or is being spearheaded by something else.
 
@@ -94,7 +91,12 @@ def get_day_prefix(num: int) -> str:
     return day_prefixes[int(n[len(n) - 1])]
 
 
-def print_banner(concurrency: int, shard_count: int, bot_name: str = 'Your bot', module: Optional[str] = 'pycord'):
+def print_banner(
+    concurrency: int,
+    shard_count: int,
+    bot_name: str = 'Your bot',
+    module: str | None = 'pycord',
+):
     banners = importlib.resources.files(module)
 
     for trav in banners.iterdir():

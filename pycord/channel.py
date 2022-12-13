@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +54,9 @@ class ThreadMetadata:
     def __init__(self, metadata: DiscordThreadMetadata) -> None:
         self.archived: bool = metadata['archived']
         self.auto_archive_duration: int = metadata['auto_archive_duration']
-        self.archive_timestamp: datetime = datetime.fromisoformat(metadata['archive_timestamp'])
+        self.archive_timestamp: datetime = datetime.fromisoformat(
+            metadata['archive_timestamp']
+        )
         self.locked: bool = metadata['locked']
         self.invitable: bool | UndefinedType = metadata.get('invitable', UNDEFINED)
         self.create_timestamp: datetime | UndefinedType = (
@@ -69,9 +69,13 @@ class ThreadMetadata:
 class ThreadMember:
     def __init__(self, member: DiscordThreadMember) -> None:
         self._id: str | None = member.get('id')
-        self.id: Snowflake | UndefinedType = Snowflake(self._id) if self._id is not None else UNDEFINED
+        self.id: Snowflake | UndefinedType = (
+            Snowflake(self._id) if self._id is not None else UNDEFINED
+        )
         self._user_id: str | None = member.get('user_id')
-        self.user_id: Snowflake | UndefinedType = Snowflake(self._user_id) if self._user_id is not None else UNDEFINED
+        self.user_id: Snowflake | UndefinedType = (
+            Snowflake(self._user_id) if self._user_id is not None else UNDEFINED
+        )
         self.join_timestamp: datetime = datetime.fromisoformat(member['join_timestamp'])
         self.flags: int = member['flags']
 
@@ -88,7 +92,9 @@ class ForumTag:
 class DefaultReaction:
     def __init__(self, data: DiscordDefaultReaction) -> None:
         self._emoji_id: str | None = data.get('emoji_id')
-        self.emoji_id: Snowflake | None = Snowflake(self._emoji_id) if self._emoji_id is not None else None
+        self.emoji_id: Snowflake | None = (
+            Snowflake(self._emoji_id) if self._emoji_id is not None else None
+        )
         self.emoji_name: str | None = data['emoji_name']
 
 
@@ -98,29 +104,43 @@ class Channel:
         self.id: Snowflake = Snowflake(data['id'])
         self.type: ChannelType = ChannelType(data['type'])
         self.guild_id: Snowflake | UndefinedType = (
-            Snowflake(data['guild_id']) if data.get('guild_id') is not None else UNDEFINED
+            Snowflake(data['guild_id'])
+            if data.get('guild_id') is not None
+            else UNDEFINED
         )
         self.position: int | UndefinedType = data.get('position', UNDEFINED)
-        self.permission_overwrites: list[_Overwrite] = [_Overwrite(d) for d in data.get('permission_overwrites', [])]
+        self.permission_overwrites: list[_Overwrite] = [
+            _Overwrite(d) for d in data.get('permission_overwrites', [])
+        ]
         self.name: str | UndefinedType = data.get('name', UNDEFINED)
         self.topic: str | None | UndefinedType = data.get('topic', UNDEFINED)
         self.nsfw: bool | UndefinedType = data.get('nsfw', UNDEFINED)
         self.last_message_id: int | None = (
-            Snowflake(data['last_message_id']) if data.get('last_message_id') is not None else None
+            Snowflake(data['last_message_id'])
+            if data.get('last_message_id') is not None
+            else None
         )
         self.bitrate: int | UndefinedType = data.get('bitrate', UNDEFINED)
         self.user_limit: int | UndefinedType = data.get('user_limit', UNDEFINED)
-        self.rate_limit_per_user: int | UndefinedType = data.get('rate_limit_per_user', UNDEFINED)
+        self.rate_limit_per_user: int | UndefinedType = data.get(
+            'rate_limit_per_user', UNDEFINED
+        )
         self.recipients: list[User] = [User(d) for d in data.get('recipients', [])]
         self._icon: str | UndefinedType | None = data.get('icon', UndefinedType)
         self.owner_id: Snowflake | UndefinedType = (
-            Snowflake(data['owner_id']) if data.get('owner_id') is not None else UNDEFINED
+            Snowflake(data['owner_id'])
+            if data.get('owner_id') is not None
+            else UNDEFINED
         )
         self.application_id: Snowflake | UndefinedType = (
-            Snowflake(data['application_id']) if data.get('application_id') is not None else UNDEFINED
+            Snowflake(data['application_id'])
+            if data.get('application_id') is not None
+            else UNDEFINED
         )
         self.parent_id: Snowflake | UndefinedType = (
-            Snowflake(data['parent_id']) if data.get('parent_id') is not None else data.get('parent_id', UNDEFINED)
+            Snowflake(data['parent_id'])
+            if data.get('parent_id') is not None
+            else data.get('parent_id', UNDEFINED)
         )
         self.last_pin_timestamp: None | datetime | UndefinedType = (
             datetime.fromisoformat(data['last_pin_timestamp'])
@@ -129,29 +149,42 @@ class Channel:
         )
         self.rtc_region: str | UndefinedType = data.get('rtc_region', UNDEFINED)
         self.video_quality_mode: VideoQualityMode | UndefinedType = (
-            VideoQualityMode(data['video_quality_mode']) if data.get('video_quality_mode') is not None else UNDEFINED
+            VideoQualityMode(data['video_quality_mode'])
+            if data.get('video_quality_mode') is not None
+            else UNDEFINED
         )
         self.message_count: int | UndefinedType = data.get('message_count', UNDEFINED)
         self.thread_metadata: ThreadMetadata | UndefinedType = (
-            ThreadMetadata(data['thread_metadata']) if data.get('thread_metadata') is not None else UNDEFINED
+            ThreadMetadata(data['thread_metadata'])
+            if data.get('thread_metadata') is not None
+            else UNDEFINED
         )
-        self.default_auto_archive_duration: int | UndefinedType = data.get('default_auto_archive_duration', UNDEFINED)
+        self.default_auto_archive_duration: int | UndefinedType = data.get(
+            'default_auto_archive_duration', UNDEFINED
+        )
         self.permissions: Permissions | UndefinedType = (
             Permissions.from_value(data['permissions']) if data.get('permissions') is not None else UNDEFINED
         )
         self.flags: ChannelFlags | UndefinedType = (
             ChannelFlags.from_value(data['flags']) if data.get('flags') is not None else UNDEFINED
         )
-        self.total_messages_sent: int | UndefinedType = data.get('total_messages_sent', UNDEFINED)
-        self.available_tags: list[ForumTag] = [ForumTag(d) for d in data.get('available_tags', [])]
-        self.applied_tags: list[Snowflake] = [Snowflake(s) for s in data.get('applied_tags', [])]
+        self.available_tags: list[ForumTag] = [
+            ForumTag(d) for d in data.get('available_tags', [])
+        ]
+        self.applied_tags: list[Snowflake] = [
+            Snowflake(s) for s in data.get('applied_tags', [])
+        ]
         self.default_reaction_emoji: DefaultReaction | UndefinedType = (
-            DefaultReaction(data['default_reaction_emoji']) if data.get('default_reaction_emoji') is not None else UNDEFINED
+            DefaultReaction(data['default_reaction_emoji'])
+            if data.get('default_reaction_emoji') is not None
+            else UNDEFINED
         )
         self.default_thread_rate_limit_per_user: int | UndefinedType = data.get(
             'default_thread_rate_limit_per_user', UndefinedType
         )
-        self.default_sort_order: int | None | UndefinedType = data.get('default_sort_order', UndefinedType)
+        self.default_sort_order: int | None | UndefinedType = data.get(
+            'default_sort_order', UndefinedType
+        )
 
 
 class MessageableChannel(Channel):
@@ -165,7 +198,13 @@ class MessageableChannel(Channel):
         flags: int | UndefinedType = UNDEFINED,
     ) -> None:
         await self._state.http.create_message(
-            channel_id=self.id, content=content, nonce=nonce, tts=tts, embeds=embeds, sticker_ids=sticker_ids, flags=flags
+            channel_id=self.id,
+            content=content,
+            nonce=nonce,
+            tts=tts,
+            embeds=embeds,
+            sticker_ids=sticker_ids,
+            flags=flags,
         )
 
 

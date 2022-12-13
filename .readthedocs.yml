@@ -6,15 +6,14 @@ build:
   tools:
     python: "3.10"
 
-
 python:
-    install:
-      - method: pip
-        path: .
-        extra_requirements:
-          - docs
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
 
 sphinx:
-   configuration: docs/conf.py
-   fail_on_warning: false
-   builder: html
+  configuration: docs/conf.py
+  fail_on_warning: false
+  builder: html
