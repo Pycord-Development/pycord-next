@@ -22,7 +22,8 @@
 from ...embed import Embed
 from ...snowflake import Snowflake
 from ...types.message import Message
-from ...utils import UNDEFINED, UndefinedType, remove_undefined
+from ...undefined import UNDEFINED, UndefinedType
+from ...utils import remove_undefined
 from ..route import Route
 from .base import BaseRouter
 

@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING
 from .member import Member
 from .snowflake import Snowflake
 from .types import VoiceState as DiscordVoiceState
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State

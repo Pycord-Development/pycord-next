@@ -25,6 +25,8 @@ from typing import Any, Literal, TypeVar
 
 from aiohttp import ClientResponse
 
+from .undefined import UNDEFINED, UndefinedType
+
 try:
     import msgspec
 except ImportError:
@@ -34,28 +36,6 @@ except ImportError:
 
 DISCORD_EPOCH: int = 1420070400000
 S = TypeVar('S', bound=Sequence)
-
-
-class UndefinedType:
-    __slots__ = ()
-
-    def __bool__(self) -> Literal[False]:
-        return False
-
-    def __getstate__(self) -> Any:
-        return False
-
-    def __repr__(self) -> str:
-        return 'UNDEFINED'
-
-    def __reduce__(self) -> str:
-        return 'UNDEFINED'
-
-    def __str__(self) -> str:
-        return 'UNDEFINED'
-
-
-UNDEFINED = UndefinedType()
 
 
 async def _text_or_json(cr: ClientResponse, self) -> str | dict[str, Any]:

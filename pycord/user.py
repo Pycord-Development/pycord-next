@@ -27,7 +27,7 @@ from .enums import PremiumType
 from .flags import UserFlags
 from .snowflake import Snowflake
 from .types import LOCALE, User as DiscordUser
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State
@@ -56,9 +56,7 @@ class User:
         self.email: str | None | UndefinedType = data.get('email', UNDEFINED)
         self._flags: UndefinedType | int = data.get('flags', UNDEFINED)
         self.flags: UndefinedType | UserFlags = (
-            UserFlags._from_value(self._flags)
-            if self._flags is not UNDEFINED
-            else UNDEFINED
+            UserFlags.from_value(self._flags) if self._flags is not UNDEFINED else UNDEFINED
         )
         self._premium_type: UndefinedType | int = data.get('premium_type', UNDEFINED)
         self.premium_type: PremiumType | UndefinedType = (
@@ -68,7 +66,5 @@ class User:
         )
         self._public_flags: UndefinedType | int = data.get('public_flags', UNDEFINED)
         self.public_flags: UndefinedType | UserFlags = (
-            UserFlags._from_value(self._public_flags)
-            if self._public_flags is not UNDEFINED
-            else UNDEFINED
+            UserFlags.from_value(self._public_flags) if self._public_flags is not UNDEFINED else UNDEFINED
         )

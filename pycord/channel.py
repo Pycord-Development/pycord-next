@@ -35,8 +35,8 @@ from .types import (
     ThreadMember as DiscordThreadMember,
     ThreadMetadata as DiscordThreadMetadata,
 )
+from .undefined import UNDEFINED, UndefinedType
 from .user import User
-from .utils import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State
@@ -46,8 +46,8 @@ class _Overwrite:
     def __init__(self, overwrite: DiscordOverwrite) -> None:
         self.id: Snowflake = Snowflake(overwrite['id'])
         self.type: OverwriteType = OverwriteType(overwrite['type'])
-        self.allow: Permissions = Permissions._from_value(overwrite['allow'])
-        self.deny: Permissions = Permissions._from_value(overwrite['deny'])
+        self.allow: Permissions = Permissions.from_value(overwrite['allow'])
+        self.deny: Permissions = Permissions.from_value(overwrite['deny'])
 
 
 class ThreadMetadata:
@@ -163,17 +163,10 @@ class Channel:
             'default_auto_archive_duration', UNDEFINED
         )
         self.permissions: Permissions | UndefinedType = (
-            Permissions._from_value(data['permissions'])
-            if data.get('permissions') is not None
-            else UNDEFINED
+            Permissions.from_value(data['permissions']) if data.get('permissions') is not None else UNDEFINED
         )
         self.flags: ChannelFlags | UndefinedType = (
-            ChannelFlags._from_value(data['flags'])
-            if data.get('flags') is not None
-            else UNDEFINED
-        )
-        self.total_messages_sent: int | UndefinedType = data.get(
-            'total_messages_sent', UNDEFINED
+            ChannelFlags.from_value(data['flags']) if data.get('flags') is not None else UNDEFINED
         )
         self.available_tags: list[ForumTag] = [
             ForumTag(d) for d in data.get('available_tags', [])
@@ -227,7 +220,7 @@ class DMChannel(MessageableChannel):
     ...
 
 
-class VoiceChannel(MessageableChannel):
+class VoiceChannel(MessageableChannel, AudioChannel):
     ...
 
 
@@ -251,7 +244,7 @@ class Thread(MessageableChannel):
     ...
 
 
-class StageChannel(Channel):
+class StageChannel(AudioChannel, Channel):
     ...
 
 

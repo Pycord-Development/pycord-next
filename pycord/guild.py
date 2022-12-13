@@ -45,8 +45,8 @@ from .types import (
     Widget as DiscordWidget,
     WidgetSettings as DiscordWidgetSettings,
 )
+from .undefined import UNDEFINED, UndefinedType
 from .user import User
-from .utils import UNDEFINED, UndefinedType
 from .welcome_screen import WelcomeScreen
 
 if TYPE_CHECKING:
@@ -67,9 +67,7 @@ class Guild:
             self._discovery_splash: str | None = data['discovery_splash']
             self.owner: bool | UndefinedType = data.get('owner', UNDEFINED)
             self.owner_id: Snowflake = Snowflake(data.get('owner_id'))
-            self.permissions: Permissions = Permissions._from_value(
-                data.get('permissions', 0)
-            )
+            self.permissions: Permissions = Permissions.from_value(data.get('permissions', 0))
             self._afk_channel_id: str | None = data.get('afk_channel_id')
             self.afk_channel_id: Snowflake | None = (
                 Snowflake(self._afk_channel_id)
@@ -118,6 +116,7 @@ class Guild:
             self.system_channel_flags: SystemChannelFlags = (
                 SystemChannelFlags._from_value(data['system_channel_flags'])
             )
+
             self._rules_channel_id: str | None = data.get('rules_channel_id')
             self.rules_channel_id: Snowflake | None = (
                 Snowflake(self._rules_channel_id)

@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from .state import State
 
 from .types import Role as DiscordRole, RoleTags as DiscordRoleTags
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 
 class RoleTags:
@@ -61,7 +61,7 @@ class Role:
             'unicode_emoji', UNDEFINED
         )
         self.position: int = data['position']
-        self.permissions: Permissions = Permissions._from_value(data['permissions'])
+        self.permissions: Permissions = Permissions.from_value(data['permissions'])
         self.managed: bool = data['managed']
         self.mentionable: bool = data['mentionable']
         self._tags: dict[str, str | None] | UndefinedType = data.get('tags', UNDEFINED)

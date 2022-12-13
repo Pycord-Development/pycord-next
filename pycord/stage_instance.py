@@ -25,7 +25,7 @@ from typing import TYPE_CHECKING
 from .enums import StageInstancePrivacyLevel
 from .snowflake import Snowflake
 from .types import StageInstance as DiscordStageInstance
-from .utils import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State

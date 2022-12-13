@@ -31,8 +31,8 @@ from .enums import (
 from .member import Member
 from .snowflake import Snowflake
 from .types import EntityMetadata as DiscordEntityMetadata, GuildScheduledEvent
+from .undefined import UNDEFINED, UndefinedType
 from .user import User
-from .utils import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State

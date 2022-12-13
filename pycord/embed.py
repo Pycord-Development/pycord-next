@@ -32,7 +32,8 @@ from .types import (
     Thumbnail as DiscordThumbnail,
     Video as DiscordVideo,
 )
-from .utils import UNDEFINED, UndefinedType, remove_undefined
+from .undefined import UNDEFINED, UndefinedType
+from .utils import remove_undefined
 
 
 # pure data classes, no user interaction.

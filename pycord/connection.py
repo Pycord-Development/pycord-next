@@ -25,12 +25,8 @@ from typing import TYPE_CHECKING
 
 from .enums import VisibilityType
 from .snowflake import Snowflake
-from .types import (
-    SERVICE,
-    Connection as DiscordConnection,
-    Integration as DiscordIntegration,
-)
-from .utils import UNDEFINED, UndefinedType
+from .types import SERVICE, Connection as DiscordConnection, Integration as DiscordIntegration
+from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State

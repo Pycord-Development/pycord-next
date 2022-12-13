@@ -43,6 +43,7 @@ from .voice import VoiceState
 
 if TYPE_CHECKING:
     from .commands.command import Command
+    from .ext.gears import Gear
     from .flags import Intents
     from .gateway import PassThrough, ShardCluster, ShardManager
 
@@ -103,6 +104,9 @@ class Single:
 
         if self._iter == self._maximum:
             self._parent.stores.pop(next(iter(dict)))
+
+        if self._parent.stores.get(sf) is None:
+            self._parent.stores[sf] = {self._name: [] if self.listable else {}}
 
         if self.listable:
             things = self._parent.stores.get(sf)
@@ -232,6 +236,7 @@ class State:
         self.shard_managers: list[ShardManager] = []
         self.shard_clusters: list[ShardCluster] = []
         self.commands: list[Command] = []
+        self.gears: list[Gear] = []
         self._session_start_limit: dict[str, Any] | None = None
         self._clustered: bool | None = None
         # makes sure that multiple clusters don't start at once
@@ -504,6 +509,9 @@ class State:
                     self._raw_user_fut.set_result(None)
 
                 self._ready = True
+
+                for gear in self.gears:
+                    asyncio.create_task(gear.on_attach(), name=f'Attached Gear: {gear.name}')
         elif type == 'USER_UPDATE':
             user = User(data['user'], self)
             self.user = user

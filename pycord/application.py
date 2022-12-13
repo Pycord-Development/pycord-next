@@ -25,13 +25,9 @@ from typing import TYPE_CHECKING
 from .flags import ApplicationFlags, Permissions
 from .snowflake import Snowflake
 from .team import Team
-from .types import (
-    SCOPE,
-    Application as DiscordApplication,
-    InstallParams as DiscordInstallParams,
-)
+from .types import SCOPE, Application as DiscordApplication, InstallParams as DiscordInstallParams
+from .undefined import UNDEFINED, UndefinedType
 from .user import User
-from .utils import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State
@@ -40,7 +36,7 @@ if TYPE_CHECKING:
 class InstallParams:
     def __init__(self, data: DiscordInstallParams) -> None:
         self.scopes: list[SCOPE] = data['scopes']
-        self.permissions: Permissions = Permissions._from_value(data['permissions'])
+        self.permissions: Permissions = Permissions.from_value(data['permissions'])
 
 
 class Application:
@@ -80,9 +76,7 @@ class Application:
         self.slug: str | UndefinedType = data.get('slug', UNDEFINED)
         self._cover_image: str | UndefinedType = data.get('cover_image', UNDEFINED)
         self.flags: ApplicationFlags | UndefinedType = (
-            ApplicationFlags._from_value(data.get('flags'))
-            if data.get('flags') is not None
-            else UNDEFINED
+            ApplicationFlags.from_value(data.get('flags')) if data.get('flags') is not None else UNDEFINED
         )
         self.tags: list[str] | UndefinedType = data.get('tags', UNDEFINED)
         self.install_params: InstallParams | UndefinedType = (

@@ -29,8 +29,8 @@ from .enums import InviteTargetType
 from .guild import Guild
 from .scheduled_event import ScheduledEvent
 from .types import Invite as DiscordInvite, InviteMetadata as DiscordInviteMetadata
+from .undefined import UNDEFINED, UndefinedType
 from .user import User
-from .utils import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State

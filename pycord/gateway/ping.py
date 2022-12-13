@@ -52,4 +52,4 @@ class Ping:
         if self._pings.get(name):
             self._pings[name].append(func)
         else:
-            self._pings = {name: [func]}
+            self._pings[name] = [func]

@@ -18,14 +18,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from __future__ import annotations
+
 import asyncio
 from multiprocessing import Process
+from typing import TYPE_CHECKING
 
 from aiohttp import BasicAuth
 
-from ..state import State
 from ..utils import chunk
 from .manager import ShardManager
+
+if TYPE_CHECKING:
+    from ..state import State
 
 
 class ShardCluster(Process):

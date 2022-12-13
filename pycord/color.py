@@ -21,9 +21,8 @@
 
 
 class Color:
-    """Represents the default discord colors
+    """Represents the default discord colors.
     Defines factory methods which return a certain color code to be used.
-    .. versionadded:: 0.7.0
     """
 
     def __init__(self, value: int):

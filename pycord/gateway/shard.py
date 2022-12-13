@@ -36,11 +36,11 @@ from aiohttp import (
 )
 
 from ..errors import DisallowedIntents, InvalidAuth, ShardingRequired
-from ..state import State
 from ..utils import dumps, loads
 from .passthrough import PassThrough
 
 if TYPE_CHECKING:
+    from ..state import State
     from .notifier import Notifier
 
 ZLIB_SUFFIX = b'\x00\x00\xff\xff'

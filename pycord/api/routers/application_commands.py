@@ -20,31 +20,20 @@
 # SOFTWARE
 from ...snowflake import Snowflake
 from ...types import ATYPE, ApplicationCommandOption
-from ...utils import UNDEFINED, UndefinedType, remove_undefined
+from ...undefined import UNDEFINED, UndefinedType
+from ...utils import remove_undefined
 from ..route import Route
 from .base import BaseRouter
 
 
 class ApplicationCommands(BaseRouter):
-    async def get_global_application_commands(
-        self, application_id: Snowflake, with_localizations: bool = False
-    ):
-        if with_localizations:
-            return await self.request(
-                'GET',
-                Route(
-                    '/applications/{application_id}/commands?=with_localizations=true',
-                    application_id=application_id,
-                ),
-            )
-        else:
-            return await self.request(
-                'GET',
-                Route(
-                    '/applications/{application_id}/commands',
-                    application_id=application_id,
-                ),
-            )
+
+    async def get_global_application_commands(self, application_id: Snowflake, with_localizations: bool = False):
+        return await self.request(
+            'GET',
+            Route('/applications/{application_id}/commands', application_id=application_id),
+            query_params={"with_localizations": str(with_localizations).lower()},
+        )
 
     async def create_global_application_command(
         self,
