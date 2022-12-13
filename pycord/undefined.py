@@ -25,6 +25,11 @@ from typing import Any, Literal
 
 
 class UndefinedType:
+    """
+    Represents that an object, function, class, and more are undefined.
+
+    This class shouldn't be used and is only used internally for typing.
+    """
     __slots__ = ()
 
     def __bool__(self) -> Literal[False]:
@@ -44,6 +49,9 @@ class UndefinedType:
 
 
 UNDEFINED = UndefinedType()
+"""
+An instance of :class:`.undefined.UndefinedType` for purposes of code use.
+"""
 
 
 def __new__(cls: type[UndefinedType]) -> UndefinedType:
