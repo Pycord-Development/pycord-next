@@ -61,10 +61,10 @@ class HTTPClient(ApplicationCommands, Messages):
         method: str,
         route: BaseRoute,
 
-        data: Optional[dict[str, Any]] = None,
+        data: dict[str, Any] | None = None,
         *,
-        reason: Optional[str] = None,
-        query_params: Optional[dict[str, str]] = None,
+        reason: str | None = None,
+        query_params: dict[str, str] | None = None,
     ) -> str | dict[str, Any] | bytes:
         endpoint = route.merge(self.base_url)
 

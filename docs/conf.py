@@ -24,7 +24,8 @@ sys.path.append(os.path.abspath("extensions"))
 extensions = [
     'resourcelinks',
     'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'sphinx.ext.intersphinx',
 ]
 
 templates_path = ['_templates']
@@ -42,4 +43,10 @@ html_static_path = ['_static']
 resource_links = {
     'guide': 'https://guide.pycord.dev',
     'repository': 'https://github.com/pycord-development/pycord-v3'
+}
+
+# Links used for cross-referencing stuff in other documentation
+intersphinx_mapping = {
+  'py': ('https://docs.python.org/3', None),
+  'aio': ('https://docs.aiohttp.org/en/stable/', None),
 }

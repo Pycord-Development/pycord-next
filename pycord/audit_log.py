@@ -153,7 +153,9 @@ class AuditLog:
     audit_log_entries: list[:class:`.audit_log.AuditLogEntry`]
     auto_moderation_rules: list[:class:`.auto_moderation.AutoModRule`]
     guild_scheduled_events: list[:class:`.scheduled_event.ScheduledEvent`]
-    integrations
+    integrations: list[:class:`.user.Integration`]
+    users: list[:class:`.user.User`]
+    webhooks: list[:class:`.webhook.Webhook`]
     """
     def __init__(self, data: DiscordAuditLog, state: State) -> None:
         # TODO: use models for these

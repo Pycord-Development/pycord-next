@@ -48,7 +48,6 @@ extra_requires = {
     ],
     'docs': [
         'sphinx~=4.4.0',
-        'sphinxawesome-theme~=3.3.7',
         'sphinx-hoverxref~=1.0.1',
     ],
 }

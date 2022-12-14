@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Any, TypeVar
+from typing import Any, TypeVar, Type
 
 from aiohttp import BasicAuth
 

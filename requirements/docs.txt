@@ -1,0 +1,2 @@
+sphinx~=4.4.0
+sphinx-hoverxref~=1.0.1
