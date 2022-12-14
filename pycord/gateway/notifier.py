@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,6 +41,11 @@ class Notifier:
         self.manager.remove_shard(shard)
         del shard
 
-        new_shard = Shard(id=shard_id, state=self.manager._state, session=self.manager.session, notifier=self)
+        new_shard = Shard(
+            id=shard_id,
+            state=self.manager._state,
+            session=self.manager.session,
+            notifier=self,
+        )
         await new_shard.connect(token=self.manager._state.token)
         self.manager.add_shard(new_shard)

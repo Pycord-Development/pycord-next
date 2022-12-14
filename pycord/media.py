@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -43,13 +41,21 @@ if TYPE_CHECKING:
 
 class Emoji:
     def __init__(self, data: DiscordEmoji, state: State) -> None:
-        self.id: Snowflake | None = Snowflake(data['id']) if data['id'] is not None else None
+        self.id: Snowflake | None = (
+            Snowflake(data['id']) if data['id'] is not None else None
+        )
         self.name: str | None = data.get('name')
-        self._roles: list[Snowflake] = [Snowflake(role) for role in data.get('roles', [])]
+        self._roles: list[Snowflake] = [
+            Snowflake(role) for role in data.get('roles', [])
+        ]
         self.roles: list[Role] = []
         self._user: DiscordUser | UndefinedType = data.get('user', UNDEFINED)
-        self.user: UndefinedType | User = User(self._user, state) if self._user is not UNDEFINED else UNDEFINED
-        self.require_colons: UndefinedType | bool = data.get('require_colons', UNDEFINED)
+        self.user: UndefinedType | User = (
+            User(self._user, state) if self._user is not UNDEFINED else UNDEFINED
+        )
+        self.require_colons: UndefinedType | bool = data.get(
+            'require_colons', UNDEFINED
+        )
         self.managed: UndefinedType | bool = data.get('managed', UNDEFINED)
         self.animated: UndefinedType | bool = data.get('animated', UNDEFINED)
         self.available: UndefinedType | bool = data.get('available', UNDEFINED)
@@ -70,16 +76,22 @@ class StickerItem:
 class Sticker:
     def __init__(self, data: DiscordSticker, state: State) -> None:
         self.id: Snowflake | None = Snowflake(data['id'])
-        self.pack_id: Snowflake | None = Snowflake(data.get('pack_id')) if data.get('pack_id') is not None else None
+        self.pack_id: Snowflake | None = (
+            Snowflake(data.get('pack_id')) if data.get('pack_id') is not None else None
+        )
         self.name: str = data['name']
         self.description: str | None = data['description']
         self.tags: list[str] = data['tags'].split(',')
         self.type: StickerType = StickerType(data['type'])
         self.format_type: StickerFormatType = StickerFormatType(data['format_type'])
         self.available: bool | UndefinedType = data.get('available', UNDEFINED)
-        self.guild_id: Snowflake | None = Snowflake(data['guild_id']) if data['guild_id'] is not None else None
+        self.guild_id: Snowflake | None = (
+            Snowflake(data['guild_id']) if data['guild_id'] is not None else None
+        )
         self._user: DiscordUser | UndefinedType = data.get('user', UNDEFINED)
-        self.user: UndefinedType | User = User(self._user, state) if self._user is not UNDEFINED else UNDEFINED
+        self.user: UndefinedType | User = (
+            User(self._user, state) if self._user is not UNDEFINED else UNDEFINED
+        )
         self.sort_value: UndefinedType | int = data.get('sort_value', UNDEFINED)
 
 

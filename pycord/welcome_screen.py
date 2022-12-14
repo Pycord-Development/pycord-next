@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,14 +19,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 from .snowflake import Snowflake
-from .types import WelcomeScreen as DiscordWelcomeScreen, WelcomeScreenChannel as DiscordWelcomeScreenChannel
+from .types import (
+    WelcomeScreen as DiscordWelcomeScreen,
+    WelcomeScreenChannel as DiscordWelcomeScreenChannel,
+)
 
 
 class WelcomeScreenChannel:
     def __init__(self, data: DiscordWelcomeScreenChannel) -> None:
         self.channel_id: Snowflake = Snowflake(data['channel_id'])
         self.description: str = data['description']
-        self.emoji_id: Snowflake | None = Snowflake(data['emoji_id']) if data['emoji_id'] is not None else None
+        self.emoji_id: Snowflake | None = (
+            Snowflake(data['emoji_id']) if data['emoji_id'] is not None else None
+        )
         self.emoji_name: str | None = data['emoji_name']
 
 
@@ -36,4 +39,7 @@ class WelcomeScreen:
     def __init__(self, data: DiscordWelcomeScreen) -> None:
         self.description: str | None = data['description']
         self.welcome_channels: list[WelcomeScreenChannel] = []
-        self.welcome_channels.extend(WelcomeScreenChannel(welcome_channel) for welcome_channel in data['welcome_channels'])
+        self.welcome_channels.extend(
+            WelcomeScreenChannel(welcome_channel)
+            for welcome_channel in data['welcome_channels']
+        )

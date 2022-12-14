@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +29,9 @@ class TeamMember:
         self.team_id: Snowflake = Snowflake(data['team_id'])
         self.user = User(data['user'])
         self.permissions: list[str] = data['permissions']
-        self.membership_state: MembershipState = MembershipState(data['membership_state'])
+        self.membership_state: MembershipState = MembershipState(
+            data['membership_state']
+        )
 
 
 class Team:

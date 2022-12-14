@@ -3,12 +3,12 @@ pycord.api
 ~~~~~~~~~~
 Implementation of the Discord API.
 
-:copyright: 2021-present VincentRPS
+:copyright: 2021-present Pycord Development
 :license: MIT
 """
 import logging
 import sys
-from typing import Any, Optional
+from typing import Any
 
 from aiohttp import BasicAuth, ClientSession, __version__ as aiohttp_version
 
@@ -60,6 +60,7 @@ class HTTPClient(ApplicationCommands, Messages):
         self,
         method: str,
         route: BaseRoute,
+
         data: Optional[dict[str, Any]] = None,
         *,
         reason: Optional[str] = None,
@@ -95,6 +96,7 @@ class HTTPClient(ApplicationCommands, Messages):
                 headers=headers,
                 proxy=self._proxy,
                 proxy_auth=self._proxy_auth,
+
                 params=query_params,
             )
             _log.debug(f'Received back {await r.text()}')

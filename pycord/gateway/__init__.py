@@ -3,7 +3,7 @@ pycord.gateway
 ~~~~~~~~~~~~~~
 Advanced Implementation of the Discord Gateway
 
-:copyright: 2021-present VincentRPS
+:copyright: 2021-present Pycord Development
 :license: MIT
 """
 from .cluster import *

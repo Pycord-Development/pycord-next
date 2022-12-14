@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +38,9 @@ class Connection:
         self.name: str = data['name']
         self.type: SERVICE = data['type']
         self.revoked: bool | UndefinedType = data.get('revoked', UNDEFINED)
-        self._integrations: list[DiscordIntegration] | UndefinedType = data.get('integrations', UNDEFINED)
+        self._integrations: list[DiscordIntegration] | UndefinedType = data.get(
+            'integrations', UNDEFINED
+        )
         self.verified: bool = data['verified']
         self.friend_sync: bool = data['friend_sync']
         self.show_activity: bool = data['show_activity']

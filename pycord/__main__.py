@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,7 +26,7 @@ import pycord
 
 
 def main() -> None:
-    version = pycord.__version__  # type: ignore
+    version = pycord.__version__
     python_version = platform.python_version()
     sys.stderr.write(f'Running on Pycord Version {version},')
     sys.stderr.write(f' with Python version {python_version}.')

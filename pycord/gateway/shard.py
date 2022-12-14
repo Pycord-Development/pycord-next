@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +27,13 @@ from platform import system
 from random import random
 from typing import TYPE_CHECKING, Any
 
-from aiohttp import ClientConnectionError, ClientConnectorError, ClientSession, ClientWebSocketResponse, WSMsgType
+from aiohttp import (
+    ClientConnectionError,
+    ClientConnectorError,
+    ClientSession,
+    ClientWebSocketResponse,
+    WSMsgType,
+)
 
 from ..errors import DisallowedIntents, InvalidAuth, ShardingRequired
 from ..utils import dumps, loads
@@ -57,7 +61,14 @@ RESUMABLE: list[int] = [
 
 
 class Shard:
-    def __init__(self, id: int, state: State, session: ClientSession, notifier: Notifier, version: int = 10) -> None:
+    def __init__(
+        self,
+        id: int,
+        state: State,
+        session: ClientSession,
+        notifier: Notifier,
+        version: int = 10,
+    ) -> None:
         self.id = id
         self.session_id: str | None = None
         self.version = version
@@ -89,13 +100,17 @@ class Shard:
                 self._ws = await self._session.ws_connect(
                     url=url.format(version=self.version, base=self._resume_gateway_url)
                     if resume and self._resume_gateway_url
-                    else url.format(version=self.version, base='wss://gateway.discord.gg'),
+                    else url.format(
+                        version=self.version, base='wss://gateway.discord.gg'
+                    ),
                     proxy=self._notifier.manager.proxy,
                     proxy_auth=self._notifier.manager.proxy_auth,
                 )
                 _log.debug(f'shard:{self.id}: connected to gateway')
         except (ClientConnectionError, ClientConnectorError):
-            _log.debug(f'shard:{self.id}: failed to connect to discord due to connection errors, retrying in 10 seconds')
+            _log.debug(
+                f'shard:{self.id}: failed to connect to discord due to connection errors, retrying in 10 seconds'
+            )
             await asyncio.sleep(10)
             await self.connect(token=token, resume=resume)
             return
@@ -122,7 +137,11 @@ class Shard:
                 'op': 2,
                 'd': {
                     'token': self._token,
-                    'properties': {'os': system(), 'browser': 'pycord', 'device': 'pycord'},
+                    'properties': {
+                        'os': system(),
+                        'browser': 'pycord',
+                        'device': 'pycord',
+                    },
                     'compress': True,
                     'large_threshold': self._state.large_threshold,
                     'shard': [self.id, self._notifier.manager.amount],
@@ -132,7 +151,16 @@ class Shard:
         )
 
     async def send_resume(self) -> None:
-        await self.send({'op': 6, 'd': {'token': self._token, 'session_id': self.session_id, 'seq': self._sequence}})
+        await self.send(
+            {
+                'op': 6,
+                'd': {
+                    'token': self._token,
+                    'session_id': self.session_id,
+                    'seq': self._sequence,
+                },
+            }
+        )
 
     async def send_heartbeat(self, jitter: bool = False) -> None:
         if jitter:
@@ -144,7 +172,9 @@ class Shard:
         try:
             await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
         except ConnectionResetError:
-            _log.debug(f'shard:{self.id}: failed to send heartbeat due to connection reset, reconnecting...')
+            _log.debug(
+                f'shard:{self.id}: failed to send heartbeat due to connection reset, reconnecting...'
+            )
             self._receive_task.cancel()
             if not self._ws.closed:
                 await self._ws.close(code=1008)
@@ -171,7 +201,9 @@ class Shard:
                     text_coded = self._inflator.decompress(msg.data).decode('utf-8')
                 except Exception as e:
                     # while being an edge case, the data could sometimes be corrupted.
-                    _log.debug(f'shard:{self.id}: failed to decompress gateway data {msg.data}:{e}')
+                    _log.debug(
+                        f'shard:{self.id}: failed to decompress gateway data {msg.data}:{e}'
+                    )
                     continue
 
                 _log.debug(f'shard:{self.id}: received message {text_coded}')
@@ -224,7 +256,9 @@ class Shard:
             elif code == 4011:
                 raise ShardingRequired('Discord is requiring you shard your bot')
             elif code == 4014:
-                raise DisallowedIntents('You aren\'t allowed to carry a priviledged intent wanted')
+                raise DisallowedIntents(
+                    "You aren't allowed to carry a priviledged intent wanted"
+                )
 
             if code > 4000 or code == 4000:
                 await self._notifier.shard_died(self)

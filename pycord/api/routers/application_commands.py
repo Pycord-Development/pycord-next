@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +27,7 @@ from .base import BaseRouter
 
 
 class ApplicationCommands(BaseRouter):
+
     async def get_global_application_commands(self, application_id: Snowflake, with_localizations: bool = False):
         return await self.request(
             'GET',
@@ -62,5 +61,9 @@ class ApplicationCommands(BaseRouter):
         )
 
         return await self.request(
-            'POST', Route('/applications/{application_id}/commands', application_id=application_id), data=data
+            'POST',
+            Route(
+                '/applications/{application_id}/commands', application_id=application_id
+            ),
+            data=data,
         )

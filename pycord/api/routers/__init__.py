@@ -3,7 +3,7 @@ pycord.api.routers
 ~~~~~~~~~~~~~~~~~~
 Implementation of Discord API Routes
 
-:copyright: 2021-present VincentRPS
+:copyright: 2021-present Pycord Development
 :license: MIT
 """
 from .application_commands import *

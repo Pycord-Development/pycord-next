@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,7 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import Optional, Union
+from typing import Optional
 
 from pycord.types import Snowflake
 
@@ -30,17 +28,17 @@ __all__ = ['Route', 'BaseRoute']
 class BaseRoute:
     guild_id = Optional[int]
     channel_id = Optional[int]
-    webhook_id: Optional[int]
-    webhook_token: Optional[str]
+    webhook_id: int | None
+    webhook_token: str | None
 
     def __init__(
         self,
         path: str,
-        guild_id: Optional[Snowflake] = None,
-        channel_id: Optional[Snowflake] = None,
-        webhook_id: Optional[Snowflake] = None,
-        webhook_token: Optional[str] = None,
-        **parameters: Union[str, int],
+        guild_id: Snowflake | None = None,
+        channel_id: Snowflake | None = None,
+        webhook_id: Snowflake | None = None,
+        webhook_token: str | None = None,
+        **parameters: str | int,
     ) -> None:
         ...
 
@@ -52,11 +50,11 @@ class Route(BaseRoute):
     def __init__(
         self,
         path: str,
-        guild_id: Optional[Snowflake] = None,
-        channel_id: Optional[Snowflake] = None,
-        webhook_id: Optional[Snowflake] = None,
-        webhook_token: Optional[str] = None,
-        **parameters: Union[str, int],
+        guild_id: Snowflake | None = None,
+        channel_id: Snowflake | None = None,
+        webhook_id: Snowflake | None = None,
+        webhook_token: str | None = None,
+        **parameters: str | int,
     ):
         self.path = path
 
@@ -77,7 +75,7 @@ class Route(BaseRoute):
             **self.parameters,
         )
 
-    def __eq__(self, route: "Route") -> bool:
+    def __eq__(self, route: 'Route') -> bool:
         return (
             route.channel_id == self.channel_id
             or route.guild_id == self.guild_id

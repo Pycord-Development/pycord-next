@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +36,9 @@ from .user import User
 
 class Member:
     def __init__(self, data: GuildMember, state: State) -> None:
-        self.user: User | UndefinedType = User(data.get('user'), state) if data.get('user') is not None else UNDEFINED
+        self.user: User | UndefinedType = (
+            User(data.get('user'), state) if data.get('user') is not None else UNDEFINED
+        )
         self.nick: str | None | UndefinedType = data.get('nick', UNDEFINED)
         self._avatar: str | None | UndefinedType = data.get('avatar', UNDEFINED)
         self.roles: list[Snowflake] = [Snowflake(s) for s in data['roles']]
@@ -58,6 +58,7 @@ class Member:
         )
         self.communication_disabled_until: None | UndefinedType | datetime = (
             datetime.fromisoformat(data.get('communication_disabled_until'))
-            if data.get('communication_disabled_until', UNDEFINED) not in [UNDEFINED, None]
+            if data.get('communication_disabled_until', UNDEFINED)
+            not in [UNDEFINED, None]
             else data.get('communication_disabled_until', UNDEFINED)
         )

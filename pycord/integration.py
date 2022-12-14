@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +53,9 @@ class IntegrationApplication:
         self.name: str = data['name']
         self.icon: str | None = data['icon']
         self.description: str | None = data['description']
-        self.bot: User | UndefinedType = User(data['bot'], state) if data.get('bot') is not None else UNDEFINED
+        self.bot: User | UndefinedType = (
+            User(data['bot'], state) if data.get('bot') is not None else UNDEFINED
+        )
 
 
 class Integration:
@@ -65,18 +65,34 @@ class Integration:
         self.type: INTEGRATION_TYPE = data['type']
         self.enabled: bool | UndefinedType = data.get('enabled', UNDEFINED)
         self.syncing: bool | UndefinedType = data.get('syncing', UNDEFINED)
-        self.role_id: Snowflake | UndefinedType = Snowflake(data['role_id']) if data.get('role_id') else UNDEFINED
-        self.enable_emoticons: bool | UndefinedType = data.get('enable_emoticons', UNDEFINED)
-        self.expire_behavior: INTEGRATION_EXPIRE_BEHAVIOR | UndefinedType = data.get('expire_behavior', UNDEFINED)
-        self.expire_grace_period: int | UndefinedType = data.get('expire_grace_period', UNDEFINED)
-        self.user: User | UndefinedType = User(data['user'], state) if data.get('user') is not None else UNDEFINED
+        self.role_id: Snowflake | UndefinedType = (
+            Snowflake(data['role_id']) if data.get('role_id') else UNDEFINED
+        )
+        self.enable_emoticons: bool | UndefinedType = data.get(
+            'enable_emoticons', UNDEFINED
+        )
+        self.expire_behavior: INTEGRATION_EXPIRE_BEHAVIOR | UndefinedType = data.get(
+            'expire_behavior', UNDEFINED
+        )
+        self.expire_grace_period: int | UndefinedType = data.get(
+            'expire_grace_period', UNDEFINED
+        )
+        self.user: User | UndefinedType = (
+            User(data['user'], state) if data.get('user') is not None else UNDEFINED
+        )
         self.account: Account = Account(data['account'])
         self.synced_at: UndefinedType | datetime = (
-            datetime.fromisoformat(data['synced_at']) if data.get('synced_at') is not None else UNDEFINED
+            datetime.fromisoformat(data['synced_at'])
+            if data.get('synced_at') is not None
+            else UNDEFINED
         )
-        self.subscriber_count: int | UndefinedType = data.get('subscriber_count', UNDEFINED)
+        self.subscriber_count: int | UndefinedType = data.get(
+            'subscriber_count', UNDEFINED
+        )
         self.revoked: bool | UndefinedType = data.get('revoked', UNDEFINED)
         self.application: Application | UndefinedType = (
-            IntegrationApplication(data['application'], state) if data.get('application') is not None else UNDEFINED
+            IntegrationApplication(data['application'], state)
+            if data.get('application') is not None
+            else UNDEFINED
         )
         self.scopes: list[SCOPE] | UndefinedType = data.get('scopes', UNDEFINED)

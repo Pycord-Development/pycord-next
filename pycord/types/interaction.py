@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -57,7 +55,7 @@ class ApplicationCommandInteractionDataOption(TypedDict):
     name: str
     type: ATYPE
     value: NotRequired[str | int | float]
-    options: NotRequired[list["ApplicationCommandInteractionDataOption"]]
+    options: NotRequired[list['ApplicationCommandInteractionDataOption']]
     focused: NotRequired[bool]
 
 

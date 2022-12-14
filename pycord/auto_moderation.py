@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +23,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .enums import AutoModActionType, AutoModEventType, AutoModKeywordPresetType, AutoModTriggerType
+from .enums import (
+    AutoModActionType,
+    AutoModEventType,
+    AutoModKeywordPresetType,
+    AutoModTriggerType,
+)
 from .snowflake import Snowflake
 from .types import (
     AutoModerationAction as DiscordAutoModerationAction,
@@ -41,23 +44,33 @@ if TYPE_CHECKING:
 
 class AutoModTriggerMetadata:
     def __init__(self, data: DiscordAutoModerationTriggerMetadata) -> None:
-        self.keyword_filter: list[str] | UndefinedType = data.get('keyword_filter', UNDEFINED)
-        self.regex_patterns: list[str] | UndefinedType = data.get('regex_patterns', UNDEFINED)
+        self.keyword_filter: list[str] | UndefinedType = data.get(
+            'keyword_filter', UNDEFINED
+        )
+        self.regex_patterns: list[str] | UndefinedType = data.get(
+            'regex_patterns', UNDEFINED
+        )
         self.presets: list[AutoModKeywordPresetType] | UndefinedType = (
             [AutoModKeywordPresetType(preset) for preset in data['presets']]
             if data.get('presets') is not None
             else UNDEFINED
         )
         self.allow_list: list[str] | UndefinedType = data.get('allow_list', UNDEFINED)
-        self.mention_total_limit: int | UndefinedType = data.get('mention_total_limit', UNDEFINED)
+        self.mention_total_limit: int | UndefinedType = data.get(
+            'mention_total_limit', UNDEFINED
+        )
 
 
 class AutoModActionMetadata:
     def __init__(self, data: DiscordAutoModerationActionMetadata) -> None:
         self.channel_id: Snowflake | UndefinedType = (
-            Snowflake(data['channel_id']) if data.get('channel_id') is not None else UNDEFINED
+            Snowflake(data['channel_id'])
+            if data.get('channel_id') is not None
+            else UNDEFINED
         )
-        self.duration_seconds: int | UndefinedType = data.get('duration_seconds', UNDEFINED)
+        self.duration_seconds: int | UndefinedType = data.get(
+            'duration_seconds', UNDEFINED
+        )
 
 
 class AutoModAction:
@@ -74,8 +87,16 @@ class AutoModRule:
         self.creator_id: Snowflake = Snowflake(data['creator_id'])
         self.event_type: AutoModEventType = AutoModEventType(data['event_type'])
         self.trigger_type: AutoModTriggerType = AutoModTriggerType(data['trigger_type'])
-        self.trigger_metadata: AutoModTriggerMetadata = AutoModTriggerMetadata(data['trigger_metadata'])
-        self.actions: list[AutoModAction] = [AutoModAction(action) for action in data['actions']]
+        self.trigger_metadata: AutoModTriggerMetadata = AutoModTriggerMetadata(
+            data['trigger_metadata']
+        )
+        self.actions: list[AutoModAction] = [
+            AutoModAction(action) for action in data['actions']
+        ]
         self.enabled: bool = data['enabled']
-        self.exempt_roles: list[Snowflake] = [Snowflake(role) for role in data.get('exempt_roles', [])]
-        self.exempt_channels: list[Snowflake] = [Snowflake(member) for member in data.get('exempt_channels', [])]
+        self.exempt_roles: list[Snowflake] = [
+            Snowflake(role) for role in data.get('exempt_roles', [])
+        ]
+        self.exempt_channels: list[Snowflake] = [
+            Snowflake(member) for member in data.get('exempt_channels', [])
+        ]

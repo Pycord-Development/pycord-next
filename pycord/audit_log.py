@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -68,20 +66,36 @@ class OptionalAuditEntryInfo:
         self.application_id: Snowflake | UndefinedType = (
             Snowflake(data['application_id']) if 'application_id' in data else UNDEFINED
         )
-        self.auto_moderation_rule_name: str | UndefinedType = data.get('auto_moderation_rule_name', UNDEFINED)
+        self.auto_moderation_rule_name: str | UndefinedType = data.get(
+            'auto_moderation_rule_name', UNDEFINED
+        )
         self.auto_moderation_rule_trigger_type: str | UndefinedType = data.get(
             'auto_moderation_rule_trigger_type', UNDEFINED
         )
-        self.channel_id: Snowflake | UndefinedType = Snowflake(data['channel_id']) if 'channel_id' in data else UNDEFINED
-        self.count: int | UndefinedType = int(data['count']) if 'count' in data else UNDEFINED
-        self.delete_member_days: int | UndefinedType = (
-            int(data['delete_member_days']) if 'delete_member_days' in data else UNDEFINED
+        self.channel_id: Snowflake | UndefinedType = (
+            Snowflake(data['channel_id']) if 'channel_id' in data else UNDEFINED
         )
-        self.id: Snowflake | UndefinedType = Snowflake(data['id']) if 'id' in data else UNDEFINED
-        self.members_removed: int | UndefinedType = int(data['members_removed']) if 'members_removed' in data else UNDEFINED
-        self.message_id: Snowflake | UndefinedType = Snowflake(data['message_id']) if 'message_id' in data else UNDEFINED
+        self.count: int | UndefinedType = (
+            int(data['count']) if 'count' in data else UNDEFINED
+        )
+        self.delete_member_days: int | UndefinedType = (
+            int(data['delete_member_days'])
+            if 'delete_member_days' in data
+            else UNDEFINED
+        )
+        self.id: Snowflake | UndefinedType = (
+            Snowflake(data['id']) if 'id' in data else UNDEFINED
+        )
+        self.members_removed: int | UndefinedType = (
+            int(data['members_removed']) if 'members_removed' in data else UNDEFINED
+        )
+        self.message_id: Snowflake | UndefinedType = (
+            Snowflake(data['message_id']) if 'message_id' in data else UNDEFINED
+        )
         self.role_name: str | UndefinedType = data.get('role_name', UNDEFINED)
-        self.type: int | UndefinedType = int(data['type']) if 'type' in data else UNDEFINED
+        self.type: int | UndefinedType = (
+            int(data['type']) if 'type' in data else UNDEFINED
+        )
 
 
 class AuditLogChange:
@@ -119,10 +133,13 @@ class AuditLogEntry:
         )
         self._changes: list[AuditLogChange] = [AuditLogChange(change) for change in data.get('changes', [])]
         self.user_id: Snowflake | UndefinedType = Snowflake(data['user_id']) if data['user_id'] is not None else UNDEFINED
+
         self.id: Snowflake = Snowflake(data['id'])
         self.action_type: AuditLogEvent = AuditLogEvent(data['action_type'])
         self.options: OptionalAuditEntryInfo | UndefinedType = (
-            OptionalAuditEntryInfo(data['options']) if data.get('options') is not None else UNDEFINED
+            OptionalAuditEntryInfo(data['options'])
+            if data.get('options') is not None
+            else UNDEFINED
         )
         self.reason: str | UndefinedType = data.get('reason', UNDEFINED)
 
@@ -140,9 +157,15 @@ class AuditLog:
     """
     def __init__(self, data: DiscordAuditLog, state: State) -> None:
         # TODO: use models for these
-        self._application_commands: list[DiscordApplicationCommand] = data['application_commands']
-        self.audit_log_entries: list[AuditLogEntry] = [AuditLogEntry(entry) for entry in data['audit_log_entries']]
-        self.auto_moderation_rules: list[AutoModRule] = [AutoModRule(rule, state) for rule in data['auto_moderation_rules']]
+        self._application_commands: list[DiscordApplicationCommand] = data[
+            'application_commands'
+        ]
+        self.audit_log_entries: list[AuditLogEntry] = [
+            AuditLogEntry(entry) for entry in data['audit_log_entries']
+        ]
+        self.auto_moderation_rules: list[AutoModRule] = [
+            AutoModRule(rule, state) for rule in data['auto_moderation_rules']
+        ]
         self.guild_scheduled_events: list[ScheduledEvent] = [
             ScheduledEvent(event, state) for event in data['guild_scheduled_events']
         ]
