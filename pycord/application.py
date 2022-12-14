@@ -34,12 +34,62 @@ if TYPE_CHECKING:
 
 
 class InstallParams:
+    """
+    Discord's Application Installation Parameters.
+
+    Attributes
+    ----------
+    scopes: list[:class:`.types.SCOPE`]
+    permissions: :class:`.flags.Permissions`
+    """
     def __init__(self, data: DiscordInstallParams) -> None:
         self.scopes: list[SCOPE] = data['scopes']
         self.permissions: Permissions = Permissions.from_value(data['permissions'])
 
 
 class Application:
+    """
+    Represents a Discord Application. Like a bot or webhook.
+
+    Attributes
+    ----------
+    id: :class:`.snowflake.Snowflake`
+    name: :class:`str`
+        Name of this Application
+    icon: :class:`str`
+        The Icon hash of the Application
+    description: :class:`str`
+        Description of this Application
+    rpc_origins: list[:class:`str`] | :class:`.undefined.UndefinedType`
+        A list of RPC Origins for this Application
+    bot_public: :class:`bool`
+        Whether this bot can be invited by anyone or only the owner
+    bot_require_code_grant: :class:`bool`
+        Whether this bot needs a code grant to be invited
+    terms_of_service_url: :class:`str` | :class:`.undefined.UndefinedType`
+        The TOS url of this Application
+    privacy_policy_url: :class:`str` | :class:`.undefined.UndefinedType`
+        The Privacy Policy url of this Application
+    owner: :class:`.user.User` | :class:`.undefined.UndefinedType`
+        The owner of this application, if any, or only if a user
+    verify_key: :class:`str`
+        The verification key of this Application
+    team: :class:`Team` | None
+        The team of this Application, if any
+    guild_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
+        The guild this application is withheld in, if any
+    primary_sku_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
+        The Primary SKU ID (Product ID) of this Application, if any
+    slug: :class:`str` | :class:`.undefined.UndefinedType`
+        The slug of this Application, if any
+    flags: :class:`.flags.ApplicationFlags` | :class:`.undefined.UndefinedType`
+        A Class representation of this Application's Flags
+    tags: list[:class:`str`]
+        The list of tags this Application withholds
+    install_params: :class:`.application.InstallParams` | :class:`.undefined.UndefinedType`
+    custom_install_url: :class:`str` | :class:`.undefined.UndefinedType`
+        The Custom Installation URL of this Application
+    """
     def __init__(self, data: DiscordApplication, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self.name: str = data['name']
@@ -78,7 +128,7 @@ class Application:
         self.flags: ApplicationFlags | UndefinedType = (
             ApplicationFlags.from_value(data.get('flags')) if data.get('flags') is not None else UNDEFINED
         )
-        self.tags: list[str] | UndefinedType = data.get('tags', UNDEFINED)
+        self.tags: list[str] = data.get('tags', [])
         self.install_params: InstallParams | UndefinedType = (
             InstallParams(data.get('install_params'))
             if data.get('install_params') is not None

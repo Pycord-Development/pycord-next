@@ -37,6 +37,39 @@ T = TypeVar('T')
 
 
 class Bot:
+    """
+    The class for interacting with Discord with a Bot.
+
+    Parameters
+    ----------
+    intents: :class:`.flags.Intents`
+        The Gateway Intents to use
+    print_banner_on_startup
+        Wether to print the banner on startup or not
+    logging_flavor: Union[int, str, dict[str, Any], None]
+        The logging flavor this bot uses
+
+        Defaults to `None`.
+    max_messages: :class:`int`
+        The maximum amount of Messages to cache
+    shards: :class:`int` | list[:class:`int`]
+        The amount of shards this bot should launch with.
+
+        Defaults to 1.
+    proxy: :class:`str` | None
+        The proxy to use
+    proxy_auth: :class:`aiohttp.BasicAuth` | None
+        The authentication of your proxy.
+
+        Defaults to `None`.
+
+    Attributes
+    ----------
+    user: :class:`.user.User`
+        The user within this bot
+    guilds: list[:class:`.guild.Guild`]
+        The Guilds this Bot is in
+    """
     def __init__(
         self,
         intents: Intents,
@@ -109,6 +142,17 @@ class Bot:
                 return
 
     def run(self, token: str) -> None:
+        """
+        Run the Bot without being clustered.
+
+        .. WARNING::
+            This blocks permanently and doesn't allow functions after it to run
+
+        Parameters
+        ----------
+        token: :class:`str`
+            The authentication token of this Bot.
+        """
         asyncio.run(self._run_async(token=token))
 
     async def _run_cluster(
@@ -165,13 +209,26 @@ class Bot:
 
         await self._run_until_exited()
 
-    def cluster(
-        self,
-        token: str,
-        clusters: int,
-        amount: int | None = None,
-        managers: int | None = None,
-    ) -> None:
+    def cluster(self, token: str, clusters: int, amount: int | None = None, managers: int | None = None) -> None:
+        """
+        Run the Bot in a clustered formation.
+        Much more complex but much more scalable.
+
+        .. WARNING:: Shouldn't be used on Bots under ~300k Guilds
+
+        Parameters
+        ----------
+        token: :class:`str`
+            The authentication token of this Bot.
+        clusters: :class:`int`
+            The amount of clusters to run.
+        amount: :class:`int`
+            The full amount of shards that are/will be running globally (not just on this instance.)
+        managers: :class:`int` | :class:`int`
+            The amount of managers to hold per cluster.
+
+            Defaults to `None` which automatically determines the amount.
+        """
         shards = self._shards if isinstance(self._shards, int) else len(self._shards)
 
         if clusters > shards:
@@ -198,13 +255,33 @@ class Bot:
         )
 
     def listen(self, name: str) -> T:
+        """
+        Listen to an event
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the event to listen to.
+        """
         def wrapper(func: T) -> T:
             self._state.ping.add_listener(name=name, func=func)
             return func
 
         return wrapper
 
-    def command(self, name: str, cls: type[Command], **kwargs: Any) -> T:
+    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+        """
+        Create a command within the Bot
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the Command.
+        cls: type of :class:`.commands.Command`
+            The command type to instantiate.
+        kwargs: dict[str, Any]
+            The kwargs to entail onto the instantiated command.
+        """
         def wrapper(func: T) -> T:
             command = cls(func, name, state=self._state, **kwargs)
             self._state.commands.append(command)
@@ -212,7 +289,19 @@ class Bot:
 
         return wrapper
 
-    def group(self, name: str, cls: type[Group], **kwargs: Any) -> T:
+    def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
+        """
+        Create a brand new Group of Commands
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the Group.
+        cls: type of :class:`.commands.Group`
+            The group type to instantiate.
+        kwargs: dict[str, Any]
+            The kwargs to entail onto the instantiated group.
+        """
         def wrapper(func: T) -> T:
             return cls(func, name, state=self._state, **kwargs)
 

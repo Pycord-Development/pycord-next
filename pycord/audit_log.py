@@ -29,24 +29,39 @@ from .enums import AuditLogEvent
 from .scheduled_event import ScheduledEvent
 from .snowflake import Snowflake
 from .types import (
-    AUDIT_LOG_EVENT_TYPE,
     ApplicationCommand as DiscordApplicationCommand,
     AuditLog as DiscordAuditLog,
     AuditLogChange as DiscordAuditLogChange,
     AuditLogEntry as DiscordAuditLogEntry,
-    AutoModerationRule as DiscordAutoModerationRule,
-    Integration as DiscordIntegration,
     OptionalAuditEntryInfo as DiscordOptionalAuditEntryInfo,
-    Webhook as DiscordWebhook,
 )
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
+from .integration import Integration
+from .webhook import Webhook
 
 if TYPE_CHECKING:
     from .state import State
 
 
 class OptionalAuditEntryInfo:
+    """
+    Represents Optionalized Audit Log Information.
+
+    Attributes
+    ----------
+    application_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
+    auto_moderation_rule_name: :class:`str` | :class:`.undefined.UndefinedType`
+    auto_moderation_rule_trigger_type: :class:`str` | :class:`.undefined.UndefinedType`
+    channel_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
+    count: :class:`int` | :class:`.undefined.UndefinedType`
+    delete_member_days: :class:`int` | :class:`.undefined.UndefinedType`
+    id: :class:`Snowflake` | :class:`.undefined.UndefinedType`
+    members_removed: :class:`int` | :class:`.undefined.UndefinedType`
+    message_id: :class:`Snowflake` | :class:`.undefined.UndefinedType`
+    role_name: :class:`str` | :class:`.undefined.UndefinedType`
+    type: :class:`int` | :class:`.undefined.UndefinedType`
+    """
     def __init__(self, data: DiscordOptionalAuditEntryInfo) -> None:
         self.application_id: Snowflake | UndefinedType = (
             Snowflake(data['application_id']) if 'application_id' in data else UNDEFINED
@@ -84,6 +99,15 @@ class OptionalAuditEntryInfo:
 
 
 class AuditLogChange:
+    """
+    Represents an Audit Log Change
+
+    Attributes
+    ----------
+    key: :class:`str`
+    new_value: Any | :class:`.undefined.UndefinedType`
+    old_value: Any | :class:`.undefined.UndefinedType`
+    """
     def __init__(self, data: DiscordAuditLogChange) -> None:
         self.key: str = data['key']
         self.new_value: Any | UndefinedType = data.get('new_value', UNDEFINED)
@@ -91,6 +115,18 @@ class AuditLogChange:
 
 
 class AuditLogEntry:
+    """
+    Represents an entry into the Audit Log
+
+    Attributes
+    ----------
+    id: :class:`.snowflake.Snowflake`
+    target_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
+    user_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
+    action_type: :class:`.audit_log.AuditLogEvent`
+    options: :class:`.audit_log.OptionalAuditEntryInfo` | :class:`.undefined.UndefinedType`
+    reason: :class:`str` | :class:`.undefined.UndefinedType`
+    """
     def __init__(self, data: DiscordAuditLogEntry) -> None:
         self.target_id: Snowflake | UndefinedType = (
             Snowflake(data['target_id']) if data['target_id'] is not None else UNDEFINED
@@ -109,6 +145,16 @@ class AuditLogEntry:
 
 
 class AuditLog:
+    """
+    Represents an Audit Log inside a Guild
+
+    Attributes
+    ----------
+    audit_log_entries: list[:class:`.audit_log.AuditLogEntry`]
+    auto_moderation_rules: list[:class:`.auto_moderation.AutoModRule`]
+    guild_scheduled_events: list[:class:`.scheduled_event.ScheduledEvent`]
+    integrations
+    """
     def __init__(self, data: DiscordAuditLog, state: State) -> None:
         # TODO: use models for these
         self._application_commands: list[DiscordApplicationCommand] = data[
@@ -123,9 +169,7 @@ class AuditLog:
         self.guild_scheduled_events: list[ScheduledEvent] = [
             ScheduledEvent(event, state) for event in data['guild_scheduled_events']
         ]
-        self._integrations: list[DiscordIntegration] = data['integrations']
-        self.threads: list[Thread] = [
-            Thread(thread, state) for thread in data['threads']
-        ]
+        self.integrations: list[Integration] = [Integration(i) for i in data.get('integrations', [])]
+        self.threads: list[Thread] = [Thread(thread, state) for thread in data['threads']]
         self.users: list[User] = [User(user, state) for user in data['users']]
-        self._webhooks: list[DiscordWebhook] = data['webhooks']
+        self.webhooks: list[Webhook] = [Webhook(w, state) for w in data['webhooks']]
