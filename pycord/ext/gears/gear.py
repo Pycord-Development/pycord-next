@@ -58,6 +58,14 @@ class Gear:
         ...
 
     def listen(self, name: str) -> T:
+        """
+        Listen to an event
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the event to listen to.
+        """
         def wrapper(func: T) -> T:
             if self._listener_functions.get(name):
                 self._listener_functions[name].append(func)
@@ -68,6 +76,18 @@ class Gear:
         return wrapper
 
     def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+        """
+        Create a command within the Gear
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the Command.
+        cls: type of :class:`.commands.Command`
+            The command type to instantiate.
+        kwargs: dict[str, Any]
+            The kwargs to entail onto the instantiated command.
+        """
         def wrapper(func: T) -> T:
             command = cls(func, name, None, **kwargs)
             self._commands.append(command)
@@ -76,6 +96,18 @@ class Gear:
         return wrapper
 
     def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
+        """
+        Create a brand new Group of Commands
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the Group.
+        cls: type of :class:`.commands.Group`
+            The group type to instantiate.
+        kwargs: dict[str, Any]
+            The kwargs to entail onto the instantiated group.
+        """
         def wrapper(func: T) -> T:
             r = cls(func, name, None, **kwargs)
             self._commands.append(r)
