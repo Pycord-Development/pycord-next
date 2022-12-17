@@ -45,6 +45,7 @@ Extension API
    :maxdepth: 1
 
    api/extensions/gears.rst
+   api/extensions/pager.rst
 
 
 Indices and tables

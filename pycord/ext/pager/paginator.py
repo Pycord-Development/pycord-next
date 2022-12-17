@@ -136,11 +136,6 @@ class Paginator:
         ----------
         page: :class:`.Page`
             The page to append
-
-        Exceptions
-        ----------
-        PagerException:
-            This page has already been added to this paginator
         """
         if page in self._pages:
             raise PagerException('This page has already been added to this paginator')
@@ -154,11 +149,6 @@ class Paginator:
         ----------
         page: :class:`.Page`
             The page to remove
-
-        Exceptions
-        ----------
-        PagerException:
-            This page is not part of this paginator
         """
         if page not in self._pages:
             raise PagerException('This page is not part of this paginator')
