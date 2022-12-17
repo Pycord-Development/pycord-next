@@ -33,6 +33,10 @@ class BotException(PycordException):
     pass
 
 
+class InteractionException(BotException):
+    pass
+
+
 class GatewayException(PycordException):
     pass
 

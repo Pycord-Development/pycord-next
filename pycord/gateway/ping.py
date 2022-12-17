@@ -46,7 +46,7 @@ class Ping:
 
         for command in commands:
             if command._processor_event == name:
-                asyncio.create_task(command.invoke(*args, **kwargs))
+                asyncio.create_task(command._invoke(*args, **kwargs))
 
     def add_listener(self, name: str, func: Coroutine) -> None:
         if self._pings.get(name):

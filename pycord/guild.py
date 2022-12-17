@@ -114,7 +114,7 @@ class Guild:
                 else None
             )
             self.system_channel_flags: SystemChannelFlags = (
-                SystemChannelFlags._from_value(data['system_channel_flags'])
+                SystemChannelFlags.from_value(data['system_channel_flags'])
             )
 
             self._rules_channel_id: str | None = data.get('rules_channel_id')

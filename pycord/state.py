@@ -25,6 +25,8 @@ from typing import TYPE_CHECKING, Any, TypedDict, TypeVar
 
 from aiohttp import BasicAuth
 
+from .types.application_commands import ApplicationCommand
+
 from .api import HTTPClient
 from .auto_moderation import AutoModRule
 from .channel import Channel, Thread, identify_channel
@@ -40,6 +42,7 @@ from .snowflake import Snowflake
 from .stage_instance import StageInstance
 from .user import User
 from .voice import VoiceState
+from .interaction import Interaction
 
 if TYPE_CHECKING:
     from .commands.command import Command
@@ -242,6 +245,7 @@ class State:
         # makes sure that multiple clusters don't start at once
         self._cluster_lock: asyncio.Lock = asyncio.Lock()
         self._ready: bool = False
+        self.application_commands: list[ApplicationCommand] = []
 
     def bot_init(
         self,
@@ -310,6 +314,11 @@ class State:
                 await self.cache.channel.obj.add(channel.id, obj)
 
             args.append(guild)
+
+            if guild.id in self._available_guilds:
+                type = 'GUILD_AVAILABLE'
+            else:
+                type = 'GUILD_JOIN'
         elif type == 'GUILD_UPDATE':
             guild = Guild(data=data, state=self)
             args.append(guild)
@@ -478,11 +487,11 @@ class State:
             else:
                 args.append(None)
 
-            await self.cache.messages.add(message.channel_id, message)
+            await self.cache.channel.messages.add(message.channel_id, message)
         elif type == 'MESSAGE_DELETE':
             message_id: Snowflake = Snowflake(data['id'])
 
-            if await self.cache.messages.exists(message_id):
+            if await self.cache.channel.messages.exists(message_id):
                 args.append(await self.cache.channel.messages.get(message_id))
                 await self.cache.channel.messages.remove(message_id)
             else:
@@ -512,8 +521,21 @@ class State:
 
                 for gear in self.gears:
                     asyncio.create_task(gear.on_attach(), name=f'Attached Gear: {gear.name}')
+
+                self._available_guilds: list[int] = [uag['id'] for uag in data['guilds']]
+
+                self.application_commands = []
+                self.application_commands.extend(await self.http.get_global_application_commands(self.user.id, True))
+
+                for command in self.commands:
+                    await command.instantiate()
         elif type == 'USER_UPDATE':
             user = User(data['user'], self)
             self.user = user
+
+        elif type == 'INTERACTION_CREATE':
+            type = 'INTERACTION'
+
+            args.append(Interaction(data, self, True))
 
         await self.ping.dispatch(type, *args, commands=self.commands)

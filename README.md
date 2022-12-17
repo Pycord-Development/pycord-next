@@ -71,7 +71,7 @@ import pycord
 bot = pycord.Bot(intents=pycord.Intents(guilds=True))
 
 
-@bot.listen('on_guild_create')
+@bot.listen('on_guild_available')
 async def handle_new_guild(guild: pycord.Guild) -> None:
     print(f'  In Guild: {guild.name}')
 

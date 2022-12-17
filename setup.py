@@ -34,6 +34,7 @@ packages = [
     'pycord.api.execution',
     'pycord.gateway',
     'pycord.commands',
+    'pycord.commands.application'
     'pycord.api.routers',
     'pycord.ext',
     'pycord.ext.gears',

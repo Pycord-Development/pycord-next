@@ -40,5 +40,8 @@ class Command:
         self.group = group
         self._state = state
 
+    async def instantiate(self) -> None:
+        ...
+
     async def _invoke(self, *args, **kwargs) -> None:
         pass
