@@ -163,10 +163,14 @@ class Channel:
             'default_auto_archive_duration', UNDEFINED
         )
         self.permissions: Permissions | UndefinedType = (
-            Permissions.from_value(data['permissions']) if data.get('permissions') is not None else UNDEFINED
+            Permissions.from_value(data['permissions'])
+            if data.get('permissions') is not None
+            else UNDEFINED
         )
         self.flags: ChannelFlags | UndefinedType = (
-            ChannelFlags.from_value(data['flags']) if data.get('flags') is not None else UNDEFINED
+            ChannelFlags.from_value(data['flags'])
+            if data.get('flags') is not None
+            else UNDEFINED
         )
         self.available_tags: list[ForumTag] = [
             ForumTag(d) for d in data.get('available_tags', [])

@@ -30,6 +30,7 @@ class UndefinedType:
 
     This class shouldn't be used and is only used internally for typing.
     """
+
     __slots__ = ()
 
     def __bool__(self) -> Literal[False]:

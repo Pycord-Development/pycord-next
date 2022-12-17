@@ -90,8 +90,11 @@ class Flags:
         return {
             v: True
             for v in dir(flagcls)
-
-            if not v.startswith('_') and v != 'as_bit' and v != 'from_value' and v != 'mro' and v not in flagcls._IGNORED
+            if not v.startswith('_')
+            and v != 'as_bit'
+            and v != 'from_value'
+            and v != 'mro'
+            and v not in flagcls._IGNORED
         }
 
     @classmethod

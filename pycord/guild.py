@@ -67,7 +67,9 @@ class Guild:
             self._discovery_splash: str | None = data['discovery_splash']
             self.owner: bool | UndefinedType = data.get('owner', UNDEFINED)
             self.owner_id: Snowflake = Snowflake(data.get('owner_id'))
-            self.permissions: Permissions = Permissions.from_value(data.get('permissions', 0))
+            self.permissions: Permissions = Permissions.from_value(
+                data.get('permissions', 0)
+            )
             self._afk_channel_id: str | None = data.get('afk_channel_id')
             self.afk_channel_id: Snowflake | None = (
                 Snowflake(self._afk_channel_id)
