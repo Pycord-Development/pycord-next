@@ -25,7 +25,11 @@ from typing import TYPE_CHECKING
 from .flags import ApplicationFlags, Permissions
 from .snowflake import Snowflake
 from .team import Team
-from .types import SCOPE, Application as DiscordApplication, InstallParams as DiscordInstallParams
+from .types import (
+    SCOPE,
+    Application as DiscordApplication,
+    InstallParams as DiscordInstallParams,
+)
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
 
@@ -42,6 +46,7 @@ class InstallParams:
     scopes: list[:class:`.types.SCOPE`]
     permissions: :class:`.flags.Permissions`
     """
+
     def __init__(self, data: DiscordInstallParams) -> None:
         self.scopes: list[SCOPE] = data['scopes']
         self.permissions: Permissions = Permissions.from_value(data['permissions'])
@@ -90,6 +95,7 @@ class Application:
     custom_install_url: :class:`str` | :class:`.undefined.UndefinedType`
         The Custom Installation URL of this Application
     """
+
     def __init__(self, data: DiscordApplication, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self.name: str = data['name']
@@ -126,7 +132,9 @@ class Application:
         self.slug: str | UndefinedType = data.get('slug', UNDEFINED)
         self._cover_image: str | UndefinedType = data.get('cover_image', UNDEFINED)
         self.flags: ApplicationFlags | UndefinedType = (
-            ApplicationFlags.from_value(data.get('flags')) if data.get('flags') is not None else UNDEFINED
+            ApplicationFlags.from_value(data.get('flags'))
+            if data.get('flags') is not None
+            else UNDEFINED
         )
         self.tags: list[str] = data.get('tags', [])
         self.install_params: InstallParams | UndefinedType = (
