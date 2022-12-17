@@ -72,7 +72,7 @@ bot = pycord.Bot(intents=pycord.Intents(guilds=True))
 
 
 @bot.listen('on_guild_create')
-async def on_ready(guild: pycord.Guild) -> None:
+async def handle_new_guild(guild: pycord.Guild) -> None:
     print(f'  In Guild: {guild.name}')
 
 
