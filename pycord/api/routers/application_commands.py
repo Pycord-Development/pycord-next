@@ -28,12 +28,15 @@ from .base import BaseRouter
 
 
 class ApplicationCommands(BaseRouter):
-
-    async def get_global_application_commands(self, application_id: Snowflake, with_localizations: bool = False):
+    async def get_global_application_commands(
+        self, application_id: Snowflake, with_localizations: bool = False
+    ):
         return await self.request(
             'GET',
-            Route('/applications/{application_id}/commands', application_id=application_id),
-            query_params={"with_localizations": str(with_localizations).lower()},
+            Route(
+                '/applications/{application_id}/commands', application_id=application_id
+            ),
+            query_params={'with_localizations': str(with_localizations).lower()},
         )
 
     async def create_global_application_command(

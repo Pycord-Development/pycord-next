@@ -62,7 +62,6 @@ class HTTPClient(ApplicationCommands, Messages):
         self,
         method: str,
         route: BaseRoute,
-
         data: dict[str, Any] | None = None,
         *,
         reason: str | None = None,
@@ -98,7 +97,6 @@ class HTTPClient(ApplicationCommands, Messages):
                 headers=headers,
                 proxy=self._proxy,
                 proxy_auth=self._proxy_auth,
-
                 params=query_params,
             )
             _log.debug(f'Received back {await r.text()}')

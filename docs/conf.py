@@ -18,8 +18,8 @@ release = '3.0.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-sys.path.insert(0, os.path.abspath(".."))
-sys.path.append(os.path.abspath("extensions"))
+sys.path.insert(0, os.path.abspath('..'))
+sys.path.append(os.path.abspath('extensions'))
 
 extensions = [
     'resourcelinks',
@@ -31,8 +31,8 @@ extensions = [
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-autodoc_member_order = "bysource"
-autodoc_typehints = "none"
+autodoc_member_order = 'bysource'
+autodoc_typehints = 'none'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -42,11 +42,11 @@ html_static_path = ['_static']
 
 resource_links = {
     'guide': 'https://guide.pycord.dev',
-    'repository': 'https://github.com/pycord-development/pycord-v3'
+    'repository': 'https://github.com/pycord-development/pycord-v3',
 }
 
 # Links used for cross-referencing stuff in other documentation
 intersphinx_mapping = {
-  'py': ('https://docs.python.org/3', None),
-  'aio': ('https://docs.aiohttp.org/en/stable/', None),
+    'py': ('https://docs.python.org/3', None),
+    'aio': ('https://docs.aiohttp.org/en/stable/', None),
 }

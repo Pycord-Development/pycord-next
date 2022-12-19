@@ -523,7 +523,7 @@ class State:
                 self._ready = True
 
                 for gear in self.gears:
-                    asyncio.create_task(gear.on_attach(), name=f'Attached Gear: {gear.name}')
+                    asyncio.create_task(gear.on_attach(), name=f'Attaching Gear: {gear.name}')
 
                 self._available_guilds: list[int] = [uag['id'] for uag in data['guilds']]
 
@@ -532,6 +532,7 @@ class State:
 
                 for command in self.commands:
                     await command.instantiate()
+
         elif type == 'USER_UPDATE':
             user = User(data['user'], self)
             self.user = user

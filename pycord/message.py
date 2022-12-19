@@ -172,7 +172,9 @@ class Message:
             else UNDEFINED
         )
         self.flags: MessageFlags | UndefinedType = (
-            MessageFlags.from_value(data.get('flags')) if data.get('flags') is not None else UNDEFINED
+            MessageFlags.from_value(data.get('flags'))
+            if data.get('flags') is not None
+            else UNDEFINED
         )
         self.referenced_message: Message | UndefinedType = (
             Message(data.get('referenced_message'), state)
@@ -180,8 +182,9 @@ class Message:
             else UNDEFINED
         )
         self.interaction: MessageInteraction | UndefinedType = (
-
-            MessageInteraction(data.get('interaction'), state) if data.get('interaction') is not None else UNDEFINED
+            MessageInteraction(data.get('interaction'), state)
+            if data.get('interaction') is not None
+            else UNDEFINED
         )
         self.thread: Thread | UndefinedType = (
             Thread(data.get('thread'), state=state)

@@ -70,6 +70,7 @@ class Bot:
     guilds: list[:class:`.guild.Guild`]
         The Guilds this Bot is in
     """
+
     def __init__(
         self,
         intents: Intents,
@@ -210,7 +211,13 @@ class Bot:
 
         await self._run_until_exited()
 
-    def cluster(self, token: str, clusters: int, amount: int | None = None, managers: int | None = None) -> None:
+    def cluster(
+        self,
+        token: str,
+        clusters: int,
+        amount: int | None = None,
+        managers: int | None = None,
+    ) -> None:
         """
         Run the Bot in a clustered formation.
         Much more complex but much more scalable.
@@ -264,6 +271,7 @@ class Bot:
         name: :class:`str`
             The name of the event to listen to.
         """
+
         def wrapper(func: T) -> T:
             self._state.ping.add_listener(name=name, func=func)
             return func
@@ -283,6 +291,7 @@ class Bot:
         kwargs: dict[str, Any]
             The kwargs to entail onto the instantiated command.
         """
+
         def wrapper(func: T) -> T:
             command = cls(func, name, state=self._state, **kwargs)
             self._state.commands.append(command)
@@ -303,6 +312,7 @@ class Bot:
         kwargs: dict[str, Any]
             The kwargs to entail onto the instantiated group.
         """
+
         def wrapper(func: T) -> T:
             return cls(func, name, state=self._state, **kwargs)
 

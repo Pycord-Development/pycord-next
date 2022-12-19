@@ -65,6 +65,7 @@ class Gear:
         name: :class:`str`
             The name of the event to listen to.
         """
+
         def wrapper(func: T) -> T:
             if self._listener_functions.get(name):
                 self._listener_functions[name].append(func)
@@ -87,6 +88,7 @@ class Gear:
         kwargs: dict[str, Any]
             The kwargs to entail onto the instantiated command.
         """
+
         def wrapper(func: T) -> T:
             command = cls(func, name, None, **kwargs)
             self._commands.append(command)
@@ -107,6 +109,7 @@ class Gear:
         kwargs: dict[str, Any]
             The kwargs to entail onto the instantiated group.
         """
+
         def wrapper(func: T) -> T:
             r = cls(func, name, None, **kwargs)
             self._commands.append(r)

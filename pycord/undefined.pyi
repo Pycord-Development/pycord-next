@@ -26,7 +26,6 @@ from typing import Literal
 
 class UndefinedType(Enum):
     UNDEFINED = auto()
-
     def __bool__(self) -> Literal[False]: ...
 
 UNDEFINED: Literal[UndefinedType.UNDEFINED] = UndefinedType.UNDEFINED
