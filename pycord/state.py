@@ -28,6 +28,7 @@ from aiohttp import BasicAuth
 from .api import HTTPClient
 from .auto_moderation import AutoModRule
 from .channel import Channel, Thread, identify_channel
+from .commands.application.arguments import ArgumentParser
 from .gateway.ping import Ping
 from .guild import Guild
 from .integration import Integration
@@ -247,6 +248,7 @@ class State:
         self.application_commands: list[ApplicationCommand] = []
         self.update_commands: bool = options.get('update_commands', True)
         self.verbose: bool = options.get('verbose', False)
+        self.arg_parser = ArgumentParser()
 
     def bot_init(
         self,

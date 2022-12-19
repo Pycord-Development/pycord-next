@@ -20,19 +20,21 @@
 # SOFTWARE
 from __future__ import annotations
 
+from copy import copy
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Coroutine
 
 from ...enums import ApplicationCommandOptionType
+from ...interaction import Interaction, InteractionOption
 from ...snowflake import Snowflake
 from ...types.interaction import ApplicationCommandData
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
 from ..command import Command
 from ..group import Group
+from .errors import ApplicationCommandException
 
 if TYPE_CHECKING:
-    from ...interaction import Interaction
     from ...state import State
 
 __all__ = ['CommandChoice', 'Option', 'ApplicationCommand']
@@ -74,6 +76,20 @@ class Option:
         self.max_value = max_value
         self.autocomplete = autocomplete
 
+        if TYPE_CHECKING:
+            self.focused: bool | UndefinedType = UNDEFINED
+            self.value: str | int | float | UndefinedType = UNDEFINED
+            self.options: list[InteractionOption] = UNDEFINED
+            self._param: str = UNDEFINED
+
+    def _inter_copy(self, data: InteractionOption) -> Option:
+        c = copy(self)
+
+        c.focused = data.focused
+        c.value = data.value
+        c.options = data.options
+        return c
+
     def to_dict(self) -> dict[str, Any]:
         return remove_undefined(
             type=self.type,
@@ -105,7 +121,6 @@ class ApplicationCommand(Command):
         type: int,
         description: str,
         state: State,
-        options: list[Option] | UndefinedType = UNDEFINED,
         guild_id: int | None = None,
         group: Group | None = None,
         # discord parameters
@@ -125,11 +140,41 @@ class ApplicationCommand(Command):
         self.nsfw = nsfw
         self._subs: list[ApplicationCommand] = []
         self._created: bool = False
-        self.options = options
-        if options is not UNDEFINED:
-            self._options = []
-            for option in options:
-                self._options.append(option.to_dict())
+        self._parse_arguments()
+
+    def _parse_arguments(self) -> None:
+        arg_defaults = self._state.arg_parser.get_arg_defaults(self._callback)
+        self.options: list[Option] = []
+        self._options_dict: dict[str, Option] = {}
+
+        i: int = 0
+
+        for name, v in arg_defaults.items():
+            # ignore interaction
+            if i == 0:
+                i += 1
+                continue
+
+            if v[0] is None and name != 'self':
+                raise ApplicationCommandException(
+                    f'Parameter {name} on command {self.name} has no default set'
+                )
+            elif name == 'self':
+                continue
+            elif not isinstance(v[0], Option):
+                raise ApplicationCommandException(
+                    f'Options may only be of type Option, not {v[0]}'
+                )
+
+            v[0]._param = name
+
+            self.options.append(v[0])
+            self._options_dict[v[0].name] = v[0]
+
+        self._options = []
+
+        for option in self.options:
+            self._options.append(option.to_dict())
 
     async def instantiate(self) -> None:
         if self.guild_id:
@@ -199,4 +244,9 @@ class ApplicationCommand(Command):
         if interaction.data:
             if interaction.data.get('name') is not None:
                 if interaction.data['name'] == self.name:
-                    await self._callback(interaction, *interaction.options)
+                    binding = {}
+                    for option in interaction.options:
+                        o = self._options_dict[option.name]
+                        binding[o._param] = o._inter_copy(option)
+
+                    await self._callback(interaction, **binding)
