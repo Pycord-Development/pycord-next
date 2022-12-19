@@ -246,6 +246,8 @@ class State:
         self._cluster_lock: asyncio.Lock = asyncio.Lock()
         self._ready: bool = False
         self.application_commands: list[ApplicationCommand] = []
+        self.update_commands: bool = options.get('update_commands', True)
+        self.verbose: bool = options.get('verbose', False)
 
     def bot_init(
         self,
@@ -260,6 +262,7 @@ class State:
             base_url=self.options.get('http_base_url', 'https://discord.com/api/v10'),
             proxy=proxy,
             proxy_auth=proxy_auth,
+            verbose=self.verbose
         )
         self._clustered = clustered
 

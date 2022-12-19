@@ -156,7 +156,7 @@ class Embed:
         *,
         title: str,
         description: str | UndefinedType = UNDEFINED,
-        url: str | UndefinedType = None,
+        url: str | UndefinedType = UNDEFINED,
         timestamp: datetime | UndefinedType = UNDEFINED,
         color: Color | UndefinedType = UNDEFINED,
         thumbnail: Thumbnail | UndefinedType = UNDEFINED,

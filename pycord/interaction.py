@@ -33,6 +33,15 @@ if TYPE_CHECKING:
     from .state import State
 
 
+class InteractionOption:
+    def __init__(self, name: str, type: int, value: str | int | float | UndefinedType = UNDEFINED, options: list[InteractionOption] = [], focused: bool | UndefinedType = UNDEFINED) -> None:
+        self.name = name
+        self.type = type
+        self.value = value
+        self.options = options
+        self.focused = focused
+
+
 class Interaction:
     def __init__(self, data: InteractionData, state: State, response: bool = False) -> None:
         self._state = state
@@ -57,6 +66,19 @@ class Interaction:
         self.app_permissions: str | UndefinedType = data.get('app_permissions', UNDEFINED)
         self.locale: str | UndefinedType = data.get('locale', UNDEFINED)
         self.guild_locale: str | UndefinedType = data.get('guild_locale', UNDEFINED)
+
+        # app command data
+        if self.type == 2:
+            self.command_id = Snowflake(self.data['id'])
+            self.name = self.data['name']
+            self.application_command_type = self.data['type']
+            self.resolved = self.data.get('resolved')
+            self.options = [InteractionOption(**option) for option in self.data.get('options', [])]
+            self.guild_id = Snowflake(data.get('guild_id')) if data.get('guild_id') is not None else UNDEFINED
+        elif self.type == 3:
+            self.custom_id = Snowflake(self.data['custom_id'])
+            self.component_type = self.data['component_type']
+            self.values = self.data['values']
 
     @property
     def resp(self) -> InteractionResponse:

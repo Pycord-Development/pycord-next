@@ -79,10 +79,11 @@ class Bot:
         shards: int | list[int] = 1,
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
+        verbose: bool = False,
     ) -> None:
         self.intents: Intents = intents
         self.max_messages: int = max_messages
-        self._state: State = State(intents=self.intents, max_messages=self.max_messages)
+        self._state: State = State(intents=self.intents, max_messages=self.max_messages, verbose=verbose)
         self._shards = shards
         self._logging_flavor: int | str | dict[str, Any] = logging_flavor
         self._print_banner = print_banner_on_startup
