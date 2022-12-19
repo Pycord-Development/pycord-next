@@ -18,9 +18,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from ...types.interaction import InteractionResponse
 from ...snowflake import Snowflake
 from ...types import ATYPE, ApplicationCommandOption
+from ...types.interaction import InteractionResponse
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
 from ..route import Route
@@ -101,16 +101,27 @@ class ApplicationCommands(BaseRouter):
         return await self.request(
             'PATCH',
             Route(
-                '/applications/{application_id}/commands/{command_id}', application_id=application_id, command_id=command_id
+                '/applications/{application_id}/commands/{command_id}',
+                application_id=application_id,
+                command_id=command_id,
             ),
-            data=data
+            data=data,
         )
 
-    async def get_guild_application_commands(self, application_id: Snowflake, guild_id: Snowflake, with_localizations: bool = False):
+    async def get_guild_application_commands(
+        self,
+        application_id: Snowflake,
+        guild_id: Snowflake,
+        with_localizations: bool = False,
+    ):
         return await self.request(
             'GET',
-            Route('/applications/{application_id}/guilds/{guild_id}/commands', application_id=application_id, guild_id=guild_id),
-            query_params={"with_localizations": str(with_localizations).lower()},
+            Route(
+                '/applications/{application_id}/guilds/{guild_id}/commands',
+                application_id=application_id,
+                guild_id=guild_id,
+            ),
+            query_params={'with_localizations': str(with_localizations).lower()},
         )
 
     async def create_guild_application_command(
@@ -142,7 +153,9 @@ class ApplicationCommands(BaseRouter):
         return await self.request(
             'POST',
             Route(
-                '/applications/{application_id}/guilds/{guild_id}/commands', application_id=application_id, guild_id=guild_id
+                '/applications/{application_id}/guilds/{guild_id}/commands',
+                application_id=application_id,
+                guild_id=guild_id,
             ),
             data=data,
         )
@@ -177,23 +190,26 @@ class ApplicationCommands(BaseRouter):
         return await self.request(
             'PATCH',
             Route(
-                '/applications/{application_id}/guilds/{guild_id}/commands/{command_id}', application_id=application_id, guild_id=guild_id, command_id=command_id
+                '/applications/{application_id}/guilds/{guild_id}/commands/{command_id}',
+                application_id=application_id,
+                guild_id=guild_id,
+                command_id=command_id,
             ),
-            data=data
+            data=data,
         )
 
     async def create_interaction_response(
         self,
         interaction_id: Snowflake,
         interaction_token: str,
-        response: InteractionResponse
+        response: InteractionResponse,
     ) -> None:
         await self.request(
             'POST',
             Route(
                 '/interactions/{interaction_id}/{interaction_token}/callback',
                 interaction_id=interaction_id,
-                interaction_token=interaction_token
+                interaction_token=interaction_token,
             ),
-            data=response
+            data=response,
         )

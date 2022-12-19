@@ -25,14 +25,13 @@ from typing import TYPE_CHECKING, Any, TypedDict, TypeVar
 
 from aiohttp import BasicAuth
 
-from .types.application_commands import ApplicationCommand
-
 from .api import HTTPClient
 from .auto_moderation import AutoModRule
 from .channel import Channel, Thread, identify_channel
 from .gateway.ping import Ping
 from .guild import Guild
 from .integration import Integration
+from .interaction import Interaction
 from .media import Emoji, Sticker
 from .member import Member
 from .message import Message
@@ -40,9 +39,9 @@ from .role import Role
 from .scheduled_event import ScheduledEvent
 from .snowflake import Snowflake
 from .stage_instance import StageInstance
+from .types.application_commands import ApplicationCommand
 from .user import User
 from .voice import VoiceState
-from .interaction import Interaction
 
 if TYPE_CHECKING:
     from .commands.command import Command
@@ -262,7 +261,7 @@ class State:
             base_url=self.options.get('http_base_url', 'https://discord.com/api/v10'),
             proxy=proxy,
             proxy_auth=proxy_auth,
-            verbose=self.verbose
+            verbose=self.verbose,
         )
         self._clustered = clustered
 
@@ -523,12 +522,18 @@ class State:
                 self._ready = True
 
                 for gear in self.gears:
-                    asyncio.create_task(gear.on_attach(), name=f'Attaching Gear: {gear.name}')
+                    asyncio.create_task(
+                        gear.on_attach(), name=f'Attaching Gear: {gear.name}'
+                    )
 
-                self._available_guilds: list[int] = [uag['id'] for uag in data['guilds']]
+                self._available_guilds: list[int] = [
+                    uag['id'] for uag in data['guilds']
+                ]
 
                 self.application_commands = []
-                self.application_commands.extend(await self.http.get_global_application_commands(self.user.id, True))
+                self.application_commands.extend(
+                    await self.http.get_global_application_commands(self.user.id, True)
+                )
 
                 for command in self.commands:
                     await command.instantiate()

@@ -19,14 +19,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
-from .errors import InteractionException
+
 from .embed import Embed
-from .message import Message
-from .undefined import UNDEFINED, UndefinedType
-from .snowflake import Snowflake
-from .types import Interaction as InteractionData, INTERACTION_DATA
+from .errors import InteractionException
 from .member import Member
+from .message import Message
+from .snowflake import Snowflake
+from .types import INTERACTION_DATA, Interaction as InteractionData
+from .undefined import UNDEFINED, UndefinedType
 from .user import User
 
 if TYPE_CHECKING:
@@ -34,7 +36,14 @@ if TYPE_CHECKING:
 
 
 class InteractionOption:
-    def __init__(self, name: str, type: int, value: str | int | float | UndefinedType = UNDEFINED, options: list[InteractionOption] = [], focused: bool | UndefinedType = UNDEFINED) -> None:
+    def __init__(
+        self,
+        name: str,
+        type: int,
+        value: str | int | float | UndefinedType = UNDEFINED,
+        options: list[InteractionOption] = [],
+        focused: bool | UndefinedType = UNDEFINED,
+    ) -> None:
         self.name = name
         self.type = type
         self.value = value
@@ -43,7 +52,9 @@ class InteractionOption:
 
 
 class Interaction:
-    def __init__(self, data: InteractionData, state: State, response: bool = False) -> None:
+    def __init__(
+        self, data: InteractionData, state: State, response: bool = False
+    ) -> None:
         self._state = state
         if response:
             self.response = InteractionResponse(self)
@@ -52,9 +63,13 @@ class Interaction:
         self.type = data['type']
         self.data: INTERACTION_DATA | UndefinedType = data.get('data', UNDEFINED)
         _guild_id = data.get('guild_id')
-        self.guild_id: Snowflake | UndefinedType = Snowflake(_guild_id) if _guild_id is not None else UNDEFINED
+        self.guild_id: Snowflake | UndefinedType = (
+            Snowflake(_guild_id) if _guild_id is not None else UNDEFINED
+        )
         _channel_id = data.get('channel_id')
-        self.channel_id: Snowflake | UndefinedType = Snowflake(_channel_id) if _channel_id is not None else UNDEFINED
+        self.channel_id: Snowflake | UndefinedType = (
+            Snowflake(_channel_id) if _channel_id is not None else UNDEFINED
+        )
         _member = data.get('member')
         self.member = Member(_member, state) if _member is not None else UNDEFINED
         _user = data.get('user')
@@ -62,8 +77,12 @@ class Interaction:
         self.token = data['token']
         self.version = data['version']
         _message = data.get('message')
-        self.message: Message | UndefinedType = Message(_message, state) if _message is not None else UNDEFINED
-        self.app_permissions: str | UndefinedType = data.get('app_permissions', UNDEFINED)
+        self.message: Message | UndefinedType = (
+            Message(_message, state) if _message is not None else UNDEFINED
+        )
+        self.app_permissions: str | UndefinedType = data.get(
+            'app_permissions', UNDEFINED
+        )
         self.locale: str | UndefinedType = data.get('locale', UNDEFINED)
         self.guild_locale: str | UndefinedType = data.get('guild_locale', UNDEFINED)
 
@@ -73,8 +92,14 @@ class Interaction:
             self.name = self.data['name']
             self.application_command_type = self.data['type']
             self.resolved = self.data.get('resolved')
-            self.options = [InteractionOption(**option) for option in self.data.get('options', [])]
-            self.guild_id = Snowflake(data.get('guild_id')) if data.get('guild_id') is not None else UNDEFINED
+            self.options = [
+                InteractionOption(**option) for option in self.data.get('options', [])
+            ]
+            self.guild_id = (
+                Snowflake(data.get('guild_id'))
+                if data.get('guild_id') is not None
+                else UNDEFINED
+            )
         elif self.type == 3:
             self.custom_id = Snowflake(self.data['custom_id'])
             self.component_type = self.data['component_type']
@@ -103,7 +128,14 @@ class InteractionResponse:
         await self._parent._state.http.create_interaction_response(
             self._parent.id,
             self._parent.token,
-            {'type': 4, 'data': {'content': content, 'tts': tts, 'embeds': embeds, 'flags': flags}}
+            {
+                'type': 4,
+                'data': {
+                    'content': content,
+                    'tts': tts,
+                    'embeds': embeds,
+                    'flags': flags,
+                },
+            },
         )
         self.responded = True
-        

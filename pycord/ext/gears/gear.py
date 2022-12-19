@@ -21,7 +21,7 @@
 from __future__ import annotations
 
 from collections.abc import Coroutine
-from typing import TYPE_CHECKING, Any, TypeVar, Type
+from typing import TYPE_CHECKING, Any, Type, TypeVar
 
 from ...commands import Command, Group
 

@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Any, TypeVar, Type
+from typing import Any, Type, TypeVar
 
 from aiohttp import BasicAuth
 
@@ -84,7 +84,9 @@ class Bot:
     ) -> None:
         self.intents: Intents = intents
         self.max_messages: int = max_messages
-        self._state: State = State(intents=self.intents, max_messages=self.max_messages, verbose=verbose)
+        self._state: State = State(
+            intents=self.intents, max_messages=self.max_messages, verbose=verbose
+        )
         self._shards = shards
         self._logging_flavor: int | str | dict[str, Any] = logging_flavor
         self._print_banner = print_banner_on_startup

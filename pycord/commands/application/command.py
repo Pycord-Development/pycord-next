@@ -19,27 +19,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 from __future__ import annotations
-from ...utils import remove_undefined
+
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any, Coroutine
+
+from ...enums import ApplicationCommandOptionType
+from ...snowflake import Snowflake
 from ...types.interaction import ApplicationCommandData
 from ...undefined import UNDEFINED, UndefinedType
+from ...utils import remove_undefined
 from ..command import Command
-from typing import TYPE_CHECKING, Any, Coroutine
 from ..group import Group
-from dataclasses import dataclass
-from ...snowflake import Snowflake
-from ...enums import ApplicationCommandOptionType
 
 if TYPE_CHECKING:
-    from ...state import State
     from ...interaction import Interaction
+    from ...state import State
 
 __all__ = ['CommandChoice', 'Option', 'ApplicationCommand']
+
 
 @dataclass
 class CommandChoice:
     name: str
     value: str | int | float
     name_localizations: dict[str, str] | None = None
+
 
 class Option:
     def __init__(
@@ -51,7 +55,7 @@ class Option:
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         required: bool | UndefinedType = UNDEFINED,
         choices: list[CommandChoice] | UndefinedType = UNDEFINED,
-        options: list["Option"] | UndefinedType = UNDEFINED,
+        options: list['Option'] | UndefinedType = UNDEFINED,
         channel_types: list[int] | UndefinedType = UNDEFINED,
         min_value: int | UndefinedType = UNDEFINED,
         max_value: int | UndefinedType = UNDEFINED,
@@ -79,13 +83,15 @@ class Option:
             description_localizations=self.description_localizations,
             required=self.required,
             choices=self.choices,
-            options=[option.to_dict() for option in self.options] if self.options is not UNDEFINED else UNDEFINED,
+            options=[option.to_dict() for option in self.options]
+            if self.options is not UNDEFINED
+            else UNDEFINED,
             channel_types=self.channel_types,
             min_value=self.min_value,
             max_value=self.max_value,
-            autocomplete=self.autocomplete
+            autocomplete=self.autocomplete,
         )
-        
+
 
 class ApplicationCommand(Command):
     _processor_event = 'on_interaction'
@@ -127,7 +133,11 @@ class ApplicationCommand(Command):
 
     async def instantiate(self) -> None:
         if self.guild_id:
-            guild_commands: list[ApplicationCommandData] = await self._state.http.get_guild_application_commands(self._state.user.id, self.guild_id, True)
+            guild_commands: list[
+                ApplicationCommandData
+            ] = await self._state.http.get_guild_application_commands(
+                self._state.user.id, self.guild_id, True
+            )
 
             for app_cmd in guild_commands:
                 if app_cmd['name'] == self.name and self._state.update_commands:
@@ -140,7 +150,7 @@ class ApplicationCommand(Command):
                         description=self.description,
                         description_localizations=self.description_localizations,
                         type=self.type,
-                        options=self._options
+                        options=self._options,
                     )
                     self._created = True
                     break
@@ -154,7 +164,7 @@ class ApplicationCommand(Command):
                     description=self.description,
                     description_localizations=self.description_localizations,
                     type=self.type,
-                    options=self._options
+                    options=self._options,
                 )
 
             return
@@ -169,7 +179,7 @@ class ApplicationCommand(Command):
                     description=self.description,
                     description_localizations=self.description_localizations,
                     type=self.type,
-                    options=self._options
+                    options=self._options,
                 )
                 self._created = True
                 break
@@ -182,7 +192,7 @@ class ApplicationCommand(Command):
                 description=self.description,
                 description_localizations=self.description_localizations,
                 type=self.type,
-                options=self._options
+                options=self._options,
             )
 
     async def _invoke(self, interaction: Interaction) -> None:

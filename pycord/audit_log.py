@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING, Any
 from .auto_moderation import AutoModRule
 from .channel import Thread
 from .enums import AuditLogEvent
+from .integration import Integration
 from .scheduled_event import ScheduledEvent
 from .snowflake import Snowflake
 from .types import (
@@ -37,7 +38,6 @@ from .types import (
 )
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
-from .integration import Integration
 from .webhook import Webhook
 
 if TYPE_CHECKING:
