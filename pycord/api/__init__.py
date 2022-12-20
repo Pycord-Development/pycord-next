@@ -30,7 +30,7 @@ _log = logging.getLogger(__name__)
 class HTTPClient(ApplicationCommands, Messages):
     def __init__(
         self,
-        token: str,
+        token: str | None = None,
         base_url: str = 'https://discord.com/api/v10',
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
@@ -41,11 +41,12 @@ class HTTPClient(ApplicationCommands, Messages):
         self._proxy = proxy
         self._proxy_auth = proxy_auth
         self._headers = {
-            'Authorization': f'Bot {token}',
             'User-Agent': 'DiscordBot (https://pycord.dev, {0}) Python/{1[0]}.{1[1]} aiohttp/{2}'.format(
                 __version__, sys.version_info, aiohttp_version
             ),
         }
+        if token:
+            self._headers['Authorization'] = f'Bot {token}'
         self.verbose = verbose
 
         self._session: None | ClientSession = None
