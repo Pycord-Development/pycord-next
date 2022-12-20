@@ -20,6 +20,7 @@
 # SOFTWARE
 from __future__ import annotations
 
+from functools import cached_property
 from typing import TYPE_CHECKING
 
 from .embed import Embed
@@ -30,6 +31,7 @@ from .snowflake import Snowflake
 from .types import INTERACTION_DATA, Interaction as InteractionData
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
+from .webhook import Webhook
 
 if TYPE_CHECKING:
     from .state import State
@@ -115,6 +117,11 @@ class InteractionResponse:
     def __init__(self, parent: Interaction) -> None:
         self._parent = parent
         self.responded: bool = False
+        self._deferred: bool = False
+
+    @cached_property
+    def followup(self) -> Webhook:
+        return Webhook(self._parent.id, self._parent.token)
 
     async def send(
         self,
@@ -140,3 +147,13 @@ class InteractionResponse:
             },
         )
         self.responded = True
+
+    async def defer(self) -> None:
+        if self._deferred:
+            raise InteractionException('This interaction has already been deferred')
+
+        await self._parent._state.http.create_interaction_response(
+            self._parent.id, self._parent.token, {'type': 5}
+        )
+
+        self._deferred = True
