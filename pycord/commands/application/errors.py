@@ -18,30 +18,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from __future__ import annotations
 
-from collections.abc import Coroutine
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from ..state import State
-    from .group import Group
+from ...errors import PycordException
 
 
-class Command:
-    _processor_event: str
-
-    def __init__(
-        self, callback: Coroutine, name: str, state: State, group: Group | None = None
-    ) -> None:
-        self._callback = callback
-
-        self.name = name
-        self.group = group
-        self._state = state
-
-    async def instantiate(self) -> None:
-        ...
-
-    async def _invoke(self, *args, **kwargs) -> None:
-        pass
+class ApplicationCommandException(PycordException):
+    ...

@@ -23,6 +23,7 @@ from .gateway import *
 from .guild import *
 from .guild_template import *
 from .integration import *
+from .interaction import *
 from .interface import *
 from .invite import *
 from .media import *

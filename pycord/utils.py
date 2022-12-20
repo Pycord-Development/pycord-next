@@ -62,7 +62,7 @@ def parse_errors(errors: dict[str, Any], key: str | None = None) -> dict[str, st
             try:
                 errors_ = v['_errors']
             except KeyError:
-                ret.append(parse_errors(errors=errors_, key=kie).items())
+                continue
             else:
                 ret.append((kie, ''.join(x.get('message') for x in errors_)))
         else:

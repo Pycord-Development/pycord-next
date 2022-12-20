@@ -15,7 +15,7 @@ from aiohttp import BasicAuth, ClientSession, __version__ as aiohttp_version
 from pycord._about import __version__
 
 from .. import utils
-from ..errors import Forbidden, HTTPException, InternalError, NotFound
+from ..errors import BotException, Forbidden, HTTPException, InternalError, NotFound
 from ..utils import dumps
 from .execution import Executer
 from .json_decoder import JSONDecoder
@@ -34,6 +34,7 @@ class HTTPClient(ApplicationCommands, Messages):
         base_url: str = 'https://discord.com/api/v10',
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
+        verbose: bool = False,
     ) -> None:
         self.base_url = base_url
         self._json_decoder = JSONDecoder()
@@ -45,6 +46,7 @@ class HTTPClient(ApplicationCommands, Messages):
                 __version__, sys.version_info, aiohttp_version
             ),
         }
+        self.verbose = verbose
 
         self._session: None | ClientSession = None
         self._executers: list[Executer] = []
@@ -123,7 +125,10 @@ class HTTPClient(ApplicationCommands, Messages):
             elif r.ok:
                 return data
             else:
-                raise HTTPException(resp=r, data=data)
+                if self.verbose:
+                    raise BotException(r, data)
+                else:
+                    raise HTTPException(resp=r, data=data)
 
     async def get_gateway_bot(self) -> dict[str, Any]:
         return await self.request('GET', Route('/gateway/bot'))

@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Any, TypeVar, Type
+from typing import Any, Coroutine, Type, TypeVar
 
 from aiohttp import BasicAuth
 
@@ -80,10 +80,13 @@ class Bot:
         shards: int | list[int] = 1,
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
+        verbose: bool = False,
     ) -> None:
         self.intents: Intents = intents
         self.max_messages: int = max_messages
-        self._state: State = State(intents=self.intents, max_messages=self.max_messages)
+        self._state: State = State(
+            intents=self.intents, max_messages=self.max_messages, verbose=verbose
+        )
         self._shards = shards
         self._logging_flavor: int | str | dict[str, Any] = logging_flavor
         self._print_banner = print_banner_on_startup
@@ -277,7 +280,7 @@ class Bot:
 
         return wrapper
 
-    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+    def command(self, name: str, cls: T, **kwargs: Any) -> T:
         """
         Create a command within the Bot
 
@@ -291,7 +294,7 @@ class Bot:
             The kwargs to entail onto the instantiated command.
         """
 
-        def wrapper(func: T) -> T:
+        def wrapper(func: Coroutine) -> T:
             command = cls(func, name, state=self._state, **kwargs)
             self._state.commands.append(command)
             return command

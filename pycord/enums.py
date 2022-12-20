@@ -18,7 +18,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from fastenum import Enum
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from enum import Enum
+else:
+    from fastenum.fastenum import Enum
 
 
 class VerificationLevel(Enum):

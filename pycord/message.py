@@ -107,7 +107,7 @@ class MessageInteraction:
         self.id: Snowflake = Snowflake(data['id'])
         self.type: InteractionType = InteractionType(data['type'])
         self.name: str = data['name']
-        self.user: User = User(data['user'])
+        self.user: User = User(data['user'], state)
         self.member: Member | UndefinedType = (
             Member(data.get('member'), state)
             if data.get('member') is not None

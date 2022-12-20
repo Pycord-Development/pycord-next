@@ -13,6 +13,28 @@ Bot
     :members:
 
 
+Application Commands
+--------------------
+
+Application Command
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ApplicationCommand()
+    :members:
+
+Option
+~~~~~~
+
+.. autoclass:: Option()
+    :members:
+
+Choice
+~~~~~~
+
+.. autoclass:: CommandChoice()
+    :members:
+
+
 Discord Models
 --------------
 

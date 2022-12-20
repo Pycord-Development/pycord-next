@@ -28,9 +28,11 @@ from aiohttp import BasicAuth
 from .api import HTTPClient
 from .auto_moderation import AutoModRule
 from .channel import Channel, Thread, identify_channel
+from .commands.application.arguments import ArgumentParser
 from .gateway.ping import Ping
 from .guild import Guild
 from .integration import Integration
+from .interaction import Interaction
 from .media import Emoji, Sticker
 from .member import Member
 from .message import Message
@@ -38,6 +40,7 @@ from .role import Role
 from .scheduled_event import ScheduledEvent
 from .snowflake import Snowflake
 from .stage_instance import StageInstance
+from .types.application_commands import ApplicationCommand
 from .user import User
 from .voice import VoiceState
 
@@ -242,6 +245,9 @@ class State:
         # makes sure that multiple clusters don't start at once
         self._cluster_lock: asyncio.Lock = asyncio.Lock()
         self._ready: bool = False
+        self.application_commands: list[ApplicationCommand] = []
+        self.update_commands: bool = options.get('update_commands', True)
+        self.verbose: bool = options.get('verbose', False)
 
     def bot_init(
         self,
@@ -256,6 +262,7 @@ class State:
             base_url=self.options.get('http_base_url', 'https://discord.com/api/v10'),
             proxy=proxy,
             proxy_auth=proxy_auth,
+            verbose=self.verbose,
         )
         self._clustered = clustered
 
@@ -310,6 +317,11 @@ class State:
                 await self.cache.channel.obj.add(channel.id, obj)
 
             args.append(guild)
+
+            if guild.id in self._available_guilds:
+                type = 'GUILD_AVAILABLE'
+            else:
+                type = 'GUILD_JOIN'
         elif type == 'GUILD_UPDATE':
             guild = Guild(data=data, state=self)
             args.append(guild)
@@ -478,11 +490,11 @@ class State:
             else:
                 args.append(None)
 
-            await self.cache.messages.add(message.channel_id, message)
+            await self.cache.channel.messages.add(message.channel_id, message)
         elif type == 'MESSAGE_DELETE':
             message_id: Snowflake = Snowflake(data['id'])
 
-            if await self.cache.messages.exists(message_id):
+            if await self.cache.channel.messages.exists(message_id):
                 args.append(await self.cache.channel.messages.get(message_id))
                 await self.cache.channel.messages.remove(message_id)
             else:
@@ -512,10 +524,36 @@ class State:
 
                 for gear in self.gears:
                     asyncio.create_task(
-                        gear.on_attach(), name=f'Attached Gear: {gear.name}'
+                        gear.on_attach(), name=f'Attaching Gear: {gear.name}'
                     )
+
+                self._available_guilds: list[int] = [
+                    uag['id'] for uag in data['guilds']
+                ]
+
+                self.application_commands = []
+                self.application_commands.extend(
+                    await self.http.get_global_application_commands(self.user.id, True)
+                )
+                self._application_command_names: list[str] = []
+
+                for command in self.commands:
+                    await command.instantiate()
+                    self._application_command_names.append(command.name)
+
+                for app_command in self.application_commands:
+                    if app_command['name'] not in self._application_command_names:
+                        await self.http.delete_global_application_command(
+                            self.user.id.real, app_command['id']
+                        )
+
         elif type == 'USER_UPDATE':
             user = User(data['user'], self)
             self.user = user
+
+        elif type == 'INTERACTION_CREATE':
+            type = 'INTERACTION'
+
+            args.append(Interaction(data, self, True))
 
         await self.ping.dispatch(type, *args, commands=self.commands)

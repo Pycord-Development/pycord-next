@@ -18,30 +18,28 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from __future__ import annotations
-
-from collections.abc import Coroutine
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from ..state import State
-    from .group import Group
+import inspect
+from typing import Any, Coroutine
 
 
-class Command:
-    _processor_event: str
-
-    def __init__(
-        self, callback: Coroutine, name: str, state: State, group: Group | None = None
-    ) -> None:
-        self._callback = callback
-
-        self.name = name
-        self.group = group
-        self._state = state
-
-    async def instantiate(self) -> None:
-        ...
-
-    async def _invoke(self, *args, **kwargs) -> None:
+class ArgumentParser:
+    def __init__(self) -> None:
         pass
+
+    def get_arg_defaults(self, fnc: Coroutine) -> dict[str, Any]:
+        signature = inspect.signature(fnc)
+        ret = {}
+        for k, v in signature.parameters.items():
+            if (
+                v.default is not inspect.Parameter.empty
+                and v.annotation is not inspect.Parameter.empty
+            ):
+                ret[k] = (v.default, v.annotation)
+            elif v.default is not inspect.Parameter.empty:
+                ret[k] = (v.default, None)
+            elif v.annotation is not inspect.Parameter.empty:
+                ret[k] = (None, v.annotation)
+            else:
+                ret[k] = (None, None)
+
+        return ret
