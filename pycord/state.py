@@ -535,9 +535,17 @@ class State:
                 self.application_commands.extend(
                     await self.http.get_global_application_commands(self.user.id, True)
                 )
+                self._application_command_names: list[str] = []
 
                 for command in self.commands:
                     await command.instantiate()
+                    self._application_command_names.append(command.name)
+
+                for app_command in self.application_commands:
+                    if app_command['name'] not in self._application_command_names:
+                        await self.http.delete_global_application_command(
+                            self.user.id.real, app_command['id']
+                        )
 
         elif type == 'USER_UPDATE':
             user = User(data['user'], self)

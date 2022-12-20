@@ -23,13 +23,14 @@ from __future__ import annotations
 import asyncio
 from copy import copy
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Coroutine
+from typing import TYPE_CHECKING, Any, Coroutine, Type, Union
 
 from ...channel import identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
 from ...interaction import Interaction, InteractionOption
 from ...media import Attachment
 from ...member import Member
+from ...message import Message
 from ...role import Role
 from ...snowflake import Snowflake
 from ...types.interaction import ApplicationCommandData
@@ -179,6 +180,12 @@ class Option:
                 description_localizations=description_localizations,
             )
             command._callback = func
+
+            if self._level == 2:
+                raise ApplicationCommandException(
+                    'Sub commands cannot be three levels deep'
+                )
+
             command._level = self._level + 1
 
             if self._subs == {}:
@@ -208,15 +215,15 @@ class ApplicationCommand(Command):
         callback: Coroutine | None,
         name: str,
         type: int | ApplicationCommandType,
-        description: str,
         state: State,
+        description: str | UndefinedType = UNDEFINED,
         guild_id: int | None = None,
         group: Group | None = None,
         # discord parameters
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
-        dm_permission: bool = True,
-        nsfw: bool = False,
+        dm_permission: bool | UndefinedType = UNDEFINED,
+        nsfw: bool | UndefinedType = UNDEFINED,
     ) -> None:
         super().__init__(callback, name, state, group)
 
@@ -231,9 +238,14 @@ class ApplicationCommand(Command):
         self.description_localizations = description_localizations
         self.dm_permission = dm_permission
         self.nsfw = nsfw
+        self._options = []
+        self._parse_arguments()
         if self.type == 1:
             self._subs: dict[str, ApplicationCommand] = {}
-            self._parse_arguments()
+            if not description:
+                raise ApplicationCommandException(
+                    'Chat Input commands must include a description'
+                )
         self._created: bool = False
 
     def command(
@@ -244,6 +256,11 @@ class ApplicationCommand(Command):
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
     ) -> ApplicationCommand:
         def wrapper(func: Coroutine):
+            if self.type != 1:
+                raise ApplicationCommandException(
+                    'Sub Commands cannot be created on non-slash-commands'
+                )
+
             command = Option(
                 type=1,
                 name=name,
@@ -269,7 +286,76 @@ class ApplicationCommand(Command):
 
         return wrapper
 
+    def _parse_user_command_arguments(self) -> None:
+        arg_defaults = arg_parser.get_arg_defaults(self._callback)
+
+        fielded: bool = False
+        i: int = 0
+
+        for name, arg in arg_defaults.items():
+            if i == 2:
+                raise ApplicationCommandException(
+                    'User Command has too many arguments, only one is allowed'
+                )
+
+            i += 1
+
+            if (
+                arg[1] != Member
+                and arg[1] != User
+                and arg[1] != Interaction
+                and arg[1] != Union[User, Member]
+            ):
+                raise ApplicationCommandException(
+                    'Command argument incorrectly type hinted'
+                )
+
+            fielded = True
+
+            self._user_command_field = name
+
+        if not fielded:
+            raise ApplicationCommandException('No argument set for a member/user')
+
+    def _parse_message_command_arguments(self) -> None:
+        arg_defaults = arg_parser.get_arg_defaults(self._callback)
+
+        fielded: bool = False
+        i: int = 0
+
+        for _, arg in arg_defaults.items():
+            if i == 3:
+                raise ApplicationCommandException(
+                    'Message Command has too many arguments, only two are allowed'
+                )
+
+            i += 1
+
+            if (
+                arg[1] != Message
+                and arg[1] != Interaction
+                and arg[1] != User
+                and arg[1] != Member
+                and arg[1] != Union[User, Member]
+            ):
+                raise ApplicationCommandException(
+                    'Command argument incorrectly type hinted'
+                )
+
+            if arg[1] != Interaction:
+                fielded = True
+
+        if not fielded:
+            raise ApplicationCommandException('No argument set for a message and user')
+
     def _parse_arguments(self) -> None:
+        if self.type == 2:
+            self._parse_user_command_arguments()
+            return
+        elif self.type == 3:
+            self._parse_message_command_arguments()
+            return
+
         arg_defaults = arg_parser.get_arg_defaults(self._callback)
         self.options: list[Option] = []
         self._options_dict: dict[str, Option] = {}
@@ -298,8 +384,6 @@ class ApplicationCommand(Command):
             self.options.append(v[0])
             self._options_dict[v[0].name] = v[0]
 
-        self._options = []
-
         for option in self.options:
             self._options.append(option.to_dict())
 
@@ -312,7 +396,15 @@ class ApplicationCommand(Command):
             )
 
             for app_cmd in guild_commands:
+                if app_cmd['name'] not in self._state._application_command_names:
+                    await self._state.http.delete_guild_application_command(
+                        self._state.user.id, self.guild_id, app_cmd['id']
+                    )
+
                 if app_cmd['name'] == self.name and self._state.update_commands:
+                    if app_cmd['type'] != self.type:
+                        continue
+
                     await self._state.http.edit_guild_application_command(
                         self._state.user.id,
                         Snowflake(app_cmd['id']),
@@ -343,6 +435,9 @@ class ApplicationCommand(Command):
 
         for app_cmd in self._state.application_commands:
             if app_cmd['name'] == self.name and self._state.update_commands:
+                if app_cmd['type'] != self.type:
+                    continue
+
                 await self._state.http.edit_global_application_command(
                     self._state.user.id,
                     Snowflake(app_cmd['id']),
@@ -435,6 +530,12 @@ class ApplicationCommand(Command):
 
         return binding
 
+    def _process_user_command(self, inter: Interaction) -> User | Member:
+        if inter.member:
+            return inter.member
+        else:
+            return inter.user
+
     async def _invoke(self, interaction: Interaction) -> None:
         if interaction.data:
             if interaction.data.get('name') is not None:
@@ -450,4 +551,16 @@ class ApplicationCommand(Command):
                         if self._callback:
                             await self._callback(interaction, **binding)
                     elif interaction.data['type'] == 2:
-                        ...
+                        user_binding = self._process_user_command(interaction)
+
+                        await self._callback(interaction, user_binding)
+                    elif interaction.data['type'] == 3:
+                        message = Message(
+                            interaction.data['resolved']['messages'][
+                                interaction.data['target_id']
+                            ],
+                            self._state,
+                        )
+                        requester = self._process_user_command(interaction)
+
+                        await self._callback(interaction, message, requester)

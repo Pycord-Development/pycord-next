@@ -30,8 +30,15 @@ class ArgumentParser:
         signature = inspect.signature(fnc)
         ret = {}
         for k, v in signature.parameters.items():
-            if v.default is not inspect.Parameter.empty:
+            if (
+                v.default is not inspect.Parameter.empty
+                and v.annotation is not inspect.Parameter.empty
+            ):
                 ret[k] = (v.default, v.annotation)
+            elif v.default is not inspect.Parameter.empty:
+                ret[k] = (v.default, None)
+            elif v.annotation is not inspect.Parameter.empty:
+                ret[k] = (None, v.annotation)
             else:
                 ret[k] = (None, None)
 

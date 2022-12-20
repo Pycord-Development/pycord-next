@@ -108,6 +108,20 @@ class ApplicationCommands(BaseRouter):
             data=data,
         )
 
+    async def delete_global_application_command(
+        self,
+        application_id: Snowflake,
+        command_id: Snowflake,
+    ):
+        return await self.request(
+            'DELETE',
+            Route(
+                '/applications/{application_id}/commands/{command_id}',
+                application_id=application_id,
+                command_id=command_id,
+            ),
+        )
+
     async def get_guild_application_commands(
         self,
         application_id: Snowflake,
@@ -196,6 +210,22 @@ class ApplicationCommands(BaseRouter):
                 command_id=command_id,
             ),
             data=data,
+        )
+
+    async def delete_guild_application_command(
+        self,
+        application_id: Snowflake,
+        guild_id: Snowflake,
+        command_id: Snowflake,
+    ):
+        return await self.request(
+            'DELETE',
+            Route(
+                '/applications/{application_id}/guilds/{guild_id}/commands/{command_id}',
+                application_id=application_id,
+                command_id=command_id,
+                guild_id=guild_id,
+            ),
         )
 
     async def create_interaction_response(
