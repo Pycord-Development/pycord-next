@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Any, Coroutine, Type, TypeVar
+from typing import Any, AsyncGenerator, Coroutine, Type, TypeVar
 
 from aiohttp import BasicAuth
 
@@ -321,5 +321,5 @@ class Bot:
         return wrapper
 
     @property
-    async def guilds(self) -> list[Guild]:
-        return await self._state.cache.guild.obj.all()
+    async def guilds(self) -> AsyncGenerator[Guild, None]:
+        return await (self._state.store.sift('guilds')).get_all()
