@@ -23,7 +23,7 @@ from __future__ import annotations
 import asyncio
 from copy import copy
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Coroutine, Type, Union
+from typing import TYPE_CHECKING, Any, Coroutine, Union
 
 from ...channel import identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
@@ -52,12 +52,64 @@ arg_parser = ArgumentParser()
 
 @dataclass
 class CommandChoice:
+    """
+    A single choice of an option. Used often in autocomplete-based commands
+
+    Parameters
+    ----------
+    name: :class:`str`
+        The name of this choice
+    value: :class:`str` | :class:`int` :class:`float`
+        The value of this choice
+    name_localizations: dict[:class:`str`, :class:`str`]
+        Dictionary of localizations
+    """
+
     name: str
     value: str | int | float
     name_localizations: dict[str, str] | None = None
 
+    def _to_dict(self) -> dict[str, Any]:
+        return {
+            'name': self.name,
+            'value': self.value,
+            'name_localizations': self.name_localizations,
+        }
+
 
 class Option:
+    """
+    An option of a Chat Input Command.
+
+    Parameters
+    ----------
+    type: :class:`.ApplicationCommandOptionType` | :class:`int`
+        The type of Option
+    name: :class:`str`
+        The name of this Option
+    description: :class:`str`
+        The description of what and why this option is needed
+    name_localizations: dict[:class:`str`, :class:`str`]
+        Dictionary of localizations
+    description_localizations: dict[:class:`str`, :class:`str`]
+        Dictionary of localizations
+    required: bool
+        Is this option required to pass
+        Defaults to False.
+    choices: list[:class:`.CommandChoice`]
+        The choices this option can be given. Often used in autocomplete
+    options: list[:class:`Option`]
+        Extra Options to add. ONLY support for Sub Commands
+    channel_types: list[:class:`int`]
+        A list of channel types to keep lock of
+    min_value: :class:`int`
+        The minimum integer value
+    max_value: :class:`int`
+        The maximum integer value
+    autocomplete: :class:`bool`
+        Whether to implement autocomplete or not
+    """
+
     _level: int = 0
 
     def __init__(
@@ -84,7 +136,7 @@ class Option:
         self.description = description
         self.description_localizations = description_localizations
         self.required = required
-        self.choices = choices
+        self.choices = [choice._to_dict() for choice in choices if choices]
         self.options = options
         self.channel_types = channel_types
         self.min_value = min_value
@@ -171,6 +223,21 @@ class Option:
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
     ) -> ApplicationCommand:
+        """
+        Add a command to this sub command to make it a group.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of this newly instantiated sub command
+        description: :class:`str`
+            The description of this newly created sub command
+        name_localizations: dict[:class:`str`, :class:`str`]
+            Dictionary of localizations
+        description_localizations: dict[:class:`str`, :class:`str`]
+            Dictionary of localizations
+        """
+
         def wrapper(func: Coroutine):
             command = Option(
                 type=1,
@@ -206,6 +273,32 @@ class Option:
 
 
 class ApplicationCommand(Command):
+    """
+    Commands deployed to Discord by Applications
+
+    Parameters
+    ----------
+    name: :class:`str`
+        The name of this Command
+    type: :class:`ApplicationCommandType`
+        The type of Application Command
+    description: :class:`str`
+        The description for this command
+    guild_id: :class:`int`
+        The Guild ID to limit this command to.
+        Defaults to None.
+    name_localizations: dict[:class:`str`, :class:`str`]
+        Dictionary of localizations
+    description_localizations: dict[:class:`str`, :class:`str`]
+        Dictionary of localizations
+    dm_permission: :class:`bool`
+        If this command should be instantiatable in DMs
+        Defaults to True.
+    nsfw: :class:`bool`
+        Whether this Application Command is for NSFW audiences or not
+        Defaults to False.
+    """
+
     _processor_event = 'on_interaction'
     sub_level: int = 0
 
@@ -248,6 +341,27 @@ class ApplicationCommand(Command):
                 )
         self._created: bool = False
 
+    async def _autocomplete(self, interaction: Interaction) -> list[dict[str, Any]]:
+        option = interaction.data['options'][0]
+        real_option = self._options_dict[option['name']]
+
+        return real_option.choices
+
+    def autocomplete(self) -> None:
+        """
+        Replace the default autocomplete handler with your own
+        """
+
+        def wrapper(func: Coroutine) -> None:
+            if not asyncio.iscoroutinefunction(func):
+                raise ApplicationCommandException(
+                    'Autocomplete functions must be asynchronous'
+                )
+
+            self._autocomplete = func
+
+        return wrapper
+
     def command(
         self,
         name: str,
@@ -255,6 +369,21 @@ class ApplicationCommand(Command):
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
     ) -> ApplicationCommand:
+        """
+        Add a sub command to this command
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of this newly instantiated sub command
+        description: :class:`str`
+            The description of this newly created sub command
+        name_localizations: dict[:class:`str`, :class:`str`]
+            Dictionary of localizations
+        description_localizations: dict[:class:`str`, :class:`str`]
+            Dictionary of localizations
+        """
+
         def wrapper(func: Coroutine):
             if self.type != 1:
                 raise ApplicationCommandException(
@@ -400,10 +529,13 @@ class ApplicationCommand(Command):
                     await self._state.http.delete_guild_application_command(
                         self._state.user.id, self.guild_id, app_cmd['id']
                     )
+                    continue
 
                 if app_cmd['name'] == self.name and self._state.update_commands:
                     if app_cmd['type'] != self.type:
                         continue
+
+                    self.id = app_cmd['id']
 
                     await self._state.http.edit_guild_application_command(
                         self._state.user.id,
@@ -420,7 +552,7 @@ class ApplicationCommand(Command):
                     break
 
             if not self._created:
-                await self._state.http.create_guild_application_command(
+                res = await self._state.http.create_guild_application_command(
                     self._state.user.id,
                     guild_id=self.guild_id,
                     name=self.name,
@@ -430,6 +562,7 @@ class ApplicationCommand(Command):
                     type=self.type,
                     options=self._options,
                 )
+                self.id = res['id']
 
             return
 
@@ -449,10 +582,11 @@ class ApplicationCommand(Command):
                     options=self._options,
                 )
                 self._created = True
+                self.id = app_cmd['id']
                 break
 
         if not self._created:
-            await self._state.http.create_global_application_command(
+            res = await self._state.http.create_global_application_command(
                 self._state.user.id,
                 name=self.name,
                 name_localizations=self.name_localizations,
@@ -461,6 +595,7 @@ class ApplicationCommand(Command):
                 type=self.type,
                 options=self._options,
             )
+            self.id = res['id']
 
     def _process_options(
         self, interaction: Interaction, options: list[InteractionOption]
@@ -537,12 +672,26 @@ class ApplicationCommand(Command):
             return inter.user
 
     async def _invoke(self, interaction: Interaction) -> None:
-        if interaction.data:
-            if interaction.data.get('name') is not None:
-                if interaction.data['type'] != self.type:
-                    return
+        if interaction.type == 4:
+            if interaction.data.get('id') is not None:
+                if interaction.data['id'] == self.id:
+                    await self._state.http.create_interaction_response(
+                        interaction.id,
+                        interaction.token,
+                        {
+                            'type': 8,
+                            'data': {
+                                'choices': await self._autocomplete(
+                                    interaction=interaction
+                                )
+                            },
+                        },
+                    )
+            return
 
-                if interaction.data['name'] == self.name:
+        if interaction.data:
+            if interaction.data.get('id') is not None:
+                if interaction.data['id'] == self.id:
                     if interaction.data['type'] == 1:
                         binding = self._process_options(
                             interaction, interaction.options

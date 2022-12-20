@@ -85,6 +85,7 @@ class Interaction:
         )
         self.locale: str | UndefinedType = data.get('locale', UNDEFINED)
         self.guild_locale: str | UndefinedType = data.get('guild_locale', UNDEFINED)
+        self.options = []
 
         # app command data
         if self.type == 2:
