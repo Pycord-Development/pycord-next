@@ -103,10 +103,13 @@ class Option:
         return self._callback
 
     @callback.setter
-    def callback(self, call: Coroutine) -> None:
+    def callback(self, call: Coroutine | None) -> None:
+        if call is None:
+            self._callback = None
+            return
+
         arg_defaults = arg_parser.get_arg_defaults(self._callback)
         self.options: list[Option] = []
-        self._options_dict: dict[str, Option] = {}
 
         i: int = 0
 
@@ -118,7 +121,7 @@ class Option:
 
             if v[0] is None and name != 'self':
                 raise ApplicationCommandException(
-                    f'Parameter {name} on command {self.name} has no default set'
+                    f'Parameter {name} on sub command {self.name} has no default set'
                 )
             elif name == 'self':
                 continue
@@ -130,12 +133,6 @@ class Option:
             v[0]._param = name
 
             self.options.append(v[0])
-            self._options_dict[v[0].name] = v[0]
-
-        self._options = []
-
-        for option in self.options:
-            self._options.append(option.to_dict())
 
     def __get__(self):
         return self.value
@@ -273,7 +270,7 @@ class ApplicationCommand(Command):
         return wrapper
 
     def _parse_arguments(self) -> None:
-        arg_defaults = self._state.arg_parser.get_arg_defaults(self._callback)
+        arg_defaults = arg_parser.get_arg_defaults(self._callback)
         self.options: list[Option] = []
         self._options_dict: dict[str, Option] = {}
 

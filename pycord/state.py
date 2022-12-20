@@ -248,7 +248,6 @@ class State:
         self.application_commands: list[ApplicationCommand] = []
         self.update_commands: bool = options.get('update_commands', True)
         self.verbose: bool = options.get('verbose', False)
-        self.arg_parser = ArgumentParser()
 
     def bot_init(
         self,
