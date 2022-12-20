@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Any, Type, TypeVar
+from typing import Any, Coroutine, Type, TypeVar
 
 from aiohttp import BasicAuth
 
@@ -280,7 +280,7 @@ class Bot:
 
         return wrapper
 
-    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+    def command(self, name: str, cls: T, **kwargs: Any) -> T:
         """
         Create a command within the Bot
 
@@ -294,7 +294,7 @@ class Bot:
             The kwargs to entail onto the instantiated command.
         """
 
-        def wrapper(func: T) -> T:
+        def wrapper(func: Coroutine) -> T:
             command = cls(func, name, state=self._state, **kwargs)
             self._state.commands.append(command)
             return command
