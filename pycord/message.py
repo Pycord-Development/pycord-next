@@ -201,12 +201,14 @@ class Message:
         asyncio.create_task(self._retreive_channel())
 
     async def _retreive_channel(self) -> None:
-        exists = await self._state.cache.channel.obj.exists(self.channel_id)
+        exists = await (self._state.store.sift('channels')).get_without_parents(
+            self.channel_id
+        )
 
         if exists:
-            self.channel: TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = await self._state.cache.channel.obj.get(
-                self.channel_id
-            )
+            self.channel: TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = exists[
+                1
+            ]
         else:
             self.channel: TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = (
                 None
