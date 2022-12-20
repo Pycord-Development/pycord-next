@@ -22,6 +22,7 @@ from ...errors import PycordException
 
 __all__ = ['PagerException', 'NoMorePages']
 
+
 class PagerException(PycordException):
     ...
 

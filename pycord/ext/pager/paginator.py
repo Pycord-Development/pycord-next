@@ -18,8 +18,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import TypeVar, Protocol
-from .errors import PagerException, NoMorePages
+from typing import Protocol, TypeVar
+
+from .errors import NoMorePages, PagerException
 
 T = TypeVar('T', covariant=True)
 

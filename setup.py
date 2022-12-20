@@ -38,7 +38,7 @@ packages = [
     'pycord.api.routers',
     'pycord.ext',
     'pycord.ext.gears',
-    'pycord.ext.pager'
+    'pycord.ext.pager',
 ]
 
 extra_requires = {

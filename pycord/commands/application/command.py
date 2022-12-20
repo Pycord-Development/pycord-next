@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import asyncio
 from copy import copy
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Coroutine, Union
 
 from ...channel import identify_channel
@@ -50,7 +49,17 @@ __all__ = ['CommandChoice', 'Option', 'ApplicationCommand']
 arg_parser = ArgumentParser()
 
 
-@dataclass
+async def _autocomplete(
+    _: Interaction, option: Option, string: str
+) -> list[dict[str, Any]]:
+    string = str(string).lower()
+    return [
+        choice._to_dict()
+        for choice in option._choices
+        if string in str(choice.value).lower()
+    ]
+
+
 class CommandChoice:
     """
     A single choice of an option. Used often in autocomplete-based commands
@@ -65,9 +74,18 @@ class CommandChoice:
         Dictionary of localizations
     """
 
-    name: str
-    value: str | int | float
-    name_localizations: dict[str, str] | None = None
+    def __init__(
+        self,
+        name: str,
+        name_localizations: dict[str, str] | None = None,
+        value: str | int | float | None = None,
+    ) -> None:
+        self.name = name
+
+        if value is None:
+            self.value = name
+
+        self.name_localizations = name_localizations
 
     def _to_dict(self) -> dict[str, Any]:
         return {
@@ -126,17 +144,23 @@ class Option:
         min_value: int | UndefinedType = UNDEFINED,
         max_value: int | UndefinedType = UNDEFINED,
         autocomplete: bool | UndefinedType = UNDEFINED,
+        autocompleter: Coroutine = _autocomplete,
     ) -> None:
         if isinstance(type, ApplicationCommandOptionType):
             self.type = type.value
         else:
             self.type = type
+        self.autocompleter = autocompleter
         self.name = name
         self.name_localizations = name_localizations
         self.description = description
         self.description_localizations = description_localizations
         self.required = required
-        self.choices = [choice._to_dict() for choice in choices if choices]
+        if autocomplete:
+            self.choices = []
+            self._choices = [choice for choice in choices if choices]
+        else:
+            self.choices = [choice._to_dict() for choice in choices if choices]
         self.options = options
         self.channel_types = channel_types
         self.min_value = min_value
@@ -341,27 +365,6 @@ class ApplicationCommand(Command):
                 )
         self._created: bool = False
 
-    async def _autocomplete(self, interaction: Interaction) -> list[dict[str, Any]]:
-        option = interaction.data['options'][0]
-        real_option = self._options_dict[option['name']]
-
-        return real_option.choices
-
-    def autocomplete(self) -> None:
-        """
-        Replace the default autocomplete handler with your own
-        """
-
-        def wrapper(func: Coroutine) -> None:
-            if not asyncio.iscoroutinefunction(func):
-                raise ApplicationCommandException(
-                    'Autocomplete functions must be asynchronous'
-                )
-
-            self._autocomplete = func
-
-        return wrapper
-
     def command(
         self,
         name: str,
@@ -535,6 +538,12 @@ class ApplicationCommand(Command):
                     if app_cmd['type'] != self.type:
                         continue
 
+                    if self._created is True:
+                        await self._state.http.delete_guild_application_command(
+                            self._state.user.id, self.guild_id, app_cmd['id']
+                        )
+                        continue
+
                     self.id = app_cmd['id']
 
                     await self._state.http.edit_guild_application_command(
@@ -549,7 +558,6 @@ class ApplicationCommand(Command):
                         options=self._options,
                     )
                     self._created = True
-                    break
 
             if not self._created:
                 res = await self._state.http.create_guild_application_command(
@@ -571,6 +579,11 @@ class ApplicationCommand(Command):
                 if app_cmd['type'] != self.type:
                     continue
 
+                if self._created is True:
+                    await self._state.http.delete_global_application_command(
+                        self._state.user.id, app_cmd['id']
+                    )
+
                 await self._state.http.edit_global_application_command(
                     self._state.user.id,
                     Snowflake(app_cmd['id']),
@@ -583,7 +596,6 @@ class ApplicationCommand(Command):
                 )
                 self._created = True
                 self.id = app_cmd['id']
-                break
 
         if not self._created:
             res = await self._state.http.create_global_application_command(
@@ -673,25 +685,27 @@ class ApplicationCommand(Command):
 
     async def _invoke(self, interaction: Interaction) -> None:
         if interaction.type == 4:
-            if interaction.data.get('id') is not None:
-                if interaction.data['id'] == self.id:
+            if interaction.data.get('name') is not None:
+                if interaction.data['name'] == self.name:
+                    option = interaction.data['options'][0]
+                    real_option = self._options_dict[option['name']]
+                    choices = await real_option.autocompleter(
+                        interaction, real_option, option['value']
+                    )
+
                     await self._state.http.create_interaction_response(
                         interaction.id,
                         interaction.token,
                         {
                             'type': 8,
-                            'data': {
-                                'choices': await self._autocomplete(
-                                    interaction=interaction
-                                )
-                            },
+                            'data': {'choices': choices},
                         },
                     )
             return
 
         if interaction.data:
-            if interaction.data.get('id') is not None:
-                if interaction.data['id'] == self.id:
+            if interaction.data.get('name') is not None:
+                if interaction.data['name'] == self.name:
                     if interaction.data['type'] == 1:
                         binding = self._process_options(
                             interaction, interaction.options
