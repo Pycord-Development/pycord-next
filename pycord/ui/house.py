@@ -22,7 +22,7 @@
 from __future__ import annotations
 
 from copy import copy
-from typing import Coroutine
+from typing import Coroutine, Literal
 from uuid import uuid4
 
 from ..enums import ButtonStyle
@@ -30,6 +30,7 @@ from ..media import Emoji
 from ..undefined import UNDEFINED, UndefinedType
 from .button import Button
 from .component import ActionRow, Component
+from .select_menu import SelectMenu
 
 
 class House:
@@ -80,5 +81,31 @@ class House:
             )
             self.add_component(button)
             return button
+
+        return wrapper
+
+    def select_menu(
+        self,
+        type: Literal[3, 5, 6, 7, 8] = 3,
+        channel_types: list[int] | UndefinedType = UNDEFINED,
+        placeholder: str | UndefinedType = UNDEFINED,
+        min_values: int | UndefinedType = UNDEFINED,
+        max_values: int | UndefinedType = UNDEFINED,
+        disabled: bool | UndefinedType = UNDEFINED,
+    ) -> SelectMenu:
+        def wrapper(func: Coroutine) -> SelectMenu:
+            custom_id = str(uuid4())
+            select = SelectMenu(
+                func,
+                custom_id=custom_id,
+                type=type,
+                channel_types=channel_types,
+                placeholder=placeholder,
+                min_values=min_values,
+                max_values=max_values,
+                disabled=disabled,
+            )
+            self.add_component(select)
+            return select
 
         return wrapper

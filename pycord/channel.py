@@ -36,12 +36,12 @@ from .types import (
     ThreadMember as DiscordThreadMember,
     ThreadMetadata as DiscordThreadMetadata,
 )
-from .ui.house import House
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
 
 if TYPE_CHECKING:
     from .state import State
+    from .ui.house import House
 
 
 class _Overwrite:

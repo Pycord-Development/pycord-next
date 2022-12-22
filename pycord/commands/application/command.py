@@ -24,6 +24,7 @@ import asyncio
 from copy import copy
 from typing import TYPE_CHECKING, Any, Coroutine, Union
 
+from ...arguments import ArgumentParser
 from ...channel import identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
 from ...interaction import Interaction, InteractionOption
@@ -38,7 +39,6 @@ from ...user import User
 from ...utils import remove_undefined
 from ..command import Command
 from ..group import Group
-from .arguments import ArgumentParser
 from .errors import ApplicationCommandException
 
 if TYPE_CHECKING:
