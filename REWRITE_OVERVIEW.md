@@ -5,7 +5,7 @@ made in v3, and why we made them.
 
 ## Namespace
 
-Byfar one of the smallest yet most significant
+By far one of the smallest yet most significant
 changes is our namespace.
 While v2 used to have the discord namespace
 for v3 to signify we're not a fork anymore
@@ -16,7 +16,7 @@ So instead of `import discord` its just
 
 ## Generalized Commands
 
-In while, commands have been restructured
+In v3, commands have been restructured
 into one system to allow the easy creation
 of new ones.
 
