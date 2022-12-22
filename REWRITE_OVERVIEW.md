@@ -81,7 +81,7 @@ to Gears, also because it's particularly a better name.
 
      gear = Gear(__name__)
 
-     @gear.command('dunce', pycord.ApplicationCommand, type=1, description='duncy command's)
+     @gear.command('dunce', pycord.ApplicationCommand, type=1, description='duncy command')
      async def dunce(inter: pycord.Interaction) -> None:
         ...
   ```
