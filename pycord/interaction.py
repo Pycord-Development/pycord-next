@@ -102,9 +102,9 @@ class Interaction:
                 else UNDEFINED
             )
         elif self.type == 3:
-            self.custom_id = Snowflake(self.data['custom_id'])
+            self.custom_id = self.data['custom_id']
             self.component_type = self.data['component_type']
-            self.values = self.data['values']
+            self.values = self.data.get('values', UNDEFINED)
 
     @property
     def resp(self) -> InteractionResponse:

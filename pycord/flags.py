@@ -22,7 +22,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Literal, TypeVar
+from typing import Literal, Type, TypeVar
 
 F = TypeVar('F', bound='Flags')
 FF = TypeVar('FF')
@@ -67,21 +67,18 @@ class Flags:
                 raise AttributeError('as_bit is not a flag')
 
             flag_value = getattr(self.__class__, name)
-            self._overwrite_flag(flag_value, value)
+            self._flag_overwrites.append((flag_value, value))
 
-    def _has_flag(self, flag: int) -> bool:
+    def _has_flag(self, flag: int) -> tuple[int, bool]:
         return next(
-            (
-                overwrite[1]
-                for overwrite in self._flag_overwrites
-                if overwrite[0] == flag
-            ),
+            (overwrite for overwrite in self._flag_overwrites if overwrite[0] == flag),
             False,
         )
 
     def _overwrite_flag(self, flag: int, value: bool) -> None:
-        if self._has_flag(flag=flag):
-            self._flag_overwrites.remove((flag, value))
+        f = self._has_flag(flag=flag)
+        if f[1]:
+            self._flag_overwrites.remove(f)
 
         self._flag_overwrites.append((flag, value))
 

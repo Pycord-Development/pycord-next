@@ -21,6 +21,7 @@
 
 from ...embed import Embed
 from ...snowflake import Snowflake
+from ...types.component import Component
 from ...types.message import Message
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
@@ -38,6 +39,7 @@ class Messages(BaseRouter):
         embeds: list[Embed] | UndefinedType = UNDEFINED,
         sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
         flags: int | UndefinedType = UNDEFINED,
+        components: list[Component] | UndefinedType = UNDEFINED,
     ) -> Message:
         if embeds is not UNDEFINED:
             embeds = [embed._to_data() for embed in embeds]
@@ -52,5 +54,6 @@ class Messages(BaseRouter):
                 tts=tts,
                 sticker_ids=sticker_ids,
                 flags=flags,
+                components=components,
             ),
         )

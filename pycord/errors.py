@@ -91,3 +91,7 @@ class InternalError(HTTPException):
 
 class OverfilledShardsException(BotException):
     pass
+
+
+class ComponentException(BotException):
+    pass
