@@ -22,19 +22,56 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from .api import HTTPClient, Route
+from .embed import Embed
 from .enums import WebhookType
 from .guild import Guild
 from .snowflake import Snowflake
 from .types import Webhook as DiscordWebhook
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
+from .utils import remove_undefined
 
 if TYPE_CHECKING:
     from .state import State
 
 
 class Webhook:
-    def __init__(self, data: DiscordWebhook, state: State) -> None:
+    def __init__(self, id: int, token: str) -> None:
+        self.id = Snowflake(id)
+        self.token = token
+        self._http = HTTPClient()
+
+    async def execute(
+        self,
+        content: str | UndefinedType = UNDEFINED,
+        username: str | UndefinedType = UNDEFINED,
+        tts: bool | UndefinedType = UNDEFINED,
+        embeds: list[Embed] | UndefinedType = UNDEFINED,
+        sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
+        flags: int | UndefinedType = UNDEFINED,
+    ):
+        if embeds is not UNDEFINED:
+            embeds = [embed._to_data() for embed in embeds]
+
+        return await self._http.request(
+            'POST',
+            Route(
+                '/webhooks/{webhook_id}/{webhook_token}',
+                webhook_id=self.id,
+                webhook_token=self.token,
+            ),
+            data=remove_undefined(
+                content=content,
+                embeds=embeds,
+                username=username,
+                tts=tts,
+                sticker_ids=sticker_ids,
+                flags=flags,
+            ),
+        )
+
+    def _from_data(self, data: DiscordWebhook, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self.type: WebhookType = WebhookType(data['type'])
         self.guild_id: Snowflake | None | UndefinedType = (

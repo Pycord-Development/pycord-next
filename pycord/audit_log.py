@@ -186,4 +186,6 @@ class AuditLog:
             Thread(thread, state) for thread in data['threads']
         ]
         self.users: list[User] = [User(user, state) for user in data['users']]
-        self.webhooks: list[Webhook] = [Webhook(w, state) for w in data['webhooks']]
+        self.webhooks: list[Webhook] = [
+            Webhook._from_data(w, state) for w in data['webhooks']
+        ]
