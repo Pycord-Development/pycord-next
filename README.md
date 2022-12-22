@@ -12,7 +12,7 @@
 </div>
 
 <p align='center'>
- The API Wrapper for <b>Modern Discord Bots.</b>
+ <b>Make Bots Happen.</b>
 </p>
 
 Welcome! This is the repository for the pre-alpha and heavy conception next major
@@ -59,6 +59,19 @@ Python version increases.
 That being said, if you want to move your bot to v3 you'll have to rewrite it. We've
 made sure to make the rewriting experience easier though, providing less boilerplate
 than v2 and letting you do anything in smaller snippets.
+
+## Making Good Bots Happen
+
+v3 is made to be the best experience for both
+developers and users, providing a fast
+experience for users and a good interface for that for the developer.
+
+We've adopted a modern interface inspired by
+Hikari to form an interface easier, smarter, and objectively better than discord.py.
+
+Instead of following a mix of object-instance paradigm (in this case think of cog-bot)
+we're following a instance-only paradigm completely restructuring old features and stripping useless parts from them.
+Overall a cleanup of v2, and new better interface.
 
 ## Code Example
 
