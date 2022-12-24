@@ -25,10 +25,13 @@ from copy import copy
 from typing import Any, Coroutine, Literal
 
 from ..arguments import ArgumentParser
+from ..channel import identify_channel
 from ..errors import ComponentException
 from ..interaction import Interaction
 from ..media import Emoji
+from ..role import Role
 from ..undefined import UNDEFINED, UndefinedType
+from ..user import User
 from ..utils import remove_undefined
 from .interactive_component import InteractiveComponent
 
@@ -149,6 +152,58 @@ class SelectMenu(InteractiveComponent):
                     invocation_data[option.value] = False
 
             await self._callback(inter, **invocation_data)
+        elif self.type == 5:
+            users = []
+            for user_id in inter.values:
+                users.append(
+                    User(inter.data['resolved']['users'][user_id], self._state)
+                )
+
+            await self._callback(
+                inter, users if len(users) > 1 and users != [] else users[0]
+            )
+        elif self.type == 6:
+            roles = []
+            for role_id in inter.values:
+                roles.append(
+                    Role(inter.data['resolved']['roles'][role_id], self._state)
+                )
+
+            await self._callback(
+                inter, roles if len(roles) > 1 and roles != [] else roles[0]
+            )
+        elif self.type == 7:
+            mentionables = []
+            for mentionable_id in inter.values:
+                try:
+                    mentionables.append(
+                        User(
+                            inter.data['resolved']['users'][mentionable_id], self._state
+                        )
+                    )
+                except KeyError:
+                    mentionables.append(
+                        Role(inter.data['resolved']['roles'][mentionable_id])
+                    )
+
+            await self._callback(
+                inter,
+                mentionables
+                if len(mentionables) > 1 and mentionables != []
+                else mentionables[1],
+            )
+        elif self.type == 8:
+            channels = []
+            for channel_id in inter.values:
+                channels.append(
+                    identify_channel(
+                        inter.data['resolved']['channels'][channel_id], self._state
+                    )
+                )
+
+            await self._callback(
+                inter, channels if len(channels) > 1 and channels != [] else channels[0]
+            )
 
     def disable(self) -> None:
         self.disabled = True

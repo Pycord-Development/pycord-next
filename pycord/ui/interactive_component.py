@@ -27,6 +27,7 @@ from .component import Component
 
 if TYPE_CHECKING:
     from ..interaction import Interaction
+    from ..state import State
 
 
 class InteractiveComponent(Component):
@@ -39,6 +40,10 @@ class InteractiveComponent(Component):
     ) -> None:
         self._callback = callback
         self.id = custom_id
+        self._state: State | None = None
+
+    def _set_state(self, state: State) -> None:
+        self._state = state
 
     async def _internal_invocation(self, inter: Interaction) -> None:
         ...
