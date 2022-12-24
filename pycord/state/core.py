@@ -40,6 +40,7 @@ from ..snowflake import Snowflake
 from ..stage_instance import StageInstance
 from ..ui import Component
 from ..ui.house import House
+from ..ui.text_input import Modal
 from ..undefined import UNDEFINED
 from ..user import User
 from .grouped_store import GroupedStore
@@ -79,6 +80,11 @@ class State:
         self.components: list[Component] = []
         self._component_custom_ids: list[str] = []
         self._components_via_custom_id: dict[str, Component] = {}
+        self.modals = []
+
+    def sent_modal(self, modal: Modal) -> None:
+        if modal not in self.modals:
+            self.modals.append(modal)
 
     def sent_component(self, comp: Component) -> None:
         if comp.id not in self._component_custom_ids and comp.id != UNDEFINED:
@@ -454,5 +460,8 @@ class State:
 
             for component in self.components:
                 asyncio.create_task(component._invoke(interaction))
+
+            for modal in self.modals:
+                asyncio.create_task(modal._invoke(interaction))
 
         await self.ping.dispatch(type, *args, commands=self.commands)
