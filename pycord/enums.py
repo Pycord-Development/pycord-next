@@ -90,6 +90,9 @@ class ApplicationCommandOptionType(Enum):
     ATTACHMENT = 11
 
 
+OptionType = ApplicationCommandOptionType
+
+
 class ApplicationCommandPermissionType(Enum):
     ROLE = 1
     USER = 2
