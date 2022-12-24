@@ -27,7 +27,7 @@ async def favorite(
     anime: pycord.Option = pycord.Option(
         # The type of input the user will put,
         # for this example it's integer to support autocomplete.
-        pycord.ApplicationCommandOptionType.STRING,
+        pycord.OptionType.STRING,
         # The name of this option,
         # can be set to anything but
         # try to keep it short
