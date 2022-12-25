@@ -24,7 +24,7 @@ GUILD_ID: int = 0
 # this has the option anime, displayed as a Parameter,
 # which is parsed by Pycord to give you the information the user gave.
 async def favorite(
-        inter,
+        inter: pycord.Interaction,
         anime: pycord.Option = pycord.Option(
             # The type of input the user will put,
             # for this example it's integer to support autocomplete.
