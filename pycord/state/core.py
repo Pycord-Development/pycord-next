@@ -449,6 +449,8 @@ class State:
                             self.user.id.real, app_command['id']
                         )
 
+                await self.ping.dispatch('hook', *args, commands=self.commands)
+
         elif type == 'USER_UPDATE':
             user = User(data['user'], self)
             self.user = user
