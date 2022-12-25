@@ -80,7 +80,7 @@ class State:
         self.components: list[Component] = []
         self._component_custom_ids: list[str] = []
         self._components_via_custom_id: dict[str, Component] = {}
-        self.modals = []
+        self.modals: list[Modal] = []
 
     def sent_modal(self, modal: Modal) -> None:
         if modal not in self.modals:
