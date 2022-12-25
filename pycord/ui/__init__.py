@@ -11,3 +11,4 @@ from .component import *
 from .house import *
 from .interactive_component import *
 from .select_menu import *
+from .text_input import *
