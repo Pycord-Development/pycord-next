@@ -91,7 +91,7 @@ class State:
             self.components.append(comp)
             self._component_custom_ids.append(comp.id)
             self._components_via_custom_id[comp.id] = comp
-        elif comp.disabled is not self._components_via_custom_id[comp.id].disabled:
+        elif comp.disabled != self._components_via_custom_id[comp.id].disabled:
             oldc = self._components_via_custom_id[comp.id]
             self.components.remove(oldc)
             self.components.append(comp)
