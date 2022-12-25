@@ -45,7 +45,7 @@ class House:
     def __init__(self) -> None:
         self.components: dict[Component, Component] = {}
 
-    def disabled(self) -> 'House':
+    def disabled(self) -> House:
         """
         Returns a copy of this House in which all components are disabled
         """
