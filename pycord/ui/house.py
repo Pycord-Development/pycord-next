@@ -63,7 +63,7 @@ class House:
         """
         A representation of this house within an action row.
         """
-        return ActionRow(components=[c._to_dict() for _, c in self.components.items()])
+        return ActionRow(components=[c._to_dict() for c in self.components.values()])
 
     def add_component(self, comp: Component) -> None:
         """
