@@ -45,7 +45,7 @@ class Button(InteractiveComponent):
         callback: AsyncFunc,
         # button-based values
         style: ButtonStyle | int,
-        label: str | None,
+        label: str | UndefinedType = UNDEFINED,
         custom_id: str | UndefinedType = UNDEFINED,
         emoji: str | Emoji | UndefinedType = UNDEFINED,
         url: str | UndefinedType = UNDEFINED,
