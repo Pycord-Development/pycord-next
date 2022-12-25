@@ -78,7 +78,10 @@ class Interaction:
         _member = data.get('member')
         self.member = Member(_member, state) if _member is not None else UNDEFINED
         _user = data.get('user')
-        self.user = User(_user, state) if _user is not None else UNDEFINED
+        if self.member is not UNDEFINED:
+            self.user = self.member.user
+        else:
+            self.user = User(_user, state) if _user is not None else UNDEFINED
         self.token = data['token']
         self.version = data['version']
         _message = data.get('message')
