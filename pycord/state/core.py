@@ -98,7 +98,7 @@ class State:
             self._components_via_custom_id[comp.id] = comp
 
     def sent_house(self, house: House) -> None:
-        for _, comp in house.components.items():
+        for comp in house.components.values():
             self.sent_component(comp)
 
     def bot_init(
