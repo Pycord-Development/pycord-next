@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any, Type, TypeVar
 
 from ...commands import Command, Group
 from ...types import AsyncFunc
+from types import SimpleNamespace
 
 if TYPE_CHECKING:
     from ...bot import Bot
@@ -52,6 +53,7 @@ class Gear:
         self._listener_functions: dict[str, list[AsyncFunc]] = {}
         self.bot: Bot
         self._commands: list[Command | Group] = []
+        self.ctx = SimpleNamespace()
 
     async def on_attach(self, *args, **kwargs) -> None:
         ...
