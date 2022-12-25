@@ -50,6 +50,6 @@ async def favorite_friend(inter: pycord.Interaction) -> None:
     await inter.resp.send_modal(modal=favorite_friend_modal)
 
 
-# run the bot with the token token.
+# run the bot with the token
 # PLEASE REMEMBER TO CHANGE!
 bot.run('token')

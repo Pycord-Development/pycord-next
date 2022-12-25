@@ -32,6 +32,6 @@ async def on_message(message: pycord.Message) -> None:
         await message.channel.send('Heres your house mate', house=house)
 
 
-# run the bot with the token token.
+# run the bot with the token.
 # PLEASE REMEMBER TO CHANGE!
 bot.run('token')
