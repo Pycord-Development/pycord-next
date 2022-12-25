@@ -23,6 +23,8 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING
 
+from .flags import MessageFlags
+
 from .embed import Embed
 from .errors import InteractionException
 from .member import Member
@@ -129,10 +131,13 @@ class InteractionResponse:
         content: str,
         tts: bool = False,
         embeds: list[Embed] = [],
-        flags: int = 0,
+        flags: int | MessageFlags = 0,
     ) -> None:
         if self.responded:
             raise InteractionException('This interaction has already been responded to')
+
+        if isinstance(flags, MessageFlags):
+            flags = flags.as_bit
 
         await self._parent._state.http.create_interaction_response(
             self._parent.id,
