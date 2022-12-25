@@ -45,7 +45,7 @@ class Bot:
     intents: :class:`.flags.Intents`
         The Gateway Intents to use
     print_banner_on_startup
-        Wether to print the banner on startup or not
+        Whether to print the banner on startup or not
     logging_flavor: Union[int, str, dict[str, Any], None]
         The logging flavor this bot uses
 

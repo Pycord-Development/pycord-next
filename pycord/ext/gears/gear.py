@@ -98,7 +98,7 @@ class Gear:
 
     def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
         """
-        Create a brand new Group of Commands
+        Create a brand-new Group of Commands
 
         Parameters
         ----------

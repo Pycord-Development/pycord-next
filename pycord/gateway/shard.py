@@ -257,7 +257,7 @@ class Shard:
                 raise ShardingRequired('Discord is requiring you shard your bot')
             elif code == 4014:
                 raise DisallowedIntents(
-                    "You aren't allowed to carry a priviledged intent wanted"
+                    "You aren't allowed to carry a privileged intent wanted"
                 )
 
             if code > 4000 or code == 4000:
