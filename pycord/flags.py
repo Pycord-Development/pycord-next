@@ -22,7 +22,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Literal, TypeVar
+from typing import Type, TypeVar
+
+from .errors import FlagException
 
 F = TypeVar('F', bound='Flags')
 FF = TypeVar('FF')
@@ -42,84 +44,76 @@ class flag:
     def __init__(self, func: Callable):
         self.value: int = func(None)
         self.__doc__ = func.__doc__
+        self._name = func.__name__
 
     def __get__(self, instance: F | None, _: type[F]) -> int | bool:
-        return instance._has_flag(self.value) if instance else self.value
+        if instance:
+            try:
+                value = instance._values[self._name]
+            except KeyError:
+                return False
+            else:
+                return value
+        else:
+            return self.value
 
     def __set__(self, instance: F, value: bool) -> None:
-        instance._overwrite_flag(flag=self.value, value=value)
+        instance._values[self._name] = value
+
+
+def fill() -> Callable[[Type[F]], Type[F]]:
+    def wrapper(cls: Type[F]) -> Type[F]:
+        cls._FLAGS = {
+            name: flg.value
+            for name, flg in cls.__dict__.items()
+            if isinstance(flg, flag)
+        }
+        return cls
+
+    return wrapper
 
 
 class Flags:
-    _IGNORED: list[str] = []
+    _FLAGS = {}
 
     def __init__(self, **flags_named: bool) -> None:
-        self._flag_overwrites: list[tuple[int, bool]] = []
+        self._values: dict[str, bool] = {}
 
-        for name, value in flags_named.items():
-            if name.startswith('_'):
-                raise AttributeError('Flags cannot be private')
+        for name, set in flags_named.items():
+            try:
+                self._FLAGS[name]
+            except KeyError:
+                raise FlagException(
+                    f'Flag {name} is not a valid flag of {self.__class__}'
+                )
 
-            if not hasattr(self, name):
-                raise AttributeError(f'Flag {repr(name)} does not exist')
+            if set is False:
+                continue
 
-            if name == 'as_bit':
-                raise AttributeError('as_bit is not a flag')
-
-            flag_value = getattr(self.__class__, name)
-            self._overwrite_flag(flag_value, value)
-
-    def _has_flag(self, flag: int) -> bool:
-        return next(
-            (
-                overwrite[1]
-                for overwrite in self._flag_overwrites
-                if overwrite[0] == flag
-            ),
-            False,
-        )
-
-    def _overwrite_flag(self, flag: int, value: bool) -> None:
-        if self._has_flag(flag=flag):
-            self._flag_overwrites.remove((flag, value))
-
-        self._flag_overwrites.append((flag, value))
-
-    @staticmethod
-    def _valid_flags(flagcls) -> dict[str, Literal[True]]:
-        return {
-            v: True
-            for v in dir(flagcls)
-            if not v.startswith('_')
-            and v != 'as_bit'
-            and v != 'from_value'
-            and v != 'mro'
-            and v not in flagcls._IGNORED
-        }
+            self._values[name] = set
 
     @classmethod
     def from_value(cls: Type[FF], value: int | str) -> FF:
+        self = cls()
         value = int(value)
-        valid_flag_names = cls._valid_flags(cls)
-        valid_flags: dict[str, int] = {
-            v: getattr(cls, v) for v, n in valid_flag_names.items()
-        }
-        parse: dict[str, Literal[True]] = {
-            name: True for name, v in valid_flags.items() if (value & v)
-        }
 
-        return cls(**parse)
+        for name, bit in self._FLAGS.items():
+            if value & bit:
+                self._values[name] = True
+
+        return self
 
     @property
     def as_bit(self) -> int:
-        return sum(
-            overwrite[0] for overwrite in self._flag_overwrites if overwrite[1] is True
-        )
+        n = 0
+        for name in self._values.keys():
+            n += self._FLAGS[name]
+
+        return n
 
 
+@fill()
 class Intents(Flags):
-    _IGNORED: list[str] = ['all', 'unpriv', 'priv']
-
     @flag
     def guilds(self) -> bool | int:
         return 1 << 0
@@ -198,8 +192,10 @@ class Intents(Flags):
 
     @classmethod
     def all(cls) -> Intents:
-        valid_intents = cls._valid_flags(Intents)
-        return cls(**valid_intents)
+        self = cls()
+        for name in self._FLAGS.keys():
+            self._values[name] = True
+        return self
 
     @classmethod
     def priv(cls) -> Intents:
@@ -214,6 +210,7 @@ class Intents(Flags):
         return self
 
 
+@fill()
 class Permissions(Flags):
     @flag
     def create_instant_invite(self) -> bool | int:
@@ -380,6 +377,7 @@ class Permissions(Flags):
         return 1 << 40
 
 
+@fill()
 class SystemChannelFlags(Flags):
     @flag
     def suppress_join_notifications(self) -> bool | int:
@@ -398,6 +396,7 @@ class SystemChannelFlags(Flags):
         return 1 << 3
 
 
+@fill()
 class ApplicationFlags(Flags):
     @flag
     def gateway_presence(self) -> bool | int:
@@ -440,6 +439,7 @@ class ApplicationFlags(Flags):
         return 1 << 24
 
 
+@fill()
 class ChannelFlags(Flags):
     @flag
     def pinned(self) -> bool | int:
@@ -450,6 +450,7 @@ class ChannelFlags(Flags):
         return 1 << 4
 
 
+@fill()
 class MessageFlags(Flags):
     @flag
     def crossposted(self) -> bool | int:
@@ -488,6 +489,7 @@ class MessageFlags(Flags):
         return 1 << 8
 
 
+@fill()
 class UserFlags(Flags):
     @flag
     def staff(self) -> bool | int:
