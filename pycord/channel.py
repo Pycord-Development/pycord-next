@@ -61,7 +61,7 @@ class ThreadMetadata:
         self.invitable: bool | UndefinedType = metadata.get('invitable', UNDEFINED)
         self.create_timestamp: datetime | UndefinedType = (
             datetime.fromisoformat(metadata.get('create_timestamp'))
-            if metadata.get('create_timestamp') != None
+            if metadata.get('create_timestamp') is not None
             else UNDEFINED
         )
 

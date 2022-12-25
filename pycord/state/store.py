@@ -46,7 +46,7 @@ class Store:
     async def get_without_parents(self, id: Any) -> tuple[set[Any], Any] | None:
         for store in self._store:
             if store.id == id:
-                return (store.parents, store.storing)
+                return store.parents, store.storing
 
     async def insert(self, parents: list[Any], id: Any, data: Any) -> None:
         if len(self._store) == self.max_items:

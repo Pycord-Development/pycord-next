@@ -347,7 +347,7 @@ class VisibilityType(Enum):
 class WebhookType(Enum):
     INCOMING = 1
     CHANNEL_FOLLOWER = 2
-    APPLICATIOn = 3
+    APPLICATION = 3
 
 
 class MembershipState(Enum):
