@@ -24,36 +24,36 @@ GUILD_ID: int = 0
 # this has the option anime, displayed as a Parameter,
 # which is parsed by Pycord to give you the information the user gave.
 async def favorite(
-        inter: pycord.Interaction,
-        anime: pycord.Option = pycord.Option(
-            # The type of input the user will put,
-            # for this example it's integer to support autocomplete.
-            pycord.OptionType.STRING,
-            # The name of this option,
-            # can be set to anything but
-            # try to keep it short
-            'anime',
-            # The description for this option,
-            # this is a longer version of name displaying
-            # more detail and technicalities
-            'Your favorite Anime Show',
-            # this just sets it so the user cannot procede without
-            # entering this option
-            required=True,
-            # enables autocomplete on Discord's side
-            autocomplete=True,
-            # these are the choices the user can pick.
-            # the first value is the name, which is what
-            # the user will see. The second is the value, which is what
-            # you, or the bot, will see.
-            choices=[
-                pycord.CommandChoice('Attack on Titan'),
-                pycord.CommandChoice("JoJo's Bizzare Adventure"),
-                pycord.CommandChoice('Cowboy Bebop'),
-                pycord.CommandChoice('Hunter x Hunter'),
-                pycord.CommandChoice('Spy x Family'),
-            ],
-        ),
+    inter: pycord.Interaction,
+    anime: pycord.Option = pycord.Option(
+        # The type of input the user will put,
+        # for this example it's integer to support autocomplete.
+        pycord.OptionType.STRING,
+        # The name of this option,
+        # can be set to anything but
+        # try to keep it short
+        'anime',
+        # The description for this option,
+        # this is a longer version of name displaying
+        # more detail and technicalities
+        'Your favorite Anime Show',
+        # this just sets it so the user cannot procede without
+        # entering this option
+        required=True,
+        # enables autocomplete on Discord's side
+        autocomplete=True,
+        # these are the choices the user can pick.
+        # the first value is the name, which is what
+        # the user will see. The second is the value, which is what
+        # you, or the bot, will see.
+        choices=[
+            pycord.CommandChoice('Attack on Titan'),
+            pycord.CommandChoice("JoJo's Bizzare Adventure"),
+            pycord.CommandChoice('Cowboy Bebop'),
+            pycord.CommandChoice('Hunter x Hunter'),
+            pycord.CommandChoice('Spy x Family'),
+        ],
+    ),
 ):
     # checks the value of the int
     # and if it matches up to an anime,
