@@ -20,11 +20,11 @@
 # SOFTWARE
 from __future__ import annotations
 
-from collections.abc import Coroutine
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..state import State
+    from ..types import AsyncFunc
     from .group import Group
 
 
@@ -32,7 +32,7 @@ class Command:
     _processor_event: str
 
     def __init__(
-        self, callback: Coroutine, name: str, state: State, group: Group | None = None
+        self, callback: AsyncFunc, name: str, state: State, group: Group | None = None
     ) -> None:
         self._callback = callback
 

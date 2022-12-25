@@ -21,11 +21,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Coroutine
+from typing import TYPE_CHECKING, Any
 
 from ..enums import ButtonStyle
 from ..errors import ComponentException
 from ..media import Emoji
+from ..types import AsyncFunc
 from ..undefined import UNDEFINED, UndefinedType
 from ..utils import remove_undefined
 from .interactive_component import InteractiveComponent
@@ -38,9 +39,10 @@ class Button(InteractiveComponent):
     """
     Represents a Discord Button
     """
+
     def __init__(
         self,
-        callback: Coroutine,
+        callback: AsyncFunc,
         # button-based values
         style: ButtonStyle | int,
         label: str | None,

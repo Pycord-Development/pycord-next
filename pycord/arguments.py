@@ -19,14 +19,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import inspect
-from typing import Any, Coroutine
+from typing import Any
+
+from .types import AsyncFunc
 
 
 class ArgumentParser:
     def __init__(self) -> None:
         pass
 
-    def get_arg_defaults(self, fnc: Coroutine) -> dict[str, Any]:
+    def get_arg_defaults(self, fnc: AsyncFunc) -> dict[str, Any]:
         signature = inspect.signature(fnc)
         ret = {}
         for k, v in signature.parameters.items():

@@ -21,11 +21,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Coroutine
+from typing import Any
 from uuid import uuid4
 
 from ..enums import TextInputStyle
 from ..interaction import Interaction
+from ..types import AsyncFunc
 from ..undefined import UNDEFINED, UndefinedType
 from ..utils import remove_undefined
 from .interactive_component import InteractiveComponent
@@ -41,6 +42,7 @@ class Modal:
     title: :class:`str`
         The title of this Modal in the Discord UI
     """
+
     def __init__(
         self,
         title: str,
@@ -48,13 +50,14 @@ class Modal:
         self.id = str(uuid4())
         self.title = title
         self.components: list[TextInput] = []
-        self._callback: Coroutine | None = None
+        self._callback: AsyncFunc | None = None
 
-    def on_call(self) -> Coroutine:
+    def on_call(self) -> AsyncFunc:
         """
         Add a function to run when this Modal is submitted
         """
-        def wrapper(func: Coroutine) -> Coroutine:
+
+        def wrapper(func: AsyncFunc) -> AsyncFunc:
             self._callback = func
             return func
 
@@ -115,6 +118,7 @@ class TextInput(InteractiveComponent):
     placeholder: :class:`str`
         The placeholder value to put onto this Text Input
     """
+
     def __init__(
         self,
         label: str,

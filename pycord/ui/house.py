@@ -22,11 +22,12 @@
 from __future__ import annotations
 
 from copy import copy
-from typing import Coroutine, Literal
+from typing import Literal
 from uuid import uuid4
 
 from ..enums import ButtonStyle, SelectMenuType
 from ..media import Emoji
+from ..types import AsyncFunc
 from ..undefined import UNDEFINED, UndefinedType
 from .button import Button
 from .component import ActionRow, Component
@@ -38,6 +39,7 @@ class House:
     The house for components.
     You can have, at maximum, **five** houses on one message
     """
+
     def __init__(self) -> None:
         self.components: dict[Component, Component] = {}
 
@@ -108,7 +110,8 @@ class House:
             Wether if this button shall be started disabled or not.
             Defaults to `False`.
         """
-        def wrapper(func: Coroutine) -> Button:
+
+        def wrapper(func: AsyncFunc) -> Button:
             if not url:
                 custom_id = str(uuid4())
             else:
@@ -158,7 +161,7 @@ class House:
         if isinstance(type, SelectMenuType):
             type = type.value
 
-        def wrapper(func: Coroutine) -> SelectMenu:
+        def wrapper(func: AsyncFunc) -> SelectMenu:
             custom_id = str(uuid4())
             select = SelectMenu(
                 func,

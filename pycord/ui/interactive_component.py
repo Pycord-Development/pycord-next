@@ -21,13 +21,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Coroutine
+from typing import TYPE_CHECKING
 
 from .component import Component
 
 if TYPE_CHECKING:
     from ..interaction import Interaction
     from ..state import State
+    from ..types import AsyncFunc
 
 
 class InteractiveComponent(Component):
@@ -35,13 +36,14 @@ class InteractiveComponent(Component):
     The base set of a component which can be interacted with.
 
     .. WARNING::
-        This is a **base class** which means we don't 
-        recommend usage of it unless you're making your 
+        This is a **base class** which means we don't
+        recommend usage of it unless you're making your
         own component class.
     """
+
     def __init__(
         self,
-        callback: Coroutine,
+        callback: AsyncFunc,
         custom_id: str | None,
     ) -> None:
         self._callback = callback

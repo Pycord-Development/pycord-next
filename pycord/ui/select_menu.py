@@ -22,7 +22,7 @@
 from __future__ import annotations
 
 from copy import copy
-from typing import Any, Coroutine, Literal
+from typing import Any, Literal
 
 from ..arguments import ArgumentParser
 from ..channel import identify_channel
@@ -30,6 +30,7 @@ from ..errors import ComponentException
 from ..interaction import Interaction
 from ..media import Emoji
 from ..role import Role
+from ..types import AsyncFunc
 from ..undefined import UNDEFINED, UndefinedType
 from ..user import User
 from ..utils import remove_undefined
@@ -54,6 +55,7 @@ class SelectOption:
         Wether this is the default option or not.
         Defaults to False
     """
+
     def __init__(
         self,
         label: str,
@@ -92,9 +94,10 @@ class SelectMenu(InteractiveComponent):
     """
     Represents a Discord Select Menu
     """
+
     def __init__(
         self,
-        callback: Coroutine,
+        callback: AsyncFunc,
         custom_id: str,
         type: Literal[3, 5, 6, 7, 8] = 3,
         channel_types: list[int] | UndefinedType = UNDEFINED,
