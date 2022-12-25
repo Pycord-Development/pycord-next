@@ -50,7 +50,7 @@ extra_requires = {
         'ciso8601~=2.2.0',  # Faster datetime parsing.
     ],
     'docs': [
-        'sphinx~=4.4.0',
+        'sphinx==5.3.0',
         'sphinx-hoverxref~=1.0.1',
     ],
 }
