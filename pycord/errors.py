@@ -95,3 +95,7 @@ class OverfilledShardsException(BotException):
 
 class FlagException(BotException):
     pass
+
+
+class ComponentException(BotException):
+    pass

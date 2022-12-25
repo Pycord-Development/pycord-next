@@ -18,28 +18,49 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-import inspect
-from typing import Any, Coroutine
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from .component import Component
+
+if TYPE_CHECKING:
+    from ..interaction import Interaction
+    from ..state import State
+    from ..types import AsyncFunc
 
 
-class ArgumentParser:
-    def __init__(self) -> None:
-        pass
+class InteractiveComponent(Component):
+    """
+    The base set of a component which can be interacted with.
 
-    def get_arg_defaults(self, fnc: Coroutine) -> dict[str, Any]:
-        signature = inspect.signature(fnc)
-        ret = {}
-        for k, v in signature.parameters.items():
-            if (
-                v.default is not inspect.Parameter.empty
-                and v.annotation is not inspect.Parameter.empty
-            ):
-                ret[k] = (v.default, v.annotation)
-            elif v.default is not inspect.Parameter.empty:
-                ret[k] = (v.default, None)
-            elif v.annotation is not inspect.Parameter.empty:
-                ret[k] = (None, v.annotation)
-            else:
-                ret[k] = (None, None)
+    .. WARNING::
+        This is a **base class** which means we don't
+        recommend usage of it unless you're making your
+        own component class.
+    """
 
-        return ret
+    def __init__(
+        self,
+        callback: AsyncFunc,
+        custom_id: str | None,
+    ) -> None:
+        self._callback = callback
+        self.id = custom_id
+        self._state: State | None = None
+
+    def _set_state(self, state: State) -> None:
+        self._state = state
+
+    async def _internal_invocation(self, inter: Interaction) -> None:
+        ...
+
+    async def _invoke(self, inter: Interaction) -> None:
+        if inter.type not in (3, 5):
+            return
+
+        custom_id = inter.data['custom_id']
+
+        if custom_id == self.id:
+            await self._internal_invocation(inter)

@@ -19,17 +19,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 import asyncio
-from typing import Any, AsyncGenerator, Coroutine, Type, TypeVar
+from typing import Any, AsyncGenerator, Type, TypeVar
 
 from aiohttp import BasicAuth
 
-from .commands import Command, Group
+from .commands import Group
 from .errors import NoIdentifiesLeft, OverfilledShardsException
 from .flags import Intents
 from .gateway import PassThrough, ShardCluster, ShardManager
 from .guild import Guild
 from .interface import print_banner, start_logging
 from .state import State
+from .types import AsyncFunc
 from .user import User
 from .utils import chunk
 
@@ -294,7 +295,7 @@ class Bot:
             The kwargs to entail onto the instantiated command.
         """
 
-        def wrapper(func: Coroutine) -> T:
+        def wrapper(func: AsyncFunc) -> T:
             command = cls(func, name, state=self._state, **kwargs)
             self._state.commands.append(command)
             return command
