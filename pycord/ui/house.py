@@ -25,6 +25,8 @@ from copy import copy
 from typing import Literal
 from uuid import uuid4
 
+from ..errors import ComponentException
+
 from ..enums import ButtonStyle, SelectMenuType
 from ..media import Emoji
 from ..types import AsyncFunc
@@ -72,6 +74,9 @@ class House:
         comp: :class:`.Component`
             The component to append
         """
+        if len(self.components) == 5:
+            raise ComponentException('Cannot add more components, already reached maximum')
+
         self.components[comp] = comp
 
     def remove_component(self, comp: Component) -> None:
