@@ -355,3 +355,11 @@ class MembershipState(Enum):
 class OverwriteType(Enum):
     ROLE = 0
     MEMBER = 1
+
+
+class SelectMenuType(Enum):
+    STRING = 3
+    USER = 5
+    ROLE = 6
+    MENTIONABLE = 7
+    CHANNEL = 8

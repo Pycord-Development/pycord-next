@@ -31,8 +31,14 @@ if TYPE_CHECKING:
 
 
 class InteractiveComponent(Component):
-    _processor_event = 'on_interaction'
+    """
+    The base set of a component which can be interacted with.
 
+    .. WARNING::
+        This is a **base class** which means we don't 
+        recommend usage of it unless you're making your 
+        own component class.
+    """
     def __init__(
         self,
         callback: Coroutine,

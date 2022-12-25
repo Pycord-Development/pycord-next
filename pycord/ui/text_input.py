@@ -32,6 +32,15 @@ from .interactive_component import InteractiveComponent
 
 
 class Modal:
+    """
+    Represents a Discord Modal
+    Stores, deletes, uses, and calls Text Inputs
+
+    Parameters
+    ----------
+    title: :class:`str`
+        The title of this Modal in the Discord UI
+    """
     def __init__(
         self,
         title: str,
@@ -42,6 +51,9 @@ class Modal:
         self._callback: Coroutine | None = None
 
     def on_call(self) -> Coroutine:
+        """
+        Add a function to run when this Modal is submitted
+        """
         def wrapper(func: Coroutine) -> Coroutine:
             self._callback = func
             return func
@@ -49,6 +61,14 @@ class Modal:
         return wrapper
 
     def add_text_input(self, text_input: TextInput) -> None:
+        """
+        Append a Text Input to this Modal
+
+        Parameters
+        ----------
+        text_input: :class:`.TextInput`
+            The text input to append
+        """
         self.components.append(text_input)
 
     def _to_dict(self) -> dict[str, Any]:
@@ -75,6 +95,26 @@ class Modal:
 
 
 class TextInput(InteractiveComponent):
+    """
+    Represents a Text Input on a Modal
+
+    Parameters
+    ----------
+    label: :class:`str`
+        The label of this Text Input
+    style: :class:`style`
+        The style to use within this Text Input
+    min_length: :class:`int`
+        The minimum text length
+    max_length: :class:`int`
+        The maximum text length
+    required: :class:`bool`
+        Wether this Text Input is required to be filled or not
+    value: :class:`str`
+        The default value of this Text Input
+    placeholder: :class:`str`
+        The placeholder value to put onto this Text Input
+    """
     def __init__(
         self,
         label: str,

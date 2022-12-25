@@ -27,7 +27,11 @@ from typing import Any, Literal
 
 
 class Component:
-    custom_id: str
+    """
+    The base component type which every other component
+    subclasses and bases off of
+    """
+    id: str
     type: int
     disabled: bool
 
@@ -43,6 +47,9 @@ class Component:
 
 @dataclass
 class ActionRow:
+    """
+    Represents a Discord Action Row
+    """
     type: Literal[1] = field(default=1)
     components: list[Component] = field(default=list)
 

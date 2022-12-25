@@ -35,6 +35,9 @@ if TYPE_CHECKING:
 
 
 class Button(InteractiveComponent):
+    """
+    Represents a Discord Button
+    """
     def __init__(
         self,
         callback: Coroutine,
@@ -85,6 +88,9 @@ class Button(InteractiveComponent):
         )
 
     def disable(self) -> None:
+        """
+        Disables this Button
+        """
         self.disabled = True
 
     async def _internal_invocation(self, inter: Interaction) -> None:

@@ -39,6 +39,21 @@ arg_parser = ArgumentParser()
 
 
 class SelectOption:
+    """
+    Create a new Select Menu Option
+
+    Parameters
+    ----------
+    label: :class:`str`
+        The label of this option
+    description: :class:`str`
+        The description of this option
+    emoji: Union[:class:`str`, :class:`.Emoji`]
+        The emoji to use in front of this option's label
+    default: :class:`bool`
+        Wether this is the default option or not.
+        Defaults to False
+    """
     def __init__(
         self,
         label: str,
@@ -69,16 +84,14 @@ class SelectOption:
     def __get__(self) -> str:
         return self._resp
 
-    def clone(self, resp: str) -> 'SelectOption':
-        c = copy(self)
-        c._resp = resp
-        return c
-
     def __bool__(self) -> bool:
         return self._resp is not None
 
 
 class SelectMenu(InteractiveComponent):
+    """
+    Represents a Discord Select Menu
+    """
     def __init__(
         self,
         callback: Coroutine,
@@ -206,4 +219,7 @@ class SelectMenu(InteractiveComponent):
             )
 
     def disable(self) -> None:
+        """
+        Disables this Select Menu
+        """
         self.disabled = True
