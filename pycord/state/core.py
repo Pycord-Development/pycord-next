@@ -128,7 +128,7 @@ class State:
                 identify_channel(c, self) for c in data['channels']
             ]
             threads: list[Thread] = [
-                identify_channel(c, self) for c in data['channels']
+                identify_channel(c, self) for c in data['threads']
             ]
             stage_instances: list[StageInstance] = [
                 StageInstance(st, self) for st in data['stage_instances']
