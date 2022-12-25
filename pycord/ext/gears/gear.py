@@ -55,12 +55,12 @@ class Gear(Generic[ContextT]):
     """
     ctx: ContextT
 
-    def __init__(self, name: str, ctx: ContextT = BaseContext()) -> None:
+    def __init__(self, name: str, ctx: ContextT = BaseContext) -> None:
         self.name = name
         self._listener_functions: dict[str, list[AsyncFunc]] = {}
         self.bot: Bot
         self._commands: list[Command | Group] = []
-        self.ctx = ctx
+        self.ctx = ctx()
 
     async def on_attach(self, *args, **kwargs) -> None:
         ...
