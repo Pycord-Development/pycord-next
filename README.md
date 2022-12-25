@@ -1,7 +1,7 @@
 <div align='center'>
     <br />
     <p>
-        <a href="https://github.com/pycord/pycord-v3"><img src="https://raw.githubusercontent.com/pycord/pycord-v3/main/docs/assets/pycord-v3.png" width="546" alt="pycord" /></a>
+        <a href="https://github.com/Pycord-Development/pycord-v3"><img src="https://raw.githubusercontent.com/Pycord-Development/pycord-v3/main/docs/assets/pycord-v3.png" width="546" alt="Pycord v3" /></a>
     </p>
     <br />
     <p>
