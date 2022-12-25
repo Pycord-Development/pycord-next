@@ -28,6 +28,7 @@ from aiohttp import BasicAuth
 
 from ..api import HTTPClient
 from ..channel import Channel, Thread, identify_channel
+from ..commands.application import ApplicationCommand
 from ..gateway.ping import Ping
 from ..guild import Guild
 from ..interaction import Interaction
@@ -37,7 +38,10 @@ from ..role import Role
 from ..scheduled_event import ScheduledEvent
 from ..snowflake import Snowflake
 from ..stage_instance import StageInstance
-from ..types.application_commands import ApplicationCommand
+from ..ui import Component
+from ..ui.house import House
+from ..ui.text_input import Modal
+from ..undefined import UNDEFINED
 from ..user import User
 from .grouped_store import GroupedStore
 
@@ -73,6 +77,29 @@ class State:
         self.application_commands: list[ApplicationCommand] = []
         self.update_commands: bool = options.get('update_commands', True)
         self.verbose: bool = options.get('verbose', False)
+        self.components: list[Component] = []
+        self._component_custom_ids: list[str] = []
+        self._components_via_custom_id: dict[str, Component] = {}
+        self.modals: list[Modal] = []
+
+    def sent_modal(self, modal: Modal) -> None:
+        if modal not in self.modals:
+            self.modals.append(modal)
+
+    def sent_component(self, comp: Component) -> None:
+        if comp.id not in self._component_custom_ids and comp.id is not UNDEFINED:
+            self.components.append(comp)
+            self._component_custom_ids.append(comp.id)
+            self._components_via_custom_id[comp.id] = comp
+        elif comp.disabled != self._components_via_custom_id[comp.id].disabled:
+            oldc = self._components_via_custom_id[comp.id]
+            self.components.remove(oldc)
+            self.components.append(comp)
+            self._components_via_custom_id[comp.id] = comp
+
+    def sent_house(self, house: House) -> None:
+        for comp in house.components.values():
+            self.sent_component(comp)
 
     def bot_init(
         self,
@@ -350,6 +377,7 @@ class State:
                 [message.channel_id], message.id, message
             )
             args.append(message)
+            type = 'message'
         elif type == 'MESSAGE_UPDATE':
             message = Message(data, self)
             args.append(message)
@@ -412,7 +440,8 @@ class State:
 
                 for command in self.commands:
                     await command.instantiate()
-                    self._application_command_names.append(command.name)
+                    if hasattr(command, 'name'):
+                        self._application_command_names.append(command.name)
 
                 for app_command in self.application_commands:
                     if app_command['name'] not in self._application_command_names:
@@ -426,7 +455,13 @@ class State:
 
         elif type == 'INTERACTION_CREATE':
             type = 'INTERACTION'
+            interaction = Interaction(data, self, True)
+            args.append(interaction)
 
-            args.append(Interaction(data, self, True))
+            for component in self.components:
+                asyncio.create_task(component._invoke(interaction))
+
+            for modal in self.modals:
+                asyncio.create_task(modal._invoke(interaction))
 
         await self.ping.dispatch(type, *args, commands=self.commands)

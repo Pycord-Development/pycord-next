@@ -20,7 +20,8 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import re
+from typing import TYPE_CHECKING, Any
 
 from .enums import StickerFormatType, StickerType
 from .role import Role
@@ -40,6 +41,10 @@ if TYPE_CHECKING:
 
 
 class Emoji:
+    _EMOJI_NAME_REGEX = re.compile(
+        r'<?(?P<animated>a)?:?(?P<name>\w+):(?P<id>[0-9]{13,20})>?'
+    )
+
     def __init__(self, data: DiscordEmoji, state: State) -> None:
         self.id: Snowflake | None = (
             Snowflake(data['id']) if data['id'] is not None else None
@@ -64,6 +69,27 @@ class Emoji:
         for role in roles:
             if role.id in self._roles:
                 self.roles.append(role)
+
+    def _partial(self) -> dict[str, Any]:
+        return {'name': self.name, 'id': self.id, 'animated': self.animated}
+
+    @classmethod
+    def _from_str(cls, string: str, state: State) -> 'Emoji':
+        match = cls._EMOJI_NAME_REGEX.match(string)
+
+        if match:
+            grps = match.groupdict()
+            return cls(
+                {
+                    'animated': bool(grps['animated']),
+                    'id': Snowflake(grps['id']),
+                    'name': grps['name'],
+                },
+                state,
+            )
+
+        # assumes this is unicode
+        return cls({'name': string, 'id': None, 'animated': False}, state)
 
 
 class StickerItem:

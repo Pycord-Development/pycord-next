@@ -20,18 +20,19 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Coroutine, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from .command import Command
 
 if TYPE_CHECKING:
     from ..state import State
+    from ..types import AsyncFunc
 
 T = TypeVar('T')
 
 
 class Group:
-    def __init__(self, func: Coroutine | None, name: str, state: State) -> None:
+    def __init__(self, func: AsyncFunc | None, name: str, state: State) -> None:
         self.commands: list[Command] = []
         # nested groups
         self.groups: list['Group'] = []
