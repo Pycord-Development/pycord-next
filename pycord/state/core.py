@@ -87,7 +87,7 @@ class State:
             self.modals.append(modal)
 
     def sent_component(self, comp: Component) -> None:
-        if comp.id not in self._component_custom_ids and comp.id != UNDEFINED:
+        if comp.id not in self._component_custom_ids and comp.id is not UNDEFINED:
             self.components.append(comp)
             self._component_custom_ids.append(comp.id)
             self._components_via_custom_id[comp.id] = comp
