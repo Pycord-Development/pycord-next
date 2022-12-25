@@ -1,7 +1,7 @@
 """
 Pycord
 ~~~~~~
-Python's Intuitive Discord API Wrapper
+Making Bots Happen.
 
 :copyright: 2021-present Pycord Development
 :license: MIT
