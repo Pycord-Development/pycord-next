@@ -8,6 +8,7 @@ bot = pycord.Bot(intents=pycord.Intents())
 # commands
 GUILD_ID: int = 0
 
+
 # make a chat input command which
 # is named favorite and that displays
 # an autocompleted list of animes to pick from
@@ -26,7 +27,7 @@ async def favorite(
     inter,
     anime: pycord.Option = pycord.Option(
         # The type of input the user will put,
-        # for this example it's integer to support autocomplete.
+        # for this example its integer to support autocomplete.
         pycord.OptionType.STRING,
         # The name of this option,
         # can be set to anything but
@@ -36,7 +37,7 @@ async def favorite(
         # this is a longer version of name displaying
         # more detail and technicalities
         'Your favorite Anime Show',
-        # this just sets it so the user cannot procede without
+        # this just sets it so the user cannot proceed without
         # entering this option
         required=True,
         # enables autocomplete on Discord's side
@@ -74,6 +75,6 @@ async def favorite(
         )
 
 
-# run the bot with the token token.
+# run the bot with the token.
 # PLEASE REMEMBER TO CHANGE!
 bot.run('token')
