@@ -35,6 +35,7 @@ from .webhook import Webhook
 
 if TYPE_CHECKING:
     from .state import State
+    from .ui.text_input import Modal
 
 
 class InteractionOption:
@@ -104,9 +105,9 @@ class Interaction:
                 else UNDEFINED
             )
         elif self.type == 3:
-            self.custom_id = Snowflake(self.data['custom_id'])
+            self.custom_id = self.data['custom_id']
             self.component_type = self.data['component_type']
-            self.values = self.data['values']
+            self.values = self.data.get('values', UNDEFINED)
 
     @property
     def resp(self) -> InteractionResponse:
@@ -157,3 +158,13 @@ class InteractionResponse:
         )
 
         self._deferred = True
+
+    async def send_modal(self, modal: Modal) -> None:
+        if self.responded:
+            raise InteractionException('This interaction has already been responded to')
+
+        await self._parent._state.http.create_interaction_response(
+            self._parent.id, self._parent.token, {'type': 9, 'data': modal._to_dict()}
+        )
+        self._parent._state.sent_modal(modal)
+        self.responded = True

@@ -22,8 +22,9 @@ from __future__ import annotations
 
 import asyncio
 from copy import copy
-from typing import TYPE_CHECKING, Any, Coroutine, Union
+from typing import TYPE_CHECKING, Any, Union
 
+from ...arguments import ArgumentParser
 from ...channel import identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
 from ...interaction import Interaction, InteractionOption
@@ -32,13 +33,13 @@ from ...member import Member
 from ...message import Message
 from ...role import Role
 from ...snowflake import Snowflake
+from ...types import AsyncFunc
 from ...types.interaction import ApplicationCommandData
 from ...undefined import UNDEFINED, UndefinedType
 from ...user import User
 from ...utils import remove_undefined
 from ..command import Command
 from ..group import Group
-from .arguments import ArgumentParser
 from .errors import ApplicationCommandException
 
 if TYPE_CHECKING:
@@ -144,7 +145,7 @@ class Option:
         min_value: int | UndefinedType = UNDEFINED,
         max_value: int | UndefinedType = UNDEFINED,
         autocomplete: bool | UndefinedType = UNDEFINED,
-        autocompleter: Coroutine = _autocomplete,
+        autocompleter: AsyncFunc = _autocomplete,
     ) -> None:
         if isinstance(type, ApplicationCommandOptionType):
             self.type = type.value
@@ -173,14 +174,14 @@ class Option:
             self.value: str | int | float | UndefinedType = UNDEFINED
             self.options: list[InteractionOption] = UNDEFINED
             self._param: str = UNDEFINED
-            self._callback: Coroutine | None = UNDEFINED
+            self._callback: AsyncFunc | None = UNDEFINED
 
     @property
-    def callback(self) -> Coroutine:
+    def callback(self) -> AsyncFunc:
         return self._callback
 
     @callback.setter
-    def callback(self, call: Coroutine | None) -> None:
+    def callback(self, call: AsyncFunc | None) -> None:
         if call is None:
             self._callback = None
             return
@@ -262,7 +263,7 @@ class Option:
             Dictionary of localizations
         """
 
-        def wrapper(func: Coroutine):
+        def wrapper(func: AsyncFunc):
             command = Option(
                 type=1,
                 name=name,
@@ -329,7 +330,7 @@ class ApplicationCommand(Command):
     def __init__(
         self,
         # normal parameters
-        callback: Coroutine | None,
+        callback: AsyncFunc | None,
         name: str,
         type: int | ApplicationCommandType,
         state: State,
@@ -387,7 +388,7 @@ class ApplicationCommand(Command):
             Dictionary of localizations
         """
 
-        def wrapper(func: Coroutine):
+        def wrapper(func: AsyncFunc):
             if self.type != 1:
                 raise ApplicationCommandException(
                     'Sub Commands cannot be created on non-slash-commands'

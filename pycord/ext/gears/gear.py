@@ -20,10 +20,10 @@
 # SOFTWARE
 from __future__ import annotations
 
-from collections.abc import Coroutine
 from typing import TYPE_CHECKING, Any, Type, TypeVar
 
 from ...commands import Command, Group
+from ...types import AsyncFunc
 
 if TYPE_CHECKING:
     from ...bot import Bot
@@ -49,7 +49,7 @@ class Gear:
 
     def __init__(self, name: str) -> None:
         self.name = name
-        self._listener_functions: dict[str, list[Coroutine]] = {}
+        self._listener_functions: dict[str, list[AsyncFunc]] = {}
         self.bot: Bot
         self._commands: list[Command | Group] = []
 

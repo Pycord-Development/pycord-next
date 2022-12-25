@@ -6,6 +6,8 @@ Typing's for the Discord API.
 :copyright: 2021-present Pycord Development
 :license: MIT
 """
+from typing import Any, Callable, Coroutine
+
 from .application import *
 from .application_commands import *
 from .audit_log import *
@@ -28,3 +30,5 @@ from .user import *
 from .voice_state import *
 from .webhook import *
 from .welcome_screen import *
+
+AsyncFunc = Callable[..., Coroutine[Any, Any, Any]]

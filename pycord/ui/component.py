@@ -18,30 +18,42 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from ..state import State
-    from ..types import AsyncFunc
-    from .group import Group
+from copy import copy
+from dataclasses import dataclass, field
+from typing import Any, Literal
 
 
-class Command:
-    _processor_event: str
+class Component:
+    """
+    The base component type which every other component
+    subclasses and bases off of
+    """
 
-    def __init__(
-        self, callback: AsyncFunc, name: str, state: State, group: Group | None = None
-    ) -> None:
-        self._callback = callback
+    id: str
+    type: int
+    disabled: bool
 
-        self.name = name
-        self.group = group
-        self._state = state
+    def copy(self) -> Component:
+        return copy(self)
 
-    async def instantiate(self) -> None:
+    def _to_dict(self) -> dict[str, Any]:
         ...
 
-    async def _invoke(self, *args, **kwargs) -> None:
-        pass
+    def disable(self) -> None:
+        ...
+
+
+@dataclass
+class ActionRow:
+    """
+    Represents a Discord Action Row
+    """
+
+    type: Literal[1] = field(default=1)
+    components: list[Component] = field(default=list)
+
+    def _to_dict(self) -> dict[str, Any]:
+        return {'type': self.type, 'components': self.components}
