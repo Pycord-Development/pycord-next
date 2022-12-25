@@ -8,6 +8,7 @@ bot = pycord.Bot(intents=pycord.Intents())
 # commands
 GUILD_ID: int = 0
 
+
 # make a chat input command which
 # is named favorite and that displays
 # an autocompleted list of animes to pick from
@@ -23,7 +24,7 @@ GUILD_ID: int = 0
 # this has the option anime, displayed as a Parameter,
 # which is parsed by Pycord to give you the information the user gave.
 async def favorite(
-    inter,
+    inter: pycord.Interaction,
     anime: pycord.Option = pycord.Option(
         # The type of input the user will put,
         # for this example it's integer to support autocomplete.
@@ -58,22 +59,25 @@ async def favorite(
     # and if it matches up to an anime,
     # it responds with a custom response.
     anime = anime.value
-    if anime == 'Attack on Titan':
-        await inter.resp.send('It seems like you like Attack on Titan, Nice!')
-    elif anime == "JoJo's Bizzare Adventure":
-        await inter.resp.send("おにいちゃんありがとう. You like JoJo's Bizzare Adventure. Nice!")
-    elif anime == 'Cowboy Bebop':
-        await inter.resp.send('良い！あなたはカウボーイビバップが好きです')
-    elif anime == 'Hunter x Hunter':
-        await inter.resp.send(
-            'I ran out of responses... Well anyway, you like Hunter x Hunter which is Nice!'
-        )
-    elif anime == 'Spy x Family':
-        await inter.resp.send(
-            "I have a friend which really likes this anime, it's good seeing you like it too. Of course, Spy x Family!"
-        )
+    
+    match anime:
+        case "Attack on Titan":
+            await inter.resp.send('It seems like you like Attack on Titan, Nice!')
+        case "JoJo's Bizzare Adventure":
+            await inter.resp.send("おにいちゃんありがとう. You like JoJo's Bizzare Adventure. Nice!")
+        case 'Cowboy Bebop':
+            await inter.resp.send('良い！あなたはカウボーイビバップが好きです')
+        case 'Hunter x Hunter':
+            await inter.resp.send(
+                'I ran out of responses... Well anyway, you like Hunter x Hunter which is Nice!'
+            )
+        case 'Spy x Family':
+            await inter.resp.send(
+                "I have a friend which really likes this anime, "
+                "it's good seeing you like it too. Of course, Spy x Family!"
+            )
 
 
-# run the bot with the token token.
+# run the bot with the token.
 # PLEASE REMEMBER TO CHANGE!
 bot.run('token')
