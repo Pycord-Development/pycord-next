@@ -20,11 +20,11 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Type, TypeVar, Generic
+from types import SimpleNamespace
+from typing import TYPE_CHECKING, Any, Generic, Type, TypeVar
 
 from ...commands import Command, Group
 from ...types import AsyncFunc
-from types import SimpleNamespace
 
 if TYPE_CHECKING:
     from ...bot import Bot
@@ -32,10 +32,12 @@ if TYPE_CHECKING:
 
 T = TypeVar('T')
 
+
 class BaseContext(SimpleNamespace):
     ...
 
-ContextT = TypeVar("ContextT", bound=BaseContext)
+
+ContextT = TypeVar('ContextT', bound=BaseContext)
 
 
 class Gear(Generic[ContextT]):
@@ -53,6 +55,7 @@ class Gear(Generic[ContextT]):
     bot: Union[:class:`pycord.Bot`, None]
         The bot this Gear is attached to.
     """
+
     ctx: ContextT
 
     def __init__(self, name: str, ctx: ContextT) -> None:
