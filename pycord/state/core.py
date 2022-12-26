@@ -128,7 +128,7 @@ class State:
                 identify_channel(c, self) for c in data['channels']
             ]
             threads: list[Thread] = [
-                identify_channel(c, self) for c in data['channels']
+                identify_channel(c, self) for c in data['threads']
             ]
             stage_instances: list[StageInstance] = [
                 StageInstance(st, self) for st in data['stage_instances']
@@ -448,6 +448,8 @@ class State:
                         await self.http.delete_global_application_command(
                             self.user.id.real, app_command['id']
                         )
+
+                await self.ping.dispatch('hook', *args, commands=self.commands)
 
         elif type == 'USER_UPDATE':
             user = User(data['user'], self)

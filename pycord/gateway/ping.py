@@ -49,7 +49,7 @@ class Ping:
             if command._processor_event == name:
                 asyncio.create_task(command._invoke(*args, **kwargs))
 
-    def add_listener(self, name: str, func: Asyn) -> None:
+    def add_listener(self, name: str, func: AsyncFunc) -> None:
         if self._pings.get(name):
             self._pings[name].append(func)
         else:

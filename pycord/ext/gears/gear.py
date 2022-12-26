@@ -20,18 +20,25 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Type, TypeVar, Generic
 
 from ...commands import Command, Group
 from ...types import AsyncFunc
+from types import SimpleNamespace
 
 if TYPE_CHECKING:
     from ...bot import Bot
 
+
 T = TypeVar('T')
 
+class BaseContext(SimpleNamespace):
+    ...
 
-class Gear:
+ContextT = TypeVar("ContextT", bound=BaseContext)
+
+
+class Gear(Generic[ContextT]):
     """
     The Gear. Pycord's reinterpretation of Cogs in a way which is easier for both developers and library developers.
     It removes the old subclass-based system with a new instance-based system.
@@ -46,12 +53,14 @@ class Gear:
     bot: Union[:class:`pycord.Bot`, None]
         The bot this Gear is attached to.
     """
+    ctx: ContextT
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, ctx: ContextT) -> None:
         self.name = name
         self._listener_functions: dict[str, list[AsyncFunc]] = {}
         self.bot: Bot
         self._commands: list[Command | Group] = []
+        self.ctx = ctx
 
     async def on_attach(self, *args, **kwargs) -> None:
         ...

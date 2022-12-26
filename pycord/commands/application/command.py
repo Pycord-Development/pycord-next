@@ -159,10 +159,17 @@ class Option:
         self.required = required
         if autocomplete:
             self.choices = []
-            self._choices = [choice for choice in choices if choices]
+            if choices:
+                self._choices = [choice for choice in choices if choices]
+            else:
+                self._choices = []
         else:
-            self.choices = [choice._to_dict() for choice in choices if choices]
-        self.options = options
+            if choices:
+                self.choices = [choice._to_dict() for choice in choices]
+        if options is UNDEFINED:
+            self.options = []
+        else:
+            self.options = options
         self.channel_types = channel_types
         self.min_value = min_value
         self.max_value = max_value

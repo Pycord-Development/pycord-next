@@ -68,7 +68,7 @@ class Store:
             if len(self._store) == self.max_items:
                 self._store = {}
 
-            store = _stored(parents, id, data)
+            store = _stored(set(parents), id, data)
             self._store.add(store)
 
     async def discard(self, parents: list[Any], id: Any) -> Any | None:
