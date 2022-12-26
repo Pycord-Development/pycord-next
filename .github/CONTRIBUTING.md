@@ -12,15 +12,14 @@ This is an extremely basic guide for contributing to the repo.
 
 Thanks for taking the time to report an issue, this helps us make a more stable and usable library.
 
-1. If your issue produces an exception, include the entire traceback in a [code block](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks).
-2. Fill out the template. If the template is not filled out properly, your issue will most likely be closed.
-3. Be as detailed as possible when creating your bug report. In most scenarios, the fewer details that we are given, the longer it will take for your issue to be resolved.
+1. Fill out the template. If the template is not filled out properly, your issue will most likely be closed. If you include a traceback, please place it in a [code block](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks).
+2. Be as detailed as possible when creating your bug report. In most scenarios, the fewer details that we are given, the longer it will take for your issue to be resolved.
 
 ## Steps for Opening Pull Requests
 
 Considering that we are in a pre-alpha state right now, thank you very much for your contribution. It is deeply appreciated.
 
-However, before you create your PR, please ensure you've done a couple things:
+However, before you create your PR, please ensure you've done a couple of things:
 
 1. Your PR needs to have a clear purpose. PRs that edit multiple files are more than welcome, but make sure it accomplishes a single goal. This could be fixing a bug, refactoring, or even adding new material.
 2. Follow the style of the library. This implies two separate points:
