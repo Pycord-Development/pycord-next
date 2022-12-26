@@ -16,7 +16,7 @@
 
 <!-- Put an x inside [ ] to check it, like so: [x] -->
 
-- [ ] I have searched the currently open pull requests for duplicates.
-- [ ] I have tested the changes made (and they work).
+- [ ] I have searched all pull requests for duplicates.
+- [ ] I have tested the changes made.
   - [ ] I have properly changed the docs to reflect the changes made.
 - [ ] If 'type: ignore' comments were used, a comment is left to explain why it is needed.

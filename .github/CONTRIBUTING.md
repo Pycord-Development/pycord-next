@@ -12,7 +12,7 @@ This is an extremely basic guide for contributing to the repo.
 
 Thanks for taking the time to report an issue, this helps us make a more stable and usable library.
 
-1. If your issue produces a traceback/exception, include the entirety of it. Please put it in a [code block](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks).
+1. If your issue produces an exception, include the entire traceback in a [code block](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks).
 2. Fill out the template. If the template is not filled out properly, your issue will most likely be closed.
 3. Be as detailed as possible when creating your bug report. In most scenarios, the fewer details that we are given, the longer it will take for your issue to be resolved.
 

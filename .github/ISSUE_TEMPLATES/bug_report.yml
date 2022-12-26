@@ -40,7 +40,7 @@ body:
     attributes:
       label: Issue Checklist
       options:
-        - label: I have searched the currently open issues for duplicates.
+        - label: I have searched all issues for duplicates.
           required: true
         - label: I have shown the entire traceback, if available.
           required: true
