@@ -473,7 +473,7 @@ class State:
     }
 
     async def _process_event(self, event_type: str, data: dict[str, Any]) -> None:
-        if event := self._events.get(event_type, None):
-            args, event_type = await event(event_type, data)
+        if event_proccessor := self._events.get(event_type, None):
+            args, event_type = await event_proccessor(self, event_type, data)
 
             await self.ping.dispatch(event_type, *args, commands=self.commands)
