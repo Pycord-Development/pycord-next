@@ -1,0 +1,52 @@
+name: Bug Report
+description: Report broken/incorrect behavior caused by the library.
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Please ensure this is actually a bug with the library, and not with your own code.
+        
+        If you discover this is a bug with your code, come ask for help in [our Discord server](https://discord.gg/pycord).
+  - type: input
+    attributes:
+      label: Summary
+      description: A short summary of the bug encountered.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction Steps
+      description: What steps lead to this bug's occurrence.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction Code
+      description: If code that causes the bug can be given, please provide it here.
+    render: python
+  - type: textarea
+    attributes:
+      label: Expectations vs. Actual
+      description: What were your expectations of the code, and what actually happened.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Version
+      description: Please provide the version/commit on which you are running the code on.
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Issue Checklist
+      options:
+        - label: I have searched the currently open issues for duplicates.
+          required: true
+        - label: I have shown the entire traceback, if available.
+          required: true
+        - label: I have removed my token from any given code, if visible.
+          required: true
+  - type: textarea
+    attributes:
+      label: More Information
+      description: Please provide any extra information you have here, including system information.
