@@ -25,6 +25,7 @@ However, before you create your PR, please ensure you've done a couple of things
 2. Follow the style of the library. This implies two separate points:
    1. Make sure your code is as clean as possible and looks similar to the rest of the codebase. This includes spacing, function signatures/definitions, and commenting/documentation format.
    2. Ensure that your opened pull request follows the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/#summary) styling guide. This helps people understand the purpose of the PR, and how it should be reviewed.
+3. If possible, try to use our pre-commit hooks to format your code. These hooks format the code before you push it to GitHub, and could vastly improve your own experience by not needing to use other formatting commands.
 
 ## Where can I get more help with my issue/PR?
 
