@@ -63,16 +63,16 @@ async def _autocomplete(
 
 class CommandChoice:
     """
-    A single choice of an option. Used often in autocomplete-based commands
+    A single choice of an option.
 
     Parameters
     ----------
     name: :class:`str`
         The name of this choice
-    value: :class:`str` | :class:`int` :class:`float`
+    value: :class:`str` | :class:`int` | :class:`float`
         The value of this choice
     name_localizations: dict[:class:`str`, :class:`str`]
-        Dictionary of localizations
+        A dictionary of name localizations
     """
 
     def __init__(
@@ -103,30 +103,30 @@ class Option:
     Parameters
     ----------
     type: :class:`.ApplicationCommandOptionType` | :class:`int`
-        The type of Option
+        The type of this option
     name: :class:`str`
-        The name of this Option
+        The name of this option
     description: :class:`str`
-        The description of what and why this option is needed
+        The description of this option
     name_localizations: dict[:class:`str`, :class:`str`]
-        Dictionary of localizations
+        A dictionary of localizations for the ``name`` field
     description_localizations: dict[:class:`str`, :class:`str`]
-        Dictionary of localizations
-    required: bool
-        Is this option required to pass
-        Defaults to False.
+        A dictionary of localizations for the ``description`` field
+    required: :class:`bool`
+        Whether this option is required
+        Defaults to ``False``.
     choices: list[:class:`.CommandChoice`]
-        The choices this option can be given. Often used in autocomplete
+        Choices for string, integer and number options for the user to pick from
     options: list[:class:`Option`]
-        Extra Options to add. ONLY support for Sub Commands
+        Nested options, used to make subcommands
     channel_types: list[:class:`int`]
-        A list of channel types to keep lock of
+        A list of channel types this option will display
     min_value: :class:`int`
-        The minimum integer value
+        The minimum integer value a user can input
     max_value: :class:`int`
-        The maximum integer value
+        The maximum integer value a user can input
     autocomplete: :class:`bool`
-        Whether to implement autocomplete or not
+        Whether to implement autocomplete on this option
     """
 
     _level: int = 0
@@ -256,18 +256,18 @@ class Option:
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
     ) -> ApplicationCommand:
         """
-        Add a command to this sub command to make it a group.
+        Add a command to this subcommand to make it a group.
 
         Parameters
         ----------
         name: :class:`str`
-            The name of this newly instantiated sub command
+            The name of this newly created subcommand
         description: :class:`str`
-            The description of this newly created sub command
+            The description of this newly created subcommand
         name_localizations: dict[:class:`str`, :class:`str`]
-            Dictionary of localizations
+            A dictionary of localizations for the ``name`` field
         description_localizations: dict[:class:`str`, :class:`str`]
-            Dictionary of localizations
+            A dictionary of localizations for the ``description`` field
         """
 
         def wrapper(func: AsyncFunc):
@@ -282,7 +282,7 @@ class Option:
 
             if self._level == 2:
                 raise ApplicationCommandException(
-                    'Sub commands cannot be three levels deep'
+                    'Subcommands cannot be three levels deep'
                 )
 
             command._level = self._level + 1
@@ -306,29 +306,29 @@ class Option:
 
 class ApplicationCommand(Command):
     """
-    Commands deployed to Discord by Applications
+    Command deployed to Discord by applications
 
     Parameters
     ----------
     name: :class:`str`
-        The name of this Command
+        The name of this application command
     type: :class:`ApplicationCommandType`
-        The type of Application Command
+        The type of this application command
     description: :class:`str`
-        The description for this command
+        The description of this application command
     guild_id: :class:`int`
-        The Guild ID to limit this command to.
-        Defaults to None.
+        The Guild ID to limit this application command to
+        Defaults to ``None``.
     name_localizations: dict[:class:`str`, :class:`str`]
-        Dictionary of localizations
+        A dictionary of localizations for the ``name`` field
     description_localizations: dict[:class:`str`, :class:`str`]
-        Dictionary of localizations
+        A dictionary of localizations for the ``description`` field
     dm_permission: :class:`bool`
-        If this command should be instantiatable in DMs
-        Defaults to True.
+        Whether this application command should be visible in direct message channels
+        Defaults to ``True``.
     nsfw: :class:`bool`
-        Whether this Application Command is for NSFW audiences or not
-        Defaults to False.
+        Whether this application command should only be used in NSFW-marked channels
+        Defaults to ``False``.
     """
 
     _processor_event = 'on_interaction'
@@ -381,24 +381,24 @@ class ApplicationCommand(Command):
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
     ) -> ApplicationCommand:
         """
-        Add a sub command to this command
+        Add a subcommand to this command
 
         Parameters
         ----------
         name: :class:`str`
-            The name of this newly instantiated sub command
+            The name of this newly instantiated subcommand
         description: :class:`str`
-            The description of this newly created sub command
+            The description of this newly created subcommand
         name_localizations: dict[:class:`str`, :class:`str`]
-            Dictionary of localizations
+            A dictionary of localizations for the ``name`` field
         description_localizations: dict[:class:`str`, :class:`str`]
-            Dictionary of localizations
+            A dictionary of localizations for the ``description`` field
         """
 
         def wrapper(func: AsyncFunc):
             if self.type != 1:
                 raise ApplicationCommandException(
-                    'Sub Commands cannot be created on non-slash-commands'
+                    'Subcommands cannot be created on non-slash-commands'
                 )
 
             command = Option(
