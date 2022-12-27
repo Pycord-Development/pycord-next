@@ -51,7 +51,7 @@ class Executer:
                 else:
                     await asyncio.sleep(5)
 
-            requests_passed + 1
+            requests_passed += 1
             e = await self._request_queue.get()
             e.set()
 
