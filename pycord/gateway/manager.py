@@ -18,6 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+
 from __future__ import annotations
 
 import asyncio
@@ -26,13 +27,12 @@ from typing import TYPE_CHECKING
 from aiohttp import BasicAuth, ClientSession
 
 from ..errors import NoIdentifiesLeft
-
-if TYPE_CHECKING:
-    from ..state import State
-
 from .notifier import Notifier
 from .passthrough import PassThrough
 from .shard import Shard
+
+if TYPE_CHECKING:
+    from ..state import State
 
 
 class ShardManager:

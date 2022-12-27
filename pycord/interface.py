@@ -18,6 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+
 import datetime
 import importlib.resources
 import logging
@@ -31,7 +32,7 @@ import warnings
 
 import colorlog
 
-from pycord._about import __copyright__, __git_sha1__, __license__, __version__
+from ._about import __copyright__, __git_sha1__, __license__, __version__
 
 __all__ = ['start_logging', 'print_banner']
 

@@ -6,6 +6,7 @@ Typing's for the Discord API.
 :copyright: 2021-present Pycord Development
 :license: MIT
 """
+
 from typing import Any, Callable, Coroutine
 
 from .application import *

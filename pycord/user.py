@@ -18,6 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -26,7 +27,10 @@ from .color import Color
 from .enums import PremiumType
 from .flags import UserFlags
 from .snowflake import Snowflake
-from .types import LOCALE, User as DiscordUser
+from .types import (
+    LOCALE,
+    User as DiscordUser,
+)
 from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
