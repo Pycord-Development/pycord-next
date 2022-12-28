@@ -18,7 +18,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-
 from __future__ import annotations
 
 from datetime import datetime
@@ -26,12 +25,13 @@ from typing import TYPE_CHECKING
 
 from .flags import Permissions
 from .snowflake import Snowflake
-from .types import GuildMember
-from .undefined import UNDEFINED, UndefinedType
-from .user import User
 
 if TYPE_CHECKING:
     from .state import State
+
+from .types import GuildMember
+from .undefined import UNDEFINED, UndefinedType
+from .user import User
 
 
 class Member:

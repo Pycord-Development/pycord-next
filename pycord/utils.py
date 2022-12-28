@@ -31,6 +31,7 @@ try:
     import msgspec
 except ImportError:
     import json
+
     msgspec = None
 
 DISCORD_EPOCH: int = 1420070400000

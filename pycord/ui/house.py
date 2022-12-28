@@ -25,8 +25,9 @@ from copy import copy
 from typing import Literal
 from uuid import uuid4
 
-from ..enums import ButtonStyle, SelectMenuType
 from ..errors import ComponentException
+
+from ..enums import ButtonStyle, SelectMenuType
 from ..media import Emoji
 from ..types import AsyncFunc
 from ..undefined import UNDEFINED, UndefinedType
