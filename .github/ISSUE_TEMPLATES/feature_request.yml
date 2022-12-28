@@ -23,7 +23,7 @@ body:
     attributes:
       label: Purpose
       description: >
-        What is the general purpose of this PR? What exactly becomes easier or 
+        What is the general purpose of this feature request? What exactly becomes easier or 
         possible when this feature is implemented?
     validations:
       required: true
