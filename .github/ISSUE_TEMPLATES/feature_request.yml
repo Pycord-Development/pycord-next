@@ -1,0 +1,43 @@
+name: Feature Request
+description: Suggest a feature implementation for a section of the library.
+labels: feature request
+body:
+  - type: input
+    attributes:
+      label: Summary
+      description: A short summary of what your feature request is.
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      multiple: false
+      label: What section of the library should this be implemented in?
+      options:
+        - pycord [core library]
+        - pycord.ext.gears
+        - pycord.ext.pager
+        - docs
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Purpose
+      description: >
+        What is the general purpose of this PR? What exactly becomes easier or 
+        possible when this feature is implemented?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Ideal Solution
+      description: >
+        Is there a specific way this should be implemented? 
+        Is there anything particular this feature should do?
+  - type: textarea
+    attributes:
+      label: Current Solution
+      description: What is the current solution to this problem, if any?
+  - type: textarea
+    attributes:
+      label: More Information
+      description: If there is anything else you'd like to add, please do so here.

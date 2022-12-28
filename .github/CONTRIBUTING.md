@@ -10,10 +10,11 @@ This is an extremely basic guide for contributing to the repo.
 
 ## Steps for Opening Issues
 
-Thanks for taking the time to report an issue, this helps us make a more stable and usable library.
+Thanks for taking the time to open an issue, this helps us make a more stable and usable library.
 
-1. Fill out the template. If the template is not filled out properly, your issue will most likely be closed. If you include a traceback, please place it in a [code block](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks).
-2. Be as detailed as possible when creating your bug report. In most scenarios, the fewer details that we are given, the longer it will take for your issue to be resolved.
+1. Fill out the template. If the template is not filled out properly, your issue will most likely be closed.
+   1. If you include a traceback when creating a bug report, or if you include bits of code in your feature request, please place it in a [code block](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks).
+2. Be as detailed as possible when creating your issue. In most scenarios, the fewer details that we are given, the longer it will take for your issue to be resolved.
 
 ## Steps for Opening Pull Requests
 
