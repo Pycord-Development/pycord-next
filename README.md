@@ -29,7 +29,7 @@ An automatic install should look something like
     pip install -U git+https://github.com/pycord-development/pycord-v3
 ```
 
-If instead, you wanted to do a manual install (incase of something like development),
+If instead, you wanted to do a manual install (in case of something like development),
 you could do the following
 
 ```sh
@@ -42,7 +42,7 @@ you could do the following
 
 ## Stability
 
-While we are working and striving for stability throughout v3, its still quite a new
+While we are working and striving for stability throughout v3, it's still quite a new
 library so breakages can still happen especially with us still being in a pre-alpha
 stage.
 
@@ -70,7 +70,7 @@ We've adopted a modern interface inspired by
 Hikari to form an interface easier, smarter, and objectively better than discord.py.
 
 Instead of following a mix of object-instance paradigm (in this case think of cog-bot)
-we're following a instance-only paradigm completely restructuring old features and stripping useless parts from them.
+we're following an instance-only paradigm completely restructuring old features and stripping useless parts from them.
 Overall a cleanup of v2, and new better interface.
 
 ## Code Example

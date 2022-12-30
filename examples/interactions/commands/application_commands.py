@@ -37,7 +37,7 @@ async def favorite(
         # this is a longer version of name displaying
         # more detail and technicalities
         'Your favorite Anime Show',
-        # this just sets it so the user cannot procede without
+        # this just sets it so the user cannot proceed without
         # entering this option
         required=True,
         # enables autocomplete on Discord's side
