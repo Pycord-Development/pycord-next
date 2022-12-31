@@ -38,9 +38,6 @@ from ..role import Role
 from ..scheduled_event import ScheduledEvent
 from ..snowflake import Snowflake
 from ..stage_instance import StageInstance
-from ..ui import Component
-from ..ui.house import House
-from ..ui.text_input import Modal
 from ..undefined import UNDEFINED
 from ..user import User
 from .grouped_store import GroupedStore
@@ -77,29 +74,6 @@ class State:
         self.application_commands: list[ApplicationCommand] = []
         self.update_commands: bool = options.get('update_commands', True)
         self.verbose: bool = options.get('verbose', False)
-        self.components: list[Component] = []
-        self._component_custom_ids: list[str] = []
-        self._components_via_custom_id: dict[str, Component] = {}
-        self.modals: list[Modal] = []
-
-    def sent_modal(self, modal: Modal) -> None:
-        if modal not in self.modals:
-            self.modals.append(modal)
-
-    def sent_component(self, comp: Component) -> None:
-        if comp.id not in self._component_custom_ids and comp.id is not UNDEFINED:
-            self.components.append(comp)
-            self._component_custom_ids.append(comp.id)
-            self._components_via_custom_id[comp.id] = comp
-        elif comp.disabled != self._components_via_custom_id[comp.id].disabled:
-            oldc = self._components_via_custom_id[comp.id]
-            self.components.remove(oldc)
-            self.components.append(comp)
-            self._components_via_custom_id[comp.id] = comp
-
-    def sent_house(self, house: House) -> None:
-        for comp in house.components.values():
-            self.sent_component(comp)
 
     def bot_init(
         self,

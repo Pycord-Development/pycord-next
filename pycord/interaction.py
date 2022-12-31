@@ -37,7 +37,6 @@ from .webhook import Webhook
 
 if TYPE_CHECKING:
     from .state import State
-    from .ui.text_input import Modal
 
 
 class InteractionOption:
@@ -167,12 +166,9 @@ class InteractionResponse:
 
         self._deferred = True
 
-    async def send_modal(self, modal: Modal) -> None:
+    async def send_modal(self, modal) -> None:
         if self.responded:
             raise InteractionException('This interaction has already been responded to')
 
-        await self._parent._state.http.create_interaction_response(
-            self._parent.id, self._parent.token, {'type': 9, 'data': modal._to_dict()}
-        )
-        self._parent._state.sent_modal(modal)
+        # TODO: Reimplement
         self.responded = True
