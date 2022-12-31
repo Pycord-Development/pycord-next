@@ -61,12 +61,10 @@ async def favorite(
     anime = anime.value
     
     match anime:
-        case 'Attack on Titan':
+        case "Attack on Titan":
             await inter.resp.send('It seems like you like Attack on Titan, Nice!')
         case "JoJo's Bizzare Adventure":
-            await inter.resp.send(
-                "おにいちゃんありがとう. You like JoJo's Bizzare Adventure. Nice!"
-            )
+            await inter.resp.send("おにいちゃんありがとう. You like JoJo's Bizzare Adventure. Nice!")
         case 'Cowboy Bebop':
             await inter.resp.send('良い！あなたはカウボーイビバップが好きです')
         case 'Hunter x Hunter':
@@ -75,7 +73,7 @@ async def favorite(
             )
         case 'Spy x Family':
             await inter.resp.send(
-                'I have a friend which really likes this anime, '
+                "I have a friend which really likes this anime, "
                 "it's good seeing you like it too. Of course, Spy x Family!"
             )
 
