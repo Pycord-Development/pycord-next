@@ -38,7 +38,7 @@ from .types import (
 )
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
-from .webhook import Webhook
+from .webhook import GuildWebhook
 
 if TYPE_CHECKING:
     from .state import State
@@ -162,7 +162,7 @@ class AuditLog:
     guild_scheduled_events: list[:class:`.scheduled_event.ScheduledEvent`]
     integrations: list[:class:`.user.Integration`]
     users: list[:class:`.user.User`]
-    webhooks: list[:class:`.webhook.Webhook`]
+    webhooks: list[:class:`.webhook.GuildWebhook`]
     """
 
     def __init__(self, data: DiscordAuditLog, state: State) -> None:
@@ -186,6 +186,6 @@ class AuditLog:
             Thread(thread, state) for thread in data['threads']
         ]
         self.users: list[User] = [User(user, state) for user in data['users']]
-        self.webhooks: list[Webhook] = [
-            Webhook._from_data(w, state) for w in data['webhooks']
+        self.webhooks: list[GuildWebhook] = [
+            GuildWebhook(w, state) for w in data['webhooks']
         ]
