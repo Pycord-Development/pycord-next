@@ -59,7 +59,7 @@ async def favorite(
     # and if it matches up to an anime,
     # it responds with a custom response.
     anime = anime.value
-
+    
     match anime:
         case 'Attack on Titan':
             await inter.resp.send('It seems like you like Attack on Titan, Nice!')
