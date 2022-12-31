@@ -75,7 +75,7 @@ class State:
         # makes sure that multiple clusters don't start at once
         self._cluster_lock: asyncio.Lock = asyncio.Lock()
         self._ready: bool = False
-        self.application_commands: list[ApplicationCommand] = []
+        self.application_commands: list[ApplicationCommandData] = []
         self.update_commands: bool = options.get('update_commands', True)
         self.verbose: bool = options.get('verbose', False)
         self.components: list[Component] = []
@@ -126,7 +126,7 @@ class State:
                 if command.guild_id:
                     tasks.append(self._process_guild_command(command))
                 else:
-                    tasks.extend(self._process_global_command_for(command))
+                    tasks.extend(await self._process_global_command_for(command))
         await asyncio.gather(*tasks)
 
     async def _process_global_command_for(self, command: Command) -> list[Coroutine]:
@@ -155,7 +155,7 @@ class State:
                     if app_cmd['type'] != command.type:
                         continue
 
-                    if created is True:
+                    if created:
                         await self.http.delete_guild_application_command(
                             self.user.id, command.guild_id, app_cmd['id']
                         )
