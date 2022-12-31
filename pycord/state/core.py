@@ -214,7 +214,7 @@ class State:
                 options=command._options,
             )
             created = True
-            self.id = app_cmd['id']
+            command.id = app_cmd['id']
         else:
             return
 
