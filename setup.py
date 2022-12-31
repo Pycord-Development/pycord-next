@@ -23,7 +23,6 @@ import setuptools
 
 __version__ = '3.0.0'
 
-requirements = []
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 

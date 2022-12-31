@@ -40,7 +40,7 @@ bot = pycord.Bot(...)
 async def echo(inter: pycord.Interaction, msg: str = pycord.Option(name='message', description='The message to echo')):
    await inter.resp.send(msg)
 
-bot.run()
+bot.run(...)
 ```
 
 ## Extensible Cache
