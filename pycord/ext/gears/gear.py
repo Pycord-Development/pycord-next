@@ -32,10 +32,12 @@ if TYPE_CHECKING:
 
 T = TypeVar('T')
 
+
 class BaseContext(SimpleNamespace):
     ...
 
-ContextT = TypeVar("ContextT", bound=BaseContext)
+
+ContextT = TypeVar('ContextT', bound=BaseContext)
 
 
 class Gear(Generic[ContextT]):
@@ -53,6 +55,7 @@ class Gear(Generic[ContextT]):
     bot: Union[:class:`pycord.Bot`, None]
         The bot this Gear is attached to.
     """
+
     ctx: ContextT
 
     def __init__(self, name: str, ctx: ContextT) -> None:
@@ -139,7 +142,7 @@ class Gear(Generic[ContextT]):
 
         for name, funcs in self._listener_functions.items():
             for func in funcs:
-                bot._state.ping.add_listener(name, func)
+                bot._state.emitter.add_listener(name, func)
 
         for cmd in self._commands:
             if isinstance(cmd, Command):

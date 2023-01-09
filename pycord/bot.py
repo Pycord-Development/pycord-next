@@ -276,7 +276,7 @@ class Bot:
         """
 
         def wrapper(func: T) -> T:
-            self._state.ping.add_listener(name=name, func=func)
+            self._state.emitter.add_listener(name=name, func=func)
             return func
 
         return wrapper

@@ -75,7 +75,9 @@ class House:
             The component to append
         """
         if len(self.components) == 5:
-            raise ComponentException('Cannot add more components, already reached maximum')
+            raise ComponentException(
+                'Cannot add more components, already reached maximum'
+            )
 
         self.components[comp] = comp
 
