@@ -8,6 +8,7 @@ Native Python Implementation of Voice-related Features
 """
 
 from .gateway import *
+
 # should we import opus?
 from .opus import *
 from .sock import *

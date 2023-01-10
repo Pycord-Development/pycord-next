@@ -366,3 +366,9 @@ class SelectMenuType(Enum):
     ROLE = 6
     MENTIONABLE = 7
     CHANNEL = 8
+
+
+class SpeakingMask(Enum):
+    MICROPHONE = 1 << 0
+    SOUNDSHARE = 1 << 1
+    PRIORITY = 1 << 2

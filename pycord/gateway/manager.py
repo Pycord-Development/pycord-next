@@ -96,9 +96,32 @@ class ShardManager:
 
             tasks.append(shard.connect(token=self._state.token))
 
-            self.shards.append(shard)
+            self.shards.insert(shard_id, shard)
 
         await asyncio.gather(*tasks)
 
     async def shutdown(self) -> None:
         await self.delete_shards()
+
+    def find_shard(self, guild_id: int) -> Shard | None:
+        shard_id = (guild_id >> 22) % self.amount
+
+        try:
+            shard = self.shards[shard_id]
+        except IndexError:
+            return None
+
+        return shard
+
+    async def update_voice_state(self, guild_id: int, channel_id: int, self_mute: bool = False, self_deaf: bool = False) -> None:
+        shard = self.find_shard(guild_id)
+
+        await shard.send({
+            'op': 4,
+            'data': {
+                'guild_id': guild_id,
+                'channel_id': channel_id,
+                'self_mute': self_mute,
+                'self_deaf': self_deaf
+            }
+        })

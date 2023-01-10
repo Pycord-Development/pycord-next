@@ -28,6 +28,8 @@ import aiohttp
 
 from pycord import utils
 
+from ..enums import SpeakingMask
+from ..gateway.passthrough import PassThrough
 from ..state.core import State
 from .sock import NativeSocket
 
@@ -64,6 +66,42 @@ class NativeGateway:
         self._receive_task: asyncio.Task[None] | None = None
         self.url: str | None = None
         self._data: ConnectionData | None = None
+        self._rate_limiter = PassThrough(110, 60)
+        self._nonce: int = 0
+        # mapping ssrcs and their speaking statuses
+        self.ssrc_map: dict[str, dict[str, Any]] = {}
+        self.secret_key = None
+
+    async def send(self, data: dict[str, Any]) -> None:
+        async with self._rate_limiter:
+            await self._ws.send_str(utils.dumps(data))
+
+    async def speak(self, state: SpeakingMask) -> None:
+        await self.send({'op': 5, 'd': {'speaking': int(state), 'delay': 0}})
+
+    async def identify(self, conn: ConnectionData) -> None:
+        await self.send(
+            {
+                'op': 0,
+                'd': {
+                    'server_id': conn.guild_id,
+                    'user_id': conn.user_id,
+                    'session_id': conn.session_id,
+                    'token': conn.token,
+                },
+            }
+        )
+
+    async def select(self, ip: str, port: int, mode: str) -> None:
+        await self.send(
+            {
+                'op': 1,
+                'd': {
+                    'protocol': 'udp',
+                    'data': {'address': ip, 'port': port, 'mode': mode},
+                },
+            }
+        )
 
     async def connect(self, ws_url: str, connection: ConnectionData) -> None:
         if not ws_url.startswith('wss://'):
@@ -88,7 +126,7 @@ class NativeGateway:
             await self.connect(ws_url, connection)
             return
 
-        asyncio.create_task(self._receive)
+        asyncio.create_task(self._receive())
 
     async def _receive(self) -> None:
         async for message in self._ws:
@@ -101,12 +139,27 @@ class NativeGateway:
                 d = data.get('d')
 
                 if op == 2:
-                    await self._socket.start(d)
-                elif op == 3:
+                    await self._socket.start(self, d)
+                elif op == 4:
+                    self.secret_key = data['secret_key']
+                elif op == 5:
+                    try:
+                        self.ssrc_map[d['ssrc']]['speaking'] = d['speaking']
+                    except KeyError:
+                        self.ssrc_map[d['ssrc']] = {
+                            'user_id': int(d['user_id']),
+                            'speaking': d['speaking'],
+                        }
+                elif op == 6:
                     self._stop_conn.set_result(None)
                     self._stop_conn = asyncio.create_task(self._stopper)
+                elif op == 8:
+                    self._heartbeat_interval: float | int = (
+                        d['heartbeat_interval'] / 1000
+                    )
 
     async def _stopper(self) -> None:
+        await asyncio.sleep(self._heartbeat_interval + 5)
         _log.critical('heartbeat failed to be received, remaking websocket')
         await self._ws.close()
         await self._receive_task.set_result(None)
@@ -115,4 +168,12 @@ class NativeGateway:
         self._receive_task = None
         self._ws = None
 
+        # TODO: implement resumes
         await self.connect(self.url, self._data)
+
+    async def _repeat_heartbeat(self) -> None:
+        await asyncio.sleep(self._heartbeat_interval)
+        _log.debug('sending heartbeat to voice gateway')
+        self._nonce += 1
+        await self._ws.send_str(utils.dumps({'op': 3, 'd': self._nonce}))
+        self._heartbeat_task = asyncio.create_task(self._repeat_heartbeat())
