@@ -23,6 +23,8 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING
 
+from .flags import MessageFlags
+
 from .embed import Embed
 from .errors import InteractionException
 from .member import Member
@@ -76,7 +78,10 @@ class Interaction:
         _member = data.get('member')
         self.member = Member(_member, state) if _member is not None else UNDEFINED
         _user = data.get('user')
-        self.user = User(_user, state) if _user is not None else UNDEFINED
+        if self.member is not UNDEFINED:
+            self.user = self.member.user
+        else:
+            self.user = User(_user, state) if _user is not None else UNDEFINED
         self.token = data['token']
         self.version = data['version']
         _message = data.get('message')
@@ -129,10 +134,13 @@ class InteractionResponse:
         content: str,
         tts: bool = False,
         embeds: list[Embed] = [],
-        flags: int = 0,
+        flags: int | MessageFlags = 0,
     ) -> None:
         if self.responded:
             raise InteractionException('This interaction has already been responded to')
+
+        if isinstance(flags, MessageFlags):
+            flags = flags.as_bit
 
         await self._parent._state.http.create_interaction_response(
             self._parent.id,

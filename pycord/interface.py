@@ -65,7 +65,7 @@ def start_logging(flavor: None | int | str | dict, debug: bool = False):
 
         flavor = None
 
-    # things that never will be logged.
+    # things that will never be logged.
     logging.logThreads = None
     logging.logProcesses = None
 
@@ -111,7 +111,7 @@ def print_banner(
         'copyright': __copyright__,
         'version': __version__,
         'license': __license__,
-        # the # prefix only works on windows, and the - prefix only works on linux/unix systems
+        # the # prefix only works on Windows, and the - prefix only works on linux/unix systems
         'current_time': today.strftime(f'%B the %#d{get_day_prefix(today.day)} of %Y')
         if os.name == 'nt'
         else today.strftime(f'%B the %-d{get_day_prefix(today.day)} of %Y'),

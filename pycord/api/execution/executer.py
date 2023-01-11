@@ -27,7 +27,7 @@ class Executer:
     def __init__(self, route: BaseRoute) -> None:
         self.route = route
         self.is_global: bool | None = None
-        self.holding_queue: asyncio.Queue[asyncio.Event] | None = None
+        self._request_queue: asyncio.Queue[asyncio.Event] | None = None
         self.rate_limited: bool = False
 
     async def executed(
@@ -36,7 +36,7 @@ class Executer:
         self.rate_limited = True
         self.is_global = is_global
         self._reset_after = reset_after
-        self.holding_queue = asyncio.Queue()
+        self._request_queue = asyncio.Queue()
 
         await asyncio.sleep(reset_after)
 
@@ -44,15 +44,15 @@ class Executer:
 
         # NOTE: This could break if someone did a second global rate limit somehow
         requests_passed: int = 0
-        for _ in range(self.holding_queue.qsize() - 1):
+        for _ in range(self._request_queue.qsize() - 1):
             if requests_passed == limit:
                 if not is_global:
                     await asyncio.sleep(reset_after)
                 else:
                     await asyncio.sleep(5)
 
-            requests_passed + 1
-            e = await self.holding_queue.get()
+            requests_passed += 1
+            e = await self._request_queue.get()
             e.set()
 
     async def wait(self) -> None:
@@ -61,5 +61,5 @@ class Executer:
 
         event = asyncio.Event()
 
-        self.holding_queue.put(event)
+        self._request_queue.put(event)
         await event.wait()
