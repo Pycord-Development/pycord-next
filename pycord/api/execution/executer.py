@@ -61,5 +61,5 @@ class Executer:
 
         event = asyncio.Event()
 
-        await self._request_queue.put(event)
+        self._request_queue.put_nowait(event)
         await event.wait()
