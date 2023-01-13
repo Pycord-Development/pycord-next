@@ -53,7 +53,7 @@ html_theme_options = {
 }
 
 html_sidebars = {
-    "**": ["sidebar-nav-bs", "navbar-logo"]
+    "**": ["sidebar-nav-bs"]
 }
 
 resource_links = {
