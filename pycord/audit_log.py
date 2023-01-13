@@ -107,7 +107,7 @@ class AuditLogChange:
     ----------
     key: :class:`str`
     new_value: :class:`typing.Any` | :class:`.undefined.UndefinedType`
-    old_value: `typing.Any` | :class:`.undefined.UndefinedType`
+    old_value: :class:`typing.Any` | :class:`.undefined.UndefinedType`
     """
 
     def __init__(self, data: DiscordAuditLogChange) -> None:
