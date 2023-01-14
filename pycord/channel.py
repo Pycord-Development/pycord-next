@@ -198,7 +198,7 @@ class MessageableChannel(Channel):
         )
 
 
-class AudioChannel(Channel):
+class AudioChannel(GuildChannel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.rtc_region: str | UndefinedType = data.get('rtc_region', UNDEFINED)
@@ -221,23 +221,6 @@ class DMChannel(MessageableChannel):
 
 class VoiceChannel(MessageableChannel, AudioChannel):
     ...
-
-
-class GroupDMChannel(MessageableChannel):
-    def __init__(self, data: DiscordChannel, state: State) -> None:
-        super().__init__(data, state)
-        self.owner_id: Snowflake | UndefinedType = (
-            Snowflake(data['owner_id'])
-            if data.get('owner_id') is not None
-            else UNDEFINED
-        )
-        self._icon: str | UndefinedType | None = data.get('icon', UndefinedType)
-        self.application_id: Snowflake | UndefinedType = (
-            Snowflake(data['application_id'])
-            if data.get('application_id') is not None
-            else UNDEFINED
-        )
-        self.recipients: list[User] = [User(d) for d in data.get('recipients', [])]
 
 
 class CategoryChannel(Channel):
@@ -271,7 +254,7 @@ class Thread(MessageableChannel):
         )
 
 
-class StageChannel(AudioChannel, Channel):
+class StageChannel(AudioChannel):
     ...
 
 
@@ -300,7 +283,7 @@ class ForumChannel(Channel):
 
 def identify_channel(
     data: dict[str, Any], state: State
-) -> TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel:
+) -> TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | Channel:
     type = data['type']
 
     if type == 0:
@@ -309,8 +292,6 @@ def identify_channel(
         return DMChannel(data, state)
     elif type == 2:
         return VoiceChannel(data, state)
-    elif type == 3:
-        return GroupDMChannel(data, state)
     elif type == 4:
         return CategoryChannel(data, state)
     elif type == 5:
@@ -325,3 +306,5 @@ def identify_channel(
         return DirectoryChannel(data, state)
     elif type == 15:
         return ForumChannel(data, state)
+    else:
+        return Channel(data, state)
