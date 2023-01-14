@@ -21,7 +21,7 @@
 
 from collections.abc import Iterator, Sequence
 from itertools import accumulate
-from typing import Any, Literal, TypeVar, AsyncGenerator
+from typing import Any, AsyncGenerator, Literal, TypeVar
 
 from aiohttp import ClientResponse
 

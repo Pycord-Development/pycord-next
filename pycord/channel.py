@@ -144,6 +144,7 @@ class GuildChannel(Channel):
             'default_auto_archive_duration', UNDEFINED
         )
 
+
 class MessageableChannel(Channel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
@@ -283,7 +284,7 @@ class ForumChannel(Channel):
 
 def identify_channel(
     data: dict[str, Any], state: State
-) -> TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | Channel:
+) -> TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | Channel:
     type = data['type']
 
     if type == 0:

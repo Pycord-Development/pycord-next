@@ -28,7 +28,7 @@ class BaseRouter:
         self,
         method: str,
         route: BaseRoute,
-        data: dict[str, Any] | None = None,
+        data: Any | None = None,
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,

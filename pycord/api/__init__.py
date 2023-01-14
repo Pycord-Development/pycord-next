@@ -8,14 +8,15 @@ Implementation of the Discord API.
 """
 import logging
 import sys
-from typing import Any
+from typing import Any, Iterable
 
-from aiohttp import BasicAuth, ClientSession, __version__ as aiohttp_version
+from aiohttp import BasicAuth, ClientSession, FormData, __version__ as aiohttp_version
 
 from pycord._about import __version__
 
 from .. import utils
 from ..errors import BotException, Forbidden, HTTPException, InternalError, NotFound
+from ..file import BaseFile
 from ..utils import dumps
 from .execution import Executer
 from .json_decoder import JSONDecoder
@@ -64,6 +65,8 @@ class HTTPClient(ApplicationCommands, Messages):
         method: str,
         route: BaseRoute,
         data: dict[str, Any] | None = None,
+        files: list[BaseFile] | None = None,
+        form: Iterable[dict[str, Any]] | None = None,
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,
@@ -90,7 +93,16 @@ class HTTPClient(ApplicationCommands, Messages):
                 _log.debug(f'Pausing request to {endpoint}: Found rate limit executer')
                 await executer.wait()
 
-        for _ in range(5):
+        for try_ in range(5):
+            if files:
+                for file in files:
+                    file.reset(try_)
+
+            if form:
+                data = FormData(quote_fields=False)
+                for params in form:
+                    data.add_field(**params)
+
             r = await self._session.request(
                 method,
                 endpoint,
