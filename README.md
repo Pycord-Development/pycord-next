@@ -20,7 +20,7 @@ version of Pycord.
 
 ## Installation
 
-Pycord v3 is not yet published onto PyPi, so for now you'll have to install via git. To
+Pycord v3 is not yet published onto PyPI, so for now you'll have to install via git. To
 do this, you should install [git](https://git-scm.com) if not already installed.
 
 An automatic install should look something like

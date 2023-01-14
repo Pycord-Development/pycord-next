@@ -21,7 +21,7 @@
 
 from collections.abc import Iterator, Sequence
 from itertools import accumulate
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal, TypeVar, AsyncGenerator
 
 from aiohttp import ClientResponse
 
@@ -96,3 +96,12 @@ def chunk(items: S, n: int) -> Iterator[S]:
 
 def remove_undefined(**kwargs) -> dict[str, Any]:
     return {k: v for k, v in kwargs.items() if v is not UNDEFINED}
+
+
+async def get_iterated_data(iterator: AsyncGenerator) -> list[Any]:
+    hold = []
+
+    async for data in iterator:
+        hold.append(data)
+
+    return hold
