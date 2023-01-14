@@ -33,9 +33,6 @@ class Page(Protocol[T]):
     The class for all Page Types to subclass.
     """
 
-    def __init__(self):
-        ...
-
     async def interact_forward(self, *args, **kwargs) -> None:
         """
         Interactions to do when the paginator issues a forwarded statement
@@ -154,3 +151,6 @@ class Paginator:
         if page not in self._pages:
             raise PagerException('This page is not part of this paginator')
         self._pages.remove(page)
+
+    async def __anext__(self) -> Page:
+        return await self.forward()
