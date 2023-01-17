@@ -283,7 +283,7 @@ class ForumChannel(Channel):
 
 def identify_channel(
     data: dict[str, Any], state: State
-) -> TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | Channel:
+) -> TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | Channel:
     type = data['type']
 
     if type == 0:
