@@ -1,5 +1,5 @@
 import pycord
-from pycord.ui import text_input
+from pycord.components import text_input
 
 # initiate a bot with 0 intents
 bot = pycord.Bot(intents=pycord.Intents())
