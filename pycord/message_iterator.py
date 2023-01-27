@@ -18,14 +18,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from ..errors import PycordException
+from .pages.paginator import Paginator
+from .message import Message
+from .pages import Page
 
-__all__ = ['PagerException', 'NoMorePages']
+
+class MessagePage(Page[Message]):
+    def __init__(self, message: Message) -> None:
+        self.message = message
 
 
-class PagerException(PycordException):
+# Paginator but typed for MessagePage
+class MessagePaginator(Paginator[MessagePage]):
     ...
 
-
-class NoMorePages(PagerException):
-    ...
