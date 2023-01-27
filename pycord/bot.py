@@ -25,6 +25,7 @@ from aiohttp import BasicAuth
 
 from .commands import Group
 from .errors import NoIdentifiesLeft, OverfilledShardsException
+from .events.event_manager import Event
 from .flags import Intents
 from .gateway import PassThrough, ShardCluster, ShardManager
 from .guild import Guild
@@ -265,7 +266,7 @@ class Bot:
             )
         )
 
-    def listen(self, name: str) -> T:
+    def listen(self, event: Event) -> T:
         """
         Listen to an event
 
@@ -276,7 +277,7 @@ class Bot:
         """
 
         def wrapper(func: T) -> T:
-            self._state.emitter.add_listener(name=name, func=func)
+            self._state.event_manager.add_event(event, func)
             return func
 
         return wrapper

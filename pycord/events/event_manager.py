@@ -1,0 +1,89 @@
+# cython: language_level=3
+# Copyright (c) 2021-present Pycord Development
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE
+
+
+import asyncio
+from asyncio import Future
+from typing import TYPE_CHECKING, Any, Protocol, Type
+
+from ..types import AsyncFunc
+
+if TYPE_CHECKING:
+    from ..state import State
+
+
+class Event(Protocol):
+    _name: str
+
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
+        return True
+
+
+class EventManager:
+    def __init__(self, base_events: list[Type[Event]], state: 'State') -> None:
+        self._base_events = base_events
+        self._state = state
+
+        # structured like:
+        # EventClass: [childrenfuncs]
+        self.events: dict[Type[Event], list[AsyncFunc]] = {}
+
+        for event in self._base_events:
+            # base_events is used for caching purposes
+            self.events[event] = []
+
+        self.wait_fors: dict[Type[Event], list[Future]] = {}
+
+    def add_event(self, event: Type[Event], func: AsyncFunc) -> None:
+        try:
+            self.events[event].append(func)
+        except KeyError:
+            self.events[event] = [func]
+
+    def wait_for(self, event: Type[Event]) -> Future:
+        fut = Future()
+
+        try:
+            self.wait_fors[event].append(fut)
+        except KeyError:
+            self.wait_fors[event] = [fut]
+
+        return fut
+
+    async def publish(self, event_str: str, data: dict[str, Any]) -> None:
+        for event, funcs in self.events.items():
+            if event._name == event_str:
+                eve = event()
+                dispatch = await eve._async_load(data, self._state)
+
+                # used in cases like GUILD_AVAILABLE
+                if dispatch is False:
+                    continue
+
+                for func in funcs:
+                    asyncio.create_task(func(eve))
+
+                wait_fors = self.wait_fors.get(event)
+
+                if wait_fors is not None:
+                    for wait_for in wait_fors:
+                        wait_for.set_result(eve)
+                    self.wait_fors.pop(event)

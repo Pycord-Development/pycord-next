@@ -22,14 +22,16 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, TypeVar, Callable
+from typing import TYPE_CHECKING, Any, Callable, TypeVar
 
 from aiohttp import BasicAuth
 
 from ..api import HTTPClient
 from ..channel import Channel, Thread, identify_channel
 from ..commands.application import ApplicationCommand
-from ..events.emitter import Emitter
+from ..events import GuildCreate
+from ..events.event_manager import EventManager
+from ..events.other import Ready
 from ..guild import Guild
 from ..interaction import Interaction
 from ..member import Member
@@ -46,6 +48,11 @@ from ..user import User
 from .grouped_store import GroupedStore
 
 T = TypeVar('T')
+
+BASE_EVENTS = [
+    Ready,
+    GuildCreate,
+]
 
 if TYPE_CHECKING:
     from ..commands.command import Command
@@ -64,7 +71,7 @@ class State:
         self.user: User | None = None
         self.raw_user: dict[str, Any] | None = None
         self.store = GroupedStore(messages_max_items=self.max_messages)
-        self.emitter = Emitter(self)
+        self.event_manager = EventManager(BASE_EVENTS, self)
         self.shard_managers: list[ShardManager] = []
         self.shard_clusters: list[ShardCluster] = []
         self.commands: list[Command] = []

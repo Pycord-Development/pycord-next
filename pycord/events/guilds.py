@@ -26,86 +26,81 @@ from ..channel import Channel, Thread, identify_channel
 from ..guild import Guild
 from ..scheduled_event import ScheduledEvent
 from ..stage_instance import StageInstance
-from .base import BaseEvent
+from .event_manager import Event
 
 if TYPE_CHECKING:
     from ..state import State
 
 
-class FilledGuildCreate(BaseEvent):
-    guild: Guild
-    channels: list[Channel]
-    threads: list[Thread]
-    stage_instances: list[StageInstance]
-    guild_scheduled_events: list[ScheduledEvent]
-    scheduled_events: list[ScheduledEvent]
+class GuildCreate(Event):
+    _name = 'GUILD_CREATE'
 
-
-class GuildAvailable(FilledGuildCreate):
-    EVENT_NAME = 'GUILD_AVAILABLE'
-
-
-class GuildJoin(FilledGuildCreate):
-    EVENT_NAME = 'GUILD_JOIN'
-
-
-class AbstractGuildCreate(BaseEvent):
-    EVENT_NAME = 'GUILD_CREATE'
-
-    @classmethod
-    async def _load(cls, state: 'State', data: dict[str, Any]) -> None:
-        guild = Guild(data, state=state)
-        channels: list[Channel] = [identify_channel(c, state) for c in data['channels']]
-        threads: list[Thread] = [identify_channel(c, state) for c in data['threads']]
-        stage_instances: list[StageInstance] = [
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
+        self.guild = Guild(data, state=state)
+        self.channels: list[Channel] = [
+            identify_channel(c, state) for c in data['channels']
+        ]
+        self.threads: list[Thread] = [
+            identify_channel(c, state) for c in data['threads']
+        ]
+        self.stage_instances: list[StageInstance] = [
             StageInstance(st, state) for st in data['stage_instances']
         ]
-        guild_scheduled_events: list[ScheduledEvent] = [
+        self.guild_scheduled_events: list[ScheduledEvent] = [
             ScheduledEvent(se, state) for se in data['guild_scheduled_events']
         ]
 
-        await (state.store.sift('guilds')).insert([guild.id], guild.id, guild)
+        await (state.store.sift('guilds')).insert(
+            [self.guild.id], self.guild.id, self.guild
+        )
 
-        for channel in channels:
-            await (state.store.sift('channels')).insert([guild.id], channel.id, channel)
-
-        for thread in threads:
-            await (state.store.sift('threads')).insert(
-                [guild.id, thread.parent_id], thread.id, thread
+        for channel in self.channels:
+            await (state.store.sift('channels')).insert(
+                [self.guild.id], channel.id, channel
             )
 
-        for stage in stage_instances:
+        for thread in self.threads:
+            await (state.store.sift('threads')).insert(
+                [self.guild.id, thread.parent_id], thread.id, thread
+            )
+
+        for stage in self.stage_instances:
             await (state.store.sift('stages')).insert(
-                [stage.channel_id, guild.id, stage.guild_scheduled_event_id],
+                [stage.channel_id, self.guild.id, stage.guild_scheduled_event_id],
                 stage.id,
                 stage,
             )
 
-        for scheduled_event in guild_scheduled_events:
+        for scheduled_event in self.guild_scheduled_events:
             await (state.store.sift('scheduled_events')).insert(
                 [
                     scheduled_event.channel_id,
                     scheduled_event.creator_id,
                     scheduled_event.entity_id,
-                    guild.id,
+                    self.guild.id,
                 ],
                 scheduled_event.id,
                 scheduled_event,
             )
 
-        if guild.id in state._available_guilds:
-            return GuildAvailable(
-                guild=guild,
-                channels=channels,
-                threads=threads,
-                stage_instances=stage_instances,
-                guild_scheduled_events=guild_scheduled_events,
-            )
+        return False
+
+
+class GuildAvailable(GuildCreate):
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
+        await super()._async_load(data, state)
+
+        if self.guild.id in state._available_guilds:
+            return True
         else:
-            return GuildJoin(
-                guild=guild,
-                channels=channels,
-                threads=threads,
-                stage_instances=stage_instances,
-                guild_scheduled_events=guild_scheduled_events,
-            )
+            return False
+
+
+class GuildJoin(GuildCreate):
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
+        await super()._async_load(data, state)
+
+        if self.guild.id not in state._available_guilds:
+            return True
+        else:
+            return False

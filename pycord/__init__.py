@@ -18,6 +18,7 @@ from .commands import *
 from .connection import *
 from .embed import *
 from .enums import *
+from .events import *
 from .flags import *
 from .gateway import *
 from .guild import *

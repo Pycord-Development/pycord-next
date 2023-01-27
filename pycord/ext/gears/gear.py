@@ -20,11 +20,11 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Type, TypeVar, Generic
+from types import SimpleNamespace
+from typing import TYPE_CHECKING, Any, Generic, Type, TypeVar
 
 from ...commands import Command, Group
 from ...types import AsyncFunc
-from types import SimpleNamespace
 
 if TYPE_CHECKING:
     from ...bot import Bot
