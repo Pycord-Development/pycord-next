@@ -25,7 +25,7 @@ from .pages import Page
 
 class MessagePage(Page[Message]):
     def __init__(self, message: Message) -> None:
-        self.message = message
+        self.value = message
 
 
 # Paginator but typed for MessagePage
