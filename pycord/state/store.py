@@ -49,7 +49,7 @@ class Store:
                 return store.parents, store.storing
 
     async def insert(self, parents: list[Any], id: Any, data: Any) -> None:
-        if len(self._store) == self.max_items:
+        if self.max_items and len(self._store) == self.max_items:
             self._store = set()
 
         self._store.add(_stored(set(parents), id, data))
@@ -65,7 +65,7 @@ class Store:
                 self._store.add(store)
                 return old_data
         else:
-            if len(self._store) == self.max_items:
+            if self.max_items and len(self._store) == self.max_items:
                 self._store = {}
 
             store = _stored(set(parents), id, data)
