@@ -27,7 +27,7 @@ from typing import TYPE_CHECKING, Any, Callable, TypeVar
 from aiohttp import BasicAuth
 
 from ..api import HTTPClient
-from ..channel import Channel, Thread, identify_channel
+from ..channel import Channel, GuildChannel, Thread, identify_channel
 from ..commands.application import ApplicationCommand
 from ..events import GuildCreate
 from ..events.event_manager import EventManager
@@ -324,9 +324,12 @@ class State:
     async def _process_channel_create(
         self, event_type: str, data: dict[str, Any]
     ) -> tuple[tuple, str]:
-        channel = Channel(data, self)
+        if data.get('guild_id') is not None:
+            channel = GuildChannel(data, self)
+        else:
+            channel = Channel(data, self)
 
-        deps = [channel.guild_id] if channel.guild_id else []
+        deps = [channel.guild_id] if getattr(channel, 'guild_id') else []
         await (self.store.sift('channels')).insert(deps, channel.id, channel)
 
         return (channel,), event_type
@@ -334,9 +337,12 @@ class State:
     async def _process_channel_update(
         self, event_type: str, data: dict[str, Any]
     ) -> tuple[tuple, str]:
-        channel = Channel(data, self)
+        if data.get('guild_id') is not None:
+            channel = GuildChannel(data, self)
+        else:
+            channel = Channel(data, self)
 
-        deps = [channel.guild_id] if channel.guild_id else []
+        deps = [channel.guild_id] if getattr(channel, 'guild_id') else []
         res = await (self.store.sift('channels')).save(deps, channel.id, channel)
 
         return (channel, res or None), event_type
@@ -344,9 +350,12 @@ class State:
     async def _process_channel_delete(
         self, event_type: str, data: dict[str, Any]
     ) -> tuple[tuple, str]:
-        channel = Channel(data, self)
+        if data.get('guild_id') is not None:
+            channel = GuildChannel(data, self)
+        else:
+            channel = Channel(data, self)
 
-        deps = [channel.guild_id] if channel.guild_id else []
+        deps = [channel.guild_id] if getattr(channel, 'guild_id') else []
         res = await (self.store.sift('channels')).discard(deps, channel.id)
 
         return (channel, res or None), event_type
