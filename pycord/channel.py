@@ -105,6 +105,17 @@ class Channel:
         self._state = state
         self.id: Snowflake = Snowflake(data['id'])
         self.type: ChannelType = ChannelType(data['type'])
+        self.name: str | UndefinedType = data.get('name', UNDEFINED)
+        self.flags: ChannelFlags | UndefinedType = (
+            ChannelFlags.from_value(data['flags'])
+            if data.get('flags') is not None
+            else UNDEFINED
+        )
+
+
+class GuildChannel(Channel):
+    def __init__(self, data: DiscordChannel, state: State) -> None:
+        super().__init__(data, state)
         self.guild_id: Snowflake | UndefinedType = (
             Snowflake(data['guild_id'])
             if data.get('guild_id') is not None
@@ -114,29 +125,11 @@ class Channel:
         self.permission_overwrites: list[_Overwrite] = [
             _Overwrite(d) for d in data.get('permission_overwrites', [])
         ]
-        self.name: str | UndefinedType = data.get('name', UNDEFINED)
         self.topic: str | None | UndefinedType = data.get('topic', UNDEFINED)
         self.nsfw: bool | UndefinedType = data.get('nsfw', UNDEFINED)
-        self.last_message_id: int | None = (
-            Snowflake(data['last_message_id'])
-            if data.get('last_message_id') is not None
-            else None
-        )
-        self.bitrate: int | UndefinedType = data.get('bitrate', UNDEFINED)
-        self.user_limit: int | UndefinedType = data.get('user_limit', UNDEFINED)
-        self.rate_limit_per_user: int | UndefinedType = data.get(
-            'rate_limit_per_user', UNDEFINED
-        )
-        self.recipients: list[User] = [User(d) for d in data.get('recipients', [])]
-        self._icon: str | UndefinedType | None = data.get('icon', UndefinedType)
-        self.owner_id: Snowflake | UndefinedType = (
-            Snowflake(data['owner_id'])
-            if data.get('owner_id') is not None
-            else UNDEFINED
-        )
-        self.application_id: Snowflake | UndefinedType = (
-            Snowflake(data['application_id'])
-            if data.get('application_id') is not None
+        self.permissions: Permissions | UndefinedType = (
+            Permissions.from_value(data['permissions'])
+            if data.get('permissions') is not None
             else UNDEFINED
         )
         self.parent_id: Snowflake | UndefinedType = (
@@ -144,56 +137,27 @@ class Channel:
             if data.get('parent_id') is not None
             else data.get('parent_id', UNDEFINED)
         )
+        self.rate_limit_per_user: int | UndefinedType = data.get(
+            'rate_limit_per_user', UNDEFINED
+        )
+        self.default_auto_archive_duration: int | UndefinedType = data.get(
+            'default_auto_archive_duration', UNDEFINED
+        )
+
+class MessageableChannel(Channel):
+    def __init__(self, data: DiscordChannel, state: State) -> None:
+        super().__init__(data, state)
+        self.last_message_id: int | None = (
+            Snowflake(data['last_message_id'])
+            if data.get('last_message_id') is not None
+            else None
+        )
         self.last_pin_timestamp: None | datetime | UndefinedType = (
             datetime.fromisoformat(data['last_pin_timestamp'])
             if data.get('last_pin_timestamp') is not None
             else data.get('last_pin_timestamp', UNDEFINED)
         )
-        self.rtc_region: str | UndefinedType = data.get('rtc_region', UNDEFINED)
-        self.video_quality_mode: VideoQualityMode | UndefinedType = (
-            VideoQualityMode(data['video_quality_mode'])
-            if data.get('video_quality_mode') is not None
-            else UNDEFINED
-        )
-        self.message_count: int | UndefinedType = data.get('message_count', UNDEFINED)
-        self.thread_metadata: ThreadMetadata | UndefinedType = (
-            ThreadMetadata(data['thread_metadata'])
-            if data.get('thread_metadata') is not None
-            else UNDEFINED
-        )
-        self.default_auto_archive_duration: int | UndefinedType = data.get(
-            'default_auto_archive_duration', UNDEFINED
-        )
-        self.permissions: Permissions | UndefinedType = (
-            Permissions.from_value(data['permissions'])
-            if data.get('permissions') is not None
-            else UNDEFINED
-        )
-        self.flags: ChannelFlags | UndefinedType = (
-            ChannelFlags.from_value(data['flags'])
-            if data.get('flags') is not None
-            else UNDEFINED
-        )
-        self.available_tags: list[ForumTag] = [
-            ForumTag(d) for d in data.get('available_tags', [])
-        ]
-        self.applied_tags: list[Snowflake] = [
-            Snowflake(s) for s in data.get('applied_tags', [])
-        ]
-        self.default_reaction_emoji: DefaultReaction | UndefinedType = (
-            DefaultReaction(data['default_reaction_emoji'])
-            if data.get('default_reaction_emoji') is not None
-            else UNDEFINED
-        )
-        self.default_thread_rate_limit_per_user: int | UndefinedType = data.get(
-            'default_thread_rate_limit_per_user', UndefinedType
-        )
-        self.default_sort_order: int | None | UndefinedType = data.get(
-            'default_sort_order', UndefinedType
-        )
 
-
-class MessageableChannel(Channel):
     async def send(
         self,
         content: str | UndefinedType = UNDEFINED,
@@ -234,8 +198,17 @@ class MessageableChannel(Channel):
         )
 
 
-class AudioChannel(Channel):
-    ...
+class AudioChannel(GuildChannel):
+    def __init__(self, data: DiscordChannel, state: State) -> None:
+        super().__init__(data, state)
+        self.rtc_region: str | UndefinedType = data.get('rtc_region', UNDEFINED)
+        self.video_quality_mode: VideoQualityMode | UndefinedType = (
+            VideoQualityMode(data['video_quality_mode'])
+            if data.get('video_quality_mode') is not None
+            else UNDEFINED
+        )
+        self.bitrate: int | UndefinedType = data.get('bitrate', UNDEFINED)
+        self.user_limit: int | UndefinedType = data.get('user_limit', UNDEFINED)
 
 
 class TextChannel(MessageableChannel):
@@ -247,10 +220,6 @@ class DMChannel(MessageableChannel):
 
 
 class VoiceChannel(MessageableChannel, AudioChannel):
-    ...
-
-
-class GroupDMChannel(MessageableChannel):
     ...
 
 
@@ -267,10 +236,25 @@ class AnnouncementThread(MessageableChannel):
 
 
 class Thread(MessageableChannel):
-    ...
+    def __init__(self, data: DiscordChannel, state: State) -> None:
+        super().__init__(data, state)
+        self.default_thread_rate_limit_per_user: int | UndefinedType = data.get(
+            'default_thread_rate_limit_per_user', UndefinedType
+        )
+        self.message_count: int | UndefinedType = data.get('message_count', UNDEFINED)
+        self.thread_metadata: ThreadMetadata | UndefinedType = (
+            ThreadMetadata(data['thread_metadata'])
+            if data.get('thread_metadata') is not None
+            else UNDEFINED
+        )
+        self.owner_id: Snowflake | UndefinedType = (
+            Snowflake(data['owner_id'])
+            if data.get('owner_id') is not None
+            else UNDEFINED
+        )
 
 
-class StageChannel(AudioChannel, Channel):
+class StageChannel(AudioChannel):
     ...
 
 
@@ -279,12 +263,27 @@ class DirectoryChannel(Channel):
 
 
 class ForumChannel(Channel):
-    ...
+    def __init__(self, data: DiscordChannel, state: State) -> None:
+        super().__init__(data, state)
+        self.default_sort_order: int | None | UndefinedType = data.get(
+            'default_sort_order', UndefinedType
+        )
+        self.default_reaction_emoji: DefaultReaction | UndefinedType = (
+            DefaultReaction(data['default_reaction_emoji'])
+            if data.get('default_reaction_emoji') is not None
+            else UNDEFINED
+        )
+        self.available_tags: list[ForumTag] = [
+            ForumTag(d) for d in data.get('available_tags', [])
+        ]
+        self.applied_tags: list[Snowflake] = [
+            Snowflake(s) for s in data.get('applied_tags', [])
+        ]
 
 
 def identify_channel(
     data: dict[str, Any], state: State
-) -> TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel:
+) -> TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | Channel:
     type = data['type']
 
     if type == 0:
@@ -293,8 +292,6 @@ def identify_channel(
         return DMChannel(data, state)
     elif type == 2:
         return VoiceChannel(data, state)
-    elif type == 3:
-        return GroupDMChannel(data, state)
     elif type == 4:
         return CategoryChannel(data, state)
     elif type == 5:
@@ -309,3 +306,5 @@ def identify_channel(
         return DirectoryChannel(data, state)
     elif type == 15:
         return ForumChannel(data, state)
+    else:
+        return Channel(data, state)

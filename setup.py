@@ -50,7 +50,7 @@ extra_requires = {
     ],
     'docs': [
         'sphinx==5.3.0',
-        'sphinx-hoverxref~=1.0.1',
+        'pydata-sphinx-theme~=0.12',
     ],
 }
 

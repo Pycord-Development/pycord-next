@@ -48,7 +48,7 @@ class Bot:
         The Gateway Intents to use
     print_banner_on_startup
         Whether to print the banner on startup or not
-    logging_flavor: Union[int, str, dict[str, Any], None]
+    logging_flavor: Union[int, str, dict[str, :class:`typing.Any`], None]
         The logging flavor this bot uses
 
         Defaults to `None`.
