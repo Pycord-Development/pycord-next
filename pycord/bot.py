@@ -283,19 +283,14 @@ class Bot:
             else:
                 args = get_arg_defaults(func)
 
-                try:
-                    eve = args.pop('event')
-                except KeyError:
-                    try:
-                        eve = args.pop('_event')
-                    except KeyError:
-                        raise BotException('No `event` or `_event` key found in arguments')
+                for annotation in args.values():
+                    if not isinstance(annotation[1](), Event):
+                        raise BotException('Events must be of type Event')
+                    eve = annotation
+                    break
 
                 if eve[1] is None:
                     raise BotException('Event must either be typed, or be present in the `event` parameter')
-
-                if not isinstance(eve[1](), Event):
-                    raise BotException('Events must be of type Event')
 
                 self._state.event_manager.add_event(eve[1], func)
 
