@@ -87,6 +87,10 @@ class GuildCreate(Event):
 
 
 class GuildAvailable(GuildCreate):
+    """
+    Event denoting the accessibility of a previously joined Guild.    
+    """
+
     async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
         if int(data['id']) in state._available_guilds:
             return True

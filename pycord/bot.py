@@ -283,20 +283,27 @@ class Bot:
             else:
                 args = get_arg_defaults(func)
 
-                for annotation in args.values():
-                    if not isinstance(annotation[1](), Event):
-                        raise BotException('Events must be of type Event')
-                    eve = annotation
-                    break
+                values = args.values()
+
+                if len(values) != 1:
+                    raise BotException('Only one argument is allowed on event functions')
+
+                eve = values[0]
 
                 if eve[1] is None:
                     raise BotException('Event must either be typed, or be present in the `event` parameter')
+
+                if not isinstance(eve[1](), Event):
+                    raise BotException('Events must be of type Event')
 
                 self._state.event_manager.add_event(eve[1], func)
 
             return func
 
         return wrapper
+
+    def wait_for(self, event: T) -> asyncio.Future[T]:
+        return self._state.event_manager.wait_for(event)
 
     def command(self, name: str, cls: T, **kwargs: Any) -> T:
         """
