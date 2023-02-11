@@ -21,11 +21,13 @@
 
 from collections.abc import Iterator, Sequence
 from itertools import accumulate
-from typing import Any, Literal, TypeVar, AsyncGenerator
+from typing import Any, TypeVar, AsyncGenerator
 
 from aiohttp import ClientResponse
 
-from .undefined import UNDEFINED, UndefinedType
+from .undefined import UNDEFINED
+import inspect
+from .types import AsyncFunc
 
 try:
     import msgspec
@@ -105,3 +107,22 @@ async def get_iterated_data(iterator: AsyncGenerator) -> list[Any]:
         hold.append(data)
 
     return hold
+
+
+def get_arg_defaults(fnc: AsyncFunc) -> dict[str, tuple[Any, Any]]:
+    signature = inspect.signature(fnc)
+    ret = {}
+    for k, v in signature.parameters.items():
+        if (
+            v.default is not inspect.Parameter.empty
+            and v.annotation is not inspect.Parameter.empty
+        ):
+            ret[k] = (v.default, v.annotation)
+        elif v.default is not inspect.Parameter.empty:
+            ret[k] = (v.default, None)
+        elif v.annotation is not inspect.Parameter.empty:
+            ret[k] = (None, v.annotation)
+        else:
+            ret[k] = (None, None)
+
+    return ret

@@ -37,7 +37,6 @@ from .types import (
     ThreadMetadata as DiscordThreadMetadata,
 )
 from .undefined import UNDEFINED, UndefinedType
-from .user import User
 
 if TYPE_CHECKING:
     from .state import State
@@ -235,7 +234,7 @@ class AnnouncementThread(MessageableChannel):
     ...
 
 
-class Thread(MessageableChannel):
+class Thread(MessageableChannel, GuildChannel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.default_thread_rate_limit_per_user: int | UndefinedType = data.get(

@@ -22,7 +22,7 @@
 
 import asyncio
 from asyncio import Future
-from typing import TYPE_CHECKING, Any, Protocol, Type
+from typing import TYPE_CHECKING, Any, Type, TypeVar
 
 from ..types import AsyncFunc
 
@@ -30,7 +30,10 @@ if TYPE_CHECKING:
     from ..state import State
 
 
-class Event(Protocol):
+T = TypeVar('T', bound='Event')
+
+
+class Event:
     _name: str
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
@@ -58,7 +61,7 @@ class EventManager:
         except KeyError:
             self.events[event] = [func]
 
-    def wait_for(self, event: Type[Event]) -> Future:
+    def wait_for(self, event: Type[T]) -> Future[T]:
         fut = Future()
 
         try:

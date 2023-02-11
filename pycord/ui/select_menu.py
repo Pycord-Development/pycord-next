@@ -24,7 +24,6 @@ from __future__ import annotations
 from copy import copy
 from typing import Any, Literal
 
-from ..arguments import ArgumentParser
 from ..channel import identify_channel
 from ..errors import ComponentException
 from ..interaction import Interaction
@@ -33,10 +32,8 @@ from ..role import Role
 from ..types import AsyncFunc
 from ..undefined import UNDEFINED, UndefinedType
 from ..user import User
-from ..utils import remove_undefined
+from ..utils import remove_undefined, get_arg_defaults
 from .interactive_component import InteractiveComponent
-
-arg_parser = ArgumentParser()
 
 
 class SelectOption:
@@ -137,7 +134,7 @@ class SelectMenu(InteractiveComponent):
         )
 
     def parse_arguments(self) -> None:
-        defaults = arg_parser.get_arg_defaults(self._callback)
+        defaults = get_arg_defaults(self._callback)
 
         for name, arg in defaults.items():
             if not isinstance(arg[0], SelectOption) and arg[1] != Interaction:

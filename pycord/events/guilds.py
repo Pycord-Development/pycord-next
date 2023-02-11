@@ -88,9 +88,7 @@ class GuildCreate(Event):
 
 class GuildAvailable(GuildCreate):
     async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
-        await super()._async_load(data, state)
-
-        if self.guild.id in state._available_guilds:
+        if int(data['id']) in state._available_guilds:
             return True
         else:
             return False
@@ -98,9 +96,7 @@ class GuildAvailable(GuildCreate):
 
 class GuildJoin(GuildCreate):
     async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
-        await super()._async_load(data, state)
-
-        if self.guild.id not in state._available_guilds:
+        if int(data['id']) not in state._available_guilds:
             return True
         else:
             return False

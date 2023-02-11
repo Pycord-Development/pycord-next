@@ -24,7 +24,7 @@ import asyncio
 from copy import copy
 from typing import TYPE_CHECKING, Any, Union
 
-from ...arguments import ArgumentParser
+from ...utils import get_arg_defaults
 from ...channel import identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
 from ...interaction import Interaction, InteractionOption
@@ -46,8 +46,6 @@ if TYPE_CHECKING:
     from ...state import State
 
 __all__ = ['CommandChoice', 'Option', 'ApplicationCommand']
-
-arg_parser = ArgumentParser()
 
 
 async def _autocomplete(
@@ -193,7 +191,7 @@ class Option:
             self._callback = None
             return
 
-        arg_defaults = arg_parser.get_arg_defaults(self._callback)
+        arg_defaults = get_arg_defaults(self._callback)
         self.options: list[Option] = []
 
         i: int = 0
@@ -427,7 +425,7 @@ class ApplicationCommand(Command):
         return wrapper
 
     def _parse_user_command_arguments(self) -> None:
-        arg_defaults = arg_parser.get_arg_defaults(self._callback)
+        arg_defaults = get_arg_defaults(self._callback)
 
         fielded: bool = False
         i: int = 0
@@ -458,7 +456,7 @@ class ApplicationCommand(Command):
             raise ApplicationCommandException('No argument set for a member/user')
 
     def _parse_message_command_arguments(self) -> None:
-        arg_defaults = arg_parser.get_arg_defaults(self._callback)
+        arg_defaults = get_arg_defaults(self._callback)
 
         fielded: bool = False
         i: int = 0
@@ -496,7 +494,7 @@ class ApplicationCommand(Command):
             self._parse_message_command_arguments()
             return
 
-        arg_defaults = arg_parser.get_arg_defaults(self._callback)
+        arg_defaults = get_arg_defaults(self._callback)
         self.options: list[Option] = []
         self._options_dict: dict[str, Option] = {}
 
