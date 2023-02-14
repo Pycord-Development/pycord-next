@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from ..state import State
     from ..types import AsyncFunc
 
-T = TypeVar('T', bound=AsyncFunc)
+T = TypeVar('T', bound='AsyncFunc')
 
 
 class Group:
