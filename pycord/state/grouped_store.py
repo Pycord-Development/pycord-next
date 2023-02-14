@@ -20,31 +20,32 @@
 # SOFTWARE
 
 
+from typing import Any
 from .store import Store
 
 
 class GroupedStore:
-    def __init__(self, **max_items) -> None:
+    def __init__(self, **max_items: Any) -> None:
         self._stores = []
         self._stores_dict = {}
         self._kwargs = max_items
 
     def get_stores(self) -> list[Store]:
-        return self._stores
+        return self._stores # type: ignore
 
     def get_store(self, name: str) -> Store:
-        return self._stores[name]
+        return self._stores[name] # type: ignore
 
     def discard(self, name: str) -> None:
-        d = self._stores_dict.get(name)
+        d = self._stores_dict.get(name) # type: ignore
         if d is not None:
-            self._stores_dict.pop(name)
-            self._stores.remove(d)
+            self._stores_dict.pop(name) # type: ignore
+            self._stores.remove(d) # type: ignore
 
     def sift(self, name: str) -> Store:
-        s = self._stores_dict.get(name)
+        s = self._stores_dict.get(name) # type: ignore
         if s is not None:
-            return s
+            return s # type: ignore
 
         for k, v in self._kwargs.items():
             if k == (name + '_max_items'):
@@ -52,6 +53,6 @@ class GroupedStore:
         else:
             store = Store()
 
-        self._stores.append(store)
-        self._stores_dict[name] = store
+        self._stores.append(store) # type: ignore
+        self._stores_dict[name] = store # type: ignore
         return store

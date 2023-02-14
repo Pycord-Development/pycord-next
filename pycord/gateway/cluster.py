@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import asyncio
 from multiprocessing import Process
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Coroutine
 
 from aiohttp import BasicAuth
 
@@ -53,18 +53,18 @@ class ShardCluster(Process):
         super().__init__()
 
     async def _run(self) -> None:
-        await self._state._cluster_lock.acquire()
+        await self._state._cluster_lock.acquire() # type: ignore
         # this is guessing that `i` is a shard manager
-        tasks = []
+        tasks: list[Coroutine[Any, Any, Any]] = []
         for sharder in list(chunk(self._shards, self._managers)):
             manager = ShardManager(
                 self._state, sharder, self._amount, self._proxy, self._proxy_auth
             )
-            tasks.append(manager.start())
+            tasks.append(manager.start()) 
             self.shard_managers.append(manager)
             asyncio.create_task(manager.start())
-        self._state._cluster_lock.release()
-        self.keep_alive = asyncio.Future()
+        self._state._cluster_lock.release() # type: ignore
+        self.keep_alive: asyncio.Future[None] = asyncio.Future()
         await self.keep_alive
 
     def run(self) -> None:

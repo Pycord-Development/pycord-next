@@ -28,7 +28,7 @@ class PassThrough:
         self.per: float | int = per
 
         self.current: int = self.concurrency
-        self._reserved: list[Future] = []
+        self._reserved: list[Future[None]] = []
         self.loop: AbstractEventLoop = get_running_loop()
         self.pending_reset: bool = False
 

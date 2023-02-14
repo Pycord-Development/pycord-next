@@ -79,7 +79,9 @@ class Shard:
         self._notifier = notifier
         self._state = state
         self._session = session
-        self._inflator: zlib._Decompress | None = None
+        # I am not sure whether this is meant to be used, but it's the only thing
+        # which can be "properly" typed upon
+        self._inflator: zlib._Decompress | None = None # type: ignore
         self._sequence: int | None = None
         self._ws: ClientWebSocketResponse | None = None
         self._resume_gateway_url: str | None = None
@@ -95,9 +97,9 @@ class Shard:
         self._inflator = zlib.decompressobj()
 
         try:
-            async with self._state.shard_concurrency:
+            async with self._state.shard_concurrency: # type: ignore
                 _log.debug(f'shard:{self.id}: connecting to gateway')
-                self._ws = await self._session.ws_connect(
+                self._ws = await self._session.ws_connect( # type: ignore
                     url=url.format(version=self.version, base=self._resume_gateway_url)
                     if resume and self._resume_gateway_url
                     else url.format(
@@ -129,7 +131,7 @@ class Shard:
         async with self._rate_limiter:
             d = dumps(data)
             _log.debug(f'shard:{self.id}: sending {d}')
-            await self._ws.send_str(d)
+            await self._ws.send_str(d) # type: ignore
 
     async def send_identify(self) -> None:
         await self.send(
@@ -164,45 +166,45 @@ class Shard:
 
     async def send_heartbeat(self, jitter: bool = False) -> None:
         if jitter:
-            await asyncio.sleep(self._heartbeat_interval * random())
+            await asyncio.sleep(self._heartbeat_interval * random()) # type: ignore
         else:
-            await asyncio.sleep(self._heartbeat_interval)
+            await asyncio.sleep(self._heartbeat_interval) # type: ignore
         self._hb_received = asyncio.Future()
         _log.debug(f'shard:{self.id}: sending heartbeat')
         try:
-            await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
+            await self._ws.send_str(dumps({'op': 1, 'd': self._sequence})) # type: ignore
         except ConnectionResetError:
             _log.debug(
                 f'shard:{self.id}: failed to send heartbeat due to connection reset, reconnecting...'
             )
-            self._receive_task.cancel()
-            if not self._ws.closed:
-                await self._ws.close(code=1008)
+            self._receive_task.cancel() # type: ignore
+            if not self._ws.closed: # type: ignore
+                await self._ws.close(code=1008) # type: ignore
             await self.connect(self._token, bool(self._resume_gateway_url))
             return
         try:
             await asyncio.wait_for(self._hb_received, 5)
         except asyncio.TimeoutError:
             _log.debug(f'shard:{self.id}: heartbeat waiting timed out, reconnecting...')
-            self._receive_task.cancel()
-            if not self._ws.closed:
-                await self._ws.close(code=1008)
+            self._receive_task.cancel() # type: ignore
+            if not self._ws.closed: # type: ignore
+                await self._ws.close(code=1008) # type: ignore
             await self.connect(self._token, bool(self._resume_gateway_url))
 
     async def _recv(self) -> None:
-        async for msg in self._ws:
-            if msg.type == WSMsgType.CLOSED:
+        async for msg in self._ws: # type: ignore
+            if msg.type == WSMsgType.CLOSED:# type: ignore
                 break
-            elif msg.type == WSMsgType.BINARY:
-                if len(msg.data) < 4 or msg.data[-4:] != ZLIB_SUFFIX:
+            elif msg.type == WSMsgType.BINARY: # type: ignore
+                if len(msg.data) < 4 or msg.data[-4:] != ZLIB_SUFFIX: # type: ignore
                     continue
 
                 try:
-                    text_coded = self._inflator.decompress(msg.data).decode('utf-8')
+                    text_coded = self._inflator.decompress(msg.data).decode('utf-8') # type: ignore
                 except Exception as e:
                     # while being an edge case, the data could sometimes be corrupted.
                     _log.debug(
-                        f'shard:{self.id}: failed to decompress gateway data {msg.data}:{e}'
+                        f'shard:{self.id}: failed to decompress gateway data {msg.data}:{e}' # type: ignore
                     )
                     continue
 
@@ -212,37 +214,37 @@ class Shard:
 
                 self._sequence = data.get('s')
 
-                op: int = data.get('op')
+                op: int = data.get('op') # type: ignore
                 d: dict[str, Any] | int | None = data.get('d')
                 t: str | None = data.get('t')
 
                 if op == 0:
                     if t == 'READY':
-                        self.session_id = d['session_id']
-                        self._resume_gateway_url = d['resume_gateway_url']
-                        self._state.raw_user = d['user']
-                    asyncio.create_task(self._state.event_manager.publish(t, d))
+                        self.session_id = d['session_id'] # type: ignore
+                        self._resume_gateway_url = d['resume_gateway_url'] # type: ignore
+                        self._state.raw_user = d['user'] # type: ignore
+                    asyncio.create_task(self._state.event_manager.publish(t, d)) # type: ignore
                 elif op == 1:
-                    await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
+                    await self._ws.send_str(dumps({'op': 1, 'd': self._sequence})) # type: ignore
                 elif op == 10:
-                    self._heartbeat_interval = d['heartbeat_interval'] / 1000
+                    self._heartbeat_interval = d['heartbeat_interval'] / 1000 # type: ignore
 
                     asyncio.create_task(self.send_heartbeat(jitter=True))
-                    self._hello_received.set_result(True)
+                    self._hello_received.set_result(True) # type: ignore
                 elif op == 11:
-                    if not self._hb_received.done():
-                        self._hb_received.set_result(None)
+                    if not self._hb_received.done(): # type: ignore
+                        self._hb_received.set_result(None) # type: ignore
 
                         self._hb_task = asyncio.create_task(self.send_heartbeat())
                 elif op == 7:
-                    await self._ws.close(code=1002)
+                    await self._ws.close(code=1002) # type: ignore
                     await self.connect(token=self._token, resume=True)
                     return
                 elif op == 9:
-                    await self._ws.close()
+                    await self._ws.close() # type: ignore
                     await self.connect(token=self._token)
                     return
-        await self.handle_close(self._ws.close_code)
+        await self.handle_close(self._ws.close_code) # type: ignore
 
     async def handle_close(self, code: int) -> None:
         _log.debug(f'shard:{self.id}: closed with code {code}')

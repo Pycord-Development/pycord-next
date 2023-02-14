@@ -49,7 +49,7 @@ AOTYPE = Literal[
 
 class ApplicationCommandOptionChoice(TypedDict):
     name: str
-    name_localizations: NotRequired[dict[LOCALE] | None]
+    name_localizations: NotRequired[dict[LOCALE, str] | None]
     value: str | int | float
 
 

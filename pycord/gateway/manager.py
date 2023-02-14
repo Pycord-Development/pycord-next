@@ -21,7 +21,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Coroutine
 
 from aiohttp import BasicAuth, ClientSession
 
@@ -61,10 +61,10 @@ class ShardManager:
         self.shards.clear()
 
     async def delete_shard(self, shard: Shard) -> None:
-        shard._receive_task.cancel()
-        shard._hb_task.cancel()
+        shard._receive_task.cancel() # type: ignore
+        shard._hb_task.cancel() # type: ignore
 
-        await shard._ws.close()
+        await shard._ws.close() # type: ignore
         self.remove_shard(shard)
 
     async def delete_shards(self) -> None:
@@ -85,9 +85,9 @@ class ShardManager:
             self._state.shard_concurrency = PassThrough(
                 session_start_limit['max_concurrency'], 7
             )
-            self._state._session_start_limit = session_start_limit
+            self._state._session_start_limit = session_start_limit # type: ignore
 
-        tasks = []
+        tasks: list[Coroutine[Any, Any, Any]] = []
 
         for shard_id in self._shards:
             shard = Shard(
