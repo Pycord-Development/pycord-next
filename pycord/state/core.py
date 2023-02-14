@@ -26,10 +26,10 @@ from typing import TYPE_CHECKING, Any, Callable, TypeVar
 
 from aiohttp import BasicAuth
 
-from ..events.guilds import GuildDelete, GuildUpdate
+from ..events.guilds import GuildBanCreate, GuildBanDelete, GuildDelete, GuildMemberAdd, GuildMemberChunk, GuildMemberRemove, GuildRoleCreate, GuildRoleDelete, GuildRoleUpdate, GuildUpdate
 
 from ..api import HTTPClient
-from ..channel import Channel, GuildChannel, Thread, identify_channel
+from ..channel import Channel, GuildChannel
 from ..commands.application import ApplicationCommand
 from ..events import GuildCreate
 from ..events.event_manager import EventManager
@@ -50,7 +50,15 @@ BASE_EVENTS = [
     Ready,
     GuildCreate,
     GuildUpdate,
-    GuildDelete
+    GuildDelete,
+    GuildBanCreate,
+    GuildBanDelete,
+    GuildMemberAdd,
+    GuildMemberRemove,
+    GuildMemberChunk,
+    GuildRoleCreate,
+    GuildRoleUpdate,
+    GuildRoleDelete,
 ]
 
 if TYPE_CHECKING:
@@ -230,43 +238,6 @@ class State:
 
     # SECTION: automod #
     # SECTION: misc #
-    async def _process_ready(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        if self._ready:
-            return (), event_type
-
-        user = User(data['user'], self)
-        self.user = user
-
-        if hasattr(self, '_raw_user_fut'):
-            self._raw_user_fut.set_result(None)
-
-        self._ready = True
-
-        for gear in self.gears:
-            asyncio.create_task(gear.on_attach(), name=f'Attaching Gear: {gear.name}')
-
-        self._available_guilds: list[int] = [uag['id'] for uag in data['guilds']]
-
-        self.application_commands = []
-        self.application_commands.extend(
-            await self.http.get_global_application_commands(self.user.id, True)
-        )
-        self._application_command_names: list[str] = []
-
-        for command in self.commands:
-            await command.instantiate()
-            if hasattr(command, 'name'):
-                self._application_command_names.append(command.name)
-
-        for app_command in self.application_commands:
-            if app_command['name'] not in self._application_command_names:
-                await self.http.delete_global_application_command(
-                    self.user.id.real, app_command['id']
-                )
-
-        return (), 'hook'
 
     async def _process_user_update(
         self, event_type: str, data: dict[str, Any]
@@ -298,7 +269,6 @@ class State:
         'MESSAGE_UPDATE': _process_message_update,
         'MESSAGE_DELETE': _process_message_delete,
         'MESSAGE_DELETE_BULK': _process_message_delete_bulk,
-        'READY': _process_ready,
         'USER_UPDATE': _process_user_update,
         'INTERACTION_CREATE': _process_interaction_create,
     }
