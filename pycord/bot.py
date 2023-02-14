@@ -286,12 +286,16 @@ class Bot:
                 values = args.values()
 
                 if len(values) != 1:
-                    raise BotException('Only one argument is allowed on event functions')
+                    raise BotException(
+                        'Only one argument is allowed on event functions'
+                    )
 
                 eve = values[0]
 
                 if eve[1] is None:
-                    raise BotException('Event must either be typed, or be present in the `event` parameter')
+                    raise BotException(
+                        'Event must either be typed, or be present in the `event` parameter'
+                    )
 
                 if not isinstance(eve[1](), Event):
                     raise BotException('Events must be of type Event')

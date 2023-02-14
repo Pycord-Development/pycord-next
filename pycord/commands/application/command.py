@@ -24,9 +24,9 @@ import asyncio
 from copy import copy
 from typing import TYPE_CHECKING, Any, Union
 
-from ...utils import get_arg_defaults
 from ...channel import identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
+from ...events.other import InteractionCreate
 from ...interaction import Interaction, InteractionOption
 from ...media import Attachment
 from ...member import Member
@@ -37,7 +37,7 @@ from ...types import AsyncFunc
 from ...types.interaction import ApplicationCommandData
 from ...undefined import UNDEFINED, UndefinedType
 from ...user import User
-from ...utils import remove_undefined
+from ...utils import get_arg_defaults, remove_undefined
 from ..command import Command
 from ..group import Group
 from .errors import ApplicationCommandException
@@ -329,7 +329,7 @@ class ApplicationCommand(Command):
         Defaults to False.
     """
 
-    _processor_event = 'on_interaction'
+    _processor_event = InteractionCreate
     sub_level: int = 0
 
     def __init__(
@@ -689,7 +689,9 @@ class ApplicationCommand(Command):
         else:
             return inter.user
 
-    async def _invoke(self, interaction: Interaction) -> None:
+    async def _invoke(self, event: InteractionCreate) -> None:
+        interaction = event.interaction
+
         if interaction.type == 4:
             if interaction.data.get('name') is not None:
                 if interaction.data['name'] == self.name:

@@ -32,7 +32,7 @@ from ..role import Role
 from ..types import AsyncFunc
 from ..undefined import UNDEFINED, UndefinedType
 from ..user import User
-from ..utils import remove_undefined, get_arg_defaults
+from ..utils import get_arg_defaults, remove_undefined
 from .interactive_component import InteractiveComponent
 
 

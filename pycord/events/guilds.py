@@ -23,18 +23,14 @@
 import functools
 from typing import TYPE_CHECKING, Any
 
-from ..role import Role
-
-from ..member import Member
-
-from ..user import User
-
-from ..snowflake import Snowflake
-
 from ..channel import Channel, Thread, identify_channel
 from ..guild import Guild
+from ..member import Member
+from ..role import Role
 from ..scheduled_event import ScheduledEvent
+from ..snowflake import Snowflake
 from ..stage_instance import StageInstance
+from ..user import User
 from .event_manager import Event
 
 if TYPE_CHECKING:
@@ -49,7 +45,9 @@ class _GuildAttr(Event):
         if self.guild_id is None:
             return None
 
-        guild = await (self._state.store.sift('guilds')).get_one([self.guild_id], self.guild_id)
+        guild = await (self._state.store.sift('guilds')).get_one(
+            [self.guild_id], self.guild_id
+        )
 
         return guild
 
@@ -63,7 +61,9 @@ class _MemberAttr(Event):
         if self.user_id is None:
             return None
 
-        member = await (self._state.store.sift('members')).get_one([self.guild_id], self.user_id)
+        member = await (self._state.store.sift('members')).get_one(
+            [self.guild_id], self.user_id
+        )
 
         return member
 
@@ -122,7 +122,7 @@ class GuildCreate(Event):
 
 class GuildAvailable(GuildCreate):
     """
-    Event denoting the accessibility of a previously joined Guild.    
+    Event denoting the accessibility of a previously joined Guild.
     """
 
     async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
@@ -203,7 +203,9 @@ class GuildMemberAdd(_GuildAttr):
         member = Member(data, state)
         guild_id = Snowflake(data['guild_id'])
         if state.cache_guild_members:
-            await (state.store.sift('members')).insert([guild_id], member.user.id, member)
+            await (state.store.sift('members')).insert(
+                [guild_id], member.user.id, member
+            )
 
         self.guild_id = guild_id
         self.member: Member = member
@@ -240,7 +242,7 @@ class GuildMemberRemove(_GuildAttr):
 
         self.user = User(data['user'], state)
 
-        await (self.store.sift('members')).discard([self.guild_id], self.user_id)
+        await (state.store.sift('members')).discard([self.guild_id], self.user_id)
 
 
 MemberRemove = GuildMemberRemove
@@ -252,12 +254,13 @@ class GuildMemberChunk(Event):
     async def _is_publishable(self, _data: dict[str, Any], _state: 'State') -> bool:
         return False
 
-
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         guild_id: Snowflake = Snowflake(data['guild_id'])
         ms: list[Member] = [
             await (state.store.sift('members')).save([guild_id], member.user.id, member)
-            for member in (Member(member_data, state) for member_data in data['members'])
+            for member in (
+                Member(member_data, state) for member_data in data['members']
+            )
         ]
         self.members = ms
 
@@ -267,7 +270,6 @@ MemberChunk = GuildMemberChunk
 
 class GuildRoleCreate(_GuildAttr):
     _name = 'GUILD_ROLE_CREATE'
-
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         self.guild_id: Snowflake = Snowflake(data['guild_id'])
@@ -284,12 +286,11 @@ RoleCreate = GuildRoleCreate
 class GuildRoleUpdate(_GuildAttr):
     _name = 'GUILD_ROLE_UPDATE'
 
-
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         guild_id: Snowflake = Snowflake(data['guild_id'])
         role = Role(data['role'], self)
 
-        await (self.store.sift('roles')).save([guild_id], role.id, role)
+        await (state.store.sift('roles')).save([guild_id], role.id, role)
 
         self.role = role
 
@@ -300,12 +301,13 @@ RoleUpdate = GuildRoleUpdate
 class GuildRoleDelete(_GuildAttr):
     _name = 'GUILD_ROLE_DELETE'
 
-
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         self.guild_id: Snowflake = Snowflake(data['guild_id'])
         self.role_id: Snowflake = Snowflake(data['role_id'])
 
-        self.role: Role | None = await (self.store.sift('roles')).discard([self.guild_id], self.role_id)
+        self.role: Role | None = await (state.store.sift('roles')).discard(
+            [self.guild_id], self.role_id
+        )
 
 
 RoleDelete = GuildRoleDelete

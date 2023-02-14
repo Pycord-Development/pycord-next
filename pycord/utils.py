@@ -19,15 +19,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+import inspect
 from collections.abc import Iterator, Sequence
 from itertools import accumulate
-from typing import Any, TypeVar, AsyncGenerator
+from typing import Any, AsyncGenerator, TypeVar
 
 from aiohttp import ClientResponse
 
-from .undefined import UNDEFINED
-import inspect
 from .types import AsyncFunc
+from .undefined import UNDEFINED
 
 try:
     import msgspec

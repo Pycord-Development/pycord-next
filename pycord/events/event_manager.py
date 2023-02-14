@@ -98,3 +98,7 @@ class EventManager:
                     for wait_for in wait_fors:
                         wait_for.set_result(eve)
                     self.wait_fors.pop(event)
+
+                for command in self._state.commands:
+                    if command._processor_event == event:
+                        asyncio.create_task(command._invoke(eve))

@@ -74,7 +74,9 @@ class Store:
             store = _stored(set(parents), id, data)
             self._store.add(store)
 
-    async def discard(self, parents: list[Any], id: Any, type: Type[T] | T = Any) -> T | None:
+    async def discard(
+        self, parents: list[Any], id: Any, type: Type[T] | T = Any
+    ) -> T | None:
         ps = set(parents)
 
         for store in self._store:

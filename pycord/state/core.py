@@ -22,21 +22,37 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from aiohttp import BasicAuth
 
-from ..events.guilds import GuildBanCreate, GuildBanDelete, GuildDelete, GuildMemberAdd, GuildMemberChunk, GuildMemberRemove, GuildRoleCreate, GuildRoleDelete, GuildRoleUpdate, GuildUpdate
-
 from ..api import HTTPClient
-from ..channel import Channel, GuildChannel
 from ..commands.application import ApplicationCommand
 from ..events import GuildCreate
+from ..events.channels import (
+    ChannelCreate,
+    ChannelDelete,
+    ChannelPinsUpdate,
+    ChannelUpdate,
+    MessageBulkDelete,
+    MessageCreate,
+    MessageDelete,
+    MessageUpdate,
+)
 from ..events.event_manager import EventManager
+from ..events.guilds import (
+    GuildBanCreate,
+    GuildBanDelete,
+    GuildDelete,
+    GuildMemberAdd,
+    GuildMemberChunk,
+    GuildMemberRemove,
+    GuildRoleCreate,
+    GuildRoleDelete,
+    GuildRoleUpdate,
+    GuildUpdate,
+)
 from ..events.other import Ready
-from ..interaction import Interaction
-from ..message import Message
-from ..snowflake import Snowflake
 from ..ui import Component
 from ..ui.house import House
 from ..ui.text_input import Modal
@@ -59,6 +75,14 @@ BASE_EVENTS = [
     GuildRoleCreate,
     GuildRoleUpdate,
     GuildRoleDelete,
+    ChannelCreate,
+    ChannelUpdate,
+    ChannelDelete,
+    ChannelPinsUpdate,
+    MessageCreate,
+    MessageUpdate,
+    MessageDelete,
+    MessageBulkDelete,
 ]
 
 if TYPE_CHECKING:
@@ -132,120 +156,3 @@ class State:
             verbose=self.verbose,
         )
         self._clustered = clustered
-
-    # SECTION: channels #
-    # TODO: threads
-    async def _process_channel_create(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        if data.get('guild_id') is not None:
-            channel = GuildChannel(data, self)
-        else:
-            channel = Channel(data, self)
-
-        deps = [channel.guild_id] if getattr(channel, 'guild_id') else []
-        await (self.store.sift('channels')).insert(deps, channel.id, channel)
-
-        return (channel,), event_type
-
-    async def _process_channel_update(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        if data.get('guild_id') is not None:
-            channel = GuildChannel(data, self)
-        else:
-            channel = Channel(data, self)
-
-        deps = [channel.guild_id] if getattr(channel, 'guild_id') else []
-        res = await (self.store.sift('channels')).save(deps, channel.id, channel)
-
-        return (channel, res or None), event_type
-
-    async def _process_channel_delete(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        if data.get('guild_id') is not None:
-            channel = GuildChannel(data, self)
-        else:
-            channel = Channel(data, self)
-
-        deps = [channel.guild_id] if getattr(channel, 'guild_id') else []
-        res = await (self.store.sift('channels')).discard(deps, channel.id)
-
-        return (channel, res or None), event_type
-
-    async def _process_channel_pins_update(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        channel_id: Snowflake = Snowflake(data.get('channel_id'))
-        guild_id: Snowflake = Snowflake(data.get('guild_id'))
-
-        resc = await (self.store.sift('channels')).get_without_parents(channel_id)
-
-        if guild_id:
-            resg = await (self.store.sift('guilds')).get_without_parents(guild_id)
-
-            if resc:
-                return (resc[1], resg or None), event_type
-            return (channel_id, resg or None), event_type
-
-        if resc:
-            return (resc[1], None), event_type
-
-        return (channel_id, None), event_type
-
-    # SECTION: messages #
-    async def _process_message_create(
-        self, _: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        message = Message(data, self)
-
-        await (self.store.sift('messages')).insert(
-            [message.channel_id], message.id, message
-        )
-
-        return (message,), 'message'
-
-    async def _process_message_update(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        message = Message(data, self)
-
-        res = await (self.store.sift('message')).save(
-            [message.channel_id, message.channel.guild_id], message.id, message
-        )
-
-        return (message, res or None), event_type
-
-    async def _process_message_delete(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        message_id: Snowflake = Snowflake(data['id'])
-
-        res = await (self.store.sift('messages')).discard([], message_id)
-
-        return (res or message_id,), event_type
-
-    async def _process_message_delete_bulk(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        bulk: list[Message | int] = [
-            (await (self.store.sift('messages')).discard([], message_id)) or message_id
-            for message_id in (Snowflake(id) for id in data['ids'])
-        ]
-
-        return (bulk,), event_type
-
-    _events: dict[str, Callable] = {
-        'CHANNEL_CREATE': _process_channel_create,
-        'CHANNEL_UPDATE': _process_channel_update,
-        'CHANNEL_DELETE': _process_channel_delete,
-        'CHANNEL_PINS_UPDATE': _process_channel_pins_update,
-        'MESSAGE_CREATE': _process_message_create,
-        'MESSAGE_UPDATE': _process_message_update,
-        'MESSAGE_DELETE': _process_message_delete,
-        'MESSAGE_DELETE_BULK': _process_message_delete_bulk,
-    }
-
-    async def _process_event(self, event_type: str, data: dict[str, Any]) -> None:
-        await self.emitter.dispatch(event_type, _raw_data=data, commands=self.commands)

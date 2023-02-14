@@ -24,7 +24,6 @@ import asyncio
 from typing import TYPE_CHECKING, Any
 
 from ..interaction import Interaction
-
 from ..user import User
 from .event_manager import Event
 
@@ -34,7 +33,6 @@ if TYPE_CHECKING:
 
 class Ready(Event):
     _name = 'READY'
-
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
         state._available_guilds: list[int] = [int(uag['id']) for uag in data['guilds']]
@@ -72,7 +70,6 @@ class Ready(Event):
 class UserUpdate(Event):
     _name = 'USER_UPDATE'
 
-
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         self.user = User(data, state)
         state.user = self.user
@@ -81,7 +78,6 @@ class UserUpdate(Event):
 
 class InteractionCreate(Event):
     _name = 'INTERACTION_CREATE'
-
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         interaction = Interaction(data, state, True)

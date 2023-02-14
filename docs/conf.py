@@ -49,12 +49,10 @@ html_logo = 'https://raw.githubusercontent.com/Pycord-Development/pycord-v3/main
 # Any option(s) added to your certain theme.
 # in this case, Pydata
 html_theme_options = {
-    "footer_items": ["copyright", "sphinx-version"],
+    'footer_items': ['copyright', 'sphinx-version'],
 }
 
-html_sidebars = {
-    "**": ["sidebar-nav-bs"]
-}
+html_sidebars = {'**': ['sidebar-nav-bs']}
 
 resource_links = {
     'guide': 'https://guide.pycord.dev',

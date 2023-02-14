@@ -22,6 +22,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ..events.event_manager import Event
+
 if TYPE_CHECKING:
     from ..state import State
     from ..types import AsyncFunc
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
 
 
 class Command:
-    _processor_event: str
+    _processor_event: Event
 
     def __init__(
         self, callback: AsyncFunc, name: str, state: State, group: Group | None = None
