@@ -24,9 +24,9 @@ import asyncio
 from copy import copy
 from typing import TYPE_CHECKING, Any, Union
 
-from ...arguments import ArgumentParser
 from ...channel import identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
+from ...events.other import InteractionCreate
 from ...interaction import Interaction, InteractionOption
 from ...media import Attachment
 from ...member import Member
@@ -37,7 +37,7 @@ from ...types import AsyncFunc
 from ...types.interaction import ApplicationCommandData
 from ...undefined import UNDEFINED, UndefinedType
 from ...user import User
-from ...utils import remove_undefined
+from ...utils import get_arg_defaults, remove_undefined
 from ..command import Command
 from ..group import Group
 from .errors import ApplicationCommandException
@@ -46,8 +46,6 @@ if TYPE_CHECKING:
     from ...state import State
 
 __all__ = ['CommandChoice', 'Option', 'ApplicationCommand']
-
-arg_parser = ArgumentParser()
 
 
 async def _autocomplete(
@@ -193,7 +191,7 @@ class Option:
             self._callback = None
             return
 
-        arg_defaults = arg_parser.get_arg_defaults(self._callback)
+        arg_defaults = get_arg_defaults(self._callback)
         self.options: list[Option] = []
 
         i: int = 0
@@ -331,7 +329,7 @@ class ApplicationCommand(Command):
         Defaults to False.
     """
 
-    _processor_event = 'on_interaction'
+    _processor_event = InteractionCreate
     sub_level: int = 0
 
     def __init__(
@@ -427,7 +425,7 @@ class ApplicationCommand(Command):
         return wrapper
 
     def _parse_user_command_arguments(self) -> None:
-        arg_defaults = arg_parser.get_arg_defaults(self._callback)
+        arg_defaults = get_arg_defaults(self._callback)
 
         fielded: bool = False
         i: int = 0
@@ -458,7 +456,7 @@ class ApplicationCommand(Command):
             raise ApplicationCommandException('No argument set for a member/user')
 
     def _parse_message_command_arguments(self) -> None:
-        arg_defaults = arg_parser.get_arg_defaults(self._callback)
+        arg_defaults = get_arg_defaults(self._callback)
 
         fielded: bool = False
         i: int = 0
@@ -496,7 +494,7 @@ class ApplicationCommand(Command):
             self._parse_message_command_arguments()
             return
 
-        arg_defaults = arg_parser.get_arg_defaults(self._callback)
+        arg_defaults = get_arg_defaults(self._callback)
         self.options: list[Option] = []
         self._options_dict: dict[str, Option] = {}
 
@@ -691,7 +689,9 @@ class ApplicationCommand(Command):
         else:
             return inter.user
 
-    async def _invoke(self, interaction: Interaction) -> None:
+    async def _invoke(self, event: InteractionCreate) -> None:
+        interaction = event.interaction
+
         if interaction.type == 4:
             if interaction.data.get('name') is not None:
                 if interaction.data['name'] == self.name:

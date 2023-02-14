@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-from typing import Any, Generator
+from typing import Any, Type, TypeVar
 
 
 class _stored:
@@ -27,6 +27,9 @@ class _stored:
         self.parents = parents
         self.id = self_id
         self.storing = storing
+
+
+T = TypeVar('T')
 
 
 class Store:
@@ -71,7 +74,9 @@ class Store:
             store = _stored(set(parents), id, data)
             self._store.add(store)
 
-    async def discard(self, parents: list[Any], id: Any) -> Any | None:
+    async def discard(
+        self, parents: list[Any], id: Any, type: Type[T] | T = Any
+    ) -> T | None:
         ps = set(parents)
 
         for store in self._store:
