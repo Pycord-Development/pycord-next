@@ -283,7 +283,7 @@ class Bot:
             else:
                 args = get_arg_defaults(func)
 
-                values = args.values()
+                values = list(args.values())
 
                 if len(values) != 1:
                     raise BotException(
