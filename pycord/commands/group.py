@@ -20,7 +20,7 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Callable, TypeVar
 
 from .command import Command
 
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from ..state import State
     from ..types import AsyncFunc
 
-T = TypeVar('T')
+T = TypeVar('T', bound=AsyncFunc)
 
 
 class Group:
@@ -53,7 +53,7 @@ class Group:
         for command in self._pending_commands:
             self._state.commands.append(command)
 
-    def command(self, name: str) -> T:
+    def command(self, name: str) -> Callable[..., AsyncFunc]:
         def wrapper(func: T) -> T:
             command = Command(func, name=name, state=self._state, group=self)
             if self._state:

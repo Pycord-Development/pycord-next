@@ -11,3 +11,7 @@ combine_star = true
 exclude_lines = [
     "if TYPE_CHECKING:",
 ]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+reportImportCycles = false

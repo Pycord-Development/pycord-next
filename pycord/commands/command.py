@@ -20,7 +20,7 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ..events.event_manager import Event
 
@@ -39,11 +39,10 @@ class Command:
         self._callback = callback
 
         self.name = name
-        self.group = group
         self._state = state
 
     async def instantiate(self) -> None:
         ...
 
-    async def _invoke(self, *args, **kwargs) -> None:
+    async def _invoke(self, *args: Any, **kwargs: Any) -> None:
         pass
