@@ -42,9 +42,9 @@ class Messages(BaseRouter):
         components: list[Component] | UndefinedType = UNDEFINED,
     ) -> Message:
         if embeds is not UNDEFINED:
-            embeds = [embed._to_data() for embed in embeds]
+            embeds = [embed._to_data() for embed in embeds] # type: ignore
 
-        return await self.request(
+        return await self.request( # type: ignore
             'POST',
             Route(f'/channels/{channel_id}/messages', channel_id=channel_id),
             data=remove_undefined(

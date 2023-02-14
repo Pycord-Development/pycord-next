@@ -65,10 +65,10 @@ class Gear(Generic[ContextT]):
         self._commands: list[Command | Group] = []
         self.ctx = ctx
 
-    async def on_attach(self, *args, **kwargs) -> None:
+    async def on_attach(self, *args: Any, **kwargs: Any) -> None:
         ...
 
-    def listen(self, name: str) -> T:
+    def listen(self, name: str) -> AsyncFunc:
         """
         Listen to an event
 
@@ -80,14 +80,14 @@ class Gear(Generic[ContextT]):
 
         def wrapper(func: T) -> T:
             if self._listener_functions.get(name):
-                self._listener_functions[name].append(func)
+                self._listener_functions[name].append(func) # type: ignore
             else:
-                self._listener_functions[name] = [func]
+                self._listener_functions[name] = [func] # type: ignore
             return func
 
-        return wrapper
+        return wrapper # type: ignore
 
-    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+    def command(self, name: str, cls: Type[T], **kwargs: Any) -> T:
         """
         Create a command within the Gear
 
@@ -101,14 +101,14 @@ class Gear(Generic[ContextT]):
             The kwargs to entail onto the instantiated command.
         """
 
-        def wrapper(func: T) -> T:
-            command = cls(func, name, None, **kwargs)
-            self._commands.append(command)
+        def wrapper(func: AsyncFunc) -> T:
+            command = cls(func, name, None, **kwargs) # type: ignore
+            self._commands.append(command) # type: ignore
             return command
 
-        return wrapper
+        return wrapper # type: ignore
 
-    def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
+    def group(self, name: str, cls: Type[T], **kwargs: Any) -> T:
         """
         Create a brand-new Group of Commands
 
@@ -122,12 +122,12 @@ class Gear(Generic[ContextT]):
             The kwargs to entail onto the instantiated group.
         """
 
-        def wrapper(func: T) -> T:
+        def wrapper(func: AsyncFunc) -> T:
             r = cls(func, name, None, **kwargs)
-            self._commands.append(r)
+            self._commands.append(r) # type: ignore
             return r
 
-        return wrapper
+        return wrapper # type: ignore
 
     def attach(self, bot: Bot) -> None:
         """
@@ -142,15 +142,15 @@ class Gear(Generic[ContextT]):
 
         for name, funcs in self._listener_functions.items():
             for func in funcs:
-                bot._state.emitter.add_listener(name, func)
+                bot._state.emitter.add_listener(name, func) # type: ignore
 
         for cmd in self._commands:
             if isinstance(cmd, Command):
-                cmd._state = bot._state
-                cmd._state.commands.append(cmd)
-            elif isinstance(cmd, Group):
-                cmd._state = bot._state
+                cmd._state = bot._state # type: ignore
+                cmd._state.commands.append(cmd) # type: ignore
+            elif isinstance(cmd, Group): # type: ignore
+                cmd._state = bot._state # type: ignore
 
         self.bot = bot
 
-        self.bot._state.gears.append(self)
+        self.bot._state.gears.append(self) # type: ignore

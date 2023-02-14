@@ -56,18 +56,19 @@ class HTTPClient(ApplicationCommands, Messages):
         self._session = ClientSession()
 
     async def close_session(self) -> None:
-        await self._session.close()
-        self._session = None
+        if self._session:
+            await self._session.close()
+            self._session = None
 
     async def request(
         self,
         method: str,
         route: BaseRoute,
-        data: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None, # type: ignore
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,
-    ) -> str | dict[str, Any] | bytes:
+    ) -> str | dict[str, Any] | bytes | None:
         endpoint = route.merge(self.base_url)
 
         if self._session is None:
@@ -91,7 +92,7 @@ class HTTPClient(ApplicationCommands, Messages):
                 await executer.wait()
 
         for _ in range(5):
-            r = await self._session.request(
+            r = await self._session.request( # type: ignore
                 method,
                 endpoint,
                 data=data,
@@ -102,7 +103,7 @@ class HTTPClient(ApplicationCommands, Messages):
             )
             _log.debug(f'Received back {await r.text()}')
 
-            data = await utils._text_or_json(cr=r, self=self)
+            ddata: dict[str, Any] = await utils._text_or_json(cr=r, self=self) # type: ignore
 
             if r.status == 429:
                 _log.debug(f'Request to {endpoint} failed: Request returned rate limit')
@@ -110,7 +111,7 @@ class HTTPClient(ApplicationCommands, Messages):
 
                 self._executers.append(executer)
                 await executer.executed(
-                    reset_after=data['retry_after'],
+                    reset_after=ddata['retry_after'], # type: ignore
                     is_global=r.headers.get('X-RateLimit-Scope') == 'global',
                     limit=int(r.headers.get('X-RateLimit-Limit', 10)),
                 )
@@ -118,18 +119,18 @@ class HTTPClient(ApplicationCommands, Messages):
                 continue
 
             elif r.status == 403:
-                raise Forbidden(resp=r, data=data)
+                raise Forbidden(resp=r, data=ddata)
             elif r.status == 404:
-                raise NotFound(resp=r, data=data)
+                raise NotFound(resp=r, data=ddata)
             elif r.status == 500:
-                raise InternalError(resp=r, data=data)
+                raise InternalError(resp=r, data=ddata)
             elif r.ok:
                 return data
             else:
                 if self.verbose:
                     raise BotException(r, data)
                 else:
-                    raise HTTPException(resp=r, data=data)
+                    raise HTTPException(resp=r, data=data) # type: ignore
 
     async def get_gateway_bot(self) -> dict[str, Any]:
-        return await self.request('GET', Route('/gateway/bot'))
+        return await self.request('GET', Route('/gateway/bot')) # type: ignore

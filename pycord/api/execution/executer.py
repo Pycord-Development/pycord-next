@@ -57,7 +57,7 @@ class Executer:
             e.set()
 
     async def wait(self) -> None:
-        if not self.rate_limited:
+        if not self.rate_limited or not self._request_queue:
             return
 
         event = asyncio.Event()

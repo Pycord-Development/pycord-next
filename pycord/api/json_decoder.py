@@ -24,7 +24,7 @@ from ..utils import loads
 
 
 class JSONDecoder:
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         ...
 
     def decode(self, s: str) -> Any:

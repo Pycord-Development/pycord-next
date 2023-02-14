@@ -18,7 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import Protocol, TypeVar
+from typing import Any, Protocol, TypeVar
 
 from .errors import NoMorePages, PagerException
 
@@ -36,13 +36,13 @@ class Page(Protocol[T]):
     def __init__(self):
         ...
 
-    async def interact_forward(self, *args, **kwargs) -> None:
+    async def interact_forward(self, *args: Any, **kwargs: Any) -> None:
         """
         Interactions to do when the paginator issues a forwarded statement
         """
         ...
 
-    async def interact_backward(self, *args, **kwargs) -> None:
+    async def interact_backward(self, *args: Any, **kwargs: Any) -> None:
         """
         Interactions to do when the paginator issues a backward statement
         """
@@ -59,33 +59,33 @@ class Paginator:
         Predefined pages
     """
 
-    def __init__(self, pages: list[Page] = []) -> None:
-        self._pages = pages
-        self._previous_page: tuple[int, Page] | None = None
+    def __init__(self, pages: list[Page] = []) -> None: # type: ignore
+        self._pages = pages # type: ignore
+        self._previous_page: tuple[int, Page] | None = None # type: ignore
 
-    def __next__(self) -> Page:
-        if self._previous_page is None:
+    def __next__(self) -> Page: # type: ignore 
+        if self._previous_page is None: # type: ignore
             try:
-                page = self._pages[0]
+                page = self._pages[0] # type: ignore
             except IndexError:
                 raise PagerException('No pages in paginator')
 
             self._previous_page = (0, page)
 
-            return page
+            return page # type: ignore
 
-        new = self._previous_page[0] + 1
+        new = self._previous_page[0] + 1 # type: ignore
 
         try:
-            page = self._pages[new]
+            page = self._pages[new] # type: ignore
         except IndexError:
             raise NoMorePages('No more pages left in the paginator')
 
         self._previous_page = (new, page)
 
-        return page
+        return page # type: ignore
 
-    async def forward(self, *args, **kwargs) -> Page:
+    async def forward(self, *args: Any, **kwargs: Any) -> Page[Any]:
         """
         Go forward through pages.
 
@@ -94,12 +94,12 @@ class Paginator:
         args/kwargs:
             Arguments and Keyword-Arguments to put into page.interact_forward.
         """
-        page = next(self)
+        page = next(self) # type: ignore
 
         await page.interact_forward(*args, **kwargs)
-        return page
+        return page # type: ignore
 
-    async def backward(self, *args, **kwargs) -> Page:
+    async def backward(self, *args: Any, **kwargs: Any) -> Page[Any]:
         """
         Go backwards from the paginator.
         Only works if the page is not the first page.
@@ -109,27 +109,27 @@ class Paginator:
         args/kwargs:
             Arguments and Keyword-Arguments to put into page.interact_backward.
         """
-        if self._previous_page is None or self._previous_page[0] == 0:
+        if self._previous_page is None or self._previous_page[0] == 0: # type: ignore
             raise PagerException('Unable to go backwards without available pages')
 
-        page = self._pages[self._previous_page[0] - 1]
+        page = self._pages[self._previous_page[0] - 1] # type: ignore
         self._previous_page = (
             None
-            if (self._previous_page[0] - 1) <= 0
-            else (self._previous_page[0] - 1, self._pages[self._previous_page[0] - 1])
+            if (self._previous_page[0] - 1) <= 0 # type: ignore
+            else (self._previous_page[0] - 1, self._pages[self._previous_page[0] - 1]) # type: ignore
         )
 
         await page.interact_backward(*args, **kwargs)
-        return page
+        return page # type: ignore
 
     @property
-    def previous(self) -> Page | None:
+    def previous(self) -> Page | None: # type: ignore
         """
         The Previous page of this Paginator
         """
-        return None if self._previous_page is None else self._previous_page[1]
+        return None if self._previous_page is None else self._previous_page[1] # type: ignore
 
-    def add_page(self, page: Page) -> None:
+    def add_page(self, page: Page) -> None: # type: ignore
         """
         Appends a new page to this Paginator
 
@@ -138,11 +138,11 @@ class Paginator:
         page: :class:`.Page`
             The page to append
         """
-        if page in self._pages:
+        if page in self._pages: # type: ignore
             raise PagerException('This page has already been added to this paginator')
-        self._pages.append(page)
+        self._pages.append(page) # type: ignore
 
-    def remove_page(self, page: Page) -> None:
+    def remove_page(self, page: Page) -> None: # type: ignore
         """
         Removes a page from this paginator
 
@@ -151,6 +151,6 @@ class Paginator:
         page: :class:`.Page`
             The page to remove
         """
-        if page not in self._pages:
+        if page not in self._pages: # type: ignore
             raise PagerException('This page is not part of this paginator')
-        self._pages.remove(page)
+        self._pages.remove(page) # type: ignore

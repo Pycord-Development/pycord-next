@@ -28,7 +28,7 @@ __all__ = ['Route', 'BaseRoute']
 class BaseRoute:
     guild_id = Optional[int]
     channel_id = Optional[int]
-    webhook_id: int | None
+    webhook_id: Snowflake | None
     webhook_token: str | None
 
     def __init__(
@@ -43,7 +43,7 @@ class BaseRoute:
         ...
 
     def merge(self, url: str) -> str:
-        pass
+        ...
 
 
 class Route(BaseRoute):
@@ -75,7 +75,7 @@ class Route(BaseRoute):
             **self.parameters,
         )
 
-    def __eq__(self, route: 'Route') -> bool:
+    def __eq__(self, route: 'Route') -> bool: # type: ignore
         return (
             route.channel_id == self.channel_id
             or route.guild_id == self.guild_id

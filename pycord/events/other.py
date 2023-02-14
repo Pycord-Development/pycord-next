@@ -34,36 +34,36 @@ if TYPE_CHECKING:
 class Ready(Event):
     _name = 'READY'
 
-    async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
-        state._available_guilds: list[int] = [int(uag['id']) for uag in data['guilds']]
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> bool: # type: ignore
+        state._available_guilds: list[int] = [int(uag['id']) for uag in data['guilds']] # type: ignore
 
         user = User(data['user'], state)
         state.user = user
         self.user = user
 
         if hasattr(state, '_raw_user_fut'):
-            state._raw_user_fut.set_result(None)
+            state._raw_user_fut.set_result(None) # type: ignore
 
-        state._ready = True
+        state._ready = True # type: ignore
 
-        for gear in state.gears:
-            asyncio.create_task(gear.on_attach(), name=f'Attaching Gear: {gear.name}')
+        for gear in state.gears: # type: ignore
+            asyncio.create_task(gear.on_attach(), name=f'Attaching Gear: {gear.name}') # type: ignore
 
         state.application_commands = []
         state.application_commands.extend(
-            await state.http.get_global_application_commands(state.user.id, True)
+            await state.http.get_global_application_commands(state.user.id, True) # type: ignore
         )
-        state._application_command_names: list[str] = []
+        state._application_command_names: list[str] = [] # type: ignore
 
         for command in state.commands:
             await command.instantiate()
             if hasattr(command, 'name'):
-                state._application_command_names.append(command.name)
+                state._application_command_names.append(command.name) # type: ignore
 
         for app_command in state.application_commands:
-            if app_command['name'] not in state._application_command_names:
+            if app_command['name'] not in state._application_command_names: # type: ignore
                 await state.http.delete_global_application_command(
-                    state.user.id.real, app_command['id']
+                    state.user.id.real, app_command['id'] # type: ignore
                 )
 
 
@@ -71,7 +71,7 @@ class UserUpdate(Event):
     _name = 'USER_UPDATE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        self.user = User(data, state)
+        self.user = User(data, state) # type: ignore
         state.user = self.user
         state.raw_user = data
 
@@ -80,12 +80,12 @@ class InteractionCreate(Event):
     _name = 'INTERACTION_CREATE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        interaction = Interaction(data, state, True)
+        interaction = Interaction(data, state, True) # type: ignore
 
         for component in state.components:
-            asyncio.create_task(component._invoke(interaction))
+            asyncio.create_task(component._invoke(interaction)) # type: ignore
 
         for modal in state.modals:
-            asyncio.create_task(modal._invoke(interaction))
+            asyncio.create_task(modal._invoke(interaction)) # type: ignore
 
         self.interaction = interaction

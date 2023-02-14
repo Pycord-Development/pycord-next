@@ -37,17 +37,17 @@ except ImportError:
     msgspec = None
 
 DISCORD_EPOCH: int = 1420070400000
-S = TypeVar('S', bound=Sequence)
+S = TypeVar('S', bound=Sequence[Any])
 
 
-async def _text_or_json(cr: ClientResponse, self) -> str | dict[str, Any]:
+async def _text_or_json(cr: ClientResponse, self: Any) -> str | dict[str, Any]: # type: ignore
     if cr.content_type == 'application/json':
         return await cr.json(encoding='utf-8', loads=self._json_decoder)
     return await cr.text('utf-8')
 
 
 def loads(data: Any) -> Any:
-    return msgspec.json.decode(data.encode()) if msgspec else json.loads(data)
+    return msgspec.json.decode(data.encode()) if msgspec else json.loads(data) # type: ignore
 
 
 def dumps(data: Any) -> str:
@@ -55,14 +55,14 @@ def dumps(data: Any) -> str:
 
 
 def parse_errors(errors: dict[str, Any], key: str | None = None) -> dict[str, str]:
-    ret = []
+    ret: list[Any] = []
 
     for k, v in errors.items():
         kie = f'{k}.{key}' if key else k
 
         if isinstance(v, dict):
             try:
-                errors_ = v['_errors']
+                errors_: list[Any] = v['_errors']
             except KeyError:
                 continue
             else:
@@ -96,12 +96,12 @@ def chunk(items: S, n: int) -> Iterator[S]:
         yield items[start:end]  # type: ignore
 
 
-def remove_undefined(**kwargs) -> dict[str, Any]:
+def remove_undefined(**kwargs: Any) -> dict[str, Any]:
     return {k: v for k, v in kwargs.items() if v is not UNDEFINED}
 
 
-async def get_iterated_data(iterator: AsyncGenerator) -> list[Any]:
-    hold = []
+async def get_iterated_data(iterator: AsyncGenerator[Any, Any]) -> list[Any]:
+    hold: list[Any] = []
 
     async for data in iterator:
         hold.append(data)
@@ -111,7 +111,7 @@ async def get_iterated_data(iterator: AsyncGenerator) -> list[Any]:
 
 def get_arg_defaults(fnc: AsyncFunc) -> dict[str, tuple[Any, Any]]:
     signature = inspect.signature(fnc)
-    ret = {}
+    ret: dict[str, Any] = {}
     for k, v in signature.parameters.items():
         if (
             v.default is not inspect.Parameter.empty
