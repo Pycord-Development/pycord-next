@@ -36,8 +36,11 @@ T = TypeVar('T', bound='Event')
 class Event:
     _name: str
 
-    async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
-        return True
+    async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
+        return False
+
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
+        ...
 
 
 class EventManager:
@@ -75,11 +78,13 @@ class EventManager:
         for event, funcs in self.events.items():
             if event._name == event_str:
                 eve = event()
-                dispatch = await eve._async_load(data, self._state)
+                dispatch = await eve._is_publishable(data, self._state)
 
                 # used in cases like GUILD_AVAILABLE
                 if dispatch is False:
                     continue
+                else:
+                    await eve._async_load(data, self._state)
 
                 for func in funcs:
                     asyncio.create_task(func(eve))

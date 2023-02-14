@@ -33,7 +33,14 @@ if TYPE_CHECKING:
 class Ready(Event):
     _name = 'READY'
 
+
+    async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
+        return True
+
+
     async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
+        state._available_guilds: list[int] = [int(uag['id']) for uag in data['guilds']]
+
         user = User(data['user'], state)
         state.user = user
         self.user = user
@@ -45,8 +52,6 @@ class Ready(Event):
 
         for gear in state.gears:
             asyncio.create_task(gear.on_attach(), name=f'Attaching Gear: {gear.name}')
-
-        state._available_guilds: list[int] = [uag['id'] for uag in data['guilds']]
 
         state.application_commands = []
         state.application_commands.extend(
@@ -64,5 +69,3 @@ class Ready(Event):
                 await state.http.delete_global_application_command(
                     state.user.id.real, app_command['id']
                 )
-
-        return True

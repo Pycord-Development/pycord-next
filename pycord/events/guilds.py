@@ -35,6 +35,9 @@ if TYPE_CHECKING:
 class GuildCreate(Event):
     _name = 'GUILD_CREATE'
 
+    async def _is_publishable(self, _data: dict[str, Any], _state: 'State') -> bool:
+        return False
+
     async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
         self.guild = Guild(data, state=state)
         self.channels: list[Channel] = [
@@ -50,29 +53,29 @@ class GuildCreate(Event):
             ScheduledEvent(se, state) for se in data['guild_scheduled_events']
         ]
 
-        await (state.store.sift('guilds')).insert(
+        await (state.store.sift('guilds')).save(
             [self.guild.id], self.guild.id, self.guild
         )
 
         for channel in self.channels:
-            await (state.store.sift('channels')).insert(
+            await (state.store.sift('channels')).save(
                 [self.guild.id], channel.id, channel
             )
 
         for thread in self.threads:
-            await (state.store.sift('threads')).insert(
+            await (state.store.sift('threads')).save(
                 [self.guild.id, thread.parent_id], thread.id, thread
             )
 
         for stage in self.stage_instances:
-            await (state.store.sift('stages')).insert(
+            await (state.store.sift('stages')).save(
                 [stage.channel_id, self.guild.id, stage.guild_scheduled_event_id],
                 stage.id,
                 stage,
             )
 
         for scheduled_event in self.guild_scheduled_events:
-            await (state.store.sift('scheduled_events')).insert(
+            await (state.store.sift('scheduled_events')).save(
                 [
                     scheduled_event.channel_id,
                     scheduled_event.creator_id,
@@ -83,24 +86,21 @@ class GuildCreate(Event):
                 scheduled_event,
             )
 
-        return False
-
 
 class GuildAvailable(GuildCreate):
     """
     Event denoting the accessibility of a previously joined Guild.    
     """
 
-    async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
-        if int(data['id']) in state._available_guilds:
-            return True
-        else:
-            return False
+    async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
+        return True if int(data['id']) in state._available_guilds else False
 
 
 class GuildJoin(GuildCreate):
     async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
-        if int(data['id']) not in state._available_guilds:
-            return True
-        else:
+        exists = True if int(data['id']) in state._available_guilds else False
+
+        if exists:
             return False
+
+        state._available_guilds.append(int(data['id']))
