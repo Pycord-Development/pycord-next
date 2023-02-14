@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from enum import Enum
 else:
-    from fastenum.fastenum import Enum
+    from fastenum import Enum
 
 
 class VerificationLevel(Enum):
