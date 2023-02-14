@@ -7,5 +7,6 @@ Implementation of Discord API Routes
 :license: MIT
 """
 from .application_commands import *
+from .application_role_connection_metadata import *
 from .base import *
 from .messages import *

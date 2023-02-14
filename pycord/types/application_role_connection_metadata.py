@@ -23,51 +23,23 @@ from typing import Literal
 
 from typing_extensions import NotRequired, TypedDict
 
-from .integration import SCOPE
-from .snowflake import Snowflake
-from .user import User
+from .user import LOCALE
 
+RCMTYPE = Literal[
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+]
 
-class TeamMember(TypedDict):
-    membership_state: Literal[1, 2]
-    permissions: list[str]
-    team_id: Snowflake
-    user: User
-
-
-class Team(TypedDict):
-    icon: str | None
-    id: Snowflake
-    members: list[TeamMember]
+class ApplicationRoleConnectionMetadata(TypedDict):
+    type: RCMTYPE
+    key: str
     name: str
-    owner_user_id: Snowflake
-
-
-class InstallParams(TypedDict):
-    scopes: list[SCOPE]
-    permissions: str
-
-
-class Application(TypedDict):
-    id: Snowflake
-    name: str
-    icon: str | None
+    name_localizations: NotRequired[dict[LOCALE, str]]
     description: str
-    rpc_origins: NotRequired[list[str]]
-    bot_public: bool
-    bot_require_code_grant: bool
-    terms_of_service_url: NotRequired[str]
-    privacy_policy_url: NotRequired[str]
-    owner: NotRequired[User]
-    summary: NotRequired[str]
-    verify_key: str
-    team: Team | None
-    guild_id: NotRequired[Snowflake]
-    primary_sku_id: NotRequired[Snowflake]
-    slug: NotRequired[str]
-    cover_image: NotRequired[str]
-    flags: NotRequired[int]
-    tags: NotRequired[list[str]]
-    install_params: InstallParams
-    custom_install_url: NotRequired[str]
-    role_connections_verification_url: NotRequired[str]
+    description_localizations: NotRequired[dict[LOCALE, str]]
