@@ -35,7 +35,7 @@ T = TypeVar('T', bound='Event')
 
 class Event:
     _name: str
-    _state: 'State' | None = None
+    _state: 'State'
 
     async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
         return True

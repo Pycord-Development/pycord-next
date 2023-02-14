@@ -61,7 +61,7 @@ class ChannelDelete(Event):
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         channel = identify_channel(data, state)
 
-        deps = [channel.guild_id] if getattr(channel, 'guild_id') else []
+        deps = [channel.guild_id] if hasattr(channel, 'guild_id') else []
         res = await (state.store.sift('channels')).discard(deps, channel.id)
 
         self.cached = res

@@ -52,7 +52,7 @@ from ..events.guilds import (
     GuildRoleUpdate,
     GuildUpdate,
 )
-from ..events.other import Ready
+from ..events.other import InteractionCreate, Ready, UserUpdate
 from ..ui import Component
 from ..ui.house import House
 from ..ui.text_input import Modal
@@ -83,6 +83,8 @@ BASE_EVENTS = [
     MessageUpdate,
     MessageDelete,
     MessageBulkDelete,
+    UserUpdate,
+    InteractionCreate
 ]
 
 if TYPE_CHECKING:
