@@ -142,7 +142,7 @@ class Gear(Generic[ContextT]):
 
         for name, funcs in self._listener_functions.items():
             for func in funcs:
-                bot._state.ping.add_listener(name, func)
+                bot._state.emitter.add_listener(name, func)
 
         for cmd in self._commands:
             if isinstance(cmd, Command):

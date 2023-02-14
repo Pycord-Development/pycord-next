@@ -12,7 +12,7 @@
 </div>
 
 <p align='center'>
- <b>Make Bots Happen.</b>
+ <b>Empowering developers to build the next generation of Python Discord bots.</b>
 </p>
 
 Welcome! This is the repository for the pre-alpha and heavy conception next major
@@ -80,13 +80,13 @@ A small code snippet of a basic Pycord v3 bot.
 ```py
 import pycord
 
-# If you want more interactivity with models and events, you'll want to add more intents
-bot = pycord.Bot(intents=pycord.Intents(guilds=True))
+
+bot = pycord.Bot(intents=pycord.Intents())
 
 
-@bot.listen('on_guild_available')
-async def handle_new_guild(guild: pycord.Guild) -> None:
-    print(f'  In Guild: {guild.name}')
+@bot.listen()
+async def on_ready(event: pycord.Ready) -> None:
+    print('I am ready!')
 
 
 bot.run('token')
