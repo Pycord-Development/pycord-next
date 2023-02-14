@@ -236,30 +236,6 @@ class State:
 
         return (bulk,), event_type
 
-    # SECTION: automod #
-    # SECTION: misc #
-
-    async def _process_user_update(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        user = User(data['user'], self)
-        self.user = user
-
-        return (), event_type
-
-    async def _process_interaction_create(
-        self, _: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        interaction = Interaction(data, self, True)
-
-        for component in self.components:
-            asyncio.create_task(component._invoke(interaction))
-
-        for modal in self.modals:
-            asyncio.create_task(modal._invoke(interaction))
-
-        return (interaction,), 'INTERACTION'
-
     _events: dict[str, Callable] = {
         'CHANNEL_CREATE': _process_channel_create,
         'CHANNEL_UPDATE': _process_channel_update,
@@ -269,8 +245,6 @@ class State:
         'MESSAGE_UPDATE': _process_message_update,
         'MESSAGE_DELETE': _process_message_delete,
         'MESSAGE_DELETE_BULK': _process_message_delete_bulk,
-        'USER_UPDATE': _process_user_update,
-        'INTERACTION_CREATE': _process_interaction_create,
     }
 
     async def _process_event(self, event_type: str, data: dict[str, Any]) -> None:

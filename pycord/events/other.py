@@ -23,6 +23,8 @@
 import asyncio
 from typing import TYPE_CHECKING, Any
 
+from ..interaction import Interaction
+
 from ..user import User
 from .event_manager import Event
 
@@ -32,10 +34,6 @@ if TYPE_CHECKING:
 
 class Ready(Event):
     _name = 'READY'
-
-
-    async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
-        return True
 
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
@@ -69,3 +67,29 @@ class Ready(Event):
                 await state.http.delete_global_application_command(
                     state.user.id.real, app_command['id']
                 )
+
+
+class UserUpdate(Event):
+    _name = 'USER_UPDATE'
+
+
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
+        self.user = User(data, state)
+        state.user = self.user
+        state.raw_user = data
+
+
+class InteractionCreate(Event):
+    _name = 'INTERACTION_CREATE'
+
+
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
+        interaction = Interaction(data, state, True)
+
+        for component in state.components:
+            asyncio.create_task(component._invoke(interaction))
+
+        for modal in state.modals:
+            asyncio.create_task(modal._invoke(interaction))
+
+        self.interaction = interaction
