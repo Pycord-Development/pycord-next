@@ -92,10 +92,10 @@ class Guild:
                 data['verification_level']  # type: ignore
             )
             self.default_message_notifications: DefaultMessageNotificationLevel = DefaultMessageNotificationLevel(
-                data['default_message_notifications']
+                data['default_message_notifications']  # type: ignore
             )  # type: ignore
             self.explicit_content_filter: ExplicitContentFilterLevel = ExplicitContentFilterLevel(
-                data['explicit_content_filter']
+                data['explicit_content_filter']  # type: ignore
             )  # type: ignore
             self._roles: list[dict[str, Any]] = data.get('roles', [])  # type: ignore
             self._process_roles()
@@ -116,8 +116,8 @@ class Guild:
                 else None
             )
             self.system_channel_flags: SystemChannelFlags = SystemChannelFlags.from_value(
-                data['system_channel_flags']
-            )  # type: ignore
+                data['system_channel_flags']  # type: ignore
+            )
 
             self._rules_channel_id: str | None = data.get('rules_channel_id')  # type: ignore
             self.rules_channel_id: Snowflake | None = (
