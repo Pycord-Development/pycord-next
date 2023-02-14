@@ -85,7 +85,7 @@ bot = pycord.Bot(intents=pycord.Intents())
 
 
 @bot.listen()
-async def handle_new_guild(event: pycord.Ready) -> None:
+async def on_ready(event: pycord.Ready) -> None:
     print('I am ready!')
 
 
