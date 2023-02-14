@@ -36,7 +36,7 @@ class GuildCreate(Event):
     _name = 'GUILD_CREATE'
 
     async def _is_publishable(self, _data: dict[str, Any], _state: 'State') -> bool:
-        return False
+        return True
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
         self.guild = Guild(data, state=state)
