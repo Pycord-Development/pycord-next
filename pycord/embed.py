@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present Pycord Development
+# Copyright (c) 2021-present VincentRPS
+# Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +21,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
+from typing_extensions import Self
 
 from .color import Color
 from .types import (
@@ -59,11 +62,11 @@ class Thumbnail:
         self.width: UndefinedType | int = UNDEFINED
 
     @classmethod
-    def _from_data(cls, data: DiscordThumbnail) -> 'Thumbnail':
+    def _from_data(cls, data: DiscordThumbnail) -> "Thumbnail":
         self = cls(data['url'])
-        self.proxy_url = data.get('proxy_url', UndefinedType)
-        self.height = data.get('height', UndefinedType)
-        self.width = data.get('width', UndefinedType)
+        self.proxy_url = data.get('proxy_url', UNDEFINED)
+        self.height = data.get('height', UNDEFINED)
+        self.width = data.get('width', UNDEFINED)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -78,11 +81,11 @@ class Image:
         self.width: UndefinedType | int = UNDEFINED
 
     @classmethod
-    def _from_data(cls, data: DiscordImage) -> 'Image':
+    def _from_data(cls, data: DiscordImage) -> "Image":
         self = cls(data['url'])
-        self.proxy_url = data.get('proxy_url', UndefinedType)
-        self.height = data.get('height', UndefinedType)
-        self.width = data.get('width', UndefinedType)
+        self.proxy_url = data.get('proxy_url', UNDEFINED)
+        self.height = data.get('height', UNDEFINED)
+        self.width = data.get('width', UNDEFINED)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -96,7 +99,7 @@ class Footer:
         self.proxy_icon_url: UndefinedType | str = UNDEFINED
 
     @classmethod
-    def _from_data(cls, data: DiscordFooter) -> 'Footer':
+    def _from_data(cls, data: DiscordFooter) -> "Footer":
         self = cls(data['text'], data.get('icon_url', UNDEFINED))
         self.proxy_icon_url = data.get('proxy_icon_url', UNDEFINED)
         return self
@@ -106,20 +109,15 @@ class Footer:
 
 
 class Author:
-    def __init__(
-        self,
-        name: str,
-        icon_url: str | UndefinedType = UNDEFINED,
-        url: str | UndefinedType = UNDEFINED,
-    ) -> None:
+    def __init__(self, name: str, icon_url: str | UndefinedType = UNDEFINED, url: str | UndefinedType = UNDEFINED) -> None:
         self.name = name
         self.url = url
         self.icon_url = icon_url
         self.proxy_icon_url: UndefinedType | str = UNDEFINED
 
     @classmethod
-    def _from_data(cls, data: DiscordAuthor) -> 'Author':
-        self = cls(data['name'], data.get('icon_url', UNDEFINED, data['url']))
+    def _from_data(cls, data: DiscordAuthor) -> "Author":
+        self = cls(data['name'], data.get('icon_url', UNDEFINED), data.get('url', UNDEFINED))
         self.proxy_icon_url = data.get('proxy_icon_url', UNDEFINED)
         return self
 
@@ -128,15 +126,13 @@ class Author:
 
 
 class Field:
-    def __init__(
-        self, name: str, value: str, inline: bool | UndefinedType = UNDEFINED
-    ) -> None:
+    def __init__(self, name: str, value: str, inline: bool | UndefinedType = UNDEFINED) -> None:
         self.name = name
         self.value = value
         self.inline = inline
 
     @classmethod
-    def _from_data(cls, data: DiscordField) -> 'Field':
+    def _from_data(cls, data: DiscordField) -> "Field":
         return cls(data['name'], data['value'], data.get('field', UNDEFINED))
 
     def _to_data(self) -> dict[str, Any]:
@@ -163,7 +159,9 @@ class Embed:
         author: Author | UndefinedType = UNDEFINED,
         footer: Footer | UndefinedType = UNDEFINED,
         image: Image | UndefinedType = UNDEFINED,
-        fields: list[Field] = None,
+        video: Video | UndefinedType = UNDEFINED,
+        provider: Provider | UndefinedType = UNDEFINED,
+        fields: list[Field] | None = None
     ) -> None:
         if fields is None:
             fields = []
@@ -177,71 +175,58 @@ class Embed:
         self.url = url
         self.timestamp = timestamp
         self.color = color
-
-    @classmethod
-    def _from_data(cls, data: DiscordEmbed) -> None:
-        color = Color(data.get('color')) if data.get('color') is not None else None
-        thumbnail = (
-            Thumbnail._from_data(data.get('thumbnail'))
-            if data.get('thumbnail') is not None
-            else None
-        )
-        video = Video(data.get('video')) if data.get('video') is not None else None
-        provider = (
-            Provider(data.get('provider')) if data.get('provider') is not None else None
-        )
-        author = (
-            Author._from_data(data.get('author'))
-            if data.get('author') is not None
-            else None
-        )
-        footer = (
-            Footer._from_data(data.get('footer'))
-            if data.get('footer') is not None
-            else None
-        )
-        image = (
-            Image._from_data(data.get('thumbnail'))
-            if data.get('thumbnail') is not None
-            else None
-        )
-        fields = [Field._from_data(field) for field in data.get('fields', [])]
-
-        self = cls(
-            title=data.get('title'),
-            description=data.get('description'),
-            url=data.get('url'),
-            timestamp=datetime.fromisoformat(data.get('timestamp'))
-            if data.get('timestamp') is not None
-            else None,
-            color=color,
-            footer=footer,
-            image=image,
-            thumbnail=thumbnail,
-            author=author,
-            fields=fields,
-        )
         self.video = video
         self.provider = provider
 
-    def _to_data(self) -> dict[str, Any]:
+    @classmethod
+    def _from_data(cls, data: DiscordEmbed) -> Self:
+        timestamp = datetime.fromisoformat(raw_timestamp) if (raw_timestamp := data.get('timestamp')) is not None else UNDEFINED
+        color = Color(raw_color) if (raw_color := data.get('color')) is not None else UNDEFINED
+        thumbnail = Thumbnail._from_data(raw_thumbnail) if (raw_thumbnail := data.get('thumbnail') )is not None else UNDEFINED # type: ignore
+        video = Video(raw_video) if (raw_video := data.get('video')) is not None else UNDEFINED
+        provider = Provider(raw_provider) if (raw_provider := data.get('provider')) is not None else UNDEFINED
+        author = Author._from_data(raw_author) if (raw_author := data.get('author')) is not None else UNDEFINED # type: ignore
+        footer = Footer._from_data(raw_footer) if (raw_footer := data.get('footer')) is not None else UNDEFINED # type: ignore
+        image = Image._from_data(raw_image) if (raw_image := data.get('image')) is not None else UNDEFINED # type: ignore
+        fields = [Field._from_data(field) for field in data.get('fields', [])] # type: ignore
+
+        self = cls(
+            title=data.get('title', ''),
+            description=data.get('description', UNDEFINED),
+            url=data.get('url', UNDEFINED),
+            timestamp=timestamp,
+            color=color,
+            footer=footer,
+            image=image,
+            thumbnail=thumbnail,
+            author=author,
+            fields=fields,
+            video=video,
+            provider=provider,
+        )
+        return self
+
+    def _to_data(self) -> DiscordEmbed:
         color = self.color.value if self.color else None
-        thumbnail = self.thumbnail._to_data() if self.thumbnail else UNDEFINED
-        author = self.author._to_data() if self.author else UNDEFINED
-        footer = self.footer._to_data() if self.footer else UNDEFINED
-        image = self.image._to_data() if self.image else UNDEFINED
-        fields = [field._to_data() for field in self.fields]
+        thumbnail = self.thumbnail._to_data() if self.thumbnail else UNDEFINED  # type: ignore
+        author = self.author._to_data() if self.author else UNDEFINED # type: ignore
+        footer = self.footer._to_data() if self.footer else UNDEFINED # type: ignore
+        image = self.image._to_data() if self.image else UNDEFINED # type: ignore
+        fields = [field._to_data() for field in self.fields] # type: ignore
         timestamp = self.timestamp.isoformat() if self.timestamp else UNDEFINED
 
-        return remove_undefined(
-            title=self.title,
-            description=self.description,
-            url=self.url,
-            color=color,
-            timestamp=timestamp,
-            thumbnail=thumbnail,
-            footer=footer,
-            author=author,
-            image=image,
-            fields=fields,
+        return cast(
+            DiscordEmbed,
+            remove_undefined(
+                title=self.title,
+                description=self.description,
+                url=self.url,
+                color=color,
+                timestamp=timestamp,
+                thumbnail=thumbnail,
+                footer=footer,
+                author=author,
+                image=image,
+                fields=fields,
+            )
         )
