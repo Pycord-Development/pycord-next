@@ -26,20 +26,17 @@ from typing import TYPE_CHECKING, Any, Callable, TypeVar
 
 from aiohttp import BasicAuth
 
+from ..events.guilds import GuildDelete, GuildUpdate
+
 from ..api import HTTPClient
 from ..channel import Channel, GuildChannel, Thread, identify_channel
 from ..commands.application import ApplicationCommand
 from ..events import GuildCreate
 from ..events.event_manager import EventManager
 from ..events.other import Ready
-from ..guild import Guild
 from ..interaction import Interaction
-from ..member import Member
 from ..message import Message
-from ..role import Role
-from ..scheduled_event import ScheduledEvent
 from ..snowflake import Snowflake
-from ..stage_instance import StageInstance
 from ..ui import Component
 from ..ui.house import House
 from ..ui.text_input import Modal
@@ -52,6 +49,8 @@ T = TypeVar('T')
 BASE_EVENTS = [
     Ready,
     GuildCreate,
+    GuildUpdate,
+    GuildDelete
 ]
 
 if TYPE_CHECKING:
@@ -88,6 +87,7 @@ class State:
         self._component_custom_ids: list[str] = []
         self._components_via_custom_id: dict[str, Component] = {}
         self.modals: list[Modal] = []
+        self.cache_guild_members: bool = options.get('cache_guild_members', True)
 
     def sent_modal(self, modal: Modal) -> None:
         if modal not in self.modals:
@@ -124,200 +124,6 @@ class State:
             verbose=self.verbose,
         )
         self._clustered = clustered
-
-    # SECTION: guilds #
-    async def _process_guild_create(
-        self, _: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        guild = Guild(data, state=self)
-        channels: list[Channel] = [identify_channel(c, self) for c in data['channels']]
-        threads: list[Thread] = [identify_channel(c, self) for c in data['threads']]
-        stage_instances: list[StageInstance] = [
-            StageInstance(st, self) for st in data['stage_instances']
-        ]
-        guild_scheduled_events: list[ScheduledEvent] = [
-            ScheduledEvent(se, self) for se in data['guild_scheduled_events']
-        ]
-
-        await (self.store.sift('guilds')).insert([guild.id], guild.id, guild)
-
-        for channel in channels:
-            await (self.store.sift('channels')).insert([guild.id], channel.id, channel)
-
-        for thread in threads:
-            await (self.store.sift('threads')).insert(
-                [guild.id, thread.parent_id], thread.id, thread
-            )
-
-        for stage in stage_instances:
-            await (self.store.sift('stages')).insert(
-                [stage.channel_id, guild.id, stage.guild_scheduled_event_id],
-                stage.id,
-                stage,
-            )
-
-        for scheduled_event in guild_scheduled_events:
-            await (self.store.sift('scheduled_events')).insert(
-                [
-                    scheduled_event.channel_id,
-                    scheduled_event.creator_id,
-                    scheduled_event.entity_id,
-                    guild.id,
-                ],
-                scheduled_event.id,
-                scheduled_event,
-            )
-
-        if guild.id in self._available_guilds:
-            return (guild,), 'GUILD_AVAILABLE'
-        else:
-            return (guild,), 'GUILD_JOIN'
-
-    async def _process_guild_update(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        guild = Guild(data=data, state=self)
-        res = await (self.store.sift('guilds')).save([guild.id], guild.id, guild)
-
-        if res is None:
-            return (guild, None), event_type
-        else:
-            return (guild, res), event_type
-
-    async def _process_guild_delete(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        guild_id = Snowflake(data['guild_id'])
-        res = await (self.store.sift('guilds')).discard([guild_id], guild_id)
-
-        if res is None:
-            return (guild_id,), event_type
-        else:
-            return (res,), event_type
-
-    async def _process_guild_ban_add(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        guild_id: Snowflake = Snowflake(data['guild_id'])
-        res = await (self.store.sift('guilds')).get_without_parents(guild_id)
-
-        if res is None:
-            return (guild_id, User(data['user'], self)), event_type
-        else:
-            return (res[1], User(data['user'], self)), event_type
-
-    async def _process_guild_ban_remove(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        guild_id: Snowflake = Snowflake(data['guild_id'])
-        res = await (self.store.sift('guilds')).get_without_parents(guild_id)
-
-        if res is None:
-            return (guild_id, User(data['user'], self)), event_type
-        else:
-            return (res[1], User(data['user'], self)), event_type
-
-    async def _process_member_add(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        member = Member(data, self)
-        guild_id = Snowflake(data['guild_id'])
-        await (self.store.sift('members')).insert([guild_id], member.user.id, member)
-
-        return (member,), event_type
-
-    async def _process_guild_member_update(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        member = Member(data, self)
-        guild_id = Snowflake(data['guild_id'])
-
-        res = await (self.store.sift('members')).save(
-            [guild_id], member.user.id, member
-        )
-
-        if res:
-            return (member, guild_id, res), event_type
-        else:
-            return (member, guild_id, None), event_type
-
-    async def _process_guild_member_remove(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        guild_id: Snowflake = Snowflake(data['guild_id'])
-        member_id: Snowflake = Snowflake(data['user']['id'])
-
-        resg = await (self.store.sift('guilds')).get_without_parents(guild_id)
-        resm = await (self.store.sift('members')).discard([guild_id], member_id)
-
-        user = User(data['user'], self)
-
-        if resg:
-            return (resg[1], user, resm or member_id), event_type
-
-        elif resm:
-            return (guild_id, user, resm), event_type
-
-        return (guild_id, user, member_id), event_type
-
-    async def _process_guild_member_chunk(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        guild_id: Snowflake = Snowflake(data['guild_id'])
-        ms: list[Member] = [
-            await (self.store.sift('members')).save([guild_id], member.user.id, member)
-            for member in (Member(member_data, self) for member_data in data['members'])
-        ]
-
-        return (ms,), event_type
-
-    async def _process_guild_role_create(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        guild_id: Snowflake = Snowflake(data['guild_id'])
-        role = Role(data['role'], self)
-
-        await (self.store.sift('roles')).insert([guild_id], role.id, role)
-        guild = await (self.store.sift('guilds')).get_without_parents(guild_id)
-
-        if guild:
-            return (role, guild[1]), event_type
-        else:
-            return (role, guild_id), event_type
-
-    async def _process_guild_role_update(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        guild_id: Snowflake = Snowflake(data['guild_id'])
-        role = Role(data['role'], self)
-
-        resr = await (self.store.sift('roles')).save([guild_id], role.id, role)
-        resg = await (self.store.sift('guilds')).get_without_parents(guild_id)
-
-        if resr:
-            return (role, resr, resg[1] if resg else guild_id), event_type
-
-        elif resg:
-            return (role, None, resg[1]), event_type
-
-        return (role, None, guild_id), event_type
-
-    async def _process_guild_role_delete(
-        self, event_type: str, data: dict[str, Any]
-    ) -> tuple[tuple, str]:
-        guild_id: Snowflake = Snowflake(data['guild_id'])
-        role_id: Snowflake = Snowflake(data['role_id'])
-
-        resr = await (self.store.sift('roles')).discard([guild_id], role_id)
-        resg = await (self.store.sift('guilds')).get_without_parents(guild_id)
-
-        if resr:
-            return (resr, resg[1] if resg else guild_id), event_type
-
-        elif resg:
-            return (role_id, resg[1]), event_type
-
-        return (role_id, guild_id), event_type
 
     # SECTION: channels #
     # TODO: threads
@@ -484,18 +290,6 @@ class State:
         return (interaction,), 'INTERACTION'
 
     _events: dict[str, Callable] = {
-        'GUILD_CREATE': _process_guild_create,
-        'GUILD_UPDATE': _process_guild_update,
-        'GUILD_DELETE': _process_guild_delete,
-        'GUILD_BAN_ADD': _process_guild_ban_add,
-        'GUILD_BAN_REMOVE': _process_guild_ban_remove,
-        'GUILD_MEMBER_ADD': _process_member_add,
-        'GUILD_MEMBER_UPDATE': _process_guild_member_update,
-        'GUILD_MEMBER_REMOVE': _process_guild_member_remove,
-        'GUILD_MEMBERS_CHUNK': _process_guild_member_chunk,
-        'GUILD_ROLE_CREATE': _process_guild_role_create,
-        'GUILD_ROLE_UPDATE': _process_guild_role_update,
-        'GUILD_ROLE_DELETE': _process_guild_role_delete,
         'CHANNEL_CREATE': _process_channel_create,
         'CHANNEL_UPDATE': _process_channel_update,
         'CHANNEL_DELETE': _process_channel_delete,

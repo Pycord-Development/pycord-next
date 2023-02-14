@@ -80,13 +80,13 @@ A small code snippet of a basic Pycord v3 bot.
 ```py
 import pycord
 
-# If you want more interactivity with models and events, you'll want to add more intents
-bot = pycord.Bot(intents=pycord.Intents(guilds=True))
+
+bot = pycord.Bot(intents=pycord.Intents())
 
 
 @bot.listen()
-async def handle_new_guild(event: pycord.GuildAvailable) -> None:
-    print(f'  In Guild: {event.guild.name}')
+async def handle_new_guild(event: pycord.Ready) -> None:
+    print('I am ready!')
 
 
 bot.run('token')

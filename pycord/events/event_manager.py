@@ -35,9 +35,10 @@ T = TypeVar('T', bound='Event')
 
 class Event:
     _name: str
+    _state: 'State' | None = None
 
     async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
-        return False
+        return True
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         ...
@@ -85,6 +86,8 @@ class EventManager:
                     continue
                 else:
                     await eve._async_load(data, self._state)
+
+                eve._state = self._state
 
                 for func in funcs:
                     asyncio.create_task(func(eve))
