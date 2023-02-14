@@ -97,7 +97,7 @@ class GuildAvailable(GuildCreate):
 
 
 class GuildJoin(GuildCreate):
-    async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
+    async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
         exists = True if int(data['id']) in state._available_guilds else False
 
         if exists:
