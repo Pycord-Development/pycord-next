@@ -49,28 +49,28 @@ class Invite:
     def __init__(self, data: DiscordInvite, state: State) -> None:
         self.code: str = data['code']
         self.guild: Guild | UndefinedType = (
-            Guild(data['guild'], state) if data.get('guild') is not None else UNDEFINED
+            Guild(data['guild'], state) if data.get('guild') is not None else UNDEFINED  # type: ignore
         )
         self.channel: Channel | None = (
-            Channel(data['channel'], state) if data.get('channel') is not None else None
+            Channel(data['channel'], state) if data.get('channel') is not None else None  # type: ignore
         )
         self.inviter: User | UndefinedType = (
-            User(data['inviter'], state)
+            User(data['inviter'], state)  # type: ignore
             if data.get('inviter') is not None
             else UNDEFINED
         )
         self.target_type: int | UndefinedType = (
-            InviteTargetType(data['target_type'])
+            InviteTargetType(data['target_type'])  # type: ignore
             if data.get('target_type') is not None
             else UNDEFINED
         )
         self.target_user: User | UndefinedType = (
-            User(data['target_user'], state)
+            User(data['target_user'], state)  # type: ignore
             if data.get('target_user') is not None
             else UNDEFINED
         )
         self.target_application: Application | UndefinedType = (
-            Application(data['target_application'], state)
+            Application(data['target_application'], state)  # type: ignore
             if data.get('target_application') is not None
             else UNDEFINED
         )
@@ -81,12 +81,12 @@ class Invite:
             'approximate_member_count', UNDEFINED
         )
         self.expires_at: datetime | None = (
-            datetime.fromisoformat(data['expires_at'])
+            datetime.fromisoformat(data['expires_at'])  # type: ignore
             if data.get('expires_at') is not None
             else data.get('expires_at', UNDEFINED)
         )
         self.guild_scheduled_event: ScheduledEvent | UndefinedType = (
-            ScheduledEvent(data['guild_scheduled_event'], state)
+            ScheduledEvent(data['guild_scheduled_event'], state)  # type: ignore
             if data.get('guild_scheduled_event') is not None
             else UNDEFINED
         )

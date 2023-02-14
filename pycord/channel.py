@@ -61,7 +61,7 @@ class ThreadMetadata:
         self.locked: bool = metadata['locked']
         self.invitable: bool | UndefinedType = metadata.get('invitable', UNDEFINED)
         self.create_timestamp: datetime | UndefinedType = (
-            datetime.fromisoformat(metadata.get('create_timestamp'))
+            datetime.fromisoformat(metadata.get('create_timestamp'))  # type: ignore
             if metadata.get('create_timestamp') is not None
             else UNDEFINED
         )
@@ -69,11 +69,11 @@ class ThreadMetadata:
 
 class ThreadMember:
     def __init__(self, member: DiscordThreadMember) -> None:
-        self._id: str | None = member.get('id')
+        self._id: str | None = member.get('id')  # type: ignore
         self.id: Snowflake | UndefinedType = (
             Snowflake(self._id) if self._id is not None else UNDEFINED
         )
-        self._user_id: str | None = member.get('user_id')
+        self._user_id: str | None = member.get('user_id')  # type: ignore
         self.user_id: Snowflake | UndefinedType = (
             Snowflake(self._user_id) if self._user_id is not None else UNDEFINED
         )
@@ -86,7 +86,7 @@ class ForumTag:
         self.id: Snowflake = Snowflake(tag['id'])
         self.name: str = tag['name']
         self.moderated: bool = tag['moderated']
-        self.emoji_id: Snowflake = tag['emoji_id']
+        self.emoji_id: Snowflake = tag['emoji_id']  # type: ignore
         self.emoji_name: str | None = tag['emoji_name']
 
 
@@ -104,9 +104,9 @@ class Channel:
         self._state = state
         self.id: Snowflake = Snowflake(data['id'])
         self.type: ChannelType = ChannelType(data['type'])
-        self.name: str | UndefinedType = data.get('name', UNDEFINED)
+        self.name: str | UndefinedType = data.get('name', UNDEFINED)  # type: ignore
         self.flags: ChannelFlags | UndefinedType = (
-            ChannelFlags.from_value(data['flags'])
+            ChannelFlags.from_value(data['flags'])  # type: ignore
             if data.get('flags') is not None
             else UNDEFINED
         )
@@ -116,23 +116,23 @@ class GuildChannel(Channel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.guild_id: Snowflake | UndefinedType = (
-            Snowflake(data['guild_id'])
+            Snowflake(data['guild_id'])  # type: ignore
             if data.get('guild_id') is not None
             else UNDEFINED
         )
-        self.position: int | UndefinedType = data.get('position', UNDEFINED)
+        self.position: int | UndefinedType = data.get('position', UNDEFINED)  # type: ignore
         self.permission_overwrites: list[_Overwrite] = [
             _Overwrite(d) for d in data.get('permission_overwrites', [])
         ]
         self.topic: str | None | UndefinedType = data.get('topic', UNDEFINED)
         self.nsfw: bool | UndefinedType = data.get('nsfw', UNDEFINED)
         self.permissions: Permissions | UndefinedType = (
-            Permissions.from_value(data['permissions'])
+            Permissions.from_value(data['permissions'])  # type: ignore
             if data.get('permissions') is not None
             else UNDEFINED
         )
         self.parent_id: Snowflake | UndefinedType = (
-            Snowflake(data['parent_id'])
+            Snowflake(data['parent_id'])  # type: ignore
             if data.get('parent_id') is not None
             else data.get('parent_id', UNDEFINED)
         )
@@ -148,12 +148,12 @@ class MessageableChannel(Channel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.last_message_id: int | None = (
-            Snowflake(data['last_message_id'])
+            Snowflake(data['last_message_id'])  # type: ignore
             if data.get('last_message_id') is not None
             else None
         )
         self.last_pin_timestamp: None | datetime | UndefinedType = (
-            datetime.fromisoformat(data['last_pin_timestamp'])
+            datetime.fromisoformat(data['last_pin_timestamp'])  # type: ignore
             if data.get('last_pin_timestamp') is not None
             else data.get('last_pin_timestamp', UNDEFINED)
         )
@@ -176,12 +176,12 @@ class MessageableChannel(Channel):
             if len(houses) > 5:
                 raise ComponentException('Cannot have over five houses at once')
 
-            components = [(house.action_row())._to_dict() for house in houses]
+            components = [(house.action_row())._to_dict() for house in houses]  # type: ignore
 
             for house in houses:
                 self._state.sent_house(house)
         elif house:
-            components = [(house.action_row())._to_dict()]
+            components = [(house.action_row())._to_dict()]  # type: ignore
             self._state.sent_house(house)
         else:
             components = UNDEFINED
@@ -194,16 +194,16 @@ class MessageableChannel(Channel):
             embeds=embeds,
             sticker_ids=sticker_ids,
             flags=flags,
-            components=components,
+            components=components,  # type: ignore
         )
 
 
 class AudioChannel(GuildChannel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
-        self.rtc_region: str | UndefinedType = data.get('rtc_region', UNDEFINED)
+        self.rtc_region: str | UndefinedType = data.get('rtc_region', UNDEFINED)  # type: ignore
         self.video_quality_mode: VideoQualityMode | UndefinedType = (
-            VideoQualityMode(data['video_quality_mode'])
+            VideoQualityMode(data['video_quality_mode'])  # type: ignore
             if data.get('video_quality_mode') is not None
             else UNDEFINED
         )
@@ -239,16 +239,16 @@ class Thread(MessageableChannel, GuildChannel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.default_thread_rate_limit_per_user: int | UndefinedType = data.get(
-            'default_thread_rate_limit_per_user', UndefinedType
+            'default_thread_rate_limit_per_user', UndefinedType  # type: ignore
         )
         self.message_count: int | UndefinedType = data.get('message_count', UNDEFINED)
         self.thread_metadata: ThreadMetadata | UndefinedType = (
-            ThreadMetadata(data['thread_metadata'])
+            ThreadMetadata(data['thread_metadata'])  # type: ignore
             if data.get('thread_metadata') is not None
             else UNDEFINED
         )
         self.owner_id: Snowflake | UndefinedType = (
-            Snowflake(data['owner_id'])
+            Snowflake(data['owner_id'])  # type: ignore
             if data.get('owner_id') is not None
             else UNDEFINED
         )
@@ -266,10 +266,10 @@ class ForumChannel(Channel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.default_sort_order: int | None | UndefinedType = data.get(
-            'default_sort_order', UndefinedType
+            'default_sort_order', UndefinedType  # type: ignore
         )
         self.default_reaction_emoji: DefaultReaction | UndefinedType = (
-            DefaultReaction(data['default_reaction_emoji'])
+            DefaultReaction(data['default_reaction_emoji'])  # type: ignore
             if data.get('default_reaction_emoji') is not None
             else UNDEFINED
         )
@@ -300,24 +300,24 @@ def identify_channel(data: dict[str, Any], state: State) -> CHANNEL_TYPE:
     type = data['type']
 
     if type == 0:
-        return TextChannel(data, state)
+        return TextChannel(data, state)  # type: ignore
     elif type == 1:
-        return DMChannel(data, state)
+        return DMChannel(data, state)  # type: ignore
     elif type == 2:
-        return VoiceChannel(data, state)
+        return VoiceChannel(data, state)  # type: ignore
     elif type == 4:
-        return CategoryChannel(data, state)
+        return CategoryChannel(data, state)  # type: ignore
     elif type == 5:
-        return AnnouncementChannel(data, state)
+        return AnnouncementChannel(data, state)  # type: ignore
     elif type == 10:
-        return AnnouncementThread(data, state)
+        return AnnouncementThread(data, state)  # type: ignore
     elif type in (11, 12):
-        return Thread(data, state)
+        return Thread(data, state)  # type: ignore
     elif type == 13:
-        return StageChannel(data, state)
+        return StageChannel(data, state)  # type: ignore
     elif type == 14:
-        return DirectoryChannel(data, state)
+        return DirectoryChannel(data, state)  # type: ignore
     elif type == 15:
-        return ForumChannel(data, state)
+        return ForumChannel(data, state)  # type: ignore
     else:
-        return Channel(data, state)
+        return Channel(data, state)  # type: ignore

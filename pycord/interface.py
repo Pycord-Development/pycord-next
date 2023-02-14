@@ -28,6 +28,7 @@ import string
 import sys
 import time
 import warnings
+from typing import Any
 
 import colorlog
 
@@ -50,7 +51,7 @@ day_prefixes: dict[int, str] = {
 }
 
 
-def start_logging(flavor: None | int | str | dict, debug: bool = False):
+def start_logging(flavor: None | int | str | dict, debug: bool = False):  # type: ignore
     if len(logging.root.handlers) != 0:
         return  # the user is most likely using logging.basicConfig, or is being spearheaded by something else.
 
@@ -58,9 +59,9 @@ def start_logging(flavor: None | int | str | dict, debug: bool = False):
         flavor = logging.DEBUG if debug else logging.INFO
 
     if isinstance(flavor, dict):
-        logging.config.dictConfig(flavor)
+        logging.config.dictConfig(flavor)  # type: ignore
 
-        if flavor.get('handler'):
+        if flavor.get('handler'):  # type: ignore
             return
 
         flavor = None
@@ -69,7 +70,7 @@ def start_logging(flavor: None | int | str | dict, debug: bool = False):
     logging.logThreads = None
     logging.logProcesses = None
 
-    colorlog.basicConfig(
+    colorlog.basicConfig(  # type: ignore
         level=flavor,
         format='%(log_color)s%(bold)s%(levelname)-1.1s%(thin)s %(asctime)23.23s %(bold)s%(name)s: '
         '%(thin)s%(message)s%(reset)s',
@@ -95,7 +96,7 @@ def print_banner(
     concurrency: int,
     shard_count: int,
     bot_name: str = 'Your bot',
-    module: str | None = 'pycord',
+    module: str = 'pycord',
 ):
     banners = importlib.resources.files(module)
 
@@ -107,7 +108,7 @@ def print_banner(
 
     today = datetime.date.today()
 
-    args = {
+    args: dict[str, Any] = {
         'copyright': __copyright__,
         'version': __version__,
         'license': __license__,
@@ -122,9 +123,9 @@ def print_banner(
         'shardcount': shard_count,
         'sp': '' if shard_count == 1 else 's',
     }
-    args |= colorlog.escape_codes.escape_codes
+    args |= colorlog.escape_codes.escape_codes  # type: ignore
 
-    sys.stdout.write(string.Template(banner).safe_substitute(args))
-    sys.stdout.write(string.Template(info_banner).safe_substitute(args))
+    sys.stdout.write(string.Template(banner).safe_substitute(args))  # type: ignore
+    sys.stdout.write(string.Template(info_banner).safe_substitute(args))  # type: ignore
     sys.stdout.flush()
     time.sleep(0.162)  # sleep for a bit to prevent overfill.

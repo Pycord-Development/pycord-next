@@ -69,10 +69,10 @@ class Store:
                 return old_data
         else:
             if self.max_items and len(self._store) == self.max_items:
-                self._store = {} # type: ignore
+                self._store = {}  # type: ignore
 
             store = _stored(set(parents), id, data)
-            self._store.add(store) # type: ignore
+            self._store.add(store)  # type: ignore
 
     async def discard(
         self, parents: list[Any], id: Any, type: Type[T] | T = Any
@@ -82,7 +82,7 @@ class Store:
         for store in self._store:
             if store.parents & ps or store.id == id:
                 self._store.remove(store)
-                return store # type: ignore
+                return store  # type: ignore
 
     async def get_all(self):
         for store in self._store:

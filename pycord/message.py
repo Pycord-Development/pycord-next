@@ -67,10 +67,10 @@ class ChannelMention:
 
 
 class Reaction:
-    def __init__(self, data: DiscordReaction) -> None:
+    def __init__(self, data: DiscordReaction, state: 'State') -> None:
         self.count: int = data['count']
         self.me: bool = data['me']
-        self.emoji: Emoji = Emoji(data['emoji'])
+        self.emoji: Emoji = Emoji(data['emoji'], state)
 
 
 class MessageActivity:
@@ -82,17 +82,17 @@ class MessageActivity:
 class MessageReference:
     def __init__(self, data: DiscordMessageReference) -> None:
         self.message_id: Snowflake | UndefinedType = (
-            Snowflake(data.get('message_id'))
+            Snowflake(data.get('message_id'))  # type: ignore
             if data.get('message_id') is not None
             else UNDEFINED
         )
         self.channel_id: Snowflake | UndefinedType = (
-            Snowflake(data.get('channel_id'))
+            Snowflake(data.get('channel_id'))  # type: ignore
             if data.get('channel_id') is not None
             else UNDEFINED
         )
         self.guild_id: Snowflake | UndefinedType = (
-            Snowflake(data.get('guild_id'))
+            Snowflake(data.get('guild_id'))  # type: ignore
             if data.get('guild_id') is not None
             else UNDEFINED
         )
@@ -108,7 +108,7 @@ class MessageInteraction:
         self.name: str = data['name']
         self.user: User = User(data['user'], state)
         self.member: Member | UndefinedType = (
-            Member(data.get('member'), state)
+            Member(data.get('member'), state)  # type: ignore
             if data.get('member') is not None
             else UNDEFINED
         )
@@ -119,8 +119,8 @@ class Message:
         self._state = state
         self.id: Snowflake = Snowflake(data['id'])
         self.channel_id: Snowflake = Snowflake(data['channel_id'])
-        self.author: User = User(data['author'], state=state)
-        self.content: str = data['content']
+        self.author: User = User(data['author'], state=state)  # type: ignore
+        self.content: str = data['content']  # type: ignore
         self.timestamp: datetime = datetime.fromisoformat(data['timestamp'])
         self.edited_timestamp: datetime | None = (
             datetime.fromisoformat(data['edited_timestamp'])
@@ -130,7 +130,7 @@ class Message:
         self.tts: bool = data['tts']
         self.mentions: list[User] = [User(d, state) for d in data['mentions']]
         self.mention_roles: list[Snowflake] = [
-            Snowflake(i) for i in data['mention_roles']
+            Snowflake(i) for i in data['mention_roles']  # type: ignore
         ]
         self.mention_channels: list[ChannelMention] = [
             ChannelMention(d) for d in data.get('mention_channels', [])
@@ -138,55 +138,55 @@ class Message:
         self.attachments: list[Attachment] = [
             Attachment(a, state) for a in data['attachments']
         ]
-        self.embeds: list[Embed] = [Embed._from_data(e) for e in data['embeds']]
+        self.embeds: list[Embed] = [Embed._from_data(e) for e in data['embeds']]  # type: ignore
         self.reactions: list[Reaction] = [
-            Reaction(r) for r in data.get('reactions', [])
+            Reaction(r, state) for r in data.get('reactions', [])
         ]
         self.nonce: UndefinedType | int | str = data.get('nonce', UNDEFINED)
         self.pinned: bool = data['pinned']
         self.webhook_id: Snowflake = (
-            Snowflake(data.get('webhook_id'))
-            if data.get('webhook_id') is not None
+            Snowflake(data.get('webhook_id'))  # type: ignore
+            if data.get('webhook_id') is not None  # type: ignore
             else UNDEFINED
         )
         self.type: MessageType = MessageType(data['type'])
         self.activity: MessageActivity | UndefinedType = (
-            MessageActivity(data.get('activity'))
+            MessageActivity(data.get('activity'))  # type: ignore
             if data.get('activity') is not None
             else UNDEFINED
         )
         self.application: Application | UndefinedType = (
-            Application(data.get('application'))
+            Application(data.get('application'))  # type: ignore
             if data.get('application') is not None
             else UNDEFINED
         )
         self.application_id: Snowflake | UndefinedType = (
-            Snowflake(data.get('application_id'))
+            Snowflake(data.get('application_id'))  # type: ignore
             if data.get('application_id') is not None
             else UNDEFINED
         )
         self.reference: MessageReference | UndefinedType = (
-            MessageReference(data.get('message_reference'))
+            MessageReference(data.get('message_reference'))  # type: ignore
             if data.get('message_reference') is not None
             else UNDEFINED
         )
         self.flags: MessageFlags | UndefinedType = (
-            MessageFlags.from_value(data.get('flags'))
+            MessageFlags.from_value(data.get('flags'))  # type: ignore
             if data.get('flags') is not None
             else UNDEFINED
         )
         self.referenced_message: Message | UndefinedType = (
-            Message(data.get('referenced_message'), state)
+            Message(data.get('referenced_message'), state)  # type: ignore
             if data.get('referenced_message') is not None
             else UNDEFINED
         )
         self.interaction: MessageInteraction | UndefinedType = (
-            MessageInteraction(data.get('interaction'), state)
+            MessageInteraction(data.get('interaction'), state)  # type: ignore
             if data.get('interaction') is not None
             else UNDEFINED
         )
         self.thread: Thread | UndefinedType = (
-            Thread(data.get('thread'), state=state)
+            Thread(data.get('thread'), state=state)  # type: ignore
             if data.get('thread') is not None
             else UNDEFINED
         )
@@ -195,8 +195,8 @@ class Message:
         self.sticker_items: list[StickerItem] = [
             StickerItem(si) for si in data.get('sticker_items', [])
         ]
-        self.stickers: list[Sticker] = [Sticker(s) for s in data.get('stickers', [])]
-        self.position: UndefinedType | int = data.get('position', UndefinedType)
+        self.stickers: list[Sticker] = [Sticker(s) for s in data.get('stickers', [])]  # type: ignore
+        self.position: UndefinedType | int = data.get('position', UndefinedType)  # type: ignore
         asyncio.create_task(self._retreive_channel())
 
     async def _retreive_channel(self) -> None:
@@ -205,10 +205,10 @@ class Message:
         )
 
         if exists:
-            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = exists[
+            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | None = exists[
                 1
             ]
         else:
-            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = (
+            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | None = (
                 None
             )

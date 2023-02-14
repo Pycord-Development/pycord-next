@@ -25,7 +25,7 @@ from ..channel import CHANNEL_TYPE, identify_channel
 from ..message import Message
 from ..snowflake import Snowflake
 from .event_manager import Event
-from .guilds import _GuildAttr # type: ignore
+from .guilds import _GuildAttr  # type: ignore
 
 if TYPE_CHECKING:
     from ..state import State
@@ -37,8 +37,8 @@ class ChannelCreate(Event):
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         channel = identify_channel(data, state)
 
-        deps = [channel.guild_id] if hasattr(channel, 'guild_id') else [] # type: ignore
-        await (state.store.sift('channels')).save(deps, channel.id, channel) # type: ignore
+        deps = [channel.guild_id] if hasattr(channel, 'guild_id') else []  # type: ignore
+        await (state.store.sift('channels')).save(deps, channel.id, channel)  # type: ignore
         self.channel = channel
 
 
@@ -48,9 +48,9 @@ class ChannelUpdate(Event):
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         channel = identify_channel(data, state)
 
-        deps = [channel.guild_id] if hasattr(channel, 'guild_id') else [] # type: ignore
-        self.previous: CHANNEL_TYPE = await (state.store.sift('channels')).save( # type: ignore
-            deps, channel.id, channel # type: ignore
+        deps = [channel.guild_id] if hasattr(channel, 'guild_id') else []  # type: ignore
+        self.previous: CHANNEL_TYPE = await (state.store.sift('channels')).save(  # type: ignore
+            deps, channel.id, channel  # type: ignore
         )
         self.channel = channel
 
@@ -61,8 +61,8 @@ class ChannelDelete(Event):
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         channel = identify_channel(data, state)
 
-        deps = [channel.guild_id] if hasattr(channel, 'guild_id') else [] # type: ignore
-        res = await (state.store.sift('channels')).discard(deps, channel.id) # type: ignore
+        deps = [channel.guild_id] if hasattr(channel, 'guild_id') else []  # type: ignore
+        res = await (state.store.sift('channels')).discard(deps, channel.id)  # type: ignore
 
         self.cached = res
         self.channel = channel
@@ -72,8 +72,8 @@ class ChannelPinsUpdate(_GuildAttr):
     _name = 'CHANNEL_PINS_UPDATE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        self.channel_id: Snowflake = Snowflake(data.get('channel_id')) # type: ignore
-        self.guild_id: Snowflake = Snowflake(data.get('guild_id')) # type: ignore
+        self.channel_id: Snowflake = Snowflake(data.get('channel_id'))  # type: ignore
+        self.guild_id: Snowflake = Snowflake(data.get('guild_id'))  # type: ignore
 
 
 PinsUpdate = ChannelPinsUpdate
@@ -83,7 +83,7 @@ class MessageCreate(Event):
     _name = 'MESSAGE_CREATE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        message = Message(data, state) # type: ignore
+        message = Message(data, state)  # type: ignore
 
         await (state.store.sift('messages')).save(
             [message.channel_id], message.id, message
@@ -94,9 +94,9 @@ class MessageUpdate(Event):
     _name = 'MESSAGE_UPDATE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        message = Message(data, state) # type: ignore
+        message = Message(data, state)  # type: ignore
 
-        self.previous: Message = await (state.store.sift('messages')).save( # type: ignore
+        self.previous: Message = await (state.store.sift('messages')).save(  # type: ignore
             [message.channel_id], message.id, message
         )
         self.message = message
@@ -109,7 +109,7 @@ class MessageDelete(Event):
         self.message_id = Snowflake('id')
         self.channel_id = Snowflake('channel_id')
 
-        self.message: Message = await (state.store.sift('messages')).discard( # type: ignore
+        self.message: Message = await (state.store.sift('messages')).discard(  # type: ignore
             [self.channel_id], self.message_id
         )
 

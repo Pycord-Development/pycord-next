@@ -135,7 +135,7 @@ class AuditLogEntry:
             Snowflake(data['target_id']) if data['target_id'] is not None else UNDEFINED
         )
         self._changes: list[AuditLogChange] = [
-            AuditLogChange(change) for change in data.get('changes', [])
+            AuditLogChange(change) for change in data.get('changes', [])  # type: ignore
         ]
         self.user_id: Snowflake | UndefinedType = (
             Snowflake(data['user_id']) if data['user_id'] is not None else UNDEFINED
@@ -144,7 +144,7 @@ class AuditLogEntry:
         self.id: Snowflake = Snowflake(data['id'])
         self.action_type: AuditLogEvent = AuditLogEvent(data['action_type'])
         self.options: OptionalAuditEntryInfo | UndefinedType = (
-            OptionalAuditEntryInfo(data['options'])
+            OptionalAuditEntryInfo(data['options'])  # type: ignore
             if data.get('options') is not None
             else UNDEFINED
         )
@@ -180,7 +180,7 @@ class AuditLog:
             ScheduledEvent(event, state) for event in data['guild_scheduled_events']
         ]
         self.integrations: list[Integration] = [
-            Integration(i) for i in data.get('integrations', [])
+            Integration(i) for i in data.get('integrations', [])  # type: ignore
         ]
         self.threads: list[Thread] = [
             Thread(thread, state) for thread in data['threads']

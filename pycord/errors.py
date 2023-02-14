@@ -74,7 +74,7 @@ class HTTPException(PycordException):
             else:
                 message = self.error_message
 
-        super().__init__(f'{resp.status} {resp.reason} (code: {self.code}): {message}')
+        super().__init__(f'{resp.status} {resp.reason} (code: {self.code}): {message}')  # type: ignore
 
 
 class Forbidden(HTTPException):

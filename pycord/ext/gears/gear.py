@@ -80,12 +80,12 @@ class Gear(Generic[ContextT]):
 
         def wrapper(func: T) -> T:
             if self._listener_functions.get(name):
-                self._listener_functions[name].append(func) # type: ignore
+                self._listener_functions[name].append(func)  # type: ignore
             else:
-                self._listener_functions[name] = [func] # type: ignore
+                self._listener_functions[name] = [func]  # type: ignore
             return func
 
-        return wrapper # type: ignore
+        return wrapper  # type: ignore
 
     def command(self, name: str, cls: Type[T], **kwargs: Any) -> T:
         """
@@ -102,11 +102,11 @@ class Gear(Generic[ContextT]):
         """
 
         def wrapper(func: AsyncFunc) -> T:
-            command = cls(func, name, None, **kwargs) # type: ignore
-            self._commands.append(command) # type: ignore
+            command = cls(func, name, None, **kwargs)  # type: ignore
+            self._commands.append(command)  # type: ignore
             return command
 
-        return wrapper # type: ignore
+        return wrapper  # type: ignore
 
     def group(self, name: str, cls: Type[T], **kwargs: Any) -> T:
         """
@@ -124,10 +124,10 @@ class Gear(Generic[ContextT]):
 
         def wrapper(func: AsyncFunc) -> T:
             r = cls(func, name, None, **kwargs)
-            self._commands.append(r) # type: ignore
+            self._commands.append(r)  # type: ignore
             return r
 
-        return wrapper # type: ignore
+        return wrapper  # type: ignore
 
     def attach(self, bot: Bot) -> None:
         """
@@ -142,15 +142,15 @@ class Gear(Generic[ContextT]):
 
         for name, funcs in self._listener_functions.items():
             for func in funcs:
-                bot._state.emitter.add_listener(name, func) # type: ignore
+                bot._state.emitter.add_listener(name, func)  # type: ignore
 
         for cmd in self._commands:
             if isinstance(cmd, Command):
-                cmd._state = bot._state # type: ignore
-                cmd._state.commands.append(cmd) # type: ignore
-            elif isinstance(cmd, Group): # type: ignore
-                cmd._state = bot._state # type: ignore
+                cmd._state = bot._state  # type: ignore
+                cmd._state.commands.append(cmd)  # type: ignore
+            elif isinstance(cmd, Group):  # type: ignore
+                cmd._state = bot._state  # type: ignore
 
         self.bot = bot
 
-        self.bot._state.gears.append(self) # type: ignore
+        self.bot._state.gears.append(self)  # type: ignore

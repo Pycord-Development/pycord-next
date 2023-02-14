@@ -62,7 +62,7 @@ class Interaction:
         self._state = state
         if response:
             self.response = InteractionResponse(self)
-        self.id = Snowflake(data['id'])
+        self.id = Snowflake(data['id'])  # type: ignore
         self.application_id = Snowflake(data['application_id'])
         self.type = data['type']
         self.data: INTERACTION_DATA | UndefinedType = data.get('data', UNDEFINED)
@@ -96,22 +96,22 @@ class Interaction:
 
         # app command data
         if self.type == 2:
-            self.command_id = Snowflake(self.data['id'])
-            self.name = self.data['name']
-            self.application_command_type = self.data['type']
+            self.command_id = Snowflake(self.data['id'])  # type: ignore
+            self.name = self.data['name']  # type: ignore
+            self.application_command_type = self.data['type']  # type: ignore
             self.resolved = self.data.get('resolved')
             self.options = [
-                InteractionOption(**option) for option in self.data.get('options', [])
+                InteractionOption(**option) for option in self.data.get('options', [])  # type: ignore
             ]
             self.guild_id = (
-                Snowflake(data.get('guild_id'))
+                Snowflake(data.get('guild_id'))  # type: ignore
                 if data.get('guild_id') is not None
                 else UNDEFINED
             )
         elif self.type == 3:
-            self.custom_id = self.data['custom_id']
-            self.component_type = self.data['component_type']
-            self.values = self.data.get('values', UNDEFINED)
+            self.custom_id = self.data['custom_id']  # type: ignore
+            self.component_type = self.data['component_type']  # type: ignore
+            self.values = self.data.get('values', UNDEFINED)  # type: ignore
 
     @property
     def resp(self) -> InteractionResponse:
@@ -141,13 +141,13 @@ class InteractionResponse:
         if isinstance(flags, MessageFlags):
             flags = flags.as_bit
 
-        await self._parent._state.http.create_interaction_response(
+        await self._parent._state.http.create_interaction_response(  # type: ignore
             self._parent.id,
             self._parent.token,
             {
                 'type': 4,
                 'data': {
-                    'content': content,
+                    'content': content,  # type: ignore
                     'tts': tts,
                     'embeds': embeds,
                     'flags': flags,
@@ -160,8 +160,8 @@ class InteractionResponse:
         if self._deferred:
             raise InteractionException('This interaction has already been deferred')
 
-        await self._parent._state.http.create_interaction_response(
-            self._parent.id, self._parent.token, {'type': 5}
+        await self._parent._state.http.create_interaction_response(  # type: ignore
+            self._parent.id, self._parent.token, {'type': 5}  # type: ignore
         )
 
         self._deferred = True
@@ -170,8 +170,8 @@ class InteractionResponse:
         if self.responded:
             raise InteractionException('This interaction has already been responded to')
 
-        await self._parent._state.http.create_interaction_response(
-            self._parent.id, self._parent.token, {'type': 9, 'data': modal._to_dict()}
+        await self._parent._state.http.create_interaction_response(  # type: ignore
+            self._parent.id, self._parent.token, {'type': 9, 'data': modal._to_dict()}  # type: ignore
         )
-        self._parent._state.sent_modal(modal)
+        self._parent._state.sent_modal(modal)  # type: ignore
         self.responded = True

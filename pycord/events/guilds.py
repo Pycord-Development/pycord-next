@@ -56,11 +56,11 @@ class GuildCreate(Event):
     _name = 'GUILD_CREATE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        self.guild = Guild(data, state=state) # type: ignore
+        self.guild = Guild(data, state=state)  # type: ignore
         self.channels: list[Channel] = [
             identify_channel(c, state) for c in data['channels']
         ]
-        self.threads: list[Thread] = [ # type: ignore
+        self.threads: list[Thread] = [  # type: ignore
             identify_channel(c, state) for c in data['threads']
         ]
         self.stage_instances: list[StageInstance] = [
@@ -81,7 +81,7 @@ class GuildCreate(Event):
 
         for thread in self.threads:
             await (state.store.sift('threads')).save(
-                [self.guild.id, thread.parent_id], thread.id, thread # type: ignore
+                [self.guild.id, thread.parent_id], thread.id, thread  # type: ignore
             )
 
         for stage in self.stage_instances:
@@ -110,17 +110,17 @@ class GuildAvailable(GuildCreate):
     """
 
     async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
-        return True if int(data['id']) in state._available_guilds else False # type: ignore
+        return True if int(data['id']) in state._available_guilds else False  # type: ignore
 
 
 class GuildJoin(GuildCreate):
     async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
-        exists = True if int(data['id']) in state._available_guilds else False # type: ignore
+        exists = True if int(data['id']) in state._available_guilds else False  # type: ignore
 
         if exists:
             return False
 
-        state._available_guilds.append(int(data['id'])) # type: ignore
+        state._available_guilds.append(int(data['id']))  # type: ignore
         return True
 
 
@@ -128,7 +128,7 @@ class GuildUpdate(Event):
     _name = 'GUILD_UPDATE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        guild = Guild(data=data, state=state) # type: ignore
+        guild = Guild(data=data, state=state)  # type: ignore
         res = await (state.store.sift('guilds')).save([guild.id], guild.id, guild)
 
         self.previous = res
@@ -139,7 +139,7 @@ class GuildUpdate(Event):
 class GuildDelete(Event):
     _name = 'GUILD_DELETE'
 
-    async def _is_publishable(self, data: dict[str, Any], _state: 'State') -> bool: # type: ignore
+    async def _is_publishable(self, data: dict[str, Any], _state: 'State') -> bool:  # type: ignore
         if data.get('unavailable', None) is not None:
             return True
         else:
@@ -160,7 +160,7 @@ class GuildBanCreate(_GuildAttr):
         guild_id: Snowflake = Snowflake(data['guild_id'])
 
         self.guild_id = guild_id
-        self.user = User(data['user']) # type: ignore
+        self.user = User(data['user'])  # type: ignore
 
 
 GuildBanAdd = GuildBanCreate
@@ -174,7 +174,7 @@ class GuildBanDelete(_GuildAttr):
         guild_id: Snowflake = Snowflake(data['guild_id'])
 
         self.guild_id = guild_id
-        self.user = User(data['user']) # type: ignore
+        self.user = User(data['user'])  # type: ignore
 
 
 BanDelete = GuildBanDelete
@@ -184,11 +184,11 @@ class GuildMemberAdd(_GuildAttr):
     _name = 'GUILD_MEMBER_ADD'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        member = Member(data, state) # type: ignore
+        member = Member(data, state)  # type: ignore
         guild_id = Snowflake(data['guild_id'])
         if state.cache_guild_members:
             await (state.store.sift('members')).insert(
-                [guild_id], member.user.id, member # type: ignore
+                [guild_id], member.user.id, member  # type: ignore
             )
 
         self.guild_id = guild_id
@@ -202,11 +202,11 @@ class GuildMemberUpdate(_GuildAttr):
     _name = 'GUILD_MEMBER_UPDATE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        member = Member(data, state) # type: ignore
+        member = Member(data, state)  # type: ignore
         guild_id = Snowflake(data['guild_id'])
 
         res = await (state.store.sift('members')).save(
-            [guild_id], member.user.id, member # type: ignore
+            [guild_id], member.user.id, member  # type: ignore
         )
 
         self.member: Member | None = res
@@ -235,13 +235,13 @@ MemberRemove = GuildMemberRemove
 class GuildMemberChunk(Event):
     _name = 'GUILD_MEMBER_CHUNK'
 
-    async def _is_publishable(self, _data: dict[str, Any], _state: 'State') -> bool: # type: ignore
+    async def _is_publishable(self, _data: dict[str, Any], _state: 'State') -> bool:  # type: ignore
         return False
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         guild_id: Snowflake = Snowflake(data['guild_id'])
         ms: list[Member | None] = [
-            await (state.store.sift('members')).save([guild_id], member.user.id, member) # type: ignore
+            await (state.store.sift('members')).save([guild_id], member.user.id, member)  # type: ignore
             for member in (
                 Member(member_data, state) for member_data in data['members']
             )

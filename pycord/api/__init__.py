@@ -64,7 +64,7 @@ class HTTPClient(ApplicationCommands, Messages):
         self,
         method: str,
         route: BaseRoute,
-        data: dict[str, Any] | None = None, # type: ignore
+        data: dict[str, Any] | None = None,  # type: ignore
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,
@@ -92,7 +92,7 @@ class HTTPClient(ApplicationCommands, Messages):
                 await executer.wait()
 
         for _ in range(5):
-            r = await self._session.request( # type: ignore
+            r = await self._session.request(  # type: ignore
                 method,
                 endpoint,
                 data=data,
@@ -103,7 +103,7 @@ class HTTPClient(ApplicationCommands, Messages):
             )
             _log.debug(f'Received back {await r.text()}')
 
-            ddata: dict[str, Any] = await utils._text_or_json(cr=r, self=self) # type: ignore
+            ddata: dict[str, Any] = await utils._text_or_json(cr=r, self=self)  # type: ignore
 
             if r.status == 429:
                 _log.debug(f'Request to {endpoint} failed: Request returned rate limit')
@@ -111,7 +111,7 @@ class HTTPClient(ApplicationCommands, Messages):
 
                 self._executers.append(executer)
                 await executer.executed(
-                    reset_after=ddata['retry_after'], # type: ignore
+                    reset_after=ddata['retry_after'],  # type: ignore
                     is_global=r.headers.get('X-RateLimit-Scope') == 'global',
                     limit=int(r.headers.get('X-RateLimit-Limit', 10)),
                 )
@@ -130,7 +130,7 @@ class HTTPClient(ApplicationCommands, Messages):
                 if self.verbose:
                     raise BotException(r, data)
                 else:
-                    raise HTTPException(resp=r, data=data) # type: ignore
+                    raise HTTPException(resp=r, data=data)  # type: ignore
 
     async def get_gateway_bot(self) -> dict[str, Any]:
-        return await self.request('GET', Route('/gateway/bot')) # type: ignore
+        return await self.request('GET', Route('/gateway/bot'))  # type: ignore

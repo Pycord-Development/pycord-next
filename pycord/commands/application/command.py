@@ -53,8 +53,8 @@ async def _autocomplete(
 ) -> list[dict[str, Any]]:
     string = str(string).lower()
     return [
-        choice._to_dict() # type: ignore
-        for choice in option._choices # type: ignore
+        choice._to_dict()  # type: ignore
+        for choice in option._choices  # type: ignore
         if string in str(choice.value).lower()
     ]
 
@@ -163,7 +163,7 @@ class Option:
                 self._choices = []
         else:
             if choices:
-                self.choices = [choice._to_dict() for choice in choices] # type: ignore
+                self.choices = [choice._to_dict() for choice in choices]  # type: ignore
         if options is UNDEFINED:
             self.options = []
         else:
@@ -177,13 +177,13 @@ class Option:
         if TYPE_CHECKING:
             self.focused: bool | UndefinedType = UNDEFINED
             self.value: str | int | float | UndefinedType = UNDEFINED
-            self.options: list[InteractionOption] = UNDEFINED # type: ignore
-            self._param: str = UNDEFINED # type: ignore
-            self._callback: AsyncFunc | None = UNDEFINED # type: ignore
+            self.options: list[InteractionOption] = UNDEFINED  # type: ignore
+            self._param: str = UNDEFINED  # type: ignore
+            self._callback: AsyncFunc | None = UNDEFINED  # type: ignore
 
     @property
     def callback(self) -> AsyncFunc:
-        return self._callback # type: ignore
+        return self._callback  # type: ignore
 
     @callback.setter
     def callback(self, call: AsyncFunc | None) -> None:
@@ -225,7 +225,7 @@ class Option:
 
         c.focused = data.focused
         c.value = data.value
-        c.options = data.options # type: ignore
+        c.options = data.options  # type: ignore
         return c
 
     def to_dict(self) -> dict[str, Any]:
@@ -285,13 +285,13 @@ class Option:
 
             command._level = self._level + 1
 
-            if self._subs == {}: # type: ignore
+            if self._subs == {}:  # type: ignore
                 self.options = []
                 self._callback = None
 
             self.options.append(command)
 
-            self._subs[name] = command # type: ignore
+            self._subs[name] = command  # type: ignore
 
             if self.type == 1:
                 # turn into a command group
@@ -299,7 +299,7 @@ class Option:
 
             return command
 
-        return wrapper # type: ignore
+        return wrapper  # type: ignore
 
 
 class ApplicationCommand(Command):
@@ -329,7 +329,7 @@ class ApplicationCommand(Command):
         Defaults to False.
     """
 
-    _processor_event = InteractionCreate # type: ignore
+    _processor_event = InteractionCreate  # type: ignore
     sub_level: int = 0
 
     def __init__(
@@ -348,7 +348,7 @@ class ApplicationCommand(Command):
         dm_permission: bool | UndefinedType = UNDEFINED,
         nsfw: bool | UndefinedType = UNDEFINED,
     ) -> None:
-        super().__init__(callback, name, state, group) # type: ignore
+        super().__init__(callback, name, state, group)  # type: ignore
 
         if isinstance(type, ApplicationCommandType):
             self.type = type.value
@@ -406,8 +406,8 @@ class ApplicationCommand(Command):
                 name_localizations=name_localizations,
                 description_localizations=description_localizations,
             )
-            command._callback = func # type: ignore
-            command._level = 1 # type: ignore
+            command._callback = func  # type: ignore
+            command._level = 1  # type: ignore
 
             if self._subs == {}:
                 self.options = []
@@ -417,12 +417,12 @@ class ApplicationCommand(Command):
 
             self.options.append(command)
             self._options_dict[name] = command
-            self._options.append(command.to_dict()) # type: ignore
+            self._options.append(command.to_dict())  # type: ignore
 
-            self._subs[name] = command # type: ignore
+            self._subs[name] = command  # type: ignore
             return command
 
-        return wrapper # type: ignore
+        return wrapper  # type: ignore
 
     def _parse_user_command_arguments(self) -> None:
         arg_defaults = get_arg_defaults(self._callback)
@@ -517,26 +517,26 @@ class ApplicationCommand(Command):
                     f'Options may only be of type Option, not {v[0]}'
                 )
 
-            v[0]._param = name # type: ignore
+            v[0]._param = name  # type: ignore
 
             self.options.append(v[0])
             self._options_dict[v[0].name] = v[0]
 
         for option in self.options:
-            self._options.append(option.to_dict()) # type: ignore
+            self._options.append(option.to_dict())  # type: ignore
 
     async def instantiate(self) -> None:
         if self.guild_id:
             guild_commands: list[
                 ApplicationCommandData
             ] = await self._state.http.get_guild_application_commands(
-                self._state.user.id, self.guild_id, True # type: ignore
-            ) # type: ignore
+                self._state.user.id, self.guild_id, True  # type: ignore
+            )  # type: ignore
 
             for app_cmd in guild_commands:
-                if app_cmd['name'] not in self._state._application_command_names: # type: ignore
+                if app_cmd['name'] not in self._state._application_command_names:  # type: ignore
                     await self._state.http.delete_guild_application_command(
-                        self._state.user.id, self.guild_id, app_cmd['id'] # type: ignore
+                        self._state.user.id, self.guild_id, app_cmd['id']  # type: ignore
                     )
                     continue
 
@@ -546,74 +546,74 @@ class ApplicationCommand(Command):
 
                     if self._created is True:
                         await self._state.http.delete_guild_application_command(
-                            self._state.user.id, self.guild_id, app_cmd['id'] # type: ignore
+                            self._state.user.id, self.guild_id, app_cmd['id']  # type: ignore
                         )
                         continue
 
                     self.id = app_cmd['id']
 
                     await self._state.http.edit_guild_application_command(
-                        self._state.user.id, # type: ignore
+                        self._state.user.id,  # type: ignore
                         Snowflake(app_cmd['id']),
-                        guild_id=self.guild_id, # type: ignore
+                        guild_id=self.guild_id,  # type: ignore
                         name=self.name,
                         name_localizations=self.name_localizations,
                         description=self.description,
                         description_localizations=self.description_localizations,
-                        type=self.type, # type: ignore
-                        options=self._options, # type: ignore
+                        type=self.type,  # type: ignore
+                        options=self._options,  # type: ignore
                     )
                     self._created = True
 
             if not self._created:
                 res = await self._state.http.create_guild_application_command(
-                    self._state.user.id, # type: ignore
-                    guild_id=self.guild_id, # type: ignore
+                    self._state.user.id,  # type: ignore
+                    guild_id=self.guild_id,  # type: ignore
                     name=self.name,
                     name_localizations=self.name_localizations,
                     description=self.description,
                     description_localizations=self.description_localizations,
-                    type=self.type, # type: ignore
-                    options=self._options, # type: ignore
+                    type=self.type,  # type: ignore
+                    options=self._options,  # type: ignore
                 )
-                self.id = int(res['id']) # type: ignore
+                self.id = int(res['id'])  # type: ignore
 
             return
 
         for app_cmd in self._state.application_commands:
-            if app_cmd['name'] == self.name and self._state.update_commands: # type: ignore
-                if app_cmd['type'] != self.type: # type: ignore
+            if app_cmd['name'] == self.name and self._state.update_commands:  # type: ignore
+                if app_cmd['type'] != self.type:  # type: ignore
                     continue
 
                 if self._created is True:
                     await self._state.http.delete_global_application_command(
-                        self._state.user.id, app_cmd['id'] # type: ignore
+                        self._state.user.id, app_cmd['id']  # type: ignore
                     )
 
                 await self._state.http.edit_global_application_command(
-                    self._state.user.id, # type: ignore
-                    Snowflake(app_cmd['id']), # type: ignore
+                    self._state.user.id,  # type: ignore
+                    Snowflake(app_cmd['id']),  # type: ignore
                     name=self.name,
                     name_localizations=self.name_localizations,
                     description=self.description,
                     description_localizations=self.description_localizations,
-                    type=self.type, # type: ignore
-                    options=self._options, # type: ignore
+                    type=self.type,  # type: ignore
+                    options=self._options,  # type: ignore
                 )
                 self._created = True
-                self.id = app_cmd['id'] # type: ignore
+                self.id = app_cmd['id']  # type: ignore
 
         if not self._created:
             res = await self._state.http.create_global_application_command(
-                self._state.user.id, # type: ignore
+                self._state.user.id,  # type: ignore
                 name=self.name,
                 name_localizations=self.name_localizations,
                 description=self.description,
                 description_localizations=self.description_localizations,
-                type=self.type, # type: ignore
-                options=self._options, # type: ignore
+                type=self.type,  # type: ignore
+                options=self._options,  # type: ignore
             )
-            self.id = res['id'] # type: ignore
+            self.id = res['id']  # type: ignore
 
     def _process_options(
         self, interaction: Interaction, options: list[InteractionOption]
@@ -631,53 +631,53 @@ class ApplicationCommand(Command):
             elif option.type == 2:
                 self._process_options(interaction=interaction, options=option.options)
             elif option.type in (3, 4, 5, 10):
-                binding[o._param] = o._inter_copy(option) # type: ignore
+                binding[o._param] = o._inter_copy(option)  # type: ignore
             elif option.type == 6:
                 user = User(
-                    interaction.data['resolved']['users'][option.value], self._state # type: ignore
+                    interaction.data['resolved']['users'][option.value], self._state  # type: ignore
                 )
 
                 if interaction.guild_id:
                     member = Member(
-                        interaction.data['resolved']['members'][option.value], # type: ignore
+                        interaction.data['resolved']['members'][option.value],  # type: ignore
                         self._state,
                     )
                     member.user = user
 
-                    binding[o._param] = member # type: ignore
+                    binding[o._param] = member  # type: ignore
                 else:
-                    binding[o._param] = user # type: ignore
+                    binding[o._param] = user  # type: ignore
             elif option.type == 7:
-                binding[o._param] = identify_channel( # type: ignore
-                    interaction.data['resolved']['channels'][option.value], self._state # type: ignore
+                binding[o._param] = identify_channel(  # type: ignore
+                    interaction.data['resolved']['channels'][option.value], self._state  # type: ignore
                 )
             elif option.type == 8:
-                binding[o._param] = Role( # type: ignore
-                    interaction.data['resolved']['roles'][option.value], self._state # type: ignore
+                binding[o._param] = Role(  # type: ignore
+                    interaction.data['resolved']['roles'][option.value], self._state  # type: ignore
                 )
             elif option.type == 9:
-                if interaction.data['resolved'].get('roles'): # type: ignore
-                    binding[o._param] = Role( # type: ignore
-                        interaction.data['resolved']['roles'][option.value], self._state # type: ignore
+                if interaction.data['resolved'].get('roles'):  # type: ignore
+                    binding[o._param] = Role(  # type: ignore
+                        interaction.data['resolved']['roles'][option.value], self._state  # type: ignore
                     )
                 else:
                     user = User(
-                        interaction.data['resolved']['users'][option.value], self._state # type: ignore
+                        interaction.data['resolved']['users'][option.value], self._state  # type: ignore
                     )
 
                     if interaction.guild_id:
                         member = Member(
-                            interaction.data['resolved']['members'][option.value], # type: ignore
+                            interaction.data['resolved']['members'][option.value],  # type: ignore
                             self._state,
                         )
                         member.user = user
 
-                        binding[o._param] = member # type: ignore
+                        binding[o._param] = member  # type: ignore
                     else:
-                        binding[o._param] = user # type: ignore
+                        binding[o._param] = user  # type: ignore
             elif option.type == 11:
-                binding[o._param] = Attachment( # type: ignore
-                    interaction.data['resolved']['attachments'][option.value], # type: ignore
+                binding[o._param] = Attachment(  # type: ignore
+                    interaction.data['resolved']['attachments'][option.value],  # type: ignore
                     self._state,
                 )
 
@@ -687,18 +687,18 @@ class ApplicationCommand(Command):
         if inter.member:
             return inter.member
         else:
-            return inter.user # type: ignore
+            return inter.user  # type: ignore
 
-    async def _invoke(self, event: InteractionCreate) -> None: # type: ignore
+    async def _invoke(self, event: InteractionCreate) -> None:  # type: ignore
         interaction = event.interaction
 
         if interaction.type == 4:
-            if interaction.data.get('name') is not None: # type: ignore
-                if interaction.data['name'] == self.name: # type: ignore
-                    option = interaction.data['options'][0] # type: ignore
-                    real_option = self._options_dict[option['name']] # type: ignore
+            if interaction.data.get('name') is not None:  # type: ignore
+                if interaction.data['name'] == self.name:  # type: ignore
+                    option = interaction.data['options'][0]  # type: ignore
+                    real_option = self._options_dict[option['name']]  # type: ignore
                     choices = await real_option.autocompleter(
-                        interaction, real_option, option['value'] # type: ignore
+                        interaction, real_option, option['value']  # type: ignore
                     )
 
                     await self._state.http.create_interaction_response(
@@ -713,22 +713,22 @@ class ApplicationCommand(Command):
 
         if interaction.data:
             if interaction.data.get('name') is not None:
-                if interaction.data['name'] == self.name: # type: ignore
-                    if interaction.data['type'] == 1: # type: ignore
+                if interaction.data['name'] == self.name:  # type: ignore
+                    if interaction.data['type'] == 1:  # type: ignore
                         binding = self._process_options(
                             interaction, interaction.options
                         )
 
-                        if self._callback: # type: ignore
+                        if self._callback:  # type: ignore
                             await self._callback(interaction, **binding)
-                    elif interaction.data['type'] == 2: # type: ignore
+                    elif interaction.data['type'] == 2:  # type: ignore
                         user_binding = self._process_user_command(interaction)
 
                         await self._callback(interaction, user_binding)
-                    elif interaction.data['type'] == 3: # type: ignore
+                    elif interaction.data['type'] == 3:  # type: ignore
                         message = Message(
-                            interaction.data['resolved']['messages'][ # type: ignore
-                                interaction.data['target_id'] # type: ignore
+                            interaction.data['resolved']['messages'][  # type: ignore
+                                interaction.data['target_id']  # type: ignore
                             ],
                             self._state,
                         )

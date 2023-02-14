@@ -241,5 +241,5 @@ class ApplicationCommands(BaseRouter):
                 interaction_id=interaction_id,
                 interaction_token=interaction_token,
             ),
-            data=response, # type: ignore
+            data=response,  # type: ignore
         )

@@ -37,14 +37,14 @@ from .user import User
 class Member:
     def __init__(self, data: GuildMember, state: State) -> None:
         self.user: User | UndefinedType = (
-            User(data.get('user'), state) if data.get('user') is not None else UNDEFINED
+            User(data.get('user'), state) if data.get('user') is not None else UNDEFINED  # type: ignore
         )
         self.nick: str | None | UndefinedType = data.get('nick', UNDEFINED)
         self._avatar: str | None | UndefinedType = data.get('avatar', UNDEFINED)
         self.roles: list[Snowflake] = [Snowflake(s) for s in data['roles']]
         self.joined_at: datetime = datetime.fromisoformat(data['joined_at'])
         self.premium_since: None | UndefinedType | datetime = (
-            datetime.fromisoformat(data.get('premium_since'))
+            datetime.fromisoformat(data.get('premium_since'))  # type: ignore
             if data.get('premium_since', UNDEFINED) not in [UNDEFINED, None]
             else data.get('premium_since', UNDEFINED)
         )
@@ -52,12 +52,12 @@ class Member:
         self.mute: bool | UndefinedType = data.get('mute', UNDEFINED)
         self.pending: UndefinedType | bool = data.get('pending', UNDEFINED)
         self.permissions: Permissions | UndefinedType = (
-            Permissions.from_value(data.get('permissions'))
+            Permissions.from_value(data.get('permissions'))  # type: ignore
             if data.get('permissions', UNDEFINED) is not UNDEFINED
             else UNDEFINED
         )
         self.communication_disabled_until: None | UndefinedType | datetime = (
-            datetime.fromisoformat(data.get('communication_disabled_until'))
+            datetime.fromisoformat(data.get('communication_disabled_until'))  # type: ignore
             if data.get('communication_disabled_until', UNDEFINED)
             not in [UNDEFINED, None]
             else data.get('communication_disabled_until', UNDEFINED)

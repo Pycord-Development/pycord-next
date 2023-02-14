@@ -59,31 +59,31 @@ class Paginator:
         Predefined pages
     """
 
-    def __init__(self, pages: list[Page] = []) -> None: # type: ignore
-        self._pages = pages # type: ignore
-        self._previous_page: tuple[int, Page] | None = None # type: ignore
+    def __init__(self, pages: list[Page] = []) -> None:  # type: ignore
+        self._pages = pages  # type: ignore
+        self._previous_page: tuple[int, Page] | None = None  # type: ignore
 
-    def __next__(self) -> Page: # type: ignore 
-        if self._previous_page is None: # type: ignore
+    def __next__(self) -> Page:  # type: ignore
+        if self._previous_page is None:  # type: ignore
             try:
-                page = self._pages[0] # type: ignore
+                page = self._pages[0]  # type: ignore
             except IndexError:
                 raise PagerException('No pages in paginator')
 
             self._previous_page = (0, page)
 
-            return page # type: ignore
+            return page  # type: ignore
 
-        new = self._previous_page[0] + 1 # type: ignore
+        new = self._previous_page[0] + 1  # type: ignore
 
         try:
-            page = self._pages[new] # type: ignore
+            page = self._pages[new]  # type: ignore
         except IndexError:
             raise NoMorePages('No more pages left in the paginator')
 
         self._previous_page = (new, page)
 
-        return page # type: ignore
+        return page  # type: ignore
 
     async def forward(self, *args: Any, **kwargs: Any) -> Page[Any]:
         """
@@ -94,10 +94,10 @@ class Paginator:
         args/kwargs:
             Arguments and Keyword-Arguments to put into page.interact_forward.
         """
-        page = next(self) # type: ignore
+        page = next(self)  # type: ignore
 
         await page.interact_forward(*args, **kwargs)
-        return page # type: ignore
+        return page  # type: ignore
 
     async def backward(self, *args: Any, **kwargs: Any) -> Page[Any]:
         """
@@ -109,27 +109,27 @@ class Paginator:
         args/kwargs:
             Arguments and Keyword-Arguments to put into page.interact_backward.
         """
-        if self._previous_page is None or self._previous_page[0] == 0: # type: ignore
+        if self._previous_page is None or self._previous_page[0] == 0:  # type: ignore
             raise PagerException('Unable to go backwards without available pages')
 
-        page = self._pages[self._previous_page[0] - 1] # type: ignore
+        page = self._pages[self._previous_page[0] - 1]  # type: ignore
         self._previous_page = (
             None
-            if (self._previous_page[0] - 1) <= 0 # type: ignore
-            else (self._previous_page[0] - 1, self._pages[self._previous_page[0] - 1]) # type: ignore
+            if (self._previous_page[0] - 1) <= 0  # type: ignore
+            else (self._previous_page[0] - 1, self._pages[self._previous_page[0] - 1])  # type: ignore
         )
 
         await page.interact_backward(*args, **kwargs)
-        return page # type: ignore
+        return page  # type: ignore
 
     @property
-    def previous(self) -> Page | None: # type: ignore
+    def previous(self) -> Page | None:  # type: ignore
         """
         The Previous page of this Paginator
         """
-        return None if self._previous_page is None else self._previous_page[1] # type: ignore
+        return None if self._previous_page is None else self._previous_page[1]  # type: ignore
 
-    def add_page(self, page: Page) -> None: # type: ignore
+    def add_page(self, page: Page) -> None:  # type: ignore
         """
         Appends a new page to this Paginator
 
@@ -138,11 +138,11 @@ class Paginator:
         page: :class:`.Page`
             The page to append
         """
-        if page in self._pages: # type: ignore
+        if page in self._pages:  # type: ignore
             raise PagerException('This page has already been added to this paginator')
-        self._pages.append(page) # type: ignore
+        self._pages.append(page)  # type: ignore
 
-    def remove_page(self, page: Page) -> None: # type: ignore
+    def remove_page(self, page: Page) -> None:  # type: ignore
         """
         Removes a page from this paginator
 
@@ -151,6 +151,6 @@ class Paginator:
         page: :class:`.Page`
             The page to remove
         """
-        if page not in self._pages: # type: ignore
+        if page not in self._pages:  # type: ignore
             raise PagerException('This page is not part of this paginator')
-        self._pages.remove(page) # type: ignore
+        self._pages.remove(page)  # type: ignore

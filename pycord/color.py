@@ -26,9 +26,6 @@ class Color:
     """
 
     def __init__(self, value: int):
-        if not isinstance(value, int):
-            raise TypeError('Expected a integer.')
-
         self.value: int = value
 
     @classmethod

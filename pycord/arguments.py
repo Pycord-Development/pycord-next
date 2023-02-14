@@ -30,7 +30,7 @@ class ArgumentParser:
 
     def get_arg_defaults(self, fnc: AsyncFunc) -> dict[str, Any]:
         signature = inspect.signature(fnc)
-        ret = {}
+        ret: dict[str, Any] = {}
         for k, v in signature.parameters.items():
             if (
                 v.default is not inspect.Parameter.empty

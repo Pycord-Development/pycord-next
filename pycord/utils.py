@@ -40,14 +40,14 @@ DISCORD_EPOCH: int = 1420070400000
 S = TypeVar('S', bound=Sequence[Any])
 
 
-async def _text_or_json(cr: ClientResponse, self: Any) -> str | dict[str, Any]: # type: ignore
+async def _text_or_json(cr: ClientResponse, self: Any) -> str | dict[str, Any]:  # type: ignore
     if cr.content_type == 'application/json':
         return await cr.json(encoding='utf-8', loads=self._json_decoder)
     return await cr.text('utf-8')
 
 
 def loads(data: Any) -> Any:
-    return msgspec.json.decode(data.encode()) if msgspec else json.loads(data) # type: ignore
+    return msgspec.json.decode(data.encode()) if msgspec else json.loads(data)  # type: ignore
 
 
 def dumps(data: Any) -> str:

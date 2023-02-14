@@ -18,16 +18,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from typing import TYPE_CHECKING
+
 from .enums import MembershipState
 from .snowflake import Snowflake
 from .types import Team as DiscordTeam, TeamMember as DiscordTeamMember
 from .user import User
 
+if TYPE_CHECKING:
+    from .state import State
+
 
 class TeamMember:
-    def __init__(self, data: DiscordTeamMember) -> None:
+    def __init__(self, data: DiscordTeamMember, state: 'State') -> None:
         self.team_id: Snowflake = Snowflake(data['team_id'])
-        self.user = User(data['user'])
+        self.user = User(data['user'], state)
         self.permissions: list[str] = data['permissions']
         self.membership_state: MembershipState = MembershipState(
             data['membership_state']
@@ -35,9 +40,9 @@ class TeamMember:
 
 
 class Team:
-    def __init__(self, data: DiscordTeam) -> None:
+    def __init__(self, data: DiscordTeam, state: 'State') -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self.icon: str | None = data['icon']
-        self.members: list[TeamMember] = [TeamMember(d) for d in data['members']]
+        self.members: list[TeamMember] = [TeamMember(d, state) for d in data['members']]
         self.name: str = data['name']
         self.owner_id: Snowflake = Snowflake(data['owner_user_id'])

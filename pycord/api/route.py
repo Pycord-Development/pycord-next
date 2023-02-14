@@ -75,7 +75,7 @@ class Route(BaseRoute):
             **self.parameters,
         )
 
-    def __eq__(self, route: 'Route') -> bool: # type: ignore
+    def __eq__(self, route: 'Route') -> bool:  # type: ignore
         return (
             route.channel_id == self.channel_id
             or route.guild_id == self.guild_id

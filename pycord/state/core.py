@@ -84,7 +84,7 @@ BASE_EVENTS = [
     MessageDelete,
     MessageBulkDelete,
     UserUpdate,
-    InteractionCreate
+    InteractionCreate,
 ]
 
 if TYPE_CHECKING:
@@ -104,11 +104,11 @@ class State:
         self.user: User | None = None
         self.raw_user: dict[str, Any] | None = None
         self.store = GroupedStore(messages_max_items=self.max_messages)
-        self.event_manager = EventManager(BASE_EVENTS, self) # type: ignore
+        self.event_manager = EventManager(BASE_EVENTS, self)  # type: ignore
         self.shard_managers: list[ShardManager] = []
         self.shard_clusters: list[ShardCluster] = []
         self.commands: list[Command] = []
-        self.gears: list[Gear] = [] # type: ignore
+        self.gears: list[Gear] = []  # type: ignore
         self._session_start_limit: dict[str, Any] | None = None
         self._clustered: bool | None = None
         # makes sure that multiple clusters don't start at once

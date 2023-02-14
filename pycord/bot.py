@@ -23,13 +23,12 @@ from typing import Any, AsyncGenerator, Type, TypeVar
 
 from aiohttp import BasicAuth
 
-from .commands import Group
 from .errors import BotException, NoIdentifiesLeft, OverfilledShardsException
 from .events.event_manager import Event
 from .flags import Intents
 from .gateway import PassThrough, ShardCluster, ShardManager
 from .guild import Guild
-from .interface import print_banner, start_logging
+from .interface import print_banner, start_logging  # type: ignore
 from .state import State
 from .types import AsyncFunc
 from .user import User
@@ -90,14 +89,14 @@ class Bot:
             intents=self.intents, max_messages=self.max_messages, verbose=verbose
         )
         self._shards = shards
-        self._logging_flavor: int | str | dict[str, Any] = logging_flavor
+        self._logging_flavor: int | str | dict[str, Any] = logging_flavor  # type: ignore
         self._print_banner = print_banner_on_startup
         self._proxy = proxy
         self._proxy_auth = proxy_auth
 
     @property
     def user(self) -> User:
-        return self._state.user
+        return self._state.user  # type: ignore
 
     async def _run_async(self, token: str) -> None:
         start_logging(flavor=self._logging_flavor)
@@ -112,19 +111,19 @@ class Bot:
         sharder = ShardManager(
             self._state,
             shards,
-            self._shards,
+            self._shards,  # type: ignore
             proxy=self._proxy,
             proxy_auth=self._proxy_auth,
         )
         await sharder.start()
         self._state.shard_managers.append(sharder)
         while not self._state.raw_user:
-            self._state._raw_user_fut: asyncio.Future[None] = asyncio.Future()
-            await self._state._raw_user_fut
+            self._state._raw_user_fut: asyncio.Future[None] = asyncio.Future()  # type: ignore
+            await self._state._raw_user_fut  # type: ignore
 
         if self._print_banner:
             print_banner(
-                self._state._session_start_limit['remaining'],
+                self._state._session_start_limit['remaining'],  # type: ignore
                 self._shards if isinstance(self._shards, int) else len(self._shards),
                 bot_name=self.user.name,
             )
@@ -142,7 +141,7 @@ class Bot:
                 for sm in self._state.shard_managers:
                     await sm.session.close()
 
-                if self._state._clustered:
+                if self._state._clustered:  # type: ignore
                     for sc in self._state.shard_clusters:
                         sc.keep_alive.set_result(None)
                 return
@@ -178,7 +177,7 @@ class Bot:
         self._state.shard_concurrency = PassThrough(
             session_start_limit['max_concurrency'], 7
         )
-        self._state._session_start_limit = session_start_limit
+        self._state._session_start_limit = session_start_limit  # type: ignore
 
         shards = (
             self._shards
@@ -201,16 +200,16 @@ class Bot:
             self._state.shard_clusters.append(cluster_class)
 
         while not self._state.raw_user:
-            self._state._raw_user_fut: asyncio.Future[None] = asyncio.Future()
-            await self._state._raw_user_fut
+            self._state._raw_user_fut: asyncio.Future[None] = asyncio.Future()  # type: ignore
+            await self._state._raw_user_fut  # type: ignore
 
         if self._print_banner:
             print_banner(
-                concurrency=self._state._session_start_limit['remaining'],
+                concurrency=self._state._session_start_limit['remaining'],  # type: ignore
                 shard_count=self._shards
                 if isinstance(self._shards, int)
                 else len(self._shards),
-                bot_name=self._state.user.name,
+                bot_name=self._state.user.name,  # type: ignore
             )
 
         await self._run_until_exited()
@@ -266,7 +265,7 @@ class Bot:
             )
         )
 
-    def listen(self, event: Event | None = None) -> T:
+    def listen(self, event: Event | None = None) -> AsyncFunc:
         """
         Listen to an event
 
@@ -279,9 +278,9 @@ class Bot:
 
         def wrapper(func: T) -> T:
             if event:
-                self._state.event_manager.add_event(event, func)
+                self._state.event_manager.add_event(event, func)  # type: ignore
             else:
-                args = get_arg_defaults(func)
+                args = get_arg_defaults(func)  # type: ignore
 
                 values = list(args.values())
 
@@ -300,14 +299,14 @@ class Bot:
                 if not isinstance(eve[1](), Event):
                     raise BotException('Events must be of type Event')
 
-                self._state.event_manager.add_event(eve[1], func)
+                self._state.event_manager.add_event(eve[1], func)  # type: ignore
 
             return func
 
-        return wrapper
+        return wrapper  # type: ignore
 
     def wait_for(self, event: T) -> asyncio.Future[T]:
-        return self._state.event_manager.wait_for(event)
+        return self._state.event_manager.wait_for(event)  # type: ignore
 
     def command(self, name: str, cls: T, **kwargs: Any) -> T:
         """
@@ -324,13 +323,13 @@ class Bot:
         """
 
         def wrapper(func: AsyncFunc) -> T:
-            command = cls(func, name, state=self._state, **kwargs)
-            self._state.commands.append(command)
-            return command
+            command = cls(func, name, state=self._state, **kwargs)  # type: ignore
+            self._state.commands.append(command)  # type: ignore
+            return command  # type: ignore
 
-        return wrapper
+        return wrapper  # type: ignore
 
-    def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
+    def group(self, name: str, cls: Type[T], **kwargs: Any) -> T:
         """
         Create a brand-new Group of Commands
 
@@ -344,11 +343,11 @@ class Bot:
             The kwargs to entail onto the instantiated group.
         """
 
-        def wrapper(func: T) -> T:
+        def wrapper(func: AsyncFunc) -> T:
             return cls(func, name, state=self._state, **kwargs)
 
-        return wrapper
+        return wrapper  # type: ignore
 
     @property
     async def guilds(self) -> AsyncGenerator[Guild, None]:
-        return await (self._state.store.sift('guilds')).get_all()
+        return (self._state.store.sift('guilds')).get_all()

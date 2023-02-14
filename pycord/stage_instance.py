@@ -41,7 +41,7 @@ class StageInstance:
             data['privacy_level']
         )
         self.guild_scheduled_event_id: UndefinedType | Snowflake = (
-            Snowflake(data['guild_scheduled_event_id'])
+            Snowflake(data['guild_scheduled_event_id'])  # type: ignore
             if data.get('guild_scheduled_event_id') is not None
             else UNDEFINED
         )

@@ -23,6 +23,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from .guild import Guild
 from .snowflake import Snowflake
 from .types import GuildTemplate as DiscordGuildTemplate
 from .user import User
@@ -43,5 +44,7 @@ class GuildTemplate:
         self.updated_at: datetime = datetime.fromisoformat(data['updated_at'])
         self.source_guild_id: Snowflake = Snowflake(data['source_guild_id'])
         # TODO: maybe make this a Guild object?
-        self.serialized_source_guild: dict = data['serialized_source_guild']
+        self.serialized_source_guild: Guild = Guild(
+            data['serialized_source_guild'], state
+        )
         self.is_dirty: bool | None = data['is_dirty']

@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 
 class EntityMetadata:
     def __init__(self, data: DiscordEntityMetadata) -> None:
-        self.location: UndefinedType | str = data.get('location', UNDEFINED)
+        self.location: UndefinedType | str = data.get('location', UNDEFINED)  # type: ignore
 
 
 class ScheduledEventUser:
@@ -60,13 +60,13 @@ class ScheduledEvent:
     def __init__(self, data: GuildScheduledEvent, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self.guild_id: Snowflake = Snowflake(data['guild_id'])
-        self._channel_id: str | None = data.get('channel_id')
+        self._channel_id: str | None = data.get('channel_id')  # type: ignore
         self.channel_id: Snowflake | None = (
             Snowflake(self._channel_id) if self._channel_id is not None else None
         )
-        self._creator_id: UndefinedType | None | str = data.get('creator_id', UNDEFINED)
+        self._creator_id: UndefinedType | None | str = data.get('creator_id', UNDEFINED)  # type: ignore
         self.creator_id: UndefinedType | None | Snowflake = (
-            Snowflake(self._creator_id)
+            Snowflake(self._creator_id)  # type: ignore
             if isinstance(self._creator_id, str)
             else self._creator_id
         )
@@ -92,19 +92,19 @@ class ScheduledEvent:
         self.entity_type: GuildScheduledEventEntityType = GuildScheduledEventEntityType(
             data['entity_type']
         )
-        self._entity_id: str | None = data.get('entity_id')
+        self._entity_id: str | None = data.get('entity_id')  # type: ignore
         self.entity_id: Snowflake | None = (
             Snowflake(self._entity_id) if self._entity_id is not None else None
         )
-        self._entity_metadata: dict[str, Any] | UndefinedType = data.get(
+        self._entity_metadata: dict[str, Any] | UndefinedType = data.get(  # type: ignore
             'entity_metadata', UNDEFINED
         )
         self.entity_metadata: EntityMetadata | UndefinedType = (
-            EntityMetadata(self._entity_metadata)
+            EntityMetadata(self._entity_metadata)  # type: ignore
             if self._entity_metadata is not UNDEFINED
             else UNDEFINED
         )
-        self._creator: dict[str, Any] | UndefinedType = data.get('creator', UNDEFINED)
+        self._creator: dict[str, Any] | UndefinedType = data.get('creator', UNDEFINED)  # type: ignore
         self.creator: User | UndefinedType = (
             User(self._creator, state) if self._creator is not UNDEFINED else UNDEFINED
         )

@@ -22,7 +22,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Type, TypeVar
+from typing import Any, Type, TypeVar
 
 from .errors import FlagException
 
@@ -41,7 +41,7 @@ __all__ = [
 
 
 class flag:
-    def __init__(self, func: Callable):
+    def __init__(self, func: Callable[..., Any]):
         self.value: int = func(None)
         self.__doc__ = func.__doc__
         self._name = func.__name__
@@ -49,7 +49,7 @@ class flag:
     def __get__(self, instance: F | None, _: type[F]) -> int | bool:
         if instance:
             try:
-                value = instance._values[self._name]
+                value = instance._values[self._name]  # type: ignore
             except KeyError:
                 return False
             else:
@@ -57,13 +57,13 @@ class flag:
         else:
             return self.value
 
-    def __set__(self, instance: F, value: bool) -> None:
-        instance._values[self._name] = value
+    def __set__(self, instance: Any, value: bool) -> None:
+        instance._values[self._name] = value  # type: ignore
 
 
 def fill() -> Callable[[Type[F]], Type[F]]:
     def wrapper(cls: Type[F]) -> Type[F]:
-        cls._FLAGS = {
+        cls._FLAGS = {  # type: ignore
             name: flg.value
             for name, flg in cls.__dict__.items()
             if isinstance(flg, flag)
@@ -81,7 +81,7 @@ class Flags:
 
         for name, set in flags_named.items():
             try:
-                self._FLAGS[name]
+                self._FLAGS[name]  # type: ignore
             except KeyError:
                 raise FlagException(
                     f'Flag {name} is not a valid flag of {self.__class__}'
@@ -97,9 +97,9 @@ class Flags:
         self = cls()
         value = int(value)
 
-        for name, bit in self._FLAGS.items():
+        for name, bit in self._FLAGS.items():  # type: ignore
             if value & bit:
-                self._values[name] = True
+                self._values[name] = True  # type: ignore
 
         return self
 
@@ -107,9 +107,9 @@ class Flags:
     def as_bit(self) -> int:
         n = 0
         for name in self._values.keys():
-            n += self._FLAGS[name]
+            n += self._FLAGS[name]  # type: ignore
 
-        return n
+        return n  # type: ignore
 
 
 @fill()
@@ -193,8 +193,8 @@ class Intents(Flags):
     @classmethod
     def all(cls) -> Intents:
         self = cls()
-        for name in self._FLAGS.keys():
-            self._values[name] = True
+        for name in self._FLAGS.keys():  # type: ignore
+            self._values[name] = True  # type: ignore
         return self
 
     @classmethod
@@ -388,7 +388,7 @@ class SystemChannelFlags(Flags):
         return 1 << 1
 
     @flag
-    def suppress_guild_reminder_notifications(self) -> bool | int:
+    def suppress_guild_reminder_notifications(self) -> bool | int:  # type: ignore
         return 1 << 2
 
     @flag

@@ -43,9 +43,9 @@ class Notifier:
 
         new_shard = Shard(
             id=shard_id,
-            state=self.manager._state, # type: ignore
+            state=self.manager._state,  # type: ignore
             session=self.manager.session,
             notifier=self,
         )
-        await new_shard.connect(token=self.manager._state.token) # type: ignore
+        await new_shard.connect(token=self.manager._state.token)  # type: ignore
         self.manager.add_shard(new_shard)

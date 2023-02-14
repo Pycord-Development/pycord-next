@@ -54,7 +54,7 @@ class IntegrationApplication:
         self.icon: str | None = data['icon']
         self.description: str | None = data['description']
         self.bot: User | UndefinedType = (
-            User(data['bot'], state) if data.get('bot') is not None else UNDEFINED
+            User(data['bot'], state) if data.get('bot') is not None else UNDEFINED  # type: ignore
         )
 
 
@@ -66,7 +66,7 @@ class Integration:
         self.enabled: bool | UndefinedType = data.get('enabled', UNDEFINED)
         self.syncing: bool | UndefinedType = data.get('syncing', UNDEFINED)
         self.role_id: Snowflake | UndefinedType = (
-            Snowflake(data['role_id']) if data.get('role_id') else UNDEFINED
+            Snowflake(data['role_id']) if data.get('role_id') else UNDEFINED  # type: ignore
         )
         self.enable_emoticons: bool | UndefinedType = data.get(
             'enable_emoticons', UNDEFINED
@@ -78,11 +78,11 @@ class Integration:
             'expire_grace_period', UNDEFINED
         )
         self.user: User | UndefinedType = (
-            User(data['user'], state) if data.get('user') is not None else UNDEFINED
+            User(data['user'], state) if data.get('user') is not None else UNDEFINED  # type: ignore
         )
         self.account: Account = Account(data['account'])
         self.synced_at: UndefinedType | datetime = (
-            datetime.fromisoformat(data['synced_at'])
+            datetime.fromisoformat(data['synced_at'])  # type: ignore
             if data.get('synced_at') is not None
             else UNDEFINED
         )
@@ -91,7 +91,7 @@ class Integration:
         )
         self.revoked: bool | UndefinedType = data.get('revoked', UNDEFINED)
         self.application: Application | UndefinedType = (
-            IntegrationApplication(data['application'], state)
+            IntegrationApplication(data['application'], state)  # type: ignore
             if data.get('application') is not None
             else UNDEFINED
         )

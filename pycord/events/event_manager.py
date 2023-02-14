@@ -69,25 +69,25 @@ class EventManager:
         fut: Future[event] = Future()
 
         try:
-            self.wait_fors[event].append(fut) # type: ignore
+            self.wait_fors[event].append(fut)  # type: ignore
         except KeyError:
-            self.wait_fors[event] = [fut] # type: ignore
+            self.wait_fors[event] = [fut]  # type: ignore
 
         return fut
 
     async def publish(self, event_str: str, data: dict[str, Any]) -> None:
         for event, funcs in self.events.items():
-            if event._name == event_str: # type: ignore
+            if event._name == event_str:  # type: ignore
                 eve = event()
-                dispatch = await eve._is_publishable(data, self._state) # type: ignore
+                dispatch = await eve._is_publishable(data, self._state)  # type: ignore
 
                 # used in cases like GUILD_AVAILABLE
                 if dispatch is False:
                     continue
                 else:
-                    await eve._async_load(data, self._state) # type: ignore
+                    await eve._async_load(data, self._state)  # type: ignore
 
-                eve._state = self._state # type: ignore
+                eve._state = self._state  # type: ignore
 
                 for func in funcs:
                     asyncio.create_task(func(eve))
@@ -100,5 +100,5 @@ class EventManager:
                     self.wait_fors.pop(event)
 
                 for command in self._state.commands:
-                    if command._processor_event == event: # type: ignore
-                        asyncio.create_task(command._invoke(eve)) # type: ignore
+                    if command._processor_event == event:  # type: ignore
+                        asyncio.create_task(command._invoke(eve))  # type: ignore

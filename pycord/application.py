@@ -111,35 +111,35 @@ class Application:
             'privacy_policy_url', UNDEFINED
         )
         self.owner: User | UndefinedType = (
-            User(data.get('owner'), state)
+            User(data.get('owner'), state)  # type: ignore
             if data.get('owner') is not None
             else UNDEFINED
         )
         self.verify_key: str = data.get('verify_key')
         self.team: Team | None = (
-            Team(data.get('team')) if data.get('team') is not None else None
+            Team(data.get('team')) if data.get('team') is not None else None  # type: ignore
         )
         self.guild_id: Snowflake | UndefinedType = (
-            Snowflake(data.get('guild_id'))
+            Snowflake(data.get('guild_id'))  # type: ignore
             if data.get('guild_id') is not None
             else UNDEFINED
         )
         self.primary_sku_id: Snowflake | UndefinedType = (
-            Snowflake(data.get('primary_sku_id'))
+            Snowflake(data.get('primary_sku_id'))  # type: ignore
             if data.get('primary_sku_id') is not None
             else UNDEFINED
         )
         self.slug: str | UndefinedType = data.get('slug', UNDEFINED)
         self._cover_image: str | UndefinedType = data.get('cover_image', UNDEFINED)
         self.flags: ApplicationFlags | UndefinedType = (
-            ApplicationFlags.from_value(data.get('flags'))
+            ApplicationFlags.from_value(data.get('flags'))  # type: ignore
             if data.get('flags') is not None
             else UNDEFINED
         )
         self.tags: list[str] = data.get('tags', [])
         self.install_params: InstallParams | UndefinedType = (
             InstallParams(data.get('install_params'))
-            if data.get('install_params') is not None
+            if data.get('install_params') is not None  # type: ignore
             else UNDEFINED
         )
-        self.custom_install_url: str | UndefinedType = data.get('custom_install_url')
+        self.custom_install_url: str | UndefinedType = data.get('custom_install_url')  # type: ignore

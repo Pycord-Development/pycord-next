@@ -47,7 +47,7 @@ class User:
             'accent_color', UNDEFINED
         )
         self.accent_color: UndefinedType | Color | None = (
-            Color(self._accent_color)
+            Color(self._accent_color)  # type: ignore
             if self._accent_color not in [UNDEFINED, None]
             else self._accent_color
         )

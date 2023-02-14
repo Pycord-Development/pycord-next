@@ -59,89 +59,89 @@ class Guild:
         self._state = state
         if not data.get('unavailable'):
             self.unavailable: bool = False
-            self.name: str = data['name']
+            self.name: str = data['name']  # type: ignore
             # TODO: Asset classes
-            self._icon: str | None = data['icon']
+            self._icon: str | None = data['icon']  # type: ignore
             self._icon_hash: str | None | UndefinedType = data.get('icon_hash')
-            self._splash: str | None = data['splash']
-            self._discovery_splash: str | None = data['discovery_splash']
+            self._splash: str | None = data['splash']  # type: ignore
+            self._discovery_splash: str | None = data['discovery_splash']  # type: ignore
             self.owner: bool | UndefinedType = data.get('owner', UNDEFINED)
-            self.owner_id: Snowflake = Snowflake(data.get('owner_id'))
+            self.owner_id: Snowflake = Snowflake(data.get('owner_id'))  # type: ignore
             self.permissions: Permissions = Permissions.from_value(
                 data.get('permissions', 0)
             )
-            self._afk_channel_id: str | None = data.get('afk_channel_id')
+            self._afk_channel_id: str | None = data.get('afk_channel_id')  # type: ignore
             self.afk_channel_id: Snowflake | None = (
                 Snowflake(self._afk_channel_id)
                 if self._afk_channel_id is not None
                 else None
             )
-            self.afk_timeout: int = data.get('afk_timeout')
+            self.afk_timeout: int = data.get('afk_timeout')  # type: ignore
             self.widget_enabled: bool | UndefinedType = data.get(
                 'widget_enabled', UNDEFINED
             )
             self._widget_channel_id: str | None | UndefinedType = data.get(
-                'widget_channel_id'
+                'widget_channel_id'  # type: ignore
             )
             self.widget_channel_id: UndefinedType | Snowflake | None = (
-                Snowflake(self._widget_channel_id)
+                Snowflake(self._widget_channel_id)  # type: ignore
                 if isinstance(self._widget_channel_id, str)
                 else self._widget_channel_id
             )
             self.verification_level: VerificationLevel = VerificationLevel(
-                data['verification_level']
+                data['verification_level']  # type: ignore
             )
-            self.default_message_notifications: DefaultMessageNotificationLevel = (
-                DefaultMessageNotificationLevel(data['default_message_notifications'])
-            )
-            self.explicit_content_filter: ExplicitContentFilterLevel = (
-                ExplicitContentFilterLevel(data['explicit_content_filter'])
-            )
-            self._roles: list[dict[str, Any]] = data.get('roles', [])
+            self.default_message_notifications: DefaultMessageNotificationLevel = DefaultMessageNotificationLevel(
+                data['default_message_notifications']
+            )  # type: ignore
+            self.explicit_content_filter: ExplicitContentFilterLevel = ExplicitContentFilterLevel(
+                data['explicit_content_filter']
+            )  # type: ignore
+            self._roles: list[dict[str, Any]] = data.get('roles', [])  # type: ignore
             self._process_roles()
-            self._emojis: list[dict[str, Any]] = data.get('emojis', [])
+            self._emojis: list[dict[str, Any]] = data.get('emojis', [])  # type: ignore
             self._process_emojis()
-            self.features: list[GUILD_FEATURE] = data['features']
-            self.mfa_level: MFALevel = MFALevel(data['mfa_level'])
+            self.features: list[GUILD_FEATURE] = data['features']  # type: ignore
+            self.mfa_level: MFALevel = MFALevel(data['mfa_level'])  # type: ignore
             self._application_id: str | None = data.get('application_id')
             self.application_id: Snowflake | None = (
                 Snowflake(self._application_id)
                 if self._application_id is not None
                 else None
             )
-            self._system_channel_id: str | None = data.get('system_channel_id')
+            self._system_channel_id: str | None = data.get('system_channel_id')  # type: ignore
             self.system_channel_id: Snowflake | None = (
                 Snowflake(self._system_channel_id)
                 if self._system_channel_id is not None
                 else None
             )
-            self.system_channel_flags: SystemChannelFlags = (
-                SystemChannelFlags.from_value(data['system_channel_flags'])
-            )
+            self.system_channel_flags: SystemChannelFlags = SystemChannelFlags.from_value(
+                data['system_channel_flags']
+            )  # type: ignore
 
-            self._rules_channel_id: str | None = data.get('rules_channel_id')
+            self._rules_channel_id: str | None = data.get('rules_channel_id')  # type: ignore
             self.rules_channel_id: Snowflake | None = (
                 Snowflake(self._rules_channel_id)
                 if self._rules_channel_id is not None
                 else None
             )
             self.max_presences: int | UndefinedType = data.get(
-                'max_presences', UNDEFINED
+                'max_presences', UNDEFINED  # type: ignore
             )
             self.max_members: int | UndefinedType = data.get('max_members', UNDEFINED)
             self.vanity_url: str | None = data.get('vanity_url_code')
             self.description: str | None = data.get('description')
             self._banner: str | None = data.get('banner')
-            self.premium_tier: PremiumTier = PremiumTier(data['premium_tier'])
+            self.premium_tier: PremiumTier = PremiumTier(data['premium_tier'])  # type: ignore
             self.premium_subscription_count: int | UndefinedType = data.get(
                 'premium_subscription_count', UNDEFINED
             )
-            self.preferred_locale: LOCALE = data['preferred_locale']
+            self.preferred_locale: LOCALE = data['preferred_locale']  # type: ignore
             self._public_updates_channel_id: str | None = data[
-                'public_updates_channel_id'
+                'public_updates_channel_id'  # type: ignore
             ]
             self.public_updates_channel_id: Snowflake | None = (
-                Snowflake(self._public_updates_channel_id)
+                Snowflake(self._public_updates_channel_id)  # type: ignore
                 if self._public_updates_channel_id is not None
                 else None
             )
@@ -165,19 +165,19 @@ class Guild:
                 Sticker(d, self._state) for d in data.get('stickers', [])
             ]
             self.premium_progress_bar_enabled: bool = data[
-                'premium_progress_bar_enabled'
+                'premium_progress_bar_enabled'  # type: ignore
             ]
         else:
             self.unavailable: bool = True
 
     def _process_roles(self) -> None:
-        self.roles: list[Role] = [Role(role, state=self._state) for role in self._roles]
+        self.roles: list[Role] = [Role(role, state=self._state) for role in self._roles]  # type: ignore
 
     def _process_emojis(self) -> None:
         self.emojis: list[Emoji] = []
         for emoji in self._emojis:
-            emo = Emoji(emoji, state=self._state)
-            emo._inject_roles(self.roles)
+            emo = Emoji(emoji, state=self._state)  # type: ignore
+            emo._inject_roles(self.roles)  # type: ignore
             self.emojis.append(emo)
 
 

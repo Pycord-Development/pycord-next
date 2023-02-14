@@ -36,12 +36,12 @@ from .undefined import UNDEFINED, UndefinedType
 class RoleTags:
     def __init__(self, data: DiscordRoleTags) -> None:
         self.bot_id: UndefinedType | Snowflake = (
-            Snowflake(data.get('bot_id'))
+            Snowflake(data.get('bot_id'))  # type: ignore
             if data.get('bot_id', UNDEFINED) is not UNDEFINED
             else UNDEFINED
         )
         self.integration_id: UndefinedType | Snowflake = (
-            Snowflake(data.get('integration_id'))
+            Snowflake(data.get('integration_id'))  # type: ignore
             if data.get('integration_id', UNDEFINED) is not UNDEFINED
             else UNDEFINED
         )
@@ -64,7 +64,7 @@ class Role:
         self.permissions: Permissions = Permissions.from_value(data['permissions'])
         self.managed: bool = data['managed']
         self.mentionable: bool = data['mentionable']
-        self._tags: dict[str, str | None] | UndefinedType = data.get('tags', UNDEFINED)
+        self._tags: dict[str, str | None] | UndefinedType = data.get('tags', UNDEFINED)  # type: ignore
         self.tags: RoleTags | UndefinedType = (
             RoleTags(self._tags) if self._tags is not UNDEFINED else UNDEFINED
         )

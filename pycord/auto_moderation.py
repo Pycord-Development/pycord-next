@@ -52,7 +52,7 @@ class AutoModTriggerMetadata:
         )
         self.presets: list[AutoModKeywordPresetType] | UndefinedType = (
             [AutoModKeywordPresetType(preset) for preset in data['presets']]
-            if data.get('presets') is not None
+            if data.get('presets') is not None  # type: ignore
             else UNDEFINED
         )
         self.allow_list: list[str] | UndefinedType = data.get('allow_list', UNDEFINED)
@@ -65,7 +65,7 @@ class AutoModActionMetadata:
     def __init__(self, data: DiscordAutoModerationActionMetadata) -> None:
         self.channel_id: Snowflake | UndefinedType = (
             Snowflake(data['channel_id'])
-            if data.get('channel_id') is not None
+            if data.get('channel_id') is not None  # type: ignore
             else UNDEFINED
         )
         self.duration_seconds: int | UndefinedType = data.get(

@@ -103,7 +103,7 @@ class Sticker:
     def __init__(self, data: DiscordSticker, state: State) -> None:
         self.id: Snowflake | None = Snowflake(data['id'])
         self.pack_id: Snowflake | None = (
-            Snowflake(data.get('pack_id')) if data.get('pack_id') is not None else None
+            Snowflake(data.get('pack_id')) if data.get('pack_id') is not None else None  # type: ignore
         )
         self.name: str = data['name']
         self.description: str | None = data['description']
@@ -112,7 +112,7 @@ class Sticker:
         self.format_type: StickerFormatType = StickerFormatType(data['format_type'])
         self.available: bool | UndefinedType = data.get('available', UNDEFINED)
         self.guild_id: Snowflake | None = (
-            Snowflake(data['guild_id']) if data['guild_id'] is not None else None
+            Snowflake(data['guild_id']) if data['guild_id'] is not None else None  # type: ignore
         )
         self._user: DiscordUser | UndefinedType = data.get('user', UNDEFINED)
         self.user: UndefinedType | User = (
