@@ -12,7 +12,7 @@
 </div>
 
 <p align='center'>
- <b>Make Bots Happen.</b>
+ <b>Empowering developers to build the next generation of Python Discord bots.</b>
 </p>
 
 Welcome! This is the repository for the pre-alpha and heavy conception next major
