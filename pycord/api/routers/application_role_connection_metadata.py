@@ -19,9 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 from ...snowflake import Snowflake
-from ...types import RCMTYPE, ApplicationRoleConnectionMetadata
-from ...undefined import UNDEFINED, UndefinedType
-from ...utils import remove_undefined
+from ...types import ApplicationRoleConnectionMetadata
 from ..route import Route
 from .base import BaseRouter
 
