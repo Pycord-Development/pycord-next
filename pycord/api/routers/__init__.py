@@ -9,5 +9,7 @@ Implementation of Discord API Routes
 from .application_commands import *
 from .application_role_connection_metadata import *
 from .audit_logs import *
+from .auto_moderation import *
 from .base import *
+from .channels import *
 from .messages import *
