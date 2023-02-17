@@ -88,7 +88,6 @@ class AutoModeration(BaseRouter):
         self, guild_id: Snowflake, rule_id: Snowflake, *,
         name: str | UndefinedType = UNDEFINED, 
         event_type: AUTO_MODERATION_EVENT_TYPES | UndefinedType = UNDEFINED,
-        trigger_type: AUTO_MODERATION_TRIGGER_TYPES | UndefinedType = UNDEFINED,
         actions: list[AutoModerationAction] | UndefinedType = UNDEFINED,
         trigger_metadata: AutoModerationTriggerMetadata | UndefinedType | None = UNDEFINED,
         enabled: bool | UndefinedType = UNDEFINED,
@@ -99,7 +98,6 @@ class AutoModeration(BaseRouter):
         data = {
             "name": name,
             "event_type": event_type,
-            "trigger_type": trigger_type,
             "trigger_metadata": trigger_metadata,
             "actions": actions,
             "enabled": enabled,
