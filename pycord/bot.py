@@ -23,6 +23,7 @@ from typing import Any, AsyncGenerator, Type, TypeVar
 
 from aiohttp import BasicAuth
 
+from .application_role_connection_metadata import ApplicationRoleConnectionMetadata
 from .commands import Group
 from .errors import BotException, NoIdentifiesLeft, OverfilledShardsException
 from .events.event_manager import Event
@@ -352,3 +353,33 @@ class Bot:
     @property
     async def guilds(self) -> AsyncGenerator[Guild, None]:
         return await (self._state.store.sift('guilds')).get_all()
+
+    async def get_application_role_connection_metadata_records(self) -> list[ApplicationRoleConnectionMetadata]:
+        """Get the application role connection metadata records.
+        
+        Returns
+        -------
+        list[:class:`ApplicationRoleConnectionMetadata`]
+            The application role connection metadata records.
+        """
+        data = await self._state.http.get_application_role_connection_metadata_records(self.user.id)
+        return [ApplicationRoleConnectionMetadata.from_dict(record) for record in data]
+
+    async def update_application_role_connection_metadata_records(
+            self, records: list[ApplicationRoleConnectionMetadata]
+        ) -> list[ApplicationRoleConnectionMetadata]:
+        """Update the application role connection metadata records.
+        
+        Parameters
+        ----------
+        records: list[:class:`ApplicationRoleConnectionMetadata`]
+            The application role connection metadata records.
+
+        Returns
+        -------
+        list[:class:`ApplicationRoleConnectionMetadata`]
+            The updated application role connection metadata records.
+        """
+        await self._state.http.update_application_role_connection_metadata_records(
+            self.user.id, [record.to_dict() for record in records]
+        )
