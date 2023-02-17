@@ -22,6 +22,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from .auto_moderation import (
+    AutoModRule, 
+    AutoModEventType, 
+    AutoModTriggerType, 
+    AutoModTriggerMetadata,
+    AutoModAction,
+)
 from .channel import Channel
 from .enums import (
     DefaultMessageNotificationLevel,
@@ -179,6 +186,88 @@ class Guild:
             emo = Emoji(emoji, state=self._state)
             emo._inject_roles(self.roles)
             self.emojis.append(emo)
+
+    async def list_auto_moderation_rules(self) -> list[AutoModRule]:
+        """List the auto moderation rules for this guild.
+        
+        Returns
+        -------
+        list[:class:`AutoModRule`]
+            The auto moderation rules for this guild.
+        """
+        data = await self._state.http.list_auto_moderation_rules_for_guild(self.id)
+        return [AutoModRule(rule, self._state) for rule in data]
+    
+    async def get_auto_moderation_rule(self, rule_id: int) -> AutoModRule:
+        """Get an auto moderation rule for this guild.
+        
+        Parameters
+        ----------
+        rule_id: :class:`int`
+            The ID of the rule to get.
+        
+        Returns
+        -------
+        :class:`AutoModRule`
+            The auto moderation rule for this guild.
+        """
+        data = await self._state.http.get_auto_moderation_rule_for_guild(self.id, rule_id)
+        return AutoModRule(data, self._state)
+
+    async def create_auto_moderation_rule(
+        self, *,
+        name: str,
+        event_type: AutoModEventType,
+        trigger_type: AutoModTriggerType,
+        trigger_metadata: AutoModTriggerMetadata | UndefinedType = UNDEFINED,
+        actions: list[AutoModAction],
+        enabled: bool = False,
+        exempt_roles: list[Snowflake] | UndefinedType = UNDEFINED,
+        exempt_channels: list[Snowflake] | UndefinedType = UNDEFINED,
+        reason: str | None = None,
+    ) -> AutoModRule:
+        """Create an auto moderation rule for this guild.
+        
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the rule.
+        event_type: :class:`AutoModEventType`
+            The event type of the rule.
+        trigger_type: :class:`AutoModTriggerType`
+            The trigger type of the rule.
+        trigger_metadata: :class:`AutoModTriggerMetadata`
+            The trigger metadata of the rule.
+        actions: list[:class:`AutoModAction`]
+            The actions to take when the rule is triggered.
+        enabled: :class:`bool`
+            Whether the rule is enabled.
+        exempt_roles: list[:class:`Snowflake`]
+            The roles exempt from this rule.
+        exempt_channels: list[:class:`Snowflake`]
+            The channels exempt from this rule.
+        reason: :class:`str`
+            The reason for creating the rule.
+        
+        Returns
+        -------
+        :class:`AutoModRule`
+            The auto moderation rule for this guild.
+        """
+        data = await self._state.http.create_auto_moderation_rule_for_guild(
+            self.id,
+            name=name,
+            event_type=event_type,
+            trigger_type=trigger_type,
+            trigger_metadata=trigger_metadata,
+            actions=actions,
+            enabled=enabled,
+            exempt_roles=exempt_roles,
+            exempt_channels=exempt_channels,
+            reason=reason,
+        )
+        return AutoModRule(data, self._state)
+
 
 
 class GuildPreview:
