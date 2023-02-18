@@ -150,6 +150,20 @@ class DefaultReaction:
 
 
 class Channel:
+    """
+    Represents a Discord channel. All other channel types inherit from this.
+
+    Attributes
+    ----------
+    id: :class:`Snowflake`
+        The ID of the channel.
+    type: :class:`ChannelType`
+        The type of the channel.
+    name: :class:`str` | :class:`UndefinedType`
+        The name of the channel.
+    flags: :class:`ChannelFlags` | :class:`UndefinedType`
+        The flags of the channel.
+    """
     def __init__(self, data: DiscordChannel, state: State) -> None:
         self._state = state
         self.id: Snowflake = Snowflake(data['id'])
@@ -165,8 +179,51 @@ class Channel:
         data = await self._state.http.modify_channel(self.id, **kwargs)
         return Channel(data, self._state)
 
+    async def delete(self, reason: str | None = None) -> None:
+        """
+        Delete this channel.
+
+        Parameters
+        ----------
+        reason: :class:`str` | None
+            The reason for deleting this channel. Shows up on the audit log.
+        """
+        await self._state.http.delete_channel(self.id, reason=reason)
+
 
 class GuildChannel(Channel):
+    """
+    Represents a Discord guild channel. All other guild channel types inherit from this.
+
+    Attributes
+    ----------
+    id: :class:`Snowflake`
+        The ID of the channel.
+    type: :class:`ChannelType`
+        The type of the channel.
+    name: :class:`str` | :class:`UndefinedType`
+        The name of the channel.
+    flags: :class:`ChannelFlags` | :class:`UndefinedType`
+        The flags of the channel.
+    guild_id: :class:`Snowflake` | :class:`UndefinedType`
+        The ID of the guild this channel belongs to.
+    position: :class:`int` | :class:`UndefinedType`
+        The position of the channel.
+    permission_overwrites: list[:class:`_Overwrite`]
+        The permission overwrites of the channel.
+    topic: :class:`str` | None | :class:`UndefinedType`
+        The topic of the channel.
+    nsfw: :class:`bool` | :class:`UndefinedType`
+        Whether the channel is NSFW.
+    permissions: :class:`Permissions` | :class:`UndefinedType`
+        The bot's permissions in this channel.
+    parent_id: :class:`Snowflake` | None | :class:`UndefinedType`
+        The ID of the parent category of this channel.
+    rate_limit_per_user: :class:`int` | :class:`UndefinedType`
+        The slowmode rate limit of the channel.
+    default_auto_archive_duration: :class:`int` | :class:`UndefinedType`
+        The default auto archive duration of the channel.
+    """
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.guild_id: Snowflake | UndefinedType = (
