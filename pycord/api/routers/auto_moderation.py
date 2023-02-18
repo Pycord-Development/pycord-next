@@ -18,18 +18,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from .base import BaseRouter
+from ..route import Route
 from ...snowflake import Snowflake
 from ...types import (
-    AutoModerationRule, 
-    AutoModerationTriggerMetadata, 
-    AutoModerationAction,
-    AUTO_MODERATION_EVENT_TYPES, 
-    AUTO_MODERATION_TRIGGER_TYPES,
+    AUTO_MODERATION_EVENT_TYPES, AUTO_MODERATION_TRIGGER_TYPES, AutoModerationAction, AutoModerationRule,
+    AutoModerationTriggerMetadata,
 )
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
-from ..route import Route
-from .base import BaseRouter
 
 
 class AutoModeration(BaseRouter):
@@ -42,7 +39,7 @@ class AutoModeration(BaseRouter):
                 '/guilds/{guild_id}/auto-moderation/rules', guild_id=guild_id,
             ),
         )
-    
+
     async def get_auto_moderation_rule(
         self, guild_id: Snowflake, rule_id: Snowflake,
     ) -> AutoModerationRule:
@@ -52,10 +49,10 @@ class AutoModeration(BaseRouter):
                 '/guilds/{guild_id}/auto-moderation/rules/{rule_id}', guild_id=guild_id, rule_id=rule_id,
             )
         )
-    
+
     async def create_auto_moderation_rule(
         self, guild_id: Snowflake, *,
-        name: str, 
+        name: str,
         event_type: AUTO_MODERATION_EVENT_TYPES,
         trigger_type: AUTO_MODERATION_TRIGGER_TYPES,
         actions: list[AutoModerationAction],
@@ -83,10 +80,10 @@ class AutoModeration(BaseRouter):
             remove_undefined(data),
             reason=reason,
         )
-    
+
     async def modify_auto_moderation_rule(
         self, guild_id: Snowflake, rule_id: Snowflake, *,
-        name: str | UndefinedType = UNDEFINED, 
+        name: str | UndefinedType = UNDEFINED,
         event_type: AUTO_MODERATION_EVENT_TYPES | UndefinedType = UNDEFINED,
         actions: list[AutoModerationAction] | UndefinedType = UNDEFINED,
         trigger_metadata: AutoModerationTriggerMetadata | UndefinedType | None = UNDEFINED,
@@ -112,7 +109,7 @@ class AutoModeration(BaseRouter):
             remove_undefined(data),
             reason=reason,
         )
-    
+
     async def delete_auto_moderation_rule(
         self, guild_id: Snowflake, rule_id: Snowflake, *, reason: str | None = None
     ) -> None:
@@ -123,4 +120,3 @@ class AutoModeration(BaseRouter):
             ),
             reason=reason,
         )
-

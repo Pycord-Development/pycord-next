@@ -18,12 +18,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from .base import BaseRouter
+from ..route import Route
 from ...snowflake import Snowflake
-from ...types import AuditLog, AUDIT_LOG_EVENT_TYPE
+from ...types import AUDIT_LOG_EVENT_TYPE, AuditLog
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
-from ..route import Route
-from .base import BaseRouter
 
 
 class AuditLogs(BaseRouter):
