@@ -28,15 +28,12 @@ from .enums import ApplicationRoleConnectionMetadataType
 from .undefined import UNDEFINED, UndefinedType
 from .user import LOCALE
 
-if TYPE_CHECKING:
-    from .state import State
-
 __all__ = (
     'ApplicationRoleConnectionMetadata',
 )
 
 
-class ApplicatioApplicationRoleConnectionMetadata:
+class ApplicationRoleConnectionMetadata:
     """Represents a Discord Application's Role Connection Metadata.
     
     Attributes
