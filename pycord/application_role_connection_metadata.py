@@ -20,8 +20,6 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing_extensions import Self
-
 from .enums import ApplicationRoleConnectionMetadataType
 from .types import ApplicationRoleConnectionMetadata as DiscordApplicationRoleConnectionMetadata
 from .undefined import UNDEFINED, UndefinedType
@@ -76,7 +74,7 @@ class ApplicationRoleConnectionMetadata:
         )
 
     @classmethod
-    def from_dict(cls, data: dict[str, str]) -> Self:
+    def from_dict(cls, data: dict[str, str]) -> ApplicationRoleConnectionMetadata:
         type = ApplicationRoleConnectionMetadataType(data.pop('type'))
         return cls(type=type, **data)
 
