@@ -70,7 +70,7 @@ class HTTPClient(ApplicationCommands, ApplicationRoleConnections, AuditLogs, Aut
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,
-    ) -> str | dict[str, Any] | bytes:
+    ) -> str | dict[str, Any] | list[Any] | bytes:
         endpoint = route.merge(self.base_url)
 
         if self._session is None:
