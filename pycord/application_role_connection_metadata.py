@@ -20,11 +20,10 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 from typing_extensions import Self
 
-from .types import ApplicationRoleConnectionMetadata as DiscordApplicationRoleConnectionMetadata
 from .enums import ApplicationRoleConnectionMetadataType
+from .types import ApplicationRoleConnectionMetadata as DiscordApplicationRoleConnectionMetadata
 from .undefined import UNDEFINED, UndefinedType
 from .user import LOCALE
 
@@ -51,6 +50,7 @@ class ApplicationRoleConnectionMetadata:
     description_localizations: :class:`dict[str, str]`
         The localizations for the description of the role connection metadata field.
     """
+
     def __init__(
         self,
         *,
@@ -74,12 +74,12 @@ class ApplicationRoleConnectionMetadata:
             f'description={self.description!r} name_localizations={self.name_localizations!r} '
             f'description_localizations={self.description_localizations!r}>'
         )
-    
+
     @classmethod
     def from_dict(cls, data: dict[str, str]) -> Self:
         type = ApplicationRoleConnectionMetadataType(data.pop('type'))
         return cls(type=type, **data)
-    
+
     def to_dict(self) -> DiscordApplicationRoleConnectionMetadata:
         return {
             'type': self.type.value,

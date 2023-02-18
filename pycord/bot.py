@@ -366,8 +366,8 @@ class Bot:
         return [ApplicationRoleConnectionMetadata.from_dict(record) for record in data]
 
     async def update_application_role_connection_metadata_records(
-            self, records: list[ApplicationRoleConnectionMetadata]
-        ) -> list[ApplicationRoleConnectionMetadata]:
+        self, records: list[ApplicationRoleConnectionMetadata]
+    ) -> list[ApplicationRoleConnectionMetadata]:
         """Update the application role connection metadata records.
         
         Parameters
@@ -380,6 +380,7 @@ class Bot:
         list[:class:`ApplicationRoleConnectionMetadata`]
             The updated application role connection metadata records.
         """
-        await self._state.http.update_application_role_connection_metadata_records(
+        data = await self._state.http.update_application_role_connection_metadata_records(
             self.user.id, [record.to_dict() for record in records]
         )
+        return [ApplicationRoleConnectionMetadata.from_dict(record) for record in data]
