@@ -44,11 +44,35 @@ if TYPE_CHECKING:
 
 
 class _Overwrite:
-    def __init__(self, overwrite: DiscordOverwrite) -> None:
-        self.id: Snowflake = Snowflake(overwrite['id'])
-        self.type: OverwriteType = OverwriteType(overwrite['type'])
-        self.allow: Permissions = Permissions.from_value(overwrite['allow'])
-        self.deny: Permissions = Permissions.from_value(overwrite['deny'])
+    def __init__(
+        self,
+        id: int,
+        type: OverwriteType,
+        *,
+        allow: Permissions,
+        deny: Permissions,
+    ) -> None:
+        self.id: Snowflake = Snowflake(id)
+        self.type: OverwriteType = type
+        self.allow: Permissions = allow
+        self.deny: Permissions = deny
+
+    @classmethod
+    def from_dict(cls, overwrite: DiscordOverwrite) -> _Overwrite:
+        return cls(
+            int(overwrite['id']),
+            OverwriteType(overwrite['type']),
+            allow=Permissions.from_value(overwrite['allow']),
+            deny=Permissions.from_value(overwrite['deny']),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            'id': self.id,
+            'type': self.type,
+            'allow': self.allow.value,
+            'deny': self.deny.value,
+        }
 
 
 class ThreadMetadata:
@@ -82,12 +106,38 @@ class ThreadMember:
 
 
 class ForumTag:
-    def __init__(self, tag: DiscordForumTag) -> None:
-        self.id: Snowflake = Snowflake(tag['id'])
-        self.name: str = tag['name']
-        self.moderated: bool = tag['moderated']
-        self.emoji_id: Snowflake = tag['emoji_id']
-        self.emoji_name: str | None = tag['emoji_name']
+    def __init__(
+        self, *,
+        name: str,
+        moderated: bool = False,
+        emoji_id: Snowflake | str | None = None,
+        emoji_name: str | None = None,
+    ) -> None:
+        self.id: Snowflake | None = None
+        self.name: str = name
+        self.moderated: bool = moderated
+        self.emoji_id: Snowflake | str = emoji_id
+        self.emoji_name: str | None = emoji_name
+
+    @classmethod
+    def from_dict(cls, data: DiscordForumTag) -> ForumTag:
+        obj = cls(
+            name=data['name'],
+            moderated=data['moderated'],
+            emoji_id=Snowflake(em_id) if isinstance(em_id := data.get('emoji_id'), int) else em_id,
+            emoji_name=data.get('emoji_name'),
+        )
+        obj.id = Snowflake(data['id'])
+        return obj
+
+    def to_dict(self) -> dict[str, Any]:
+        # omit ID because we don't send that to Discord
+        return {
+            'name': self.name,
+            'moderated': self.moderated,
+            'emoji_id': self.emoji_id,
+            'emoji_name': self.emoji_name,
+        }
 
 
 class DefaultReaction:
@@ -111,6 +161,10 @@ class Channel:
             else UNDEFINED
         )
 
+    async def _base_edit(self, **kwargs: Any) -> Channel:
+        data = await self._state.http.modify_channel(self.id, **kwargs)
+        return Channel(data, self._state)
+
 
 class GuildChannel(Channel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
@@ -122,7 +176,7 @@ class GuildChannel(Channel):
         )
         self.position: int | UndefinedType = data.get('position', UNDEFINED)
         self.permission_overwrites: list[_Overwrite] = [
-            _Overwrite(d) for d in data.get('permission_overwrites', [])
+            _Overwrite.from_dict(d) for d in data.get('permission_overwrites', [])
         ]
         self.topic: str | None | UndefinedType = data.get('topic', UNDEFINED)
         self.nsfw: bool | UndefinedType = data.get('nsfw', UNDEFINED)
@@ -211,31 +265,106 @@ class AudioChannel(GuildChannel):
         self.user_limit: int | UndefinedType = data.get('user_limit', UNDEFINED)
 
 
-class TextChannel(MessageableChannel):
-    ...
+class TextChannel(MessageableChannel, GuildChannel):
+    # Type 0
+    async def edit(
+        self, *,
+        name: str | UndefinedType = UNDEFINED,
+        type: ChannelType | UndefinedType = UNDEFINED,
+        position: int | None | UndefinedType = UNDEFINED,
+        topic: str | None | UndefinedType = UNDEFINED,
+        nsfw: bool | None | UndefinedType = UNDEFINED,
+        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
+        permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
+        parent_id: Snowflake | None | UndefinedType = UNDEFINED,
+        default_auto_archive_duration: int | None | UndefinedType = UNDEFINED,
+        default_thread_rate_limit_per_user: int | UndefinedType = UNDEFINED,
+    ) -> TextChannel:
+        data = await self._state.http.modify_channel(
+            self.id,
+            name=name,
+            type=type.value if type else UNDEFINED,
+            position=position,
+            topic=topic,
+            nsfw=nsfw,
+            rate_limit_per_user=rate_limit_per_user,
+            permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
+            parent_id=parent_id,
+            default_auto_archive_duration=default_auto_archive_duration,
+            default_thread_rate_limit_per_user=default_thread_rate_limit_per_user,
+        )
+        return TextChannel(data, self._state)
 
 
 class DMChannel(MessageableChannel):
+    # Type 1
     ...
 
 
 class VoiceChannel(MessageableChannel, AudioChannel):
-    ...
+    # Type 2
+    async def edit(
+        self, *,
+        name: str | UndefinedType = UNDEFINED,
+        position: int | None | UndefinedType = UNDEFINED,
+        nsfw: bool | None | UndefinedType = UNDEFINED,
+        bitrate: int | None | UndefinedType = UNDEFINED,
+        user_limit: int | None | UndefinedType = UNDEFINED,
+        permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
+        parent_id: Snowflake | None | UndefinedType = UNDEFINED,
+        rtc_region: str | None | UndefinedType = UNDEFINED,
+        video_quality_mode: VideoQualityMode | None | UndefinedType = UNDEFINED,
+    ) -> VoiceChannel:
+        data = await self._state.http.modify_channel(
+            self.id,
+            name=name,
+            position=position,
+            nsfw=nsfw,
+            bitrate=bitrate,
+            user_limit=user_limit,
+            permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
+            parent_id=parent_id,
+            rtc_region=rtc_region,
+            video_quality_mode=video_quality_mode.value if video_quality_mode else UNDEFINED,
+        )
+        return VoiceChannel(data, self._state)
+
+
+class GroupDMChannel(MessageableChannel):
+    # Type 3
+    async def edit(
+        self, *,
+        name: str | UndefinedType = UNDEFINED,
+        icon: str | UndefinedType = UNDEFINED,
+    ) -> GroupDMChannel:
+        data = await self._state.http.modify_channel(self.id, name=name, icon=icon)
+        return GroupDMChannel(data, self._state)
 
 
 class CategoryChannel(Channel):
+    # Type 4
+    async def edit(
+        self, *,
+        name: str | UndefinedType = UNDEFINED,
+        position: int | None | UndefinedType = UNDEFINED,
+        permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
+    ) -> CategoryChannel:
+        data = await self._state.http.modify_channel(
+            self.id,
+            name=name,
+            position=position,
+            permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
+        )
+        return CategoryChannel(data, self._state)
+
+
+class AnnouncementChannel(TextChannel):
+    # Type 5
     ...
 
 
-class AnnouncementChannel(MessageableChannel):
-    ...
-
-
-class AnnouncementThread(MessageableChannel):
-    ...
-
-
-class Thread(MessageableChannel, GuildChannel):
+class AnnouncementThread(MessageableChannel, GuildChannel):
+    # Type 10
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.default_thread_rate_limit_per_user: int | UndefinedType = data.get(
@@ -253,16 +382,105 @@ class Thread(MessageableChannel, GuildChannel):
             else UNDEFINED
         )
 
+    async def edit(
+        self, *,
+        name: str | UndefinedType = UNDEFINED,
+        archived: bool | UndefinedType = UNDEFINED,
+        auto_archive_duration: int | UndefinedType = UNDEFINED,
+        locked: bool | UndefinedType = UNDEFINED,
+        rate_limit_per_user: int | UndefinedType = UNDEFINED,
+    ) -> AnnouncementThread:
+        data = await self._state.http.modify_channel(
+            self.id,
+            name=name,
+            archived=archived,
+            auto_archive_duration=auto_archive_duration,
+            locked=locked,
+            rate_limit_per_user=rate_limit_per_user,
+        )
+        return AnnouncementThread(data, self._state)
+
+
+class Thread(MessageableChannel, GuildChannel):
+    # Type 11 & 12
+    def __init__(self, data: DiscordChannel, state: State) -> None:
+        super().__init__(data, state)
+        self.default_thread_rate_limit_per_user: int | UndefinedType = data.get(
+            'default_thread_rate_limit_per_user', UndefinedType
+        )
+        self.message_count: int | UndefinedType = data.get('message_count', UNDEFINED)
+        self.thread_metadata: ThreadMetadata | UndefinedType = (
+            ThreadMetadata(data['thread_metadata'])
+            if data.get('thread_metadata') is not None
+            else UNDEFINED
+        )
+        self.owner_id: Snowflake | UndefinedType = (
+            Snowflake(data['owner_id'])
+            if data.get('owner_id') is not None
+            else UNDEFINED
+        )
+
+    async def edit(
+        self, *,
+        name: str | UndefinedType = UNDEFINED,
+        archived: bool | UndefinedType = UNDEFINED,
+        auto_archive_duration: int | UndefinedType = UNDEFINED,
+        locked: bool | UndefinedType = UNDEFINED,
+        invitable: bool | UndefinedType = UNDEFINED,
+        rate_limit_per_user: int | UndefinedType = UNDEFINED,
+        flags: ChannelFlags | UndefinedType = UNDEFINED,
+        applied_tags: list[ForumTag] | UndefinedType = UNDEFINED,
+    ) -> Thread:
+        data = await self._state.http.modify_channel(
+            self.id,
+            name=name,
+            archived=archived,
+            auto_archive_duration=auto_archive_duration,
+            locked=locked,
+            invitable=invitable,
+            rate_limit_per_user=rate_limit_per_user,
+            flags=flags.value if flags else UNDEFINED,
+            applied_tags=[t.id for t in applied_tags] if applied_tags else UNDEFINED,
+        )
+        return Thread(data, self._state)
+
 
 class StageChannel(AudioChannel):
-    ...
+    # Type 13
+    async def edit(
+        self, *,
+        name: str | UndefinedType = UNDEFINED,
+        position: int | None | UndefinedType = UNDEFINED,
+        nsfw: bool | None | UndefinedType = UNDEFINED,
+        bitrate: int | None | UndefinedType = UNDEFINED,
+        user_limit: int | None | UndefinedType = UNDEFINED,
+        permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
+        parent_id: Snowflake | None | UndefinedType = UNDEFINED,
+        rtc_region: str | None | UndefinedType = UNDEFINED,
+        video_quality_mode: VideoQualityMode | None | UndefinedType = UNDEFINED,
+    ) -> StageChannel:
+        data = await self._state.http.modify_channel(
+            self.id,
+            name=name,
+            position=position,
+            nsfw=nsfw,
+            bitrate=bitrate,
+            user_limit=user_limit,
+            permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
+            parent_id=parent_id,
+            rtc_region=rtc_region,
+            video_quality_mode=video_quality_mode.value if video_quality_mode else UNDEFINED,
+        )
+        return StageChannel(data, self._state)
 
 
 class DirectoryChannel(Channel):
+    # Type 14
     ...
 
 
 class ForumChannel(Channel):
+    # Type 15
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.default_sort_order: int | None | UndefinedType = data.get(
@@ -274,25 +492,51 @@ class ForumChannel(Channel):
             else UNDEFINED
         )
         self.available_tags: list[ForumTag] = [
-            ForumTag(d) for d in data.get('available_tags', [])
+            ForumTag.from_dict(d) for d in data.get('available_tags', [])
         ]
-        self.applied_tags: list[Snowflake] = [
-            Snowflake(s) for s in data.get('applied_tags', [])
-        ]
+
+    async def edit(
+        self, *,
+        name: str | UndefinedType = UNDEFINED,
+        position: int | None | UndefinedType = UNDEFINED,
+        topic: str | None | UndefinedType = UNDEFINED,
+        nsfw: bool | None | UndefinedType = UNDEFINED,
+        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
+        permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
+        parent_id: Snowflake | None | UndefinedType = UNDEFINED,
+        default_auto_archive_duration: int | None | UndefinedType = UNDEFINED,
+        flags: ChannelFlags | UndefinedType = UNDEFINED,
+        available_tags: list[ForumTag] | UndefinedType = UNDEFINED,
+    ) -> ForumChannel:
+        data = await self._state.http.modify_channel(
+            self.id,
+            name=name,
+            position=position,
+            topic=topic,
+            nsfw=nsfw,
+            rate_limit_per_user=rate_limit_per_user,
+            permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
+            parent_id=parent_id,
+            default_auto_archive_duration=default_auto_archive_duration,
+            flags=flags.value if flags else UNDEFINED,
+            available_tags=[t.to_dict() for t in available_tags] if available_tags else UNDEFINED,
+        )
+        return ForumChannel(data, self._state)
 
 
 CHANNEL_TYPE = (
-    TextChannel
-    | DMChannel
-    | VoiceChannel
-    | CategoryChannel
-    | AnnouncementChannel
-    | AnnouncementThread
-    | Thread
-    | StageChannel
-    | DirectoryChannel
-    | ForumChannel
-    | Channel
+        TextChannel
+        | DMChannel
+        | VoiceChannel
+        | GroupDMChannel
+        | CategoryChannel
+        | AnnouncementChannel
+        | AnnouncementThread
+        | Thread
+        | StageChannel
+        | DirectoryChannel
+        | ForumChannel
+        | Channel
 )
 
 
