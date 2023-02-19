@@ -21,16 +21,14 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
-
-from .member import Member
-
-from .message import Message
+from typing import Any, TYPE_CHECKING
 
 from .embed import Embed
 from .enums import ChannelType, OverwriteType, VideoQualityMode
 from .errors import ComponentException
 from .flags import ChannelFlags, Permissions
+from .member import Member
+from .message import AllowedMentions, Message, MessageReference
 from .snowflake import Snowflake
 from .types import (
     Channel as DiscordChannel,
@@ -175,6 +173,7 @@ class Channel:
     flags: :class:`ChannelFlags` | :class:`UndefinedType`
         The flags of the channel.
     """
+
     def __init__(self, data: DiscordChannel, state: State) -> None:
         self._state = state
         self.id: Snowflake = Snowflake(data['id'])
@@ -235,6 +234,7 @@ class GuildChannel(Channel):
     default_auto_archive_duration: :class:`int` | :class:`UndefinedType`
         The default auto archive duration of the channel.
     """
+
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.guild_id: Snowflake | UndefinedType = (
@@ -286,6 +286,8 @@ class MessageableChannel(Channel):
         nonce: int | str | UndefinedType = UNDEFINED,
         tts: bool | UndefinedType = UNDEFINED,
         embeds: list[Embed] | UndefinedType = UNDEFINED,
+        allowed_mentions: AllowedMentions | UndefinedType = UNDEFINED,
+        message_reference: MessageReference | UndefinedType = UNDEFINED,
         sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
         flags: int | UndefinedType = UNDEFINED,
         house: House | UndefinedType = UNDEFINED,
@@ -314,6 +316,8 @@ class MessageableChannel(Channel):
             nonce=nonce,
             tts=tts,
             embeds=embeds,
+            allowed_mentions=allowed_mentions.to_dict() if allowed_mentions else UNDEFINED,
+            message_reference=message_reference.to_dict() if message_reference else UNDEFINED,
             sticker_ids=sticker_ids,
             flags=flags,
             components=components,
@@ -380,7 +384,7 @@ class TextChannel(MessageableChannel, GuildChannel):
         invitable: bool | UndefinedType = UNDEFINED,
         rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
         reason: str | None = None,
-    ) -> Thread:
+    ) -> Thread | AnnouncementThread:
         data = await self._state.http.start_thread_without_message(
             self.id,
             name=name,
@@ -390,7 +394,7 @@ class TextChannel(MessageableChannel, GuildChannel):
             rate_limit_per_user=rate_limit_per_user,
             reason=reason,
         )
-        return Thread(data, state=self._state)
+        return identify_channel(data, state=self._state)
 
     async def list_public_archived_threads(
         self,
@@ -511,42 +515,6 @@ class AnnouncementChannel(TextChannel):
         )
 
 
-class AnnouncementThread(MessageableChannel, GuildChannel):
-    # Type 10
-    def __init__(self, data: DiscordChannel, state: State) -> None:
-        super().__init__(data, state)
-        self.default_thread_rate_limit_per_user: int | UndefinedType = data.get(
-            'default_thread_rate_limit_per_user', UndefinedType
-        )
-        self.message_count: int | UndefinedType = data.get('message_count', UNDEFINED)
-        self.thread_metadata: ThreadMetadata | UndefinedType = (
-            ThreadMetadata(data['thread_metadata'])
-            if data.get('thread_metadata') is not None
-            else UNDEFINED
-        )
-        self.owner_id: Snowflake | UndefinedType = (
-            Snowflake(data['owner_id'])
-            if data.get('owner_id') is not None
-            else UNDEFINED
-        )
-
-    async def edit(
-        self, *,
-        name: str | UndefinedType = UNDEFINED,
-        archived: bool | UndefinedType = UNDEFINED,
-        auto_archive_duration: int | UndefinedType = UNDEFINED,
-        locked: bool | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | UndefinedType = UNDEFINED,
-    ) -> AnnouncementThread:
-        return await self._base_edit(
-            name=name,
-            archived=archived,
-            auto_archive_duration=auto_archive_duration,
-            locked=locked,
-            rate_limit_per_user=rate_limit_per_user,
-        )
-
-
 class Thread(MessageableChannel, GuildChannel):
     # Type 11 & 12
     def __init__(self, data: DiscordChannel, state: State) -> None:
@@ -616,6 +584,23 @@ class Thread(MessageableChannel, GuildChannel):
         return [ThreadMember(d) for d in data]
 
 
+class AnnouncementThread(Thread):
+    # Type 10
+    async def edit(
+        self, *,
+        name: str | UndefinedType = UNDEFINED,
+        archived: bool | UndefinedType = UNDEFINED,
+        auto_archive_duration: int | UndefinedType = UNDEFINED,
+        locked: bool | UndefinedType = UNDEFINED,
+        rate_limit_per_user: int | UndefinedType = UNDEFINED,
+    ) -> AnnouncementThread:
+        return await self._base_edit(
+            name=name,
+            archived=archived,
+            auto_archive_duration=auto_archive_duration,
+            locked=locked,
+            rate_limit_per_user=rate_limit_per_user,
+        )
 
 
 class StageChannel(AudioChannel):
