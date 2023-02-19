@@ -77,7 +77,7 @@ class AutoModeration(BaseRouter):
             Route(
                 '/guilds/{guild_id}/auto-moderation/rules', guild_id=guild_id,
             ),
-            remove_undefined(data),
+            remove_undefined(**data),
             reason=reason,
         )
 
@@ -106,7 +106,7 @@ class AutoModeration(BaseRouter):
             Route(
                 '/guilds/{guild_id}/auto-moderation/rules/{rule_id}', guild_id=guild_id, rule_id=rule_id,
             ),
-            remove_undefined(data),
+            remove_undefined(**data),
             reason=reason,
         )
 

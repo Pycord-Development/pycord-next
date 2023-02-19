@@ -105,7 +105,7 @@ class Channels(BaseRouter):
             Route(
                 '/channels/{channel_id}', channel_id=channel_id
             ),
-            remove_undefined(data),
+            remove_undefined(**data),
             reason=reason,
         )
 
@@ -139,7 +139,7 @@ class Channels(BaseRouter):
                 channel_id=channel_id,
                 overwrite_id=overwrite_id,
             ),
-            remove_undefined(data),
+            remove_undefined(**data),
             reason=reason,
         )
 
@@ -178,7 +178,7 @@ class Channels(BaseRouter):
             Route(
                 '/channels/{channel_id}/invites', channel_id=channel_id
             ),
-            remove_undefined(data),
+            remove_undefined(**data),
             reason=reason,
         )
 
@@ -272,7 +272,7 @@ class Channels(BaseRouter):
                 channel_id=channel_id,
                 message_id=message_id,
             ),
-            remove_undefined(data),
+            remove_undefined(**data),
             reason=reason,
         )
 
@@ -294,7 +294,7 @@ class Channels(BaseRouter):
                 '/channels/{channel_id}/threads',
                 channel_id=channel_id,
             ),
-            remove_undefined(data),
+            remove_undefined(**data),
             reason=reason,
         )
 
@@ -318,7 +318,7 @@ class Channels(BaseRouter):
                 '/channels/{channel_id}/threads',
                 channel_id=channel_id,
             ),
-            remove_undefined(data),
+            remove_undefined(**data),
             reason=reason,
         )
 
