@@ -26,8 +26,8 @@ __all__ = ['Route', 'BaseRoute']
 
 
 class BaseRoute:
-    guild_id = Optional[int]
-    channel_id = Optional[int]
+    guild_id = int | None
+    channel_id = int | None
     webhook_id: int | None
     webhook_token: str | None
 
