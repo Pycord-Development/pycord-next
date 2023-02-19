@@ -177,7 +177,7 @@ class Channel:
 
     async def _base_edit(self, **kwargs: Any) -> Channel:
         data = await self._state.http.modify_channel(self.id, **kwargs)
-        return Channel(data, self._state)
+        return self.__class__(data, self._state)
 
     async def delete(self, reason: str | None = None) -> None:
         """
@@ -337,8 +337,7 @@ class TextChannel(MessageableChannel, GuildChannel):
         default_auto_archive_duration: int | None | UndefinedType = UNDEFINED,
         default_thread_rate_limit_per_user: int | UndefinedType = UNDEFINED,
     ) -> TextChannel:
-        data = await self._state.http.modify_channel(
-            self.id,
+        return await self._base_edit(
             name=name,
             type=type.value if type else UNDEFINED,
             position=position,
@@ -350,7 +349,6 @@ class TextChannel(MessageableChannel, GuildChannel):
             default_auto_archive_duration=default_auto_archive_duration,
             default_thread_rate_limit_per_user=default_thread_rate_limit_per_user,
         )
-        return TextChannel(data, self._state)
 
 
 class DMChannel(MessageableChannel):
@@ -372,8 +370,7 @@ class VoiceChannel(MessageableChannel, AudioChannel):
         rtc_region: str | None | UndefinedType = UNDEFINED,
         video_quality_mode: VideoQualityMode | None | UndefinedType = UNDEFINED,
     ) -> VoiceChannel:
-        data = await self._state.http.modify_channel(
-            self.id,
+        return await self._base_edit(
             name=name,
             position=position,
             nsfw=nsfw,
@@ -384,7 +381,6 @@ class VoiceChannel(MessageableChannel, AudioChannel):
             rtc_region=rtc_region,
             video_quality_mode=video_quality_mode.value if video_quality_mode else UNDEFINED,
         )
-        return VoiceChannel(data, self._state)
 
 
 class GroupDMChannel(MessageableChannel):
@@ -406,13 +402,11 @@ class CategoryChannel(Channel):
         position: int | None | UndefinedType = UNDEFINED,
         permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
     ) -> CategoryChannel:
-        data = await self._state.http.modify_channel(
-            self.id,
+        return await self._base_edit(
             name=name,
             position=position,
             permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
         )
-        return CategoryChannel(data, self._state)
 
 
 class AnnouncementChannel(TextChannel):
@@ -447,15 +441,13 @@ class AnnouncementThread(MessageableChannel, GuildChannel):
         locked: bool | UndefinedType = UNDEFINED,
         rate_limit_per_user: int | UndefinedType = UNDEFINED,
     ) -> AnnouncementThread:
-        data = await self._state.http.modify_channel(
-            self.id,
+        return await self._base_edit(
             name=name,
             archived=archived,
             auto_archive_duration=auto_archive_duration,
             locked=locked,
             rate_limit_per_user=rate_limit_per_user,
         )
-        return AnnouncementThread(data, self._state)
 
 
 class Thread(MessageableChannel, GuildChannel):
@@ -488,8 +480,7 @@ class Thread(MessageableChannel, GuildChannel):
         flags: ChannelFlags | UndefinedType = UNDEFINED,
         applied_tags: list[ForumTag] | UndefinedType = UNDEFINED,
     ) -> Thread:
-        data = await self._state.http.modify_channel(
-            self.id,
+        return await self._base_edit(
             name=name,
             archived=archived,
             auto_archive_duration=auto_archive_duration,
@@ -499,7 +490,6 @@ class Thread(MessageableChannel, GuildChannel):
             flags=flags.value if flags else UNDEFINED,
             applied_tags=[t.id for t in applied_tags] if applied_tags else UNDEFINED,
         )
-        return Thread(data, self._state)
 
 
 class StageChannel(AudioChannel):
@@ -516,8 +506,7 @@ class StageChannel(AudioChannel):
         rtc_region: str | None | UndefinedType = UNDEFINED,
         video_quality_mode: VideoQualityMode | None | UndefinedType = UNDEFINED,
     ) -> StageChannel:
-        data = await self._state.http.modify_channel(
-            self.id,
+        return await self._base_edit(
             name=name,
             position=position,
             nsfw=nsfw,
@@ -528,7 +517,6 @@ class StageChannel(AudioChannel):
             rtc_region=rtc_region,
             video_quality_mode=video_quality_mode.value if video_quality_mode else UNDEFINED,
         )
-        return StageChannel(data, self._state)
 
 
 class DirectoryChannel(Channel):
@@ -565,8 +553,7 @@ class ForumChannel(Channel):
         flags: ChannelFlags | UndefinedType = UNDEFINED,
         available_tags: list[ForumTag] | UndefinedType = UNDEFINED,
     ) -> ForumChannel:
-        data = await self._state.http.modify_channel(
-            self.id,
+        return await self._base_edit(
             name=name,
             position=position,
             topic=topic,
@@ -578,7 +565,6 @@ class ForumChannel(Channel):
             flags=flags.value if flags else UNDEFINED,
             available_tags=[t.to_dict() for t in available_tags] if available_tags else UNDEFINED,
         )
-        return ForumChannel(data, self._state)
 
 
 CHANNEL_TYPE = (
