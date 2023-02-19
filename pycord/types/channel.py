@@ -24,9 +24,6 @@ from typing_extensions import NotRequired, TypedDict
 
 from .snowflake import Snowflake
 from .user import User
-from .embed import Embed
-from .component import Component
-from .message import Attachment
 
 CTYPE = Literal[0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15]
 
@@ -116,17 +113,6 @@ class AllowedMentions(TypedDict):
 class FollowedChannel(TypedDict):
     channel_id: Snowflake
     webhook_id: Snowflake
-
-
-class ForumThreadMessageParams(TypedDict):
-    content: NotRequired[str]
-    embeds: NotRequired[list[Embed]]
-    allowed_mentions: NotRequired[AllowedMentions]
-    components: NotRequired[list[Component]]
-    sticker_ids: NotRequired[list[Snowflake]]
-    payload_json: NotRequired[str]
-    attachments: NotRequired[list[Attachment]]
-    flags: NotRequired[int]
 
 
 class ListThreadResponse(TypedDict):
