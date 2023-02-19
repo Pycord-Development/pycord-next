@@ -24,6 +24,9 @@ import asyncio
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from .errors import ComponentException
+from .ui.house import House
+from .role import Role
 from .application import Application
 from .channel import (
     AnnouncementChannel,
@@ -32,7 +35,7 @@ from .channel import (
     DirectoryChannel,
     DMChannel,
     ForumChannel,
-    StageChannel,
+    identify_channel, StageChannel,
     TextChannel,
     Thread,
     VoiceChannel,
@@ -50,6 +53,7 @@ from .types import (
     MessageInteraction as DiscordMessageInteraction,
     MessageReference as DiscordMessageReference,
     Reaction as DiscordReaction,
+    AllowedMentions as DiscordAllowedMentions,
 )
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
@@ -100,6 +104,39 @@ class MessageReference:
             'fail_if_not_exists', UNDEFINED
         )
 
+    # refactor so user can initialize
+    def __init__(
+        self,
+        message_id: Snowflake | UndefinedType = UNDEFINED,
+        channel_id: Snowflake | UndefinedType = UNDEFINED,
+        guild_id: Snowflake | UndefinedType = UNDEFINED,
+        fail_if_not_exists: bool | UndefinedType = UNDEFINED,
+    ) -> None:
+        self.message_id: Snowflake | UndefinedType = message_id
+        self.channel_id: Snowflake | UndefinedType = channel_id
+        self.guild_id: Snowflake | UndefinedType = guild_id
+        self.fail_if_not_exists: bool | UndefinedType = fail_if_not_exists
+
+    def to_dict(self) -> DiscordMessageReference:
+        data = {}
+        if self.message_id is not UNDEFINED:
+            data['message_id'] = self.message_id
+        if self.channel_id is not UNDEFINED:
+            data['channel_id'] = self.channel_id
+        if self.guild_id is not UNDEFINED:
+            data['guild_id'] = self.guild_id
+        if self.fail_if_not_exists is not UNDEFINED:
+            data['fail_if_not_exists'] = self.fail_if_not_exists
+        return data
+
+    @classmethod
+    def from_dict(cls, data: DiscordMessageReference) -> MessageReference:
+        return cls(
+            message_id=data.get('message_id', UNDEFINED),
+            channel_id=data.get('channel_id', UNDEFINED),
+            guild_id=data.get('guild_id', UNDEFINED),
+        )
+
 
 class MessageInteraction:
     def __init__(self, data: DiscordMessageInteraction, state: State) -> None:
@@ -112,6 +149,40 @@ class MessageInteraction:
             if data.get('member') is not None
             else UNDEFINED
         )
+
+
+class AllowedMentions:
+    def __init__(
+        self,
+        *,
+        everyone: bool = False,
+        roles: bool | list[Role] = False,
+        users: bool | list[User] = False,
+        replied_user: bool = False,
+    ) -> None:
+        self.everyone: bool = everyone
+        self.roles: bool | list[Role] = roles
+        self.users: bool | list[User] = users
+        self.replied_user: bool = replied_user
+
+    def to_dict(self) -> DiscordAllowedMentions:
+        data = {}
+        parse = []
+        if self.everyone is True:
+            parse.append('everyone')
+        if self.roles is True:
+            parse.append('roles')
+        elif isinstance(self.roles, list):
+            data['roles'] = [r.id for r in self.roles]
+        if self.users is True:
+            parse.append('users')
+        elif isinstance(self.users, list):
+            data['users'] = [u.id for u in self.users]
+        if self.replied_user is True:
+            data['replied_user'] = True
+        if parse:
+            data['parse'] = parse
+        return data
 
 
 class Message:
@@ -166,7 +237,7 @@ class Message:
             else UNDEFINED
         )
         self.reference: MessageReference | UndefinedType = (
-            MessageReference(data.get('message_reference'))
+            MessageReference.from_dict(data.get('message_reference'))
             if data.get('message_reference') is not None
             else UNDEFINED
         )
@@ -205,10 +276,149 @@ class Message:
         )
 
         if exists:
-            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = exists[
+            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = \
+            exists[
                 1
             ]
         else:
             self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = (
                 None
             )
+
+    async def crosspost(self) -> Message:
+        data = await self._state.http.crosspost_message(self.channel_id, self.id)
+        return Message(data, self._state)
+
+    async def add_reaction(self, emoji: Emoji | str) -> None:
+        if isinstance(emoji, Emoji):
+            emoji = {'id': emoji.id, 'name': emoji.name}
+        await self._state.http.create_reaction(
+            self.channel_id,
+            self.id,
+            emoji,
+        )
+
+    async def remove_reaction(self, emoji: Emoji | str) -> None:
+        if isinstance(emoji, Emoji):
+            emoji = {'id': emoji.id, 'name': emoji.name}
+        await self._state.http.delete_own_reaction(
+            self.channel_id,
+            self.id,
+            emoji,
+        )
+
+    async def remove_user_reaction(self, emoji: Emoji | str, user: User) -> None:
+        if isinstance(emoji, Emoji):
+            emoji = {'id': emoji.id, 'name': emoji.name}
+        await self._state.http.delete_user_reaction(
+            self.channel_id,
+            self.id,
+            emoji,
+            user.id,
+        )
+
+    async def get_reactions(
+        self,
+        emoji: Emoji | str,
+        *,
+        after: Snowflake | UndefinedType = UNDEFINED,
+        limit: int = 25,
+    ) -> list[User]:
+        if isinstance(emoji, Emoji):
+            emoji = {'id': emoji.id, 'name': emoji.name}
+        data = await self._state.http.get_reactions(
+            self.channel_id,
+            self.id,
+            emoji,
+            after=after,
+            limit=limit,
+        )
+        return [User(d, self._state) for d in data]
+
+    async def remove_all_reactions(self, *, emoji: Emoji | str | None = None) -> None:
+        if emoji is not None:
+            if isinstance(emoji, Emoji):
+                emoji = {'id': emoji.id, 'name': emoji.name}
+            await self._state.http.delete_all_reactions_for_emoji(
+                self.channel_id,
+                self.id,
+                emoji,
+            )
+            return
+        await self._state.http.delete_all_reactions(
+            self.channel_id,
+            self.id,
+        )
+
+    async def edit(
+        self,
+        *,
+        content: str | None | UndefinedType = UNDEFINED,
+        embed: Embed | None | UndefinedType = UNDEFINED,
+        embeds: list[Embed] | None | UndefinedType = UNDEFINED,
+        allowed_mentions: AllowedMentions | None | UndefinedType = UNDEFINED,
+        attachments: list[Attachment] | None | UndefinedType = UNDEFINED,
+        flags: MessageFlags | None | UndefinedType = UNDEFINED,
+        house: House | UndefinedType = UNDEFINED,
+        houses: list[House] | UndefinedType = UNDEFINED,
+    ) -> Message:
+        if house and houses:
+            houses.append(house)
+
+        if houses:
+            if len(houses) > 5:
+                raise ComponentException('Cannot have over five houses at once')
+
+            components = [(house.action_row())._to_dict() for house in houses]
+
+            for house in houses:
+                self._state.sent_house(house)
+        elif house:
+            components = [(house.action_row())._to_dict()]
+            self._state.sent_house(house)
+        else:
+            components = UNDEFINED
+
+        data = await self._state.http.edit_message(
+            self.channel_id,
+            self.id,
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            allowed_mentions=allowed_mentions,
+            attachments=attachments,
+            components=components,
+            flags=flags,
+        )
+        return Message(data, self._state)
+
+    async def delete(self, *, reason: str | None = None) -> None:
+        await self._state.http.delete_message(self.channel_id, self.id, reason=reason)
+
+    async def reply(self, *args, **kwargs) -> Message:
+        kwargs['message_reference'] = MessageReference(
+            message_id=self.id,
+            channel_id=self.channel_id,
+        )
+        return await self.channel.send(*args, **kwargs)
+
+    async def pin(self) -> None:
+        await self._state.http.pin_message(self.channel_id, self.id)
+
+    async def unpin(self) -> None:
+        await self._state.http.unpin_message(self.channel_id, self.id)
+
+    async def create_thread(
+        self,
+        *,
+        name: str,
+        auto_archive_duration: int | UndefinedType = UNDEFINED,
+        rate_limit_per_user: int | UndefinedType = UNDEFINED,
+    ) -> Thread | AnnouncementThread:
+        data = await self._state.http.create_thread(
+            self.channel_id,
+            name,
+            auto_archive_duration=auto_archive_duration,
+            rate_limit_per_user=rate_limit_per_user,
+        )
+        return identify_channel(data, self._state)
