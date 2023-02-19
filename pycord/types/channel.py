@@ -24,6 +24,7 @@ from typing_extensions import NotRequired, TypedDict
 
 from .snowflake import Snowflake
 from .user import User
+from .guild import GuildMember
 
 CTYPE = Literal[0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15]
 
@@ -49,6 +50,7 @@ class ThreadMember(TypedDict):
     user_id: NotRequired[Snowflake]
     join_timestamp: str
     flags: int
+    member: NotRequired[GuildMember]
 
 
 class ForumTag(TypedDict):

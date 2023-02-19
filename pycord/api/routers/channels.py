@@ -290,6 +290,7 @@ class Channels(BaseRouter):
         self, channel_id: Snowflake, *,
         name: str,
         auto_archive_duration: int | UndefinedType = UNDEFINED,
+        type: CTYPE | UndefinedType = UNDEFINED,
         rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
         reason: str | None = None,
     ) -> Channel:

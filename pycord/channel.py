@@ -23,6 +23,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
+from .member import Member
+
+from .message import Message
+
 from .embed import Embed
 from .enums import ChannelType, OverwriteType, VideoQualityMode
 from .errors import ComponentException
@@ -103,6 +107,7 @@ class ThreadMember:
         )
         self.join_timestamp: datetime = datetime.fromisoformat(member['join_timestamp'])
         self.flags: int = member['flags']
+        self.member: Member | None = Member(member['member']) if 'member' in member else None
 
 
 class ForumTag:
@@ -147,6 +152,12 @@ class DefaultReaction:
             Snowflake(self._emoji_id) if self._emoji_id is not None else None
         )
         self.emoji_name: str | None = data['emoji_name']
+
+
+class FollowedChannel:
+    def __init__(self, data: dict[str, Any]) -> None:
+        self.channel_id: Snowflake = Snowflake(data['channel_id'])
+        self.webhook_id: Snowflake = Snowflake(data['webhook_id'])
 
 
 class Channel:
@@ -279,7 +290,7 @@ class MessageableChannel(Channel):
         flags: int | UndefinedType = UNDEFINED,
         house: House | UndefinedType = UNDEFINED,
         houses: list[House] | UndefinedType = UNDEFINED,
-    ) -> None:
+    ) -> Message:
         if house and houses:
             houses.append(house)
 
@@ -297,7 +308,7 @@ class MessageableChannel(Channel):
         else:
             components = UNDEFINED
 
-        await self._state.http.create_message(
+        data = await self._state.http.create_message(
             channel_id=self.id,
             content=content,
             nonce=nonce,
@@ -307,6 +318,13 @@ class MessageableChannel(Channel):
             flags=flags,
             components=components,
         )
+        return Message(data, state=self._state)
+
+    async def trigger_typing(self) -> None:
+        await self._state.http.trigger_typing_indicator(self.id)
+
+    async def bulk_delete(self, *messages: Message, reason: str | None = None) -> None:
+        await self._state.http.bulk_delete_messages(self.id, [m.id for m in messages], reason=reason)
 
 
 class AudioChannel(GuildChannel):
@@ -349,6 +367,66 @@ class TextChannel(MessageableChannel, GuildChannel):
             default_auto_archive_duration=default_auto_archive_duration,
             default_thread_rate_limit_per_user=default_thread_rate_limit_per_user,
         )
+
+    async def get_pinned_messages(self) -> list[Message]:
+        data = await self._state.http.get_pinned_messages(self.id)
+        return [Message(m, state=self._state) for m in data]
+
+    async def create_thread(
+        self,
+        name: str,
+        auto_archive_duration: int | UndefinedType = UNDEFINED,
+        type: ChannelType = ChannelType.PUBLIC_THREAD,
+        invitable: bool | UndefinedType = UNDEFINED,
+        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
+        reason: str | None = None,
+    ) -> Thread:
+        data = await self._state.http.start_thread_without_message(
+            self.id,
+            name=name,
+            auto_archive_duration=auto_archive_duration,
+            type=type.value,
+            invitable=invitable,
+            rate_limit_per_user=rate_limit_per_user,
+            reason=reason,
+        )
+        return Thread(data, state=self._state)
+
+    async def list_public_archived_threads(
+        self,
+        before: datetime.datetime | UndefinedType = UNDEFINED,
+        limit: int | UndefinedType = UNDEFINED,
+    ) -> list[Thread]:
+        data = await self._state.http.list_public_archived_threads(
+            self.id,
+            before=before.isoformat() if before else UNDEFINED,
+            limit=limit,
+        )
+        return [Thread(d, state=self._state) for d in data]
+
+    async def list_private_archived_threads(
+        self,
+        before: datetime.datetime | UndefinedType = UNDEFINED,
+        limit: int | UndefinedType = UNDEFINED,
+    ) -> list[Thread]:
+        data = await self._state.http.list_private_archived_threads(
+            self.id,
+            before=before.isoformat() if before else UNDEFINED,
+            limit=limit,
+        )
+        return [Thread(d, state=self._state) for d in data]
+
+    async def list_joined_private_archived_threads(
+        self,
+        before: datetime.datetime | UndefinedType = UNDEFINED,
+        limit: int | UndefinedType = UNDEFINED,
+    ) -> list[Thread]:
+        data = await self._state.http.list_joined_private_archived_threads(
+            self.id,
+            before=before.isoformat() if before else UNDEFINED,
+            limit=limit,
+        )
+        return [Thread(d, state=self._state) for d in data]
 
 
 class DMChannel(MessageableChannel):
@@ -411,7 +489,26 @@ class CategoryChannel(Channel):
 
 class AnnouncementChannel(TextChannel):
     # Type 5
-    ...
+    async def follow(self, target_channel: TextChannel) -> FollowedChannel:
+        data = await self._state.http.follow_news_channel(self.id, target_channel.id)
+        return FollowedChannel(data)
+
+    async def create_thread(
+        self,
+        name: str,
+        auto_archive_duration: int | UndefinedType = UNDEFINED,
+        invitable: bool | UndefinedType = UNDEFINED,
+        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
+        reason: str | None = None,
+    ) -> Thread:
+        return await super().create_thread(
+            name=name,
+            auto_archive_duration=auto_archive_duration,
+            type=ChannelType.ANNOUNCEMENT_THREAD,
+            invitable=invitable,
+            rate_limit_per_user=rate_limit_per_user,
+            reason=reason,
+        )
 
 
 class AnnouncementThread(MessageableChannel, GuildChannel):
@@ -490,6 +587,35 @@ class Thread(MessageableChannel, GuildChannel):
             flags=flags.value if flags else UNDEFINED,
             applied_tags=[t.id for t in applied_tags] if applied_tags else UNDEFINED,
         )
+
+    async def join(self) -> None:
+        await self._state.http.join_thread(self.id)
+
+    async def add_member(self, member: Member) -> None:
+        await self._state.http.add_thread_member(self.id, member.id)
+
+    async def leave(self) -> None:
+        await self._state.http.leave_thread(self.id)
+
+    async def remove_member(self, member: Member) -> None:
+        await self._state.http.remove_thread_member(self.id, member.id)
+
+    async def get_member(self, id: Snowflake, *, with_member: bool = True) -> ThreadMember:
+        data = await self._state.http.get_thread_member(self.id, id, with_member=with_member)
+        return ThreadMember(data)
+
+    async def list_members(
+        self, *,
+        with_member: bool = True,
+        limit: int = 100,
+        after: Snowflake | UndefinedType = UNDEFINED,
+    ) -> list[ThreadMember]:
+        data = await self._state.http.list_thread_members(
+            self.id, with_member=with_member, limit=limit, after=after
+        )
+        return [ThreadMember(d) for d in data]
+
+
 
 
 class StageChannel(AudioChannel):
