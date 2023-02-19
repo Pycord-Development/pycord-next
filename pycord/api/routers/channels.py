@@ -23,7 +23,7 @@ from ..route import Route
 from ...snowflake import Snowflake
 from ...types import (
     Channel, CTYPE, DefaultReaction, FollowedChannel, ForumTag, ForumThreadMessageParams, Invite, ListThreadResponse,
-    Overwrite, ThreadMember,
+    Message, Overwrite, ThreadMember,
 )
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
@@ -219,6 +219,16 @@ class Channels(BaseRouter):
             'POST',
             Route(
                 '/channels/{channel_id}/typing', channel_id=channel_id
+            )
+        )
+
+    async def get_pinned_messages(
+        self, channel_id: Snowflake,
+    ) -> list[Message]:
+        return await self.request(
+            'GET',
+            Route(
+                '/channels/{channel_id}/pins', channel_id=channel_id
             )
         )
 
