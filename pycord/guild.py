@@ -31,7 +31,7 @@ from .auto_moderation import (
 )
 from .channel import Channel
 from .enums import (
-    DefaultMessageNotificationLevel,
+    ChannelType, DefaultMessageNotificationLevel,
     ExplicitContentFilterLevel,
     MFALevel,
     NSFWLevel,
@@ -227,7 +227,7 @@ class Guild:
         reason: str | None = None,
     ) -> AutoModRule:
         """Create an auto moderation rule for this guild.
-        
+
         Parameters
         ----------
         name: :class:`str`
@@ -243,12 +243,12 @@ class Guild:
         enabled: :class:`bool`
             Whether the rule is enabled.
         exempt_roles: list[:class:`Snowflake`]
-            The roles exempt from this rule.
+            The roles to exempt from this rule.
         exempt_channels: list[:class:`Snowflake`]
-            The channels exempt from this rule.
-        reason: :class:`str`
+            The channels to exempt from this rule.
+        reason: :class:`str` | None
             The reason for creating the rule.
-        
+
         Returns
         -------
         :class:`AutoModRule`
