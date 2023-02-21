@@ -22,7 +22,7 @@ from .base import BaseRouter
 from ..route import Route
 from ...snowflake import Snowflake
 from ...types import (
-    Channel, CTYPE, DefaultReaction, FollowedChannel, ForumTag, ForumThreadMessageParams, Invite, ListThreadResponse,
+    Channel, CTYPE, DefaultReaction, FollowedChannel, ForumTag, ForumThreadMessageParams, Invite, ListThreadsResponse,
     Message, Overwrite, ThreadMember,
 )
 from ...undefined import UNDEFINED, UndefinedType
@@ -423,7 +423,7 @@ class Channels(BaseRouter):
         self, channel_id: Snowflake, *,
         before: str | UndefinedType = UNDEFINED,
         limit: int | UndefinedType = UNDEFINED,
-    ) -> ListThreadResponse:
+    ) -> ListThreadsResponse:
         params = {
             'before': before,
             'limit': limit,
@@ -441,7 +441,7 @@ class Channels(BaseRouter):
         self, channel_id: Snowflake, *,
         before: str | UndefinedType = UNDEFINED,
         limit: int | UndefinedType = UNDEFINED,
-    ) -> ListThreadResponse:
+    ) -> ListThreadsResponse:
         params = {
             'before': before,
             'limit': limit,
@@ -459,7 +459,7 @@ class Channels(BaseRouter):
         self, channel_id: Snowflake, *,
         before: str | UndefinedType = UNDEFINED,
         limit: int | UndefinedType = UNDEFINED,
-    ) -> ListThreadResponse:
+    ) -> ListThreadsResponse:
         params = {
             'before': before,
             'limit': limit,

@@ -46,7 +46,7 @@ class VoiceState:
         )
         self.user_id: Snowflake = Snowflake(data['user_id'])
         self.member: Member | UndefinedType = (
-            Member(data['member'], state)
+            Member(data['member'], state, guild_id=self.guild_id)
             if data.get('member') is not None
             else UNDEFINED
         )

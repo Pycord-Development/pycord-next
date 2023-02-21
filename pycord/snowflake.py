@@ -46,3 +46,7 @@ class Snowflake(int):
 
     def __hash__(self) -> int:
         return self >> 22
+
+    @classmethod
+    def from_datetime(cls, dt: datetime) -> 'Snowflake':
+        return cls((int(dt.timestamp()) - DISCORD_EPOCH) << 22)

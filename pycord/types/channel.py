@@ -119,7 +119,7 @@ class FollowedChannel(TypedDict):
     webhook_id: Snowflake
 
 
-class ListThreadResponse(TypedDict):
+class ListThreadsResponse(TypedDict):
     threads: list[Channel]
     members: list[ThreadMember]
     has_more: bool

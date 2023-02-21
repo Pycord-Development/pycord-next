@@ -35,7 +35,8 @@ class HTTPClient(
     AutoModeration,
     Channels,
     Emojis,
-    Messages
+    Guilds,
+    Messages,
 ):
     def __init__(
         self,

@@ -155,4 +155,10 @@ class Paginator(Generic[P]):
         self._pages.remove(page)
 
     async def __anext__(self) -> Any:
-        return await self.forward()
+        try:
+            return await self.forward()
+        except NoMorePages:
+            raise StopAsyncIteration
+
+    def __aiter__(self):
+        return self
