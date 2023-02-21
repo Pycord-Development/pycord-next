@@ -268,6 +268,76 @@ class Guild:
         )
         return AutoModRule(data, self._state)
 
+    async def create_emoji(
+        self, *,
+        name: str,
+        image: bytes,  # TODO
+        roles: list[Role] | None = None,
+        reason: str | None = None
+    ) -> Emoji:
+        """Creates an emoji.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the emoji.
+        image: :class:`bytes`
+            The image data of the emoji.
+        roles: List[:class:`Role`]
+            The roles that can use the emoji.
+        reason: Optional[:class:`str`]
+            The reason for creating the emoji. Shows up on the audit log.
+
+        Returns
+        -------
+        :class:`Emoji`
+            The created emoji.
+        """
+        data = await self._state.http.create_guild_emoji(
+            self.id, name, image, roles, reason
+        )
+        return Emoji(data, state=self._state)
+
+    async def edit_emoji(
+        self, emoji_id: Snowflake, *,
+        name: str | UndefinedType = UNDEFINED,
+        roles: list[Role] | UndefinedType = UNDEFINED,
+        reason: str | None = None
+    ) -> Emoji:
+        """Edits the emoji.
+
+        Parameters
+        ----------
+        emoji_id: :class:`Snowflake`
+            The ID of the emoji to edit.
+        name: :class:`str`
+            The new name of the emoji.
+        roles: List[:class:`Role`]
+            The new roles that can use the emoji.
+        reason: Optional[:class:`str`]
+            The reason for editing the emoji. Shows up on the audit log.
+
+        Returns
+        -------
+        :class:`Emoji`
+            The edited emoji.
+        """
+        data = await self._state.http.modify_guild_emoji(
+            self.id, emoji_id, name=name, roles=roles, reason=reason
+        )
+        return Emoji(data, self._state)
+
+    async def delete_emoji(self, emoji_id: Snowflake, *, reason: str | None = None) -> None:
+        """Deletes an emoji.
+
+        Parameters
+        ----------
+        emoji_id: :class:`Snowflake`
+            The ID of the emoji to delete.
+        reason: Optional[:class:`str`]
+            The reason for deleting the emoji. Shows up on the audit log.
+        """
+        await self._state.http.delete_guild_emoji(self.id, emoji_id, reason=reason)
 
 
 class GuildPreview:
