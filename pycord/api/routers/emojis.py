@@ -21,7 +21,7 @@
 from .base import BaseRouter
 from ..route import Route
 from ...snowflake import Snowflake
-from ...types import Emoji as Emoji
+from ...types import Emoji
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
 
