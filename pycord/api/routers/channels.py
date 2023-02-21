@@ -291,12 +291,15 @@ class Channels(BaseRouter):
         name: str,
         auto_archive_duration: int | UndefinedType = UNDEFINED,
         type: CTYPE | UndefinedType = UNDEFINED,
+        invitable: bool | UndefinedType = UNDEFINED,
         rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
         reason: str | None = None,
     ) -> Channel:
         data = {
             'name': name,
             'auto_archive_duration': auto_archive_duration,
+            'type': type,
+            'invitable': invitable,
             'rate_limit_per_user': rate_limit_per_user,
         }
         return await self.request(

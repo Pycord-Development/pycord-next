@@ -25,21 +25,8 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from .errors import ComponentException
-from .ui.house import House
 from .role import Role
 from .application import Application
-from .channel import (
-    AnnouncementChannel,
-    AnnouncementThread,
-    CategoryChannel,
-    DirectoryChannel,
-    DMChannel,
-    ForumChannel,
-    identify_channel, StageChannel,
-    TextChannel,
-    Thread,
-    VoiceChannel,
-)
 from .embed import Embed
 from .enums import ChannelType, InteractionType, MessageActivityType, MessageType
 from .flags import MessageFlags
@@ -59,6 +46,19 @@ from .undefined import UNDEFINED, UndefinedType
 from .user import User
 
 if TYPE_CHECKING:
+    from .channel import (
+        AnnouncementChannel,
+        AnnouncementThread,
+        CategoryChannel,
+        DirectoryChannel,
+        DMChannel,
+        ForumChannel,
+        StageChannel,
+        TextChannel,
+        Thread,
+        VoiceChannel,
+    )
+    from .ui.house import House
     from .state import State
 
 
@@ -276,14 +276,15 @@ class Message:
         )
 
         if exists:
-            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = \
-            exists[
-                1
-            ]
+            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | \
+                          AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = \
+                exists[
+                    1
+                ]
         else:
-            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = (
-                None
-            )
+            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | \
+                          AnnouncementChannel | AnnouncementThread | Thread | StageChannel | \
+                          DirectoryChannel | ForumChannel | None = None
 
     async def crosspost(self) -> Message:
         data = await self._state.http.crosspost_message(self.channel_id, self.id)
@@ -354,17 +355,12 @@ class Message:
         self,
         *,
         content: str | None | UndefinedType = UNDEFINED,
-        embed: Embed | None | UndefinedType = UNDEFINED,
         embeds: list[Embed] | None | UndefinedType = UNDEFINED,
         allowed_mentions: AllowedMentions | None | UndefinedType = UNDEFINED,
         attachments: list[Attachment] | None | UndefinedType = UNDEFINED,
         flags: MessageFlags | None | UndefinedType = UNDEFINED,
-        house: House | UndefinedType = UNDEFINED,
         houses: list[House] | UndefinedType = UNDEFINED,
     ) -> Message:
-        if house and houses:
-            houses.append(house)
-
         if houses:
             if len(houses) > 5:
                 raise ComponentException('Cannot have over five houses at once')
@@ -373,9 +369,6 @@ class Message:
 
             for house in houses:
                 self._state.sent_house(house)
-        elif house:
-            components = [(house.action_row())._to_dict()]
-            self._state.sent_house(house)
         else:
             components = UNDEFINED
 
@@ -383,7 +376,6 @@ class Message:
             self.channel_id,
             self.id,
             content=content,
-            embed=embed,
             embeds=embeds,
             allowed_mentions=allowed_mentions,
             attachments=attachments,
@@ -415,10 +407,9 @@ class Message:
         auto_archive_duration: int | UndefinedType = UNDEFINED,
         rate_limit_per_user: int | UndefinedType = UNDEFINED,
     ) -> Thread | AnnouncementThread:
-        data = await self._state.http.create_thread(
-            self.channel_id,
-            name,
+        return await self.channel.create_thread(
+            self,
+            name=name,
             auto_archive_duration=auto_archive_duration,
-            rate_limit_per_user=rate_limit_per_user,
+            rate_limit_per_user=rate_limit_per_user
         )
-        return identify_channel(data, self._state)
