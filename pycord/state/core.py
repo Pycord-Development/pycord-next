@@ -197,7 +197,7 @@ class State:
             if app_cmd['type'] != command.type:
                 return
 
-            if self._created is True:
+            if command._created is True:
                 await self.http.delete_global_application_command(
                     self.user.id, app_cmd['id']
                 )
