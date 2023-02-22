@@ -32,7 +32,6 @@ from .channel import (
     DirectoryChannel,
     DMChannel,
     ForumChannel,
-    GroupDMChannel,
     StageChannel,
     TextChannel,
     Thread,
@@ -206,10 +205,10 @@ class Message:
         )
 
         if exists:
-            self.channel: TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = exists[
+            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = exists[
                 1
             ]
         else:
-            self.channel: TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = (
+            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = (
                 None
             )

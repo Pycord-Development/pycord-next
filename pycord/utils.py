@@ -19,13 +19,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+import inspect
 from collections.abc import Iterator, Sequence
 from itertools import accumulate
-from typing import Any, Literal, TypeVar
+from typing import Any, AsyncGenerator, TypeVar
 
 from aiohttp import ClientResponse
 
-from .undefined import UNDEFINED, UndefinedType
+from .types import AsyncFunc
+from .undefined import UNDEFINED
 
 try:
     import msgspec
@@ -96,3 +98,31 @@ def chunk(items: S, n: int) -> Iterator[S]:
 
 def remove_undefined(**kwargs) -> dict[str, Any]:
     return {k: v for k, v in kwargs.items() if v is not UNDEFINED}
+
+
+async def get_iterated_data(iterator: AsyncGenerator) -> list[Any]:
+    hold = []
+
+    async for data in iterator:
+        hold.append(data)
+
+    return hold
+
+
+def get_arg_defaults(fnc: AsyncFunc) -> dict[str, tuple[Any, Any]]:
+    signature = inspect.signature(fnc)
+    ret = {}
+    for k, v in signature.parameters.items():
+        if (
+            v.default is not inspect.Parameter.empty
+            and v.annotation is not inspect.Parameter.empty
+        ):
+            ret[k] = (v.default, v.annotation)
+        elif v.default is not inspect.Parameter.empty:
+            ret[k] = (v.default, None)
+        elif v.annotation is not inspect.Parameter.empty:
+            ret[k] = (None, v.annotation)
+        else:
+            ret[k] = (None, None)
+
+    return ret

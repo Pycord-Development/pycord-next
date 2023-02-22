@@ -46,6 +46,7 @@ class Executer:
         requests_passed: int = 0
         for _ in range(self._request_queue.qsize() - 1):
             if requests_passed == limit:
+                requests_passed = 0
                 if not is_global:
                     await asyncio.sleep(reset_after)
                 else:
@@ -61,5 +62,5 @@ class Executer:
 
         event = asyncio.Event()
 
-        self._request_queue.put(event)
+        self._request_queue.put_nowait(event)
         await event.wait()

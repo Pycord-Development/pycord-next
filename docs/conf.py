@@ -37,8 +37,22 @@ autodoc_typehints = 'none'
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = 'pydata_sphinx_theme'
+
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named 'default.css' will overwrite the builtin 'default.css'.
 html_static_path = ['_static']
+
+html_logo = 'https://raw.githubusercontent.com/Pycord-Development/pycord-v3/main/docs/assets/pycord-v3.png'
+
+# Any option(s) added to your certain theme.
+# in this case, Pydata
+html_theme_options = {
+    'footer_items': ['copyright', 'sphinx-version'],
+}
+
+html_sidebars = {'**': ['sidebar-nav-bs']}
 
 resource_links = {
     'guide': 'https://guide.pycord.dev',

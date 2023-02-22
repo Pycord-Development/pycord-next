@@ -24,7 +24,8 @@ from typing import Any, AsyncGenerator, Type, TypeVar
 from aiohttp import BasicAuth
 
 from .commands import Group
-from .errors import NoIdentifiesLeft, OverfilledShardsException
+from .errors import BotException, NoIdentifiesLeft, OverfilledShardsException
+from .events.event_manager import Event
 from .flags import Intents
 from .gateway import PassThrough, ShardCluster, ShardManager
 from .guild import Guild
@@ -32,7 +33,7 @@ from .interface import print_banner, start_logging
 from .state import State
 from .types import AsyncFunc
 from .user import User
-from .utils import chunk
+from .utils import chunk, get_arg_defaults
 
 T = TypeVar('T')
 
@@ -47,7 +48,7 @@ class Bot:
         The Gateway Intents to use
     print_banner_on_startup
         Whether to print the banner on startup or not
-    logging_flavor: Union[int, str, dict[str, Any], None]
+    logging_flavor: Union[int, str, dict[str, :class:`typing.Any`], None]
         The logging flavor this bot uses
 
         Defaults to `None`.
@@ -263,21 +264,48 @@ class Bot:
             )
         )
 
-    def listen(self, name: str) -> T:
+    def listen(self, event: Event | None = None) -> T:
         """
         Listen to an event
 
         Parameters
         ----------
-        name: :class:`str`
-            The name of the event to listen to.
+        event: :class:`Event` | None
+            The event to listen to.
+            Optional if using type hints.
         """
 
         def wrapper(func: T) -> T:
-            self._state.ping.add_listener(name=name, func=func)
+            if event:
+                self._state.event_manager.add_event(event, func)
+            else:
+                args = get_arg_defaults(func)
+
+                values = list(args.values())
+
+                if len(values) != 1:
+                    raise BotException(
+                        'Only one argument is allowed on event functions'
+                    )
+
+                eve = values[0]
+
+                if eve[1] is None:
+                    raise BotException(
+                        'Event must either be typed, or be present in the `event` parameter'
+                    )
+
+                if not isinstance(eve[1](), Event):
+                    raise BotException('Events must be of type Event')
+
+                self._state.event_manager.add_event(eve[1], func)
+
             return func
 
         return wrapper
+
+    def wait_for(self, event: T) -> asyncio.Future[T]:
+        return self._state.event_manager.wait_for(event)
 
     def command(self, name: str, cls: T, **kwargs: Any) -> T:
         """
