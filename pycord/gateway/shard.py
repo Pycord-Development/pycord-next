@@ -221,7 +221,7 @@ class Shard:
                         self.session_id = d['session_id']
                         self._resume_gateway_url = d['resume_gateway_url']
                         self._state.raw_user = d['user']
-                    asyncio.create_task(self._state._process_event(t, d))
+                    asyncio.create_task(self._state.event_manager.publish(t, d))
                 elif op == 1:
                     await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
                 elif op == 10:

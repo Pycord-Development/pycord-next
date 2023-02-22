@@ -37,7 +37,6 @@ from .types import (
     ThreadMetadata as DiscordThreadMetadata,
 )
 from .undefined import UNDEFINED, UndefinedType
-from .user import User
 
 if TYPE_CHECKING:
     from .state import State
@@ -144,6 +143,7 @@ class GuildChannel(Channel):
             'default_auto_archive_duration', UNDEFINED
         )
 
+
 class MessageableChannel(Channel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
@@ -235,7 +235,7 @@ class AnnouncementThread(MessageableChannel):
     ...
 
 
-class Thread(MessageableChannel):
+class Thread(MessageableChannel, GuildChannel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.default_thread_rate_limit_per_user: int | UndefinedType = data.get(
@@ -281,9 +281,22 @@ class ForumChannel(Channel):
         ]
 
 
-def identify_channel(
-    data: dict[str, Any], state: State
-) -> TextChannel | DMChannel | VoiceChannel | GroupDMChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | Channel:
+CHANNEL_TYPE = (
+    TextChannel
+    | DMChannel
+    | VoiceChannel
+    | CategoryChannel
+    | AnnouncementChannel
+    | AnnouncementThread
+    | Thread
+    | StageChannel
+    | DirectoryChannel
+    | ForumChannel
+    | Channel
+)
+
+
+def identify_channel(data: dict[str, Any], state: State) -> CHANNEL_TYPE:
     type = data['type']
 
     if type == 0:
