@@ -187,7 +187,7 @@ class State:
                     type=command.type,
                     options=command._options,
                 )
-                self.id = res['id']
+                command.id = res['id']
 
     async def _process_global_command(
         self, app_cmd: ApplicationCommandData, command: ApplicationCommand
