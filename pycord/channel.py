@@ -21,7 +21,10 @@
 from __future__ import annotations
 
 from datetime import datetime
+from functools import cached_property
 from typing import Any, TYPE_CHECKING
+
+from .typing import Typing
 
 from .embed import Embed
 from .enums import ChannelType, OverwriteType, VideoQualityMode
@@ -324,8 +327,9 @@ class MessageableChannel(Channel):
         )
         return Message(data, state=self._state)
 
-    async def trigger_typing(self) -> None:
-        await self._state.http.trigger_typing_indicator(self.id)
+    @cached_property
+    def typing(self) -> Typing:
+        return Typing(self.id, self._state)
 
     async def bulk_delete(self, *messages: Message, reason: str | None = None) -> None:
         await self._state.http.bulk_delete_messages(self.id, [m.id for m in messages], reason=reason)
