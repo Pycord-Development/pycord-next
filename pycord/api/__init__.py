@@ -28,7 +28,16 @@ __all__ = ['Route', 'BaseRoute', 'HTTPClient']
 _log = logging.getLogger(__name__)
 
 
-class HTTPClient(ApplicationCommands, ApplicationRoleConnections, AuditLogs, AutoModeration, Channels, Messages):
+class HTTPClient(
+    ApplicationCommands,
+    ApplicationRoleConnections,
+    AuditLogs,
+    AutoModeration,
+    Channels,
+    Emojis,
+    Guilds,
+    Messages,
+):
     def __init__(
         self,
         token: str | None = None,

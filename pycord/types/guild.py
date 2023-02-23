@@ -59,6 +59,13 @@ GUILD_FEATURE = Literal[
 MFA_LEVEL = Literal[0, 1]
 PREMIUM_TIER = Literal[0, 1, 2, 3]
 NSFW_LEVEL = Literal[0, 1, 2, 3]
+WIDGET_STYLE = Literal[
+    'shield',
+    'banner1',
+    'banner2',
+    'banner3',
+    'banner4',
+]
 
 
 class UnavailableGuild(TypedDict):
@@ -154,3 +161,15 @@ class GuildMember(TypedDict):
 class Ban(TypedDict):
     reason: str | None
     user: User
+
+
+class ModifyGuildChannelPositionsPayload(TypedDict):
+    id: Snowflake
+    position: int | None
+    lock_permissions: bool | None
+    parent_id: Snowflake | None
+
+
+class ModifyGuildRolePositionsPayload(TypedDict):
+    id: Snowflake
+    position: NotRequired[int | None]

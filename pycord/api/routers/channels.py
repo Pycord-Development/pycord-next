@@ -22,7 +22,7 @@ from .base import BaseRouter
 from ..route import Route
 from ...snowflake import Snowflake
 from ...types import (
-    Channel, CTYPE, DefaultReaction, FollowedChannel, ForumTag, ForumThreadMessageParams, Invite, ListThreadResponse,
+    Channel, CTYPE, DefaultReaction, FollowedChannel, ForumTag, ForumThreadMessageParams, Invite, ListThreadsResponse,
     Message, Overwrite, ThreadMember,
 )
 from ...undefined import UNDEFINED, UndefinedType
@@ -291,12 +291,15 @@ class Channels(BaseRouter):
         name: str,
         auto_archive_duration: int | UndefinedType = UNDEFINED,
         type: CTYPE | UndefinedType = UNDEFINED,
+        invitable: bool | UndefinedType = UNDEFINED,
         rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
         reason: str | None = None,
     ) -> Channel:
         data = {
             'name': name,
             'auto_archive_duration': auto_archive_duration,
+            'type': type,
+            'invitable': invitable,
             'rate_limit_per_user': rate_limit_per_user,
         }
         return await self.request(
@@ -420,7 +423,7 @@ class Channels(BaseRouter):
         self, channel_id: Snowflake, *,
         before: str | UndefinedType = UNDEFINED,
         limit: int | UndefinedType = UNDEFINED,
-    ) -> ListThreadResponse:
+    ) -> ListThreadsResponse:
         params = {
             'before': before,
             'limit': limit,
@@ -438,7 +441,7 @@ class Channels(BaseRouter):
         self, channel_id: Snowflake, *,
         before: str | UndefinedType = UNDEFINED,
         limit: int | UndefinedType = UNDEFINED,
-    ) -> ListThreadResponse:
+    ) -> ListThreadsResponse:
         params = {
             'before': before,
             'limit': limit,
@@ -456,7 +459,7 @@ class Channels(BaseRouter):
         self, channel_id: Snowflake, *,
         before: str | UndefinedType = UNDEFINED,
         limit: int | UndefinedType = UNDEFINED,
-    ) -> ListThreadResponse:
+    ) -> ListThreadsResponse:
         params = {
             'before': before,
             'limit': limit,

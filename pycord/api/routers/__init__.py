@@ -12,4 +12,6 @@ from .audit_logs import *
 from .auto_moderation import *
 from .base import *
 from .channels import *
+from .emojis import *
+from .guilds import *
 from .messages import *

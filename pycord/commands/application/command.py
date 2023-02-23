@@ -641,6 +641,7 @@ class ApplicationCommand(Command):
                     member = Member(
                         interaction.data['resolved']['members'][option.value],
                         self._state,
+                        guild_id=interaction.guild_id,
                     )
                     member.user = user
 

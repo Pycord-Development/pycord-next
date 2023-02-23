@@ -106,10 +106,11 @@ class MessageDelete(Event):
     _name = 'MESSAGE_DELETE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        self.message_id = Snowflake('id')
-        self.channel_id = Snowflake('channel_id')
+        self.message_id: Snowflake = Snowflake(data['id'])
+        self.channel_id: Snowflake = Snowflake(data['channel_id'])
+        self.guild_id: Snowflake | None = Snowflake(data['guild_id']) if 'guild_id' in data else None
 
-        self.message: Message = await (state.store.sift('messages')).discard(
+        self.message: Message | None = await (state.store.sift('messages')).discard(
             [self.channel_id], self.message_id
         )
 

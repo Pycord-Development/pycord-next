@@ -25,14 +25,17 @@ from aiohttp import BasicAuth
 
 from .application_role_connection_metadata import ApplicationRoleConnectionMetadata
 from .commands import Group
+from .enums import DefaultMessageNotificationLevel, ExplicitContentFilterLevel, VerificationLevel
 from .errors import BotException, NoIdentifiesLeft, OverfilledShardsException
 from .events.event_manager import Event
-from .flags import Intents
+from .flags import Intents, SystemChannelFlags
 from .gateway import PassThrough, ShardCluster, ShardManager
-from .guild import Guild
+from .guild import Guild, GuildPreview
 from .interface import print_banner, start_logging
+from .snowflake import Snowflake
 from .state import State
 from .types import AsyncFunc
+from .undefined import UNDEFINED, UndefinedType
 from .user import User
 from .utils import chunk, get_arg_defaults
 
@@ -384,3 +387,95 @@ class Bot:
             self.user.id, [record.to_dict() for record in records]
         )
         return [ApplicationRoleConnectionMetadata.from_dict(record) for record in data]
+
+    async def create_guild(
+        self, name: str, *,
+        icon: bytes | UndefinedType = UNDEFINED,
+        verification_level: VerificationLevel | UndefinedType = UNDEFINED,
+        default_message_notifications: DefaultMessageNotificationLevel | UndefinedType = UNDEFINED,
+        explicit_content_filter: ExplicitContentFilterLevel | UndefinedType = UNDEFINED,
+        roles: list[dict] | UndefinedType = UNDEFINED,  # TODO
+        channels: list[dict] | UndefinedType = UNDEFINED,  # TODO
+        afk_channel_id: Snowflake | UndefinedType = UNDEFINED,
+        afk_timeout: int | UndefinedType = UNDEFINED,
+        system_channel_id: Snowflake | UndefinedType = UNDEFINED,
+        system_channel_flags: SystemChannelFlags | UndefinedType = UNDEFINED,
+    ) -> Guild:
+        """Create a guild.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the guild.
+        icon: :class:`bytes`
+            The icon of the guild.
+        verification_level: :class:`VerificationLevel`
+            The verification level of the guild.
+        default_message_notifications: :class:`DefaultMessageNotificationLevel`
+            The default message notifications of the guild.
+        explicit_content_filter: :class:`ExplicitContentFilterLevel`
+            The explicit content filter level of the guild.
+        roles: list[dict]
+            The roles of the guild.
+        channels: list[dict]
+            The channels of the guild.
+        afk_channel_id: :class:`Snowflake`
+            The afk channel id of the guild.
+        afk_timeout: :class:`int`
+            The afk timeout of the guild.
+        system_channel_id: :class:`Snowflake`
+            The system channel id of the guild.
+        system_channel_flags: :class:`SystemChannelFlags`
+            The system channel flags of the guild.
+
+        Returns
+        -------
+        :class:`Guild`
+            The created guild.
+        """
+        data = await self._state.http.create_guild(
+            name,
+            icon=icon,
+            verification_level=verification_level,
+            default_message_notifications=default_message_notifications,
+            explicit_content_filter=explicit_content_filter,
+            roles=roles,
+            channels=channels,
+            afk_channel_id=afk_channel_id,
+            afk_timeout=afk_timeout,
+            system_channel_id=system_channel_id,
+            system_channel_flags=system_channel_flags,
+        )
+        return Guild(data, self._state)
+
+    async def get_guild(self, guild_id: Snowflake) -> Guild:
+        """Get a guild.
+
+        Parameters
+        ----------
+        guild_id: :class:`Snowflake`
+            The guild id.
+
+        Returns
+        -------
+        :class:`Guild`
+            The guild.
+        """
+        data = await self._state.http.get_guild(guild_id)
+        return Guild(data, self._state)
+
+    async def get_guild_preview(self, guild_id: Snowflake) -> GuildPreview:
+        """Get a guild preview.
+
+        Parameters
+        ----------
+        guild_id: :class:`Snowflake`
+            The guild id.
+
+        Returns
+        -------
+        :class:`GuildPreview`
+            The guild preview.
+        """
+        data = await self._state.http.get_guild_preview(guild_id)
+        return GuildPreview(data, self._state)

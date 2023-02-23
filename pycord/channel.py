@@ -286,6 +286,7 @@ class MessageableChannel(Channel):
     async def send(
         self,
         content: str | UndefinedType = UNDEFINED,
+        *,
         nonce: int | str | UndefinedType = UNDEFINED,
         tts: bool | UndefinedType = UNDEFINED,
         embeds: list[Embed] | UndefinedType = UNDEFINED,
@@ -293,12 +294,8 @@ class MessageableChannel(Channel):
         message_reference: MessageReference | UndefinedType = UNDEFINED,
         sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
         flags: int | UndefinedType = UNDEFINED,
-        house: House | UndefinedType = UNDEFINED,
         houses: list[House] | UndefinedType = UNDEFINED,
     ) -> Message:
-        if house and houses:
-            houses.append(house)
-
         if houses:
             if len(houses) > 5:
                 raise ComponentException('Cannot have over five houses at once')
@@ -307,9 +304,6 @@ class MessageableChannel(Channel):
 
             for house in houses:
                 self._state.sent_house(house)
-        elif house:
-            components = [(house.action_row())._to_dict()]
-            self._state.sent_house(house)
         else:
             components = UNDEFINED
 
@@ -382,6 +376,8 @@ class TextChannel(MessageableChannel, GuildChannel):
 
     async def create_thread(
         self,
+        message: Message | None = None,
+        *,
         name: str,
         auto_archive_duration: int | UndefinedType = UNDEFINED,
         type: ChannelType = ChannelType.PUBLIC_THREAD,
@@ -389,15 +385,25 @@ class TextChannel(MessageableChannel, GuildChannel):
         rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
         reason: str | None = None,
     ) -> Thread | AnnouncementThread:
-        data = await self._state.http.start_thread_without_message(
-            self.id,
-            name=name,
-            auto_archive_duration=auto_archive_duration,
-            type=type.value,
-            invitable=invitable,
-            rate_limit_per_user=rate_limit_per_user,
-            reason=reason,
-        )
+        if message:
+            data = await self._state.http.start_thread_from_message(
+                self.id,
+                message.id,
+                name=name,
+                auto_archive_duration=auto_archive_duration,
+                rate_limit_per_user=rate_limit_per_user,
+                reason=reason,
+            )
+        else:
+            data = await self._state.http.start_thread_without_message(
+                self.id,
+                name=name,
+                auto_archive_duration=auto_archive_duration,
+                type=type.value,
+                invitable=invitable,
+                rate_limit_per_user=rate_limit_per_user,
+                reason=reason,
+            )
         return identify_channel(data, state=self._state)
 
     async def list_public_archived_threads(
@@ -503,6 +509,8 @@ class AnnouncementChannel(TextChannel):
 
     async def create_thread(
         self,
+        message: Message | None = None,
+        *,
         name: str,
         auto_archive_duration: int | UndefinedType = UNDEFINED,
         invitable: bool | UndefinedType = UNDEFINED,
@@ -510,6 +518,7 @@ class AnnouncementChannel(TextChannel):
         reason: str | None = None,
     ) -> Thread:
         return await super().create_thread(
+            message,
             name=name,
             auto_archive_duration=auto_archive_duration,
             type=ChannelType.ANNOUNCEMENT_THREAD,
