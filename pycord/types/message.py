@@ -23,7 +23,7 @@ from typing import Literal
 from typing_extensions import NotRequired, TypedDict
 
 from .application import Application
-from .channel import AllowedMentions, CTYPE, Channel
+from .channel import CTYPE, AllowedMentions, Channel
 from .component import Component
 from .embed import Embed
 from .guild import GuildMember

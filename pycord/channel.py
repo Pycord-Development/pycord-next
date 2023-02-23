@@ -22,9 +22,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from functools import cached_property
-from typing import Any, TYPE_CHECKING
-
-from .typing import Typing
+from typing import TYPE_CHECKING, Any
 
 from .embed import Embed
 from .enums import ChannelType, OverwriteType, VideoQualityMode
@@ -41,6 +39,7 @@ from .types import (
     ThreadMember as DiscordThreadMember,
     ThreadMetadata as DiscordThreadMetadata,
 )
+from .typing import Typing
 from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
@@ -108,12 +107,15 @@ class ThreadMember:
         )
         self.join_timestamp: datetime = datetime.fromisoformat(member['join_timestamp'])
         self.flags: int = member['flags']
-        self.member: Member | None = Member(member['member']) if 'member' in member else None
+        self.member: Member | None = (
+            Member(member['member']) if 'member' in member else None
+        )
 
 
 class ForumTag:
     def __init__(
-        self, *,
+        self,
+        *,
         name: str,
         moderated: bool = False,
         emoji_id: Snowflake | str | None = None,
@@ -130,7 +132,9 @@ class ForumTag:
         obj = cls(
             name=data['name'],
             moderated=data['moderated'],
-            emoji_id=Snowflake(em_id) if isinstance(em_id := data.get('emoji_id'), int) else em_id,
+            emoji_id=Snowflake(em_id)
+            if isinstance(em_id := data.get('emoji_id'), int)
+            else em_id,
             emoji_name=data.get('emoji_name'),
         )
         obj.id = Snowflake(data['id'])
@@ -313,8 +317,12 @@ class MessageableChannel(Channel):
             nonce=nonce,
             tts=tts,
             embeds=embeds,
-            allowed_mentions=allowed_mentions.to_dict() if allowed_mentions else UNDEFINED,
-            message_reference=message_reference.to_dict() if message_reference else UNDEFINED,
+            allowed_mentions=allowed_mentions.to_dict()
+            if allowed_mentions
+            else UNDEFINED,
+            message_reference=message_reference.to_dict()
+            if message_reference
+            else UNDEFINED,
             sticker_ids=sticker_ids,
             flags=flags,
             components=components,
@@ -326,7 +334,9 @@ class MessageableChannel(Channel):
         return Typing(self.id, self._state)
 
     async def bulk_delete(self, *messages: Message, reason: str | None = None) -> None:
-        await self._state.http.bulk_delete_messages(self.id, [m.id for m in messages], reason=reason)
+        await self._state.http.bulk_delete_messages(
+            self.id, [m.id for m in messages], reason=reason
+        )
 
 
 class AudioChannel(GuildChannel):
@@ -345,7 +355,8 @@ class AudioChannel(GuildChannel):
 class TextChannel(MessageableChannel, GuildChannel):
     # Type 0
     async def edit(
-        self, *,
+        self,
+        *,
         name: str | UndefinedType = UNDEFINED,
         type: ChannelType | UndefinedType = UNDEFINED,
         position: int | None | UndefinedType = UNDEFINED,
@@ -364,7 +375,9 @@ class TextChannel(MessageableChannel, GuildChannel):
             topic=topic,
             nsfw=nsfw,
             rate_limit_per_user=rate_limit_per_user,
-            permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
+            permission_overwrites=[o.to_dict() for o in permission_overwrites]
+            if permission_overwrites
+            else UNDEFINED,
             parent_id=parent_id,
             default_auto_archive_duration=default_auto_archive_duration,
             default_thread_rate_limit_per_user=default_thread_rate_limit_per_user,
@@ -451,7 +464,8 @@ class DMChannel(MessageableChannel):
 class VoiceChannel(MessageableChannel, AudioChannel):
     # Type 2
     async def edit(
-        self, *,
+        self,
+        *,
         name: str | UndefinedType = UNDEFINED,
         position: int | None | UndefinedType = UNDEFINED,
         nsfw: bool | None | UndefinedType = UNDEFINED,
@@ -468,17 +482,22 @@ class VoiceChannel(MessageableChannel, AudioChannel):
             nsfw=nsfw,
             bitrate=bitrate,
             user_limit=user_limit,
-            permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
+            permission_overwrites=[o.to_dict() for o in permission_overwrites]
+            if permission_overwrites
+            else UNDEFINED,
             parent_id=parent_id,
             rtc_region=rtc_region,
-            video_quality_mode=video_quality_mode.value if video_quality_mode else UNDEFINED,
+            video_quality_mode=video_quality_mode.value
+            if video_quality_mode
+            else UNDEFINED,
         )
 
 
 class GroupDMChannel(MessageableChannel):
     # Type 3
     async def edit(
-        self, *,
+        self,
+        *,
         name: str | UndefinedType = UNDEFINED,
         icon: str | UndefinedType = UNDEFINED,
     ) -> GroupDMChannel:
@@ -489,7 +508,8 @@ class GroupDMChannel(MessageableChannel):
 class CategoryChannel(Channel):
     # Type 4
     async def edit(
-        self, *,
+        self,
+        *,
         name: str | UndefinedType = UNDEFINED,
         position: int | None | UndefinedType = UNDEFINED,
         permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
@@ -497,7 +517,9 @@ class CategoryChannel(Channel):
         return await self._base_edit(
             name=name,
             position=position,
-            permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
+            permission_overwrites=[o.to_dict() for o in permission_overwrites]
+            if permission_overwrites
+            else UNDEFINED,
         )
 
 
@@ -548,7 +570,8 @@ class Thread(MessageableChannel, GuildChannel):
         )
 
     async def edit(
-        self, *,
+        self,
+        *,
         name: str | UndefinedType = UNDEFINED,
         archived: bool | UndefinedType = UNDEFINED,
         auto_archive_duration: int | UndefinedType = UNDEFINED,
@@ -581,12 +604,17 @@ class Thread(MessageableChannel, GuildChannel):
     async def remove_member(self, member: Member) -> None:
         await self._state.http.remove_thread_member(self.id, member.id)
 
-    async def get_member(self, id: Snowflake, *, with_member: bool = True) -> ThreadMember:
-        data = await self._state.http.get_thread_member(self.id, id, with_member=with_member)
+    async def get_member(
+        self, id: Snowflake, *, with_member: bool = True
+    ) -> ThreadMember:
+        data = await self._state.http.get_thread_member(
+            self.id, id, with_member=with_member
+        )
         return ThreadMember(data)
 
     async def list_members(
-        self, *,
+        self,
+        *,
         with_member: bool = True,
         limit: int = 100,
         after: Snowflake | UndefinedType = UNDEFINED,
@@ -600,7 +628,8 @@ class Thread(MessageableChannel, GuildChannel):
 class AnnouncementThread(Thread):
     # Type 10
     async def edit(
-        self, *,
+        self,
+        *,
         name: str | UndefinedType = UNDEFINED,
         archived: bool | UndefinedType = UNDEFINED,
         auto_archive_duration: int | UndefinedType = UNDEFINED,
@@ -619,7 +648,8 @@ class AnnouncementThread(Thread):
 class StageChannel(AudioChannel):
     # Type 13
     async def edit(
-        self, *,
+        self,
+        *,
         name: str | UndefinedType = UNDEFINED,
         position: int | None | UndefinedType = UNDEFINED,
         nsfw: bool | None | UndefinedType = UNDEFINED,
@@ -636,10 +666,14 @@ class StageChannel(AudioChannel):
             nsfw=nsfw,
             bitrate=bitrate,
             user_limit=user_limit,
-            permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
+            permission_overwrites=[o.to_dict() for o in permission_overwrites]
+            if permission_overwrites
+            else UNDEFINED,
             parent_id=parent_id,
             rtc_region=rtc_region,
-            video_quality_mode=video_quality_mode.value if video_quality_mode else UNDEFINED,
+            video_quality_mode=video_quality_mode.value
+            if video_quality_mode
+            else UNDEFINED,
         )
 
 
@@ -665,7 +699,8 @@ class ForumChannel(Channel):
         ]
 
     async def edit(
-        self, *,
+        self,
+        *,
         name: str | UndefinedType = UNDEFINED,
         position: int | None | UndefinedType = UNDEFINED,
         topic: str | None | UndefinedType = UNDEFINED,
@@ -683,27 +718,31 @@ class ForumChannel(Channel):
             topic=topic,
             nsfw=nsfw,
             rate_limit_per_user=rate_limit_per_user,
-            permission_overwrites=[o.to_dict() for o in permission_overwrites] if permission_overwrites else UNDEFINED,
+            permission_overwrites=[o.to_dict() for o in permission_overwrites]
+            if permission_overwrites
+            else UNDEFINED,
             parent_id=parent_id,
             default_auto_archive_duration=default_auto_archive_duration,
             flags=flags.value if flags else UNDEFINED,
-            available_tags=[t.to_dict() for t in available_tags] if available_tags else UNDEFINED,
+            available_tags=[t.to_dict() for t in available_tags]
+            if available_tags
+            else UNDEFINED,
         )
 
 
 CHANNEL_TYPE = (
-        TextChannel
-        | DMChannel
-        | VoiceChannel
-        | GroupDMChannel
-        | CategoryChannel
-        | AnnouncementChannel
-        | AnnouncementThread
-        | Thread
-        | StageChannel
-        | DirectoryChannel
-        | ForumChannel
-        | Channel
+    TextChannel
+    | DMChannel
+    | VoiceChannel
+    | GroupDMChannel
+    | CategoryChannel
+    | AnnouncementChannel
+    | AnnouncementThread
+    | Thread
+    | StageChannel
+    | DirectoryChannel
+    | ForumChannel
+    | Channel
 )
 
 

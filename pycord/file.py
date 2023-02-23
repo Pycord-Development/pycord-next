@@ -21,8 +21,8 @@
 
 
 import asyncio
-from io import BytesIO
 import pathlib
+from io import BytesIO
 from typing import BinaryIO, Protocol
 
 

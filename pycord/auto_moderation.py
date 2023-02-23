@@ -116,7 +116,7 @@ class AutoModRule:
     ) -> AutoModRule:
         """
         Edits the auto moderation rule.
-        
+
         Parameters
         ----------
         name: :class:`str`
@@ -152,9 +152,11 @@ class AutoModRule:
 
     async def delete(self, *, reason: str | None = None) -> None:
         """Deletes the auto moderation rule.
-        
+
         Parameters
         ----------
         reason: :class:`str` | None
             The reason for deleting this rule. Appears in the guild's audit log."""
-        await self._state.http.delete_auto_moderation_rule(self.guild_id, self.id, reason=reason)
+        await self._state.http.delete_auto_moderation_rule(
+            self.guild_id, self.id, reason=reason
+        )

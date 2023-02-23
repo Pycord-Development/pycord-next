@@ -18,9 +18,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from .pages.paginator import Paginator
 from .message import Message
 from .pages import Page
+from .pages.paginator import Paginator
 
 
 class MessagePage(Page[Message]):
@@ -31,4 +31,3 @@ class MessagePage(Page[Message]):
 # Paginator but typed for MessagePage
 class MessagePaginator(Paginator[MessagePage]):
     ...
-

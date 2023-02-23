@@ -18,30 +18,39 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from .base import BaseRouter
-from ..route import Route
 from ...snowflake import Snowflake
 from ...types import (
-    Channel, CTYPE, DefaultReaction, FollowedChannel, ForumTag, ForumThreadMessageParams, Invite, ListThreadsResponse,
-    Message, Overwrite, ThreadMember,
+    CTYPE,
+    Channel,
+    DefaultReaction,
+    FollowedChannel,
+    ForumTag,
+    ForumThreadMessageParams,
+    Invite,
+    ListThreadsResponse,
+    Message,
+    Overwrite,
+    ThreadMember,
 )
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
+from ..route import Route
+from .base import BaseRouter
 
 
 class Channels(BaseRouter):
     async def get_channel(
-        self, channel_id: Snowflake,
+        self,
+        channel_id: Snowflake,
     ) -> Channel:
         return await self.request(
-            'GET',
-            Route(
-                '/channels/{channel_id}', channel_id=channel_id
-            )
+            'GET', Route('/channels/{channel_id}', channel_id=channel_id)
         )
 
     async def modify_channel(
-        self, channel_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        *,
         name: str | UndefinedType = UNDEFINED,
         # Group DM Only
         icon: bytes | UndefinedType = UNDEFINED,  # TODO
@@ -102,26 +111,28 @@ class Channels(BaseRouter):
         }
         return await self.request(
             'PATCH',
-            Route(
-                '/channels/{channel_id}', channel_id=channel_id
-            ),
+            Route('/channels/{channel_id}', channel_id=channel_id),
             remove_undefined(**data),
             reason=reason,
         )
 
     async def delete_channel(
-        self, channel_id: Snowflake, *, reason: str | None = None,
+        self,
+        channel_id: Snowflake,
+        *,
+        reason: str | None = None,
     ) -> None:
         await self.request(
             'DELETE',
-            Route(
-                '/channels/{channel_id}', channel_id=channel_id
-            ),
+            Route('/channels/{channel_id}', channel_id=channel_id),
             reason=reason,
         )
 
     async def edit_channel_permissions(
-        self, channel_id: Snowflake, overwrite_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        overwrite_id: Snowflake,
+        *,
         type: int,
         allow: int | None | UndefinedType = UNDEFINED,
         deny: int | None | UndefinedType = UNDEFINED,
@@ -144,17 +155,17 @@ class Channels(BaseRouter):
         )
 
     async def get_channel_invites(
-        self, channel_id: Snowflake,
+        self,
+        channel_id: Snowflake,
     ) -> list[Invite]:
         return await self.request(
-            'GET',
-            Route(
-                '/channels/{channel_id}/invites', channel_id=channel_id
-            )
+            'GET', Route('/channels/{channel_id}/invites', channel_id=channel_id)
         )
 
     async def create_channel_invite(
-        self, channel_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        *,
         max_age: int | UndefinedType = UNDEFINED,
         max_uses: int | UndefinedType = UNDEFINED,
         temporary: bool | UndefinedType = UNDEFINED,
@@ -175,15 +186,16 @@ class Channels(BaseRouter):
         }
         return await self.request(
             'POST',
-            Route(
-                '/channels/{channel_id}/invites', channel_id=channel_id
-            ),
+            Route('/channels/{channel_id}/invites', channel_id=channel_id),
             remove_undefined(**data),
             reason=reason,
         )
 
     async def delete_channel_permission(
-        self, channel_id: Snowflake, overwrite_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        overwrite_id: Snowflake,
+        *,
         reason: str | None = None,
     ) -> None:
         await self.request(
@@ -197,7 +209,9 @@ class Channels(BaseRouter):
         )
 
     async def follow_announcement_channel(
-        self, channel_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        *,
         webhook_channel_id: Snowflake,
     ) -> FollowedChannel:
         data = {
@@ -213,27 +227,26 @@ class Channels(BaseRouter):
         )
 
     async def trigger_typing_indicator(
-        self, channel_id: Snowflake,
+        self,
+        channel_id: Snowflake,
     ) -> None:
         await self.request(
-            'POST',
-            Route(
-                '/channels/{channel_id}/typing', channel_id=channel_id
-            )
+            'POST', Route('/channels/{channel_id}/typing', channel_id=channel_id)
         )
 
     async def get_pinned_messages(
-        self, channel_id: Snowflake,
+        self,
+        channel_id: Snowflake,
     ) -> list[Message]:
         return await self.request(
-            'GET',
-            Route(
-                '/channels/{channel_id}/pins', channel_id=channel_id
-            )
+            'GET', Route('/channels/{channel_id}/pins', channel_id=channel_id)
         )
 
     async def group_dm_add_recipient(
-        self, channel_id: Snowflake, user_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        user_id: Snowflake,
+        *,
         access_token: str,
         nick: str | None | UndefinedType = UNDEFINED,
     ) -> None:
@@ -252,7 +265,9 @@ class Channels(BaseRouter):
         )
 
     async def group_dm_remove_recipient(
-        self, channel_id: Snowflake, user_id: Snowflake,
+        self,
+        channel_id: Snowflake,
+        user_id: Snowflake,
     ) -> None:
         await self.request(
             'DELETE',
@@ -264,7 +279,10 @@ class Channels(BaseRouter):
         )
 
     async def start_thread_from_message(
-        self, channel_id: Snowflake, message_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        message_id: Snowflake,
+        *,
         name: str,
         auto_archive_duration: int | UndefinedType = UNDEFINED,
         rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
@@ -287,7 +305,9 @@ class Channels(BaseRouter):
         )
 
     async def start_thread_without_message(
-        self, channel_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        *,
         name: str,
         auto_archive_duration: int | UndefinedType = UNDEFINED,
         type: CTYPE | UndefinedType = UNDEFINED,
@@ -313,7 +333,9 @@ class Channels(BaseRouter):
         )
 
     async def start_thread_in_forum_channel(
-        self, channel_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        *,
         name: str,
         auto_archive_duration: int | UndefinedType = UNDEFINED,
         rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
@@ -337,7 +359,8 @@ class Channels(BaseRouter):
         )
 
     async def join_thread(
-        self, channel_id: Snowflake,
+        self,
+        channel_id: Snowflake,
     ) -> None:
         await self.request(
             'PUT',
@@ -348,7 +371,9 @@ class Channels(BaseRouter):
         )
 
     async def add_thread_member(
-        self, channel_id: Snowflake, user_id: Snowflake,
+        self,
+        channel_id: Snowflake,
+        user_id: Snowflake,
     ) -> None:
         await self.request(
             'PUT',
@@ -360,7 +385,8 @@ class Channels(BaseRouter):
         )
 
     async def leave_thread(
-        self, channel_id: Snowflake,
+        self,
+        channel_id: Snowflake,
     ) -> None:
         await self.request(
             'DELETE',
@@ -371,7 +397,9 @@ class Channels(BaseRouter):
         )
 
     async def remove_thread_member(
-        self, channel_id: Snowflake, user_id: Snowflake,
+        self,
+        channel_id: Snowflake,
+        user_id: Snowflake,
     ) -> None:
         await self.request(
             'DELETE',
@@ -383,7 +411,10 @@ class Channels(BaseRouter):
         )
 
     async def get_thread_member(
-        self, channel_id: Snowflake, user_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        user_id: Snowflake,
+        *,
         with_member: bool | UndefinedType = UNDEFINED,
     ) -> ThreadMember:
         params = {
@@ -400,7 +431,9 @@ class Channels(BaseRouter):
         )
 
     async def list_thread_members(
-        self, channel_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        *,
         with_member: bool | UndefinedType = UNDEFINED,
         after: Snowflake | UndefinedType = UNDEFINED,
         limit: int | UndefinedType = UNDEFINED,
@@ -420,7 +453,9 @@ class Channels(BaseRouter):
         )
 
     async def list_public_archived_threads(
-        self, channel_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        *,
         before: str | UndefinedType = UNDEFINED,
         limit: int | UndefinedType = UNDEFINED,
     ) -> ListThreadsResponse:
@@ -438,7 +473,9 @@ class Channels(BaseRouter):
         )
 
     async def list_private_archived_threads(
-        self, channel_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        *,
         before: str | UndefinedType = UNDEFINED,
         limit: int | UndefinedType = UNDEFINED,
     ) -> ListThreadsResponse:
@@ -456,7 +493,9 @@ class Channels(BaseRouter):
         )
 
     async def list_joined_private_archived_threads(
-        self, channel_id: Snowflake, *,
+        self,
+        channel_id: Snowflake,
+        *,
         before: str | UndefinedType = UNDEFINED,
         limit: int | UndefinedType = UNDEFINED,
     ) -> ListThreadsResponse:

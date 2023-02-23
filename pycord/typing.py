@@ -20,11 +20,10 @@
 # SOFTWARE
 
 
-from typing import TYPE_CHECKING, Any
 import typing
+from typing import TYPE_CHECKING, Any
 
 from .types.snowflake import Snowflake
-
 
 if TYPE_CHECKING:
     from .state import State

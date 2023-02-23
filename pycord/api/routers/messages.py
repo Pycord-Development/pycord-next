@@ -21,9 +21,6 @@
 from urllib.parse import quote
 
 from ...file import File
-
-from .base import BaseRouter
-from ..route import Route
 from ...snowflake import Snowflake
 from ...types import Attachment, Emoji, User
 from ...types.channel import AllowedMentions
@@ -32,11 +29,15 @@ from ...types.embed import Embed
 from ...types.message import Message, MessageReference
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
+from ..route import Route
+from .base import BaseRouter
 
 
 class Messages(BaseRouter):
     async def create_message(
-        self, channel_id: Snowflake,  *,
+        self,
+        channel_id: Snowflake,
+        *,
         content: str | UndefinedType = UNDEFINED,
         nonce: int | str | UndefinedType = UNDEFINED,
         tts: bool | UndefinedType = UNDEFINED,
@@ -64,10 +65,12 @@ class Messages(BaseRouter):
             'POST',
             Route('/channels/{channel_id}/messages', channel_id=channel_id),
             remove_undefined(**data),
-            files=files
+            files=files,
         )
 
-    async def crosspost_message(self, channel_id: Snowflake, message_id: Snowflake) -> Message:
+    async def crosspost_message(
+        self, channel_id: Snowflake, message_id: Snowflake
+    ) -> Message:
         return await self.request(
             'POST',
             Route(
@@ -225,7 +228,7 @@ class Messages(BaseRouter):
                 message_id=message_id,
             ),
             remove_undefined(**data),
-            files=files
+            files=files,
         )
 
     async def delete_message(

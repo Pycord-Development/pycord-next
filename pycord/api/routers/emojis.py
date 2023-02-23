@@ -18,30 +18,28 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from .base import BaseRouter
-from ..route import Route
 from ...snowflake import Snowflake
 from ...types import Emoji
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
+from ..route import Route
+from .base import BaseRouter
 
 
 class Emojis(BaseRouter):
     async def list_guild_emojis(self, guild_id: Snowflake) -> list[Emoji]:
         return await self.request(
-            "GET",
-            Route("/guilds/{guild_id}/emojis", guild_id=guild_id)
+            'GET', Route('/guilds/{guild_id}/emojis', guild_id=guild_id)
         )
 
-    async def get_guild_emoji(
-        self, guild_id: Snowflake, emoji_id: Snowflake
-    ) -> Emoji:
+    async def get_guild_emoji(self, guild_id: Snowflake, emoji_id: Snowflake) -> Emoji:
         return await self.request(
-            "GET",
+            'GET',
             Route(
-                "/guilds/{guild_id}/emojis/{emoji_id}",
-                guild_id=guild_id, emoji_id=emoji_id
-            )
+                '/guilds/{guild_id}/emojis/{emoji_id}',
+                guild_id=guild_id,
+                emoji_id=emoji_id,
+            ),
         )
 
     async def create_guild_emoji(
@@ -54,18 +52,15 @@ class Emojis(BaseRouter):
         reason: str | None = None,
     ) -> Emoji:
         payload = {
-            "name": name,
-            "image": image,
-            "roles": roles,
+            'name': name,
+            'image': image,
+            'roles': roles,
         }
         return await self.request(
-            "POST",
-            Route(
-                "POST", "/guilds/{guild_id}/emojis",
-                guild_id=guild_id
-            ),
+            'POST',
+            Route('POST', '/guilds/{guild_id}/emojis', guild_id=guild_id),
             remove_undefined(**payload),
-            reason=reason
+            reason=reason,
         )
 
     async def modify_guild_emoji(
@@ -78,17 +73,18 @@ class Emojis(BaseRouter):
         reason: str | None = None,
     ) -> Emoji:
         payload = {
-            "name": name,
-            "roles": roles,
+            'name': name,
+            'roles': roles,
         }
         return await self.request(
-            "PATCH",
+            'PATCH',
             Route(
-                "/guilds/{guild_id}/emojis/{emoji_id}",
-                guild_id=guild_id, emoji_id=emoji_id
+                '/guilds/{guild_id}/emojis/{emoji_id}',
+                guild_id=guild_id,
+                emoji_id=emoji_id,
             ),
             remove_undefined(**payload),
-            reason=reason
+            reason=reason,
         )
 
     async def delete_guild_emoji(
@@ -99,10 +95,11 @@ class Emojis(BaseRouter):
         reason: str | None = None,
     ) -> None:
         await self.request(
-            "DELETE",
+            'DELETE',
             Route(
-                "/guilds/{guild_id}/emojis/{emoji_id}",
-                guild_id=guild_id, emoji_id=emoji_id
+                '/guilds/{guild_id}/emojis/{emoji_id}',
+                guild_id=guild_id,
+                emoji_id=emoji_id,
             ),
-            reason=reason
+            reason=reason,
         )

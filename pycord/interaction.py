@@ -75,7 +75,11 @@ class Interaction:
             Snowflake(_channel_id) if _channel_id is not None else UNDEFINED
         )
         _member = data.get('member')
-        self.member = Member(_member, state, guild_id=self.guild_id) if _member is not None else UNDEFINED
+        self.member = (
+            Member(_member, state, guild_id=self.guild_id)
+            if _member is not None
+            else UNDEFINED
+        )
         _user = data.get('user')
         if self.member is not UNDEFINED:
             self.user = self.member.user

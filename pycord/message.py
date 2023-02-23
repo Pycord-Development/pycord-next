@@ -24,23 +24,23 @@ import asyncio
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from .errors import ComponentException
-from .role import Role
 from .application import Application
 from .embed import Embed
 from .enums import ChannelType, InteractionType, MessageActivityType, MessageType
+from .errors import ComponentException
 from .flags import MessageFlags
 from .media import Attachment, Emoji, Sticker, StickerItem
 from .member import Member
+from .role import Role
 from .snowflake import Snowflake
 from .types import (
+    AllowedMentions as DiscordAllowedMentions,
     ChannelMention as DiscordChannelMention,
     Message as DiscordMessage,
     MessageActivity as DiscordMessageActivity,
     MessageInteraction as DiscordMessageInteraction,
     MessageReference as DiscordMessageReference,
     Reaction as DiscordReaction,
-    AllowedMentions as DiscordAllowedMentions,
 )
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
@@ -58,8 +58,8 @@ if TYPE_CHECKING:
         Thread,
         VoiceChannel,
     )
-    from .ui.house import House
     from .state import State
+    from .ui.house import House
 
 
 class ChannelMention:
@@ -276,15 +276,13 @@ class Message:
         )
 
         if exists:
-            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | \
-                          AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = \
-                exists[
-                    1
-                ]
+            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel = exists[
+                1
+            ]
         else:
-            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | \
-                          AnnouncementChannel | AnnouncementThread | Thread | StageChannel | \
-                          DirectoryChannel | ForumChannel | None = None
+            self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | None = (
+                None
+            )
 
     async def crosspost(self) -> Message:
         data = await self._state.http.crosspost_message(self.channel_id, self.id)
@@ -411,5 +409,5 @@ class Message:
             self,
             name=name,
             auto_archive_duration=auto_archive_duration,
-            rate_limit_per_user=rate_limit_per_user
+            rate_limit_per_user=rate_limit_per_user,
         )

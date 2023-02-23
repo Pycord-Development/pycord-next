@@ -21,9 +21,8 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from .pages.paginator import Page, Paginator
 from .auto_moderation import (
     AutoModAction,
     AutoModEventType,
@@ -32,14 +31,16 @@ from .auto_moderation import (
     AutoModTriggerType,
 )
 from .channel import (
-    _Overwrite,
-    AnnouncementThread, CategoryChannel,
-    Channel,
     CHANNEL_TYPE,
+    AnnouncementThread,
+    CategoryChannel,
+    Channel,
     ForumTag,
-    identify_channel,
     TextChannel,
-    Thread, VoiceChannel,
+    Thread,
+    VoiceChannel,
+    _Overwrite,
+    identify_channel,
 )
 from .enums import (
     ChannelType,
@@ -55,14 +56,15 @@ from .enums import (
 from .flags import Permissions, SystemChannelFlags
 from .media import Emoji, Sticker
 from .member import Member, MemberPaginator
+from .pages.paginator import Page, Paginator
 from .role import Role
 from .snowflake import Snowflake
 from .types import (
+    GUILD_FEATURE,
+    LOCALE,
     Ban as DiscordBan,
     Guild as DiscordGuild,
-    GUILD_FEATURE,
     GuildPreview as DiscordGuildPreview,
-    LOCALE,
     UnavailableGuild,
     Widget as DiscordWidget,
     WidgetSettings as DiscordWidgetSettings,
@@ -80,9 +82,10 @@ class ChannelPosition:
     def __init__(
         self,
         id: Snowflake,
-        position: int, *,
+        position: int,
+        *,
         lock_permissions: bool = False,
-        parent_id: Snowflake | None | UndefinedType
+        parent_id: Snowflake | None | UndefinedType,
     ) -> None:
         self.id = id
         self.position = position
@@ -94,7 +97,7 @@ class ChannelPosition:
             'id': self.id,
             'position': self.position,
             'lock_permissions': self.lock_permissions,
-            'parent_id': self.parent_id
+            'parent_id': self.parent_id,
         }
         return remove_undefined(**payload)
 
@@ -228,7 +231,7 @@ class Guild:
 
     async def list_auto_moderation_rules(self) -> list[AutoModRule]:
         """list the auto moderation rules for this guild.
-        
+
         Returns
         -------
         list[:class:`AutoModRule`]
@@ -236,25 +239,28 @@ class Guild:
         """
         data = await self._state.http.list_auto_moderation_rules_for_guild(self.id)
         return [AutoModRule(rule, self._state) for rule in data]
-    
+
     async def get_auto_moderation_rule(self, rule_id: int) -> AutoModRule:
         """Get an auto moderation rule for this guild.
-        
+
         Parameters
         ----------
         rule_id: :class:`int`
             The ID of the rule to get.
-        
+
         Returns
         -------
         :class:`AutoModRule`
             The auto moderation rule for this guild.
         """
-        data = await self._state.http.get_auto_moderation_rule_for_guild(self.id, rule_id)
+        data = await self._state.http.get_auto_moderation_rule_for_guild(
+            self.id, rule_id
+        )
         return AutoModRule(data, self._state)
 
     async def create_auto_moderation_rule(
-        self, *,
+        self,
+        *,
         name: str,
         event_type: AutoModEventType,
         trigger_type: AutoModTriggerType,
@@ -308,11 +314,12 @@ class Guild:
         return AutoModRule(data, self._state)
 
     async def create_emoji(
-        self, *,
+        self,
+        *,
         name: str,
         image: bytes,  # TODO
         roles: list[Role] | None = None,
-        reason: str | None = None
+        reason: str | None = None,
     ) -> Emoji:
         """Creates an emoji.
 
@@ -338,10 +345,12 @@ class Guild:
         return Emoji(data, state=self._state)
 
     async def edit_emoji(
-        self, emoji_id: Snowflake, *,
+        self,
+        emoji_id: Snowflake,
+        *,
         name: str | UndefinedType = UNDEFINED,
         roles: list[Role] | UndefinedType = UNDEFINED,
-        reason: str | None = None
+        reason: str | None = None,
     ) -> Emoji:
         """Edits the emoji.
 
@@ -366,7 +375,9 @@ class Guild:
         )
         return Emoji(data, self._state)
 
-    async def delete_emoji(self, emoji_id: Snowflake, *, reason: str | None = None) -> None:
+    async def delete_emoji(
+        self, emoji_id: Snowflake, *, reason: str | None = None
+    ) -> None:
         """Deletes an emoji.
 
         Parameters
@@ -388,13 +399,18 @@ class Guild:
         """
         data = await self._state.http.get_guild_preview(self.id)
         return GuildPreview(data, self._state)
-    
+
     async def edit(
-        self, *,
+        self,
+        *,
         name: str | UndefinedType = UNDEFINED,
         verification_level: VerificationLevel | None | UndefinedType = UNDEFINED,
-        default_message_notifications: DefaultMessageNotificationLevel | None | UndefinedType = UNDEFINED,
-        explicit_content_filter: ExplicitContentFilterLevel | None | UndefinedType = UNDEFINED,
+        default_message_notifications: DefaultMessageNotificationLevel
+        | None
+        | UndefinedType = UNDEFINED,
+        explicit_content_filter: ExplicitContentFilterLevel
+        | None
+        | UndefinedType = UNDEFINED,
         afk_channel: VoiceChannel | None | UndefinedType = UNDEFINED,
         afk_timeout: int | UndefinedType = UNDEFINED,
         icon: bytes | None | UndefinedType = UNDEFINED,  # TODO
@@ -409,10 +425,10 @@ class Guild:
         features: list[GUILD_FEATURE] | UndefinedType = UNDEFINED,
         description: str | None | UndefinedType = UNDEFINED,
         premium_progress_bar_enabled: bool | UndefinedType = UNDEFINED,
-        reason: str | None = None
+        reason: str | None = None,
     ) -> Guild:
         """Edits the guild.
-        
+
         Parameters
         ----------
         name: :class:`str`
@@ -453,7 +469,7 @@ class Guild:
             The reason for editing the guild. Shows up on the audit log.
         premium_progress_bar_enabled: :class:`bool`
             Whether the premium progress bar is enabled.
-            
+
         Returns
         -------
         :class:`Guild`
@@ -462,9 +478,15 @@ class Guild:
         data = await self._state.http.modify_guild(
             self.id,
             name=name,
-            verification_level=verification_level.value if verification_level else verification_level,
-            default_message_notifications=default_message_notifications.value if default_message_notifications else default_message_notifications,
-            explicit_content_filter=explicit_content_filter.value if explicit_content_filter else explicit_content_filter,
+            verification_level=verification_level.value
+            if verification_level
+            else verification_level,
+            default_message_notifications=default_message_notifications.value
+            if default_message_notifications
+            else default_message_notifications,
+            explicit_content_filter=explicit_content_filter.value
+            if explicit_content_filter
+            else explicit_content_filter,
             afk_channel_id=afk_channel.id if afk_channel else afk_channel,
             afk_timeout=afk_timeout,
             icon=icon,
@@ -474,7 +496,9 @@ class Guild:
             banner=banner,
             system_channel_id=system_channel.id if system_channel else system_channel,
             rules_channel_id=rules_channel.id if rules_channel else rules_channel,
-            public_updates_channel_id=public_updates_channel.id if public_updates_channel else public_updates_channel,
+            public_updates_channel_id=public_updates_channel.id
+            if public_updates_channel
+            else public_updates_channel,
             preferred_locale=preferred_locale,
             features=features,
             description=description,
@@ -499,7 +523,10 @@ class Guild:
         return [identify_channel(channel, self._state) for channel in data]
 
     async def create_channel(
-        self, name: str, type: ChannelType, *,
+        self,
+        name: str,
+        type: ChannelType,
+        *,
         topic: str | None | UndefinedType = UNDEFINED,
         bitrate: int | None | UndefinedType = UNDEFINED,
         user_limit: int | None | UndefinedType = UNDEFINED,
@@ -582,9 +609,7 @@ class Guild:
         )
         return identify_channel(data, self._state)
 
-    async def modify_channel_positions(
-        self, channels: list[ChannelPosition]
-    ) -> None:
+    async def modify_channel_positions(self, channels: list[ChannelPosition]) -> None:
         """Modifies the positions of the channels.
 
         Parameters
@@ -623,7 +648,9 @@ class Guild:
         data = await self._state.http.get_member(self.id, id)
         return Member(data, self._state, guild_id=self.id)
 
-    def list_members(self, limit: int = None, after: datetime.datetime | None = None) -> MemberPaginator:
+    def list_members(
+        self, limit: int = None, after: datetime.datetime | None = None
+    ) -> MemberPaginator:
         """Lists the members in the guild.
 
         Parameters
@@ -642,7 +669,8 @@ class Guild:
 
     async def search_members(
         self,
-        query: str, *,
+        query: str,
+        *,
         limit: int = None,
     ) -> list[Member]:
         """Searches for members in the guild.
@@ -708,9 +736,7 @@ class Guild:
         return Member(data, self._state, guild_id=self.id)
 
     async def edit_own_member(
-        self, *,
-        nick: str | None | UndefinedType = UNDEFINED,
-        reason: str | None = None
+        self, *, nick: str | None | UndefinedType = UNDEFINED, reason: str | None = None
     ) -> Member:
         """Edits the bot's guild member.
 
@@ -727,14 +753,13 @@ class Guild:
             The updated member.
         """
         data = await self._state.http.modify_current_member(
-            self.id,
-            nick=nick,
-            reason=reason
+            self.id, nick=nick, reason=reason
         )
         return Member(data, self._state, guild_id=self.id)
 
     def get_bans(
-        self, *,
+        self,
+        *,
         limit: int | None = 1000,
         before: datetime.datetime | None = None,
         after: datetime.datetime | None = None,
@@ -763,10 +788,13 @@ class Guild:
         :class:`BanPaginator`
             An async iterator that can be used for iterating over the guild's bans.
         """
-        return BanPaginator(self._state, self.id, limit=limit, before=before, after=after)
+        return BanPaginator(
+            self._state, self.id, limit=limit, before=before, after=after
+        )
 
     async def get_ban(
-        self, user_id: Snowflake,
+        self,
+        user_id: Snowflake,
     ) -> Ban:
         """Gets a ban for a user.
 
@@ -785,9 +813,10 @@ class Guild:
 
     async def ban(
         self,
-        user: User, *,
+        user: User,
+        *,
         delete_message_seconds: int | UndefinedType = UNDEFINED,
-        reason: str | None = None
+        reason: str | None = None,
     ) -> None:
         """Bans a user.
 
@@ -801,16 +830,13 @@ class Guild:
             The reason for the ban. Shows up in the audit log, and when the ban is fetched.
         """
         await self._state.http.create_guild_ban(
-            self.id, user.id,
+            self.id,
+            user.id,
             delete_message_seconds=delete_message_seconds,
-            reason=reason
+            reason=reason,
         )
 
-    async def unban(
-        self,
-        user: User, *,
-        reason: str | None = None
-    ) -> None:
+    async def unban(self, user: User, *, reason: str | None = None) -> None:
         """Unbans a user.
 
         Parameters
@@ -820,10 +846,7 @@ class Guild:
         reason: :class:`str` | None
             The reason for the unban. Shows up in the audit log.
         """
-        await self._state.http.remove_guild_ban(
-            self.id, user.id,
-            reason=reason
-        )
+        await self._state.http.remove_guild_ban(self.id, user.id, reason=reason)
 
 
 class GuildPreview:

@@ -23,23 +23,24 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from .role import Role
 from .flags import MemberFlags, Permissions
+from .role import Role
 from .snowflake import Snowflake
 
 if TYPE_CHECKING:
     from .state import State
 
+from .pages import Page
+from .pages.paginator import Paginator
 from .types import GuildMember
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
 
-from .pages.paginator import Paginator
-from .pages import Page
-
 
 class Member:
-    def __init__(self, data: GuildMember, state: State, *, guild_id: Snowflake | None = None) -> None:
+    def __init__(
+        self, data: GuildMember, state: State, *, guild_id: Snowflake | None = None
+    ) -> None:
         self._state: State = state
         self._guild_id: Snowflake | None = guild_id or None
         self.user: User | UndefinedType = (
@@ -81,8 +82,11 @@ class Member:
         flags: MemberFlags | None | UndefinedType = UNDEFINED,
         reason: str | None = None,
     ) -> Member:
-        communication_disabled_until = communication_disabled_until.isoformat() \
-            if communication_disabled_until else communication_disabled_until
+        communication_disabled_until = (
+            communication_disabled_until.isoformat()
+            if communication_disabled_until
+            else communication_disabled_until
+        )
         data = await self._state.http.modify_guild_member(
             self._guild_id,
             self.user.id,
@@ -98,7 +102,9 @@ class Member:
         return Member(data, self._state, guild_id=self._guild_id)
 
     async def add_role(
-        self, role: Role, *,
+        self,
+        role: Role,
+        *,
         reason: str | None = None,
     ) -> None:
         """Adds a role to the member.
@@ -118,7 +124,9 @@ class Member:
         )
 
     async def remove_role(
-        self, role: Role, *,
+        self,
+        role: Role,
+        *,
         reason: str | None = None,
     ) -> None:
         """Removes a role from the member.
@@ -146,7 +154,9 @@ class Member:
             The reason for kicking the member. Shows up in the audit log.
         """
         await self._state.http.remove_guild_member(
-            self._guild_id, self.id, reason=reason,
+            self._guild_id,
+            self.id,
+            reason=reason,
         )
 
 
@@ -162,7 +172,7 @@ class MemberPaginator(Paginator[MemberPage]):
         guild_id: Snowflake,
         *,
         limit: int = 1,
-        after: datetime | None = None
+        after: datetime | None = None,
     ) -> None:
         super().__init__()
         self._state: State = state
@@ -192,13 +202,7 @@ class MemberPaginator(Paginator[MemberPage]):
                 raise StopAsyncIteration
             for member in data:
                 self.add_page(
-                    MemberPage(
-                        Member(
-                            member,
-                            self._state,
-                            guild_id=self.guild_id
-                        )
-                    )
+                    MemberPage(Member(member, self._state, guild_id=self.guild_id))
                 )
 
     async def forward(self):

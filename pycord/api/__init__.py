@@ -100,12 +100,14 @@ class HTTPClient(
                 form = []
 
             for idx, file in enumerate(files):
-                form.append({
-                    'name': f'files[{idx}]',
-                    'value': file.file.read(),
-                    'filename': file.filename,
-                    'content_type': 'application/octet-stream'
-                })
+                form.append(
+                    {
+                        'name': f'files[{idx}]',
+                        'value': file.file.read(),
+                        'filename': file.filename,
+                        'content_type': 'application/octet-stream',
+                    }
+                )
 
         _log.debug(f'Requesting to {endpoint} with {data}, {headers}')
 

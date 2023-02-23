@@ -32,6 +32,7 @@ class Page(Protocol[T]):
     """
     The class for all Page Types to subclass.
     """
+
     value: Any
 
     async def interact_forward(self, *args, **kwargs) -> None:

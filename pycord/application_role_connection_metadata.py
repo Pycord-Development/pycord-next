@@ -21,18 +21,18 @@
 from __future__ import annotations
 
 from .enums import ApplicationRoleConnectionMetadataType
-from .types import ApplicationRoleConnectionMetadata as DiscordApplicationRoleConnectionMetadata
+from .types import (
+    ApplicationRoleConnectionMetadata as DiscordApplicationRoleConnectionMetadata,
+)
 from .undefined import UNDEFINED, UndefinedType
 from .user import LOCALE
 
-__all__ = (
-    'ApplicationRoleConnectionMetadata',
-)
+__all__ = ('ApplicationRoleConnectionMetadata',)
 
 
 class ApplicationRoleConnectionMetadata:
     """Represents a Discord Application's Role Connection Metadata.
-    
+
     Attributes
     ----------
     type: :class:`ApplicationRoleConnectionMetadataType`

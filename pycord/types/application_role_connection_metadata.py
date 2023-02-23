@@ -36,6 +36,7 @@ RCMTYPE = Literal[
     8,
 ]
 
+
 class ApplicationRoleConnectionMetadata(TypedDict):
     type: RCMTYPE
     key: str

@@ -84,7 +84,7 @@ BASE_EVENTS = [
     MessageDelete,
     MessageBulkDelete,
     UserUpdate,
-    InteractionCreate
+    InteractionCreate,
 ]
 
 if TYPE_CHECKING:

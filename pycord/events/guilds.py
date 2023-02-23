@@ -259,7 +259,8 @@ class GuildMemberChunk(Event):
         ms: list[Member] = [
             await (state.store.sift('members')).save([guild_id], member.user.id, member)
             for member in (
-                Member(member_data, state, guild_id=guild_id) for member_data in data['members']
+                Member(member_data, state, guild_id=guild_id)
+                for member_data in data['members']
             )
         ]
         self.members = ms

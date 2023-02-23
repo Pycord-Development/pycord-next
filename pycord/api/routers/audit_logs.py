@@ -18,17 +18,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from .base import BaseRouter
-from ..route import Route
 from ...snowflake import Snowflake
 from ...types import AUDIT_LOG_EVENT_TYPE, AuditLog
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
+from ..route import Route
+from .base import BaseRouter
 
 
 class AuditLogs(BaseRouter):
     async def get_guild_audit_log(
-        self, guild_id: Snowflake, *,
+        self,
+        guild_id: Snowflake,
+        *,
         user_id: Snowflake | UndefinedType = UNDEFINED,
         action_type: AUDIT_LOG_EVENT_TYPE | UndefinedType = UNDEFINED,
         before: Snowflake | UndefinedType = UNDEFINED,
@@ -36,16 +38,17 @@ class AuditLogs(BaseRouter):
         limit: int | UndefinedType = UNDEFINED,
     ) -> AuditLog:
         params = {
-            "user_id": user_id,
-            "action_type": action_type,
-            "before": before,
-            "after": after,
-            "limit": limit,
+            'user_id': user_id,
+            'action_type': action_type,
+            'before': before,
+            'after': after,
+            'limit': limit,
         }
         return await self.request(
             'GET',
             Route(
-                '/guilds/{guild_id}/audit-logs', guild_id=guild_id,
+                '/guilds/{guild_id}/audit-logs',
+                guild_id=guild_id,
             ),
-            query_params=remove_undefined(params)
+            query_params=remove_undefined(params),
         )

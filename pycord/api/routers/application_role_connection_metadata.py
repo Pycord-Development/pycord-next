@@ -18,30 +18,35 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from .base import BaseRouter
-from ..route import Route
 from ...snowflake import Snowflake
 from ...types import ApplicationRoleConnectionMetadata
+from ..route import Route
+from .base import BaseRouter
 
 
 class ApplicationRoleConnections(BaseRouter):
     async def get_application_role_connection_metadata_records(
-        self, application_id: Snowflake,
+        self,
+        application_id: Snowflake,
     ) -> list[ApplicationRoleConnectionMetadata]:
         return await self.request(
             'GET',
             Route(
-                '/applications/{application_id}/role-connections/metadata', application_id=application_id,
-            )
+                '/applications/{application_id}/role-connections/metadata',
+                application_id=application_id,
+            ),
         )
 
     async def update_application_role_connection_metadata_records(
-        self, application_id: Snowflake, records: list[ApplicationRoleConnectionMetadata],
+        self,
+        application_id: Snowflake,
+        records: list[ApplicationRoleConnectionMetadata],
     ) -> list[ApplicationRoleConnectionMetadata]:
         return self.request(
             'PUT',
             Route(
-                '/applications/{application_id}/role-connections/metadata', application_id=application_id,
+                '/applications/{application_id}/role-connections/metadata',
+                application_id=application_id,
             ),
             records,
         )

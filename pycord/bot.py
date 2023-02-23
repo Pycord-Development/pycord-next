@@ -25,7 +25,11 @@ from aiohttp import BasicAuth
 
 from .application_role_connection_metadata import ApplicationRoleConnectionMetadata
 from .commands import Group
-from .enums import DefaultMessageNotificationLevel, ExplicitContentFilterLevel, VerificationLevel
+from .enums import (
+    DefaultMessageNotificationLevel,
+    ExplicitContentFilterLevel,
+    VerificationLevel,
+)
 from .errors import BotException, NoIdentifiesLeft, OverfilledShardsException
 from .events.event_manager import Event
 from .flags import Intents, SystemChannelFlags
@@ -355,22 +359,26 @@ class Bot:
     async def guilds(self) -> AsyncGenerator[Guild, None]:
         return await (self._state.store.sift('guilds')).get_all()
 
-    async def get_application_role_connection_metadata_records(self) -> list[ApplicationRoleConnectionMetadata]:
+    async def get_application_role_connection_metadata_records(
+        self,
+    ) -> list[ApplicationRoleConnectionMetadata]:
         """Get the application role connection metadata records.
-        
+
         Returns
         -------
         list[:class:`ApplicationRoleConnectionMetadata`]
             The application role connection metadata records.
         """
-        data = await self._state.http.get_application_role_connection_metadata_records(self.user.id)
+        data = await self._state.http.get_application_role_connection_metadata_records(
+            self.user.id
+        )
         return [ApplicationRoleConnectionMetadata.from_dict(record) for record in data]
 
     async def update_application_role_connection_metadata_records(
         self, records: list[ApplicationRoleConnectionMetadata]
     ) -> list[ApplicationRoleConnectionMetadata]:
         """Update the application role connection metadata records.
-        
+
         Parameters
         ----------
         records: list[:class:`ApplicationRoleConnectionMetadata`]
@@ -381,16 +389,21 @@ class Bot:
         list[:class:`ApplicationRoleConnectionMetadata`]
             The updated application role connection metadata records.
         """
-        data = await self._state.http.update_application_role_connection_metadata_records(
-            self.user.id, [record.to_dict() for record in records]
+        data = (
+            await self._state.http.update_application_role_connection_metadata_records(
+                self.user.id, [record.to_dict() for record in records]
+            )
         )
         return [ApplicationRoleConnectionMetadata.from_dict(record) for record in data]
 
     async def create_guild(
-        self, name: str, *,
+        self,
+        name: str,
+        *,
         icon: bytes | UndefinedType = UNDEFINED,
         verification_level: VerificationLevel | UndefinedType = UNDEFINED,
-        default_message_notifications: DefaultMessageNotificationLevel | UndefinedType = UNDEFINED,
+        default_message_notifications: DefaultMessageNotificationLevel
+        | UndefinedType = UNDEFINED,
         explicit_content_filter: ExplicitContentFilterLevel | UndefinedType = UNDEFINED,
         roles: list[dict] | UndefinedType = UNDEFINED,  # TODO
         channels: list[dict] | UndefinedType = UNDEFINED,  # TODO
