@@ -141,15 +141,13 @@ class Bot:
         except (asyncio.CancelledError, KeyboardInterrupt):
             # most things are already handled by the asyncio.run function
             # the only thing we have to worry about are aiohttp errors
-            while True:
-                await self._state.http.close_session()
-                for sm in self._state.shard_managers:
-                    await sm.session.close()
+            await self._state.http.close_session()
+            for sm in self._state.shard_managers:
+                await sm.session.close()
 
-                if self._state._clustered:
-                    for sc in self._state.shard_clusters:
-                        sc.keep_alive.set_result(None)
-                return
+            if self._state._clustered:
+                for sc in self._state.shard_clusters:
+                    sc.keep_alive.set_result(None)
 
     def run(self, token: str) -> None:
         """
