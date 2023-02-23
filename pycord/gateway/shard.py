@@ -244,11 +244,13 @@ class Shard:
                     return
         await self.handle_close(self._ws.close_code)
 
-    async def handle_close(self, code: int) -> None:
+    async def handle_close(self, code: int | None) -> None:
         _log.debug(f'shard:{self.id}: closed with code {code}')
         if self._hb_task and not self._hb_task.done():
             self._hb_task.cancel()
         if code in RESUMABLE:
+            await self.connect(self._token, True)
+        elif code is None:
             await self.connect(self._token, True)
         else:
             if code == 4004:
