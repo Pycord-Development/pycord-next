@@ -21,16 +21,17 @@
 
 
 import asyncio
+from io import BytesIO
 import pathlib
-from typing import BinaryIO
+from typing import BinaryIO, Protocol
 
 
 def _open_file(path: pathlib.Path) -> BinaryIO:
     return path.expanduser().open('rb')
 
 
-class BaseFile:
-    path: pathlib.Path
+class File(Protocol):
+    path: pathlib.Path | None
     filename: str
     file: BinaryIO
     spoiler: bool
@@ -42,7 +43,7 @@ class BaseFile:
         ...
 
 
-class SysFile(BaseFile):
+class SysFile(File):
     def __init__(
         self, path: str, filename: str | None = None, spoiler: bool = False
     ) -> None:
@@ -63,6 +64,29 @@ class SysFile(BaseFile):
 
         if self.filename is None:
             self.filename = self.path.name
+
+        if self.spoiler and not self.filename.startswith('SPOILER_'):
+            self.filename = f'SPOILER_{self.filename}'
+
+        self._original_position = self.file.tell()
+
+    def reset(self, seek: int | bool = True) -> None:
+        if seek:
+            self.file.seek(self._original_position)
+
+    def close(self) -> None:
+        self.file.close = self._closer
+        self._closer()
+
+
+class BytesFile(File):
+    def __init__(self, filename: str, io: bytes | BytesIO) -> None:
+        self.filename = filename
+        self.file = BytesIO(io)
+
+        # assure we have control over closures
+        self._closer = self.file.close
+        self.file.close = lambda: None
 
         if self.spoiler and not self.filename.startswith('SPOILER_'):
             self.filename = f'SPOILER_{self.filename}'

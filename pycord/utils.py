@@ -40,9 +40,9 @@ DISCORD_EPOCH: int = 1420070400000
 S = TypeVar('S', bound=Sequence)
 
 
-async def _text_or_json(cr: ClientResponse, self) -> str | dict[str, Any]:
+async def _text_or_json(cr: ClientResponse) -> str | dict[str, Any]:
     if cr.content_type == 'application/json':
-        return await cr.json(encoding='utf-8', loads=self._json_decoder)
+        return await cr.json(encoding='utf-8', loads=loads)
     return await cr.text('utf-8')
 
 

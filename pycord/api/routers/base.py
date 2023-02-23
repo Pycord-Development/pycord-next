@@ -20,6 +20,8 @@
 # SOFTWARE
 from typing import Any
 
+from ...file import File
+
 from ..route import BaseRoute
 
 
@@ -28,7 +30,9 @@ class BaseRouter:
         self,
         method: str,
         route: BaseRoute,
-        data: Any | None = None,
+        data: dict[str, Any] | None = None,
+        files: list[File] | None = None,
+        form: list[dict[str, Any]] | None = None,
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,

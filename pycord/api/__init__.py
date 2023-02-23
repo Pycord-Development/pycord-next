@@ -8,7 +8,7 @@ Implementation of the Discord API.
 """
 import logging
 import sys
-from typing import Any, Iterable
+from typing import Any
 
 from aiohttp import BasicAuth, ClientSession, FormData, __version__ as aiohttp_version
 
@@ -16,10 +16,9 @@ from pycord._about import __version__
 
 from .. import utils
 from ..errors import BotException, Forbidden, HTTPException, InternalError, NotFound
-from ..file import BaseFile
+from ..file import File
 from ..utils import dumps
 from .execution import Executer
-from .json_decoder import JSONDecoder
 from .route import BaseRoute, Route
 from .routers import *
 
@@ -47,7 +46,6 @@ class HTTPClient(
         verbose: bool = False,
     ) -> None:
         self.base_url = base_url
-        self._json_decoder = JSONDecoder()
         self._proxy = proxy
         self._proxy_auth = proxy_auth
         self._headers = {
@@ -74,8 +72,8 @@ class HTTPClient(
         method: str,
         route: BaseRoute,
         data: dict[str, Any] | None = None,
-        files: list[BaseFile] | None = None,
-        form: Iterable[dict[str, Any]] | None = None,
+        files: list[File] | None = None,
+        form: list[dict[str, Any]] | None = None,
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,
@@ -91,9 +89,23 @@ class HTTPClient(
             headers['X-Audit-Log-Reason'] = reason
 
         if data:
-            # TODO: Support msgspec
             data: str = dumps(data=data)
             headers.update({'Content-Type': 'application/json'})
+
+        if form and data:
+            form.append({'name': 'payload_json', 'value': data})
+
+        if files:
+            if not form:
+                form = []
+
+            for idx, file in enumerate(files):
+                form.append({
+                    'name': f'files[{idx}]',
+                    'value': file.file.read(),
+                    'filename': file.filename,
+                    'content_type': 'application/octet-stream'
+                })
 
         _log.debug(f'Requesting to {endpoint} with {data}, {headers}')
 
@@ -123,7 +135,7 @@ class HTTPClient(
             )
             _log.debug(f'Received back {await r.text()}')
 
-            data = await utils._text_or_json(cr=r, self=self)
+            data = await utils._text_or_json(cr=r)
 
             if r.status == 429:
                 _log.debug(f'Request to {endpoint} failed: Request returned rate limit')

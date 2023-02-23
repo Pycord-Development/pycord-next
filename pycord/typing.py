@@ -21,6 +21,7 @@
 
 
 from typing import TYPE_CHECKING, Any
+import typing
 
 from .types.snowflake import Snowflake
 
@@ -37,8 +38,9 @@ class Typing:
     async def trigger(self) -> None:
         await self._state.http.trigger_typing_indicator(self.__channel_id)
 
-    async def __aenter__(self) -> None:
+    async def __aenter__(self) -> typing.Self:
         await self.trigger()
+        return self
 
     async def __aexit__(self, exc_t: Any, exc_v: Any, exc_tb: Any) -> None:
         await self.trigger()

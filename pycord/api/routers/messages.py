@@ -20,6 +20,8 @@
 # SOFTWARE
 from urllib.parse import quote
 
+from ...file import File
+
 from .base import BaseRouter
 from ..route import Route
 from ...snowflake import Snowflake
@@ -43,7 +45,7 @@ class Messages(BaseRouter):
         message_reference: MessageReference | UndefinedType = UNDEFINED,
         components: list[Component] | UndefinedType = UNDEFINED,
         sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
-        files: list[...] | UndefinedType = UNDEFINED,  # TODO
+        files: list[File] | UndefinedType = UNDEFINED,
         flags: int | UndefinedType = UNDEFINED,
     ) -> Message:
         data = {
@@ -62,6 +64,7 @@ class Messages(BaseRouter):
             'POST',
             Route('/channels/{channel_id}/messages', channel_id=channel_id),
             remove_undefined(**data),
+            files=files
         )
 
     async def crosspost_message(self, channel_id: Snowflake, message_id: Snowflake) -> Message:
@@ -203,7 +206,7 @@ class Messages(BaseRouter):
         flags: int | None | UndefinedType = UNDEFINED,
         allowed_mentions: AllowedMentions | None | UndefinedType = UNDEFINED,
         components: list[Component] | None | UndefinedType = UNDEFINED,
-        files: list[...] | None | UndefinedType = UNDEFINED,  # TODO
+        files: list[File] | None | UndefinedType = UNDEFINED,
         attachments: list[Attachment] | None | UndefinedType = UNDEFINED,
     ) -> Message:
         data = {
@@ -222,6 +225,7 @@ class Messages(BaseRouter):
                 message_id=message_id,
             ),
             remove_undefined(**data),
+            files=files
         )
 
     async def delete_message(
