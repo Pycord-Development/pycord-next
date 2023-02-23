@@ -68,6 +68,17 @@ class Ready(Event):
                     )
 
 
+class Hook(Event):
+    _name = 'READY'
+
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> bool:
+        if state._ready is True:
+            return False
+
+        user = User(data['user'], state)
+        self.user = user
+
+
 class UserUpdate(Event):
     _name = 'USER_UPDATE'
 
