@@ -41,30 +41,31 @@ class Ready(Event):
         state.user = user
         self.user = user
 
-        if hasattr(state, '_raw_user_fut'):
-            state._raw_user_fut.set_result(None)
+        if not state._ready:
+            if hasattr(state, '_raw_user_fut'):
+                state._raw_user_fut.set_result(None)
 
-        state._ready = True
+            state._ready = True
 
-        for gear in state.gears:
-            asyncio.create_task(gear.on_attach(), name=f'Attaching Gear: {gear.name}')
+            for gear in state.gears:
+                asyncio.create_task(gear.on_attach(), name=f'Attaching Gear: {gear.name}')
 
-        state.application_commands = []
-        state.application_commands.extend(
-            await state.http.get_global_application_commands(state.user.id, True)
-        )
-        state._application_command_names: list[str] = []
+            state.application_commands = []
+            state.application_commands.extend(
+                await state.http.get_global_application_commands(state.user.id, True)
+            )
+            state._application_command_names: list[str] = []
 
-        for command in state.commands:
-            await command.instantiate()
-            if hasattr(command, 'name'):
-                state._application_command_names.append(command.name)
+            for command in state.commands:
+                await command.instantiate()
+                if hasattr(command, 'name'):
+                    state._application_command_names.append(command.name)
 
-        for app_command in state.application_commands:
-            if app_command['name'] not in state._application_command_names:
-                await state.http.delete_global_application_command(
-                    state.user.id.real, app_command['id']
-                )
+            for app_command in state.application_commands:
+                if app_command['name'] not in state._application_command_names:
+                    await state.http.delete_global_application_command(
+                        state.user.id.real, app_command['id']
+                    )
 
 
 class UserUpdate(Event):
