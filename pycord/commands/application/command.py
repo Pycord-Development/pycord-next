@@ -357,7 +357,10 @@ class ApplicationCommand(Command):
 
         self.guild_id = guild_id
         self.name_localizations = name_localizations
-        self.description = description
+        if self.type == ApplicationCommandType.CHAT_INPUT.value:
+            self.description = description or callback.__doc__ or 'No description provided'
+        else:
+            self.description = UNDEFINED
         self.description_localizations = description_localizations
         self.dm_permission = dm_permission
         self.nsfw = nsfw
@@ -374,7 +377,7 @@ class ApplicationCommand(Command):
     def command(
         self,
         name: str,
-        description: str,
+        description: str | UndefinedType = UNDEFINED,
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
     ) -> ApplicationCommand:
@@ -402,7 +405,7 @@ class ApplicationCommand(Command):
             command = Option(
                 type=1,
                 name=name,
-                description=description,
+                description=description or func.__doc__ or 'No description provided',
                 name_localizations=name_localizations,
                 description_localizations=description_localizations,
             )
