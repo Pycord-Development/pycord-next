@@ -79,7 +79,7 @@ class Bot:
         print_banner_on_startup: bool = True,
         logging_flavor: int | str | dict[str, Any] | None = None,
         max_messages: int = 1000,
-        shards: int | list[int] = 1,
+        shards: int | list[int] | None = None,
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
         verbose: bool = False,
@@ -104,11 +104,29 @@ class Bot:
         self._state.bot_init(
             token=token, clustered=False, proxy=self._proxy, proxy_auth=self._proxy_auth
         )
-        shards = (
-            self._shards
-            if isinstance(self._shards, list)
-            else list(range(self._shards))
+
+        info = await self._state.http.get_gateway_bot()
+        session_start_limit = info['session_start_limit']
+
+        self._state.shard_concurrency = PassThrough(
+            session_start_limit['max_concurrency'], 7
         )
+        self._state._session_start_limit = session_start_limit
+
+        if shards is None:
+            shards = list(range(session_start_limit['shards']))
+        else:
+            shards: list[int] = (
+                self._shards
+                if isinstance(self._shards, list)
+                else list(range(self._shards))
+            )
+
+        if session_start_limit['remaining'] == 0:
+            raise NoIdentifiesLeft('session_start_limit has been exhausted')
+        elif session_start_limit['remaining'] - len(shards) <= 0:
+            raise NoIdentifiesLeft('session_start_limit will be exhausted')
+
         sharder = ShardManager(
             self._state,
             shards,
@@ -170,19 +188,24 @@ class Bot:
         info = await self._state.http.get_gateway_bot()
         session_start_limit = info['session_start_limit']
 
+        if self._shards is None:
+            shards = list(range(session_start_limit['shards']))
+        else:
+            shards = (
+                self._shards
+                if isinstance(self._shards, list)
+                else list(range(self._shards))
+            )
+
         if session_start_limit['remaining'] == 0:
             raise NoIdentifiesLeft('session_start_limit has been exhausted')
+        elif session_start_limit['remaining'] - len(shards) <= 0:
+            raise NoIdentifiesLeft('session_start_limit will be exhausted')
 
         self._state.shard_concurrency = PassThrough(
             session_start_limit['max_concurrency'], 7
         )
         self._state._session_start_limit = session_start_limit
-
-        shards = (
-            self._shards
-            if isinstance(self._shards, list)
-            else list(range(self._shards))
-        )
 
         sorts = list(chunk(shards, clusters))
 
