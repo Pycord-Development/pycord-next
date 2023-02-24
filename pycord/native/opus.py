@@ -18,6 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+
 import array
 import ctypes
 import ctypes.util
@@ -114,10 +115,10 @@ class Application(Enum):
 
 
 class Control(Enum):
-    SET_BITRATE = (4002,)
-    SET_BANDWIDTH = (4008,)
-    SET_FEC = (4012,)
-    SET_PLP = (4014,)
+    SET_BITRATE = 4002
+    SET_BANDWIDTH = 4008
+    SET_FEC = 4012
+    SET_PLP = 4014
 
 
 class OpusEncoder(BaseOpus):
@@ -141,11 +142,17 @@ class OpusEncoder(BaseOpus):
         'opus_encoder_destroy': ([EncoderStructPtr], None),
     }
 
-    def __init__(self, application: Application = Application.AUDIO, library_path=None):
+    def __init__(self, application: Application = Application.AUDIO, library_path: str | None = None, sample_rate: int | None = None, frame_length: int | None = None):
         super(OpusEncoder, self).__init__(library_path)
         self.application = application
 
         self._encoder = None
+        self.sample_rate = sample_rate or 48000
+        self.frame_length: int = frame_length or 20
+
+    @property
+    def frame_size(self) -> int:
+        return int(self.sample_rate / 1000 * self.frame_length)
 
     def initialize(self) -> None:
         self.create()
@@ -155,7 +162,7 @@ class OpusEncoder(BaseOpus):
         self.set_bandwidth('full')
         self.set_signal_type('auto')
 
-    def set_bitrate(self, kbps) -> None:
+    def set_bitrate(self, kbps: int) -> None:
         self._check_created()
 
         kbps = min(128, max(16, int(kbps)))
@@ -166,7 +173,7 @@ class OpusEncoder(BaseOpus):
         if ret < 0:
             raise OpusException('failed to set bitrate to {}: {}'.format(kbps, ret))
 
-    def set_fec(self, value) -> None:
+    def set_fec(self, value: bool) -> None:
         self._check_created()
 
         ret = self.opus_encoder_ctl(
@@ -176,7 +183,9 @@ class OpusEncoder(BaseOpus):
         if ret < 0:
             raise OpusException('failed to set FEC to {}: {}'.format(value, ret))
 
-    def set_expected_packet_loss_percent(self, perc) -> None:
+    def set_expected_packet_loss_percent(self, perc: int) -> None:
+        self._check_created()
+
         ret = self.opus_encoder_ctl(
             self._encoder, int(Control.SET_PLP.value), min(100, max(0, int(perc * 100)))
         )
@@ -185,24 +194,26 @@ class OpusEncoder(BaseOpus):
             raise OpusException('failed to set PLP to {}: {}'.format(perc, ret))
 
     def set_bandwidth(self, band: BandwidthControl) -> None:
+        self._check_created()
         if band not in BandwidthControl:
             raise KeyError(f'{band!r} is not a valid bandwidth setting')
 
         k = band.value
-        self.opus_encoder_ctl(self._state, Control.SET_BANDWIDTH.value, k)
+        self.opus_encoder_ctl(self._encoder, Control.SET_BANDWIDTH.value, k)
 
     def set_signal_type(self, sig: SignalControl) -> None:
+        self._check_created()
         if sig not in SignalControl:
             raise KeyError(f'{sig!r} is not a valid signal setting')
 
         k = sig.value
-        self.opus_encoder_ctl(self._state, Control.SET_SIGNAL.value, k)
+        self.opus_encoder_ctl(self._encoder, Control.SET_SIGNAL.value, k)
 
     def _check_created(self) -> None:
         if self._encoder is None:
-            raise ('encoder has not been created yet')
+            raise OpusException('encoder has not been created yet')
 
-    def create(self) -> Any:
+    def create(self) -> None:
         ret = ctypes.c_int()
         result = self.opus_encoder_create(
             self.sampling_rate, self.channels, self.application.value, ctypes.byref(ret)
@@ -214,15 +225,20 @@ class OpusEncoder(BaseOpus):
         self._encoder = result
 
     def destroy(self) -> None:
-        self.opus_encoder_destroy(self._instance)
+        self.opus_encoder_destroy(self._encoder)
 
-    def encode(self, pcm, frame_size) -> bytes:
+    def encode(self, pcm: bytes) -> bytes:
         max_data_bytes = len(pcm)
         pcm = ctypes.cast(pcm, c_int16_ptr)
         data = (ctypes.c_char * max_data_bytes)()
 
-        ret = self.opus_encode(self._encoder, pcm, frame_size, data, max_data_bytes)
+        ret = self.opus_encode(self._encoder, pcm, self.frame_size, data, max_data_bytes)
         if ret < 0:
-            raise OpusException('failed to encode: {}'.format(ret))
+            raise OpusException(f'failed to encode: {ret}')
 
         return array.array('b', data[:ret]).tobytes()
+
+    
+# Subclass of OpusEncoder and OpusDecoder
+class Opus(OpusEncoder):
+    ...
