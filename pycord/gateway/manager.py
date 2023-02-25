@@ -50,8 +50,6 @@ class ShardManager:
         self._state = state
         self.proxy = proxy
         self.proxy_auth = proxy_auth
-        # {guild_id, Future}
-        self._voice_states: dict[int, list[asyncio.Future]] = []
 
     def add_shard(self, shard: Shard) -> None:
         self.shards.insert(shard.id, shard)
@@ -115,7 +113,7 @@ class ShardManager:
 
         return shard
 
-    async def update_voice_state(self, guild_id: int, channel_id: int, self_mute: bool = False, self_deaf: bool = False, block: bool = False) -> None | dict[str, Any]:
+    async def update_voice_state(self, guild_id: int, channel_id: int, self_mute: bool = False, self_deaf: bool = False) -> None | dict[str, Any]:
         shard = self.find_shard(guild_id)
 
         await shard.send({
@@ -127,11 +125,3 @@ class ShardManager:
                 'self_deaf': self_deaf
             }
         })
-
-        if block:
-            # 0: Voice State Update
-            # 1: Voice Server Update
-            futs = [asyncio.Future(), asyncio.Future()]
-            self._voice_states[guild_id] = futs
-            await asyncio.wait(futs)
-            return futs[1].result()

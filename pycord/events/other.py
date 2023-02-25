@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING, Any
 from ..interaction import Interaction
 from ..user import User
 from .event_manager import Event
+from ..voice_state import VoiceState
 
 if TYPE_CHECKING:
     from ..state import State
@@ -101,3 +102,31 @@ class InteractionCreate(Event):
             asyncio.create_task(modal._invoke(interaction))
 
         self.interaction = interaction
+
+
+class VoiceStateUpdate(Event):
+    _name = 'VOICE_STATE_UPDATE'
+
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
+        self.state = VoiceState(data, state)
+
+
+class VoiceServerUpdate(Event):
+    _name = 'VOICE_SERVER_UPDATE'
+
+    def __init__(self, guild_id: int | str) -> None:
+        self.real_guild_id = str(guild_id)
+
+    @property
+    def guild_id(self) -> int:
+        return int(self.real_guild_id)
+
+    def __call__(self) -> None:
+        return
+
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
+        if data['guild_id'] != self.real_guild_id:
+            return False
+
+        self.token: str = data['token']
+        self.endpoint: str | None = data.get('endpoint')
