@@ -104,7 +104,6 @@ class Bot:
             self._global_shard_status = global_shard_status
         else:
             self._global_shard_status = None
-            
 
     @property
     def user(self) -> User:
@@ -157,7 +156,9 @@ class Bot:
             if self._shards is None:
                 printable_shards = len(shards)
             else:
-                printable_shards = self._shards if isinstance(self._shards, int) else len(self._shards)
+                printable_shards = (
+                    self._shards if isinstance(self._shards, int) else len(self._shards)
+                )
 
             print_banner(
                 self._state._session_start_limit['remaining'],

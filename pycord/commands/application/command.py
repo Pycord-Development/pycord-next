@@ -358,7 +358,9 @@ class ApplicationCommand(Command):
         self.guild_id = guild_id
         self.name_localizations = name_localizations
         if self.type == ApplicationCommandType.CHAT_INPUT.value:
-            self.description = description or callback.__doc__ or 'No description provided'
+            self.description = (
+                description or callback.__doc__ or 'No description provided'
+            )
         else:
             self.description = UNDEFINED
         self.description_localizations = description_localizations

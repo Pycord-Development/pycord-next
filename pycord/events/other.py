@@ -48,7 +48,9 @@ class Ready(Event):
             state._ready = True
 
             for gear in state.gears:
-                asyncio.create_task(gear.on_attach(), name=f'Attaching Gear: {gear.name}')
+                asyncio.create_task(
+                    gear.on_attach(), name=f'Attaching Gear: {gear.name}'
+                )
 
             state.application_commands = []
             state.application_commands.extend(
