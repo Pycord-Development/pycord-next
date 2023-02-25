@@ -21,7 +21,11 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Type
+
+from .voice.sock import NativeSocket
+
+from .voice.gateway import NativeGateway
 
 from .embed import Embed
 from .enums import ChannelType, OverwriteType, VideoQualityMode
@@ -37,6 +41,7 @@ from .types import (
     ThreadMetadata as DiscordThreadMetadata,
 )
 from .undefined import UNDEFINED, UndefinedType
+from .voice_client import VoiceClient
 
 if TYPE_CHECKING:
     from .state import State
@@ -209,6 +214,25 @@ class AudioChannel(GuildChannel):
         )
         self.bitrate: int | UndefinedType = data.get('bitrate', UNDEFINED)
         self.user_limit: int | UndefinedType = data.get('user_limit', UNDEFINED)
+
+    async def connect(
+        self,
+        gateway: Type[NativeGateway] = NativeGateway,
+        socket: Type[NativeSocket] = NativeSocket,
+        omit_packets: bool = True
+    ) -> None:
+        # TODO: Support distribution and sharding
+        voice = VoiceClient(
+            guild_id=int(self.guild_id),
+            channel_id=int(self.id),
+            state=self._state,
+            gateway=gateway,
+            socket=socket,
+            send_packets_as_events=not omit_packets
+        )
+        # work around for now
+        manager = self._state.shard_managers[0]
+        await voice.connect(manager)
 
 
 class TextChannel(MessageableChannel):

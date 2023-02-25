@@ -1,6 +1,6 @@
 """
-pycord.native
-~~~~~~~~~~~~~
+pycord.voice
+~~~~~~~~~~~~
 Native Python Implementation of Voice-related Features
 
 :copyright: 2021-present Pycord Development

@@ -126,6 +126,7 @@ class NativeGateway:
             await self.connect(ws_url, connection)
             return
 
+        asyncio.create_task(self.identify(connection))
         asyncio.create_task(self._receive())
 
     async def _receive(self) -> None:
