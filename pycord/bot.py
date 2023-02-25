@@ -64,6 +64,9 @@ class Bot:
         The authentication of your proxy.
 
         Defaults to `None`.
+    global_shard_status: :class:`int`
+        The amount of shards globally deployed.
+        Only supported on bots not using `.cluster`.
 
     Attributes
     ----------
@@ -80,6 +83,7 @@ class Bot:
         logging_flavor: int | str | dict[str, Any] | None = None,
         max_messages: int = 1000,
         shards: int | list[int] | None = None,
+        global_shard_status: int | None = None,
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
         verbose: bool = False,
@@ -94,6 +98,13 @@ class Bot:
         self._print_banner = print_banner_on_startup
         self._proxy = proxy
         self._proxy_auth = proxy_auth
+        if shards and not global_shard_status:
+            self._global_shard_status = len(shards)
+        elif global_shard_status:
+            self._global_shard_status = global_shard_status
+        else:
+            self._global_shard_status = None
+            
 
     @property
     def user(self) -> User:
@@ -113,8 +124,8 @@ class Bot:
         )
         self._state._session_start_limit = session_start_limit
 
-        if shards is None:
-            shards = list(range(session_start_limit['shards']))
+        if self._shards is None:
+            shards = list(range(info['shards']))
         else:
             shards: list[int] = (
                 self._shards
@@ -130,7 +141,7 @@ class Bot:
         sharder = ShardManager(
             self._state,
             shards,
-            self._shards,
+            self._global_shard_status or len(shards),
             proxy=self._proxy,
             proxy_auth=self._proxy_auth,
         )
@@ -141,9 +152,16 @@ class Bot:
             await self._state._raw_user_fut
 
         if self._print_banner:
+            printable_shards = 0
+
+            if self._shards is None:
+                printable_shards = len(shards)
+            else:
+                printable_shards = self._shards if isinstance(self._shards, int) else len(self._shards)
+
             print_banner(
                 self._state._session_start_limit['remaining'],
-                self._shards if isinstance(self._shards, int) else len(self._shards),
+                printable_shards,
                 bot_name=self.user.name,
             )
 
@@ -189,7 +207,7 @@ class Bot:
         session_start_limit = info['session_start_limit']
 
         if self._shards is None:
-            shards = list(range(session_start_limit['shards']))
+            shards = list(range(info['shards']))
         else:
             shards = (
                 self._shards

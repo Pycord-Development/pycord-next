@@ -84,6 +84,9 @@ class MessageCreate(Event):
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         message = Message(data, state)
+        self.message = message
+        self.is_human = message.author.bot is False
+        self.content = self.message.content
 
         await (state.store.sift('messages')).save(
             [message.channel_id], message.id, message
