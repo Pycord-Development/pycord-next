@@ -22,14 +22,11 @@ GUILD_ID: int = 0
 # which is parsed by Pycord to give you the information the user gave.
 async def favorite(
     inter: pycord.Interaction,
-    anime: pycord.Option = pycord.Option(
-        # The type of input the user will put,
-        # for this example it's integer to support autocomplete.
-        pycord.OptionType.STRING,
-        # The name of this option,
-        # can be set to anything but
-        # try to keep it short
-        'anime',
+
+    # The name of this option,
+    # can be set to anything but
+    # try to keep it short
+    anime: str = pycord.Option(
         # The description for this option,
         # this is a longer version of name displaying
         # more detail and technicalities
@@ -55,8 +52,6 @@ async def favorite(
     # checks the value of the int
     # and if it matches up to an anime,
     # it responds with a custom response.
-    anime = anime.value
-
     match anime:
         case 'Attack on Titan':
             await inter.resp.send('It seems like you like Attack on Titan, Nice!')
