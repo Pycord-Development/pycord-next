@@ -24,7 +24,7 @@ import asyncio
 from copy import copy
 from typing import TYPE_CHECKING, Any, Union
 
-from ...channel import identify_channel
+from ...channel import Channel, identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
 from ...events.other import InteractionCreate
 from ...interaction import Interaction, InteractionOption
@@ -94,6 +94,19 @@ class CommandChoice:
         }
 
 
+
+_OPTION_BIND = {
+    str: ApplicationCommandOptionType.STRING,
+    int: ApplicationCommandOptionType.INTEGER,
+    bool: ApplicationCommandOptionType.BOOLEAN,
+    float: ApplicationCommandOptionType.NUMBER,
+    User: ApplicationCommandOptionType.USER,
+    Channel: ApplicationCommandOptionType.CHANNEL,
+    Role: ApplicationCommandOptionType.ROLE,
+    Attachment: ApplicationCommandOptionType.ATTACHMENT
+}
+
+
 class Option:
     """
     An option of a Chat Input Command.
@@ -131,9 +144,9 @@ class Option:
 
     def __init__(
         self,
-        type: ApplicationCommandOptionType | int,
         name: str,
-        description: str,
+        description: str | None = None,
+        type: ApplicationCommandOptionType | int | Any  = ApplicationCommandOptionType.STRING,
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         required: bool | UndefinedType = UNDEFINED,
@@ -147,12 +160,14 @@ class Option:
     ) -> None:
         if isinstance(type, ApplicationCommandOptionType):
             self.type = type.value
+        elif not isinstance(type, int):
+            self.type = _OPTION_BIND[type]
         else:
             self.type = type
         self.autocompleter = autocompleter
         self.name = name
         self.name_localizations = name_localizations
-        self.description = description
+        self.description = description or 'No description provided'
         self.description_localizations = description_localizations
         self.required = required
         if autocomplete:
@@ -248,8 +263,8 @@ class Option:
 
     def command(
         self,
-        name: str,
-        description: str,
+        name: str | None = None,
+        description: str | None = None,
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
     ) -> ApplicationCommand:
@@ -271,8 +286,8 @@ class Option:
         def wrapper(func: AsyncFunc):
             command = Option(
                 type=1,
-                name=name,
-                description=description,
+                name=name or func.__name__.lower(),
+                description=description or func.__doc__ or 'No description provided',
                 name_localizations=name_localizations,
                 description_localizations=description_localizations,
             )
@@ -336,9 +351,9 @@ class ApplicationCommand(Command):
         self,
         # normal parameters
         callback: AsyncFunc | None,
-        name: str,
-        type: int | ApplicationCommandType,
         state: State,
+        name: str | UndefinedType = UNDEFINED,
+        type: int | ApplicationCommandType = ApplicationCommandType.CHAT_INPUT,
         description: str | UndefinedType = UNDEFINED,
         guild_id: int | None = None,
         group: Group | None = None,
@@ -349,6 +364,8 @@ class ApplicationCommand(Command):
         nsfw: bool | UndefinedType = UNDEFINED,
     ) -> None:
         super().__init__(callback, name, state, group)
+
+        self.name = name or callback.__name__.lower()
 
         if isinstance(type, ApplicationCommandType):
             self.type = type.value
@@ -378,7 +395,7 @@ class ApplicationCommand(Command):
 
     def command(
         self,
-        name: str,
+        name: str | UndefinedType = UNDEFINED,
         description: str | UndefinedType = UNDEFINED,
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
@@ -406,7 +423,7 @@ class ApplicationCommand(Command):
 
             command = Option(
                 type=1,
-                name=name,
+                name=name or func.__name__.lower(),
                 description=description or func.__doc__ or 'No description provided',
                 name_localizations=name_localizations,
                 description_localizations=description_localizations,
@@ -503,29 +520,32 @@ class ApplicationCommand(Command):
         self.options: list[Option] = []
         self._options_dict: dict[str, Option] = {}
 
-        i: int = 0
-
         for name, v in arg_defaults.items():
-            # ignore interaction
-            if i == 0:
-                i += 1
+            if name == 'self':
                 continue
-
-            if v[0] is None and name != 'self':
-                raise ApplicationCommandException(
-                    f'Parameter {name} on command {self.name} has no default set'
-                )
-            elif name == 'self':
+            elif isinstance(v[1], Interaction):
                 continue
-            elif not isinstance(v[0], Option):
+            elif not isinstance(v[0], Option) and v[0] is not None:
                 raise ApplicationCommandException(
                     f'Options may only be of type Option, not {v[0]}'
                 )
 
-            v[0]._param = name
+            if v[0]:
+                v[0]._param = name
 
-            self.options.append(v[0])
-            self._options_dict[v[0].name] = v[0]
+                self.options.append(v[0])
+                self._options_dict[v[0].name] = v[0]
+            else:
+                if v[1] is None:
+                    raise 
+
+                option = Option(
+                    name=name,
+                    type=v[1]
+                )
+                option._param = name
+                self.options.append(option)
+                self._options_dict[name] = option
 
         for option in self.options:
             self._options.append(option.to_dict())
@@ -621,7 +641,7 @@ class ApplicationCommand(Command):
             self.id = res['id']
 
     def _process_options(
-        self, interaction: Interaction, options: list[InteractionOption]
+        self, interaction: Interaction, options: list[InteractionOption], grouped: bool = False
     ) -> dict[str, Any]:
         binding = {}
         for option in options:
@@ -632,11 +652,14 @@ class ApplicationCommand(Command):
                 opts = self._process_options(
                     interaction=interaction, options=option.options
                 )
+                if not grouped:
+                    asyncio.create_task(self._callback(interaction))
                 asyncio.create_task(sub._callback(interaction, **opts))
             elif option.type == 2:
-                self._process_options(interaction=interaction, options=option.options)
+                asyncio.create_task(self._callback(interaction))
+                self._process_options(interaction=interaction, options=option.options, grouped=True)
             elif option.type in (3, 4, 5, 10):
-                binding[o._param] = o._inter_copy(option)
+                binding[o._param] = o._inter_copy(option).value
             elif option.type == 6:
                 user = User(
                     interaction.data['resolved']['users'][option.value], self._state

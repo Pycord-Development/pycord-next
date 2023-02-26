@@ -26,7 +26,6 @@ from typing import Any, AsyncGenerator, Type, TypeVar
 
 from aiohttp import ClientResponse
 
-from .errors import NoFetchOrGet
 from .types import AsyncFunc
 from .undefined import UNDEFINED
 
@@ -165,7 +164,7 @@ async def find(cls: Type[T], *args: Any, **kwargs: Any) -> T:
     """
 
     if not hasattr(cls, 'fetch') or not hasattr(cls, 'get'):
-        raise NoFetchOrGet('This class has no get or fetch function')
+        raise RuntimeError('This class has no get or fetch function')
 
     mret = await cls.get(*args, **kwargs)
 

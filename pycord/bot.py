@@ -24,6 +24,8 @@ from typing import Any, AsyncGenerator, Type, TypeVar
 from aiohttp import BasicAuth
 
 from .application_role_connection_metadata import ApplicationRoleConnectionMetadata
+from .undefined import UNDEFINED, UndefinedType
+from .commands.application.command import ApplicationCommand
 from .commands import Group
 from .enums import (
     DefaultMessageNotificationLevel,
@@ -357,7 +359,7 @@ class Bot:
     def wait_for(self, event: T) -> asyncio.Future[T]:
         return self._state.event_manager.wait_for(event)
 
-    def command(self, name: str, cls: T, **kwargs: Any) -> T:
+    def command(self, name: str | UndefinedType = UNDEFINED, cls: T = ApplicationCommand, **kwargs: Any) -> T:
         """
         Create a command within the Bot
 
@@ -372,7 +374,7 @@ class Bot:
         """
 
         def wrapper(func: AsyncFunc) -> T:
-            command = cls(func, name, state=self._state, **kwargs)
+            command = cls(func, name=name, state=self._state, **kwargs)
             self._state.commands.append(command)
             return command
 
