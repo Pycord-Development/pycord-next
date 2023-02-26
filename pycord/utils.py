@@ -19,13 +19,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+import inspect
 from collections.abc import Iterator, Sequence
 from itertools import accumulate
-from typing import Any, Literal, TypeVar
+from typing import Any, AsyncGenerator, Type, TypeVar
 
 from aiohttp import ClientResponse
 
-from .undefined import UNDEFINED, UndefinedType
+from .errors import NoFetchOrGet
+from .types import AsyncFunc
+from .undefined import UNDEFINED
 
 try:
     import msgspec
@@ -36,6 +39,7 @@ except ImportError:
 
 DISCORD_EPOCH: int = 1420070400000
 S = TypeVar('S', bound=Sequence)
+T = TypeVar('T')
 
 
 async def _text_or_json(cr: ClientResponse, self) -> str | dict[str, Any]:
@@ -96,3 +100,76 @@ def chunk(items: S, n: int) -> Iterator[S]:
 
 def remove_undefined(**kwargs) -> dict[str, Any]:
     return {k: v for k, v in kwargs.items() if v is not UNDEFINED}
+
+
+async def get_iterated_data(iterator: AsyncGenerator) -> list[Any]:
+    hold = []
+
+    async for data in iterator:
+        hold.append(data)
+
+    return hold
+
+
+def get_arg_defaults(fnc: AsyncFunc) -> dict[str, tuple[Any, Any]]:
+    signature = inspect.signature(fnc)
+    ret = {}
+    for k, v in signature.parameters.items():
+        if (
+            v.default is not inspect.Parameter.empty
+            and v.annotation is not inspect.Parameter.empty
+        ):
+            ret[k] = (v.default, v.annotation)
+        elif v.default is not inspect.Parameter.empty:
+            ret[k] = (v.default, None)
+        elif v.annotation is not inspect.Parameter.empty:
+            ret[k] = (None, v.annotation)
+        else:
+            ret[k] = (None, None)
+
+    return ret
+
+
+async def find(cls: Type[T], *args: Any, **kwargs: Any) -> T:
+    """
+    Locates an object by either getting it from the cache, or
+    fetching it from the API.
+
+    Parameters
+    ----------
+    cls: Type[T]
+        The class to get or fetch
+    args: Any
+        The arguments to insert in the get or fetch
+    kwargs: Any
+        The keyword arguments to insert in the get or fetch
+
+    Usage
+    -----
+
+    .. TODO:: Make .. code-block here work on VSCode
+
+    ```py
+    channel: pycord.Channel = await find(pycord.Channel, id=1234567890)
+    await channel.send('Hello, world!')
+    ```
+
+    .. code-block:: python3
+
+        channel: pycord.Channel = await find(pycord.Channel, id=1234567890)
+        await channel.send('Hello, world!')
+
+    Returns
+    -------
+    A single non-Type variant of T in `cls`.
+    """
+
+    if not hasattr(cls, 'fetch') or not hasattr(cls, 'get'):
+        raise NoFetchOrGet('This class has no get or fetch function')
+
+    mret = await cls.get(*args, **kwargs)
+
+    if mret is None:
+        return await cls.fetch(*args, **kwargs)
+    else:
+        return mret

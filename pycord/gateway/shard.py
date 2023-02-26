@@ -221,7 +221,7 @@ class Shard:
                         self.session_id = d['session_id']
                         self._resume_gateway_url = d['resume_gateway_url']
                         self._state.raw_user = d['user']
-                    asyncio.create_task(self._state._process_event(t, d))
+                    asyncio.create_task(self._state.event_manager.publish(t, d))
                 elif op == 1:
                     await self._ws.send_str(dumps({'op': 1, 'd': self._sequence}))
                 elif op == 10:
@@ -244,11 +244,13 @@ class Shard:
                     return
         await self.handle_close(self._ws.close_code)
 
-    async def handle_close(self, code: int) -> None:
+    async def handle_close(self, code: int | None) -> None:
         _log.debug(f'shard:{self.id}: closed with code {code}')
         if self._hb_task and not self._hb_task.done():
             self._hb_task.cancel()
         if code in RESUMABLE:
+            await self.connect(self._token, True)
+        elif code is None:
             await self.connect(self._token, True)
         else:
             if code == 4004:
@@ -257,7 +259,7 @@ class Shard:
                 raise ShardingRequired('Discord is requiring you shard your bot')
             elif code == 4014:
                 raise DisallowedIntents(
-                    "You aren't allowed to carry a priviledged intent wanted"
+                    "You aren't allowed to carry a privileged intent wanted"
                 )
 
             if code > 4000 or code == 4000:

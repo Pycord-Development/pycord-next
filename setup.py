@@ -23,7 +23,6 @@ import setuptools
 
 __version__ = '3.0.0'
 
-requirements = []
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
@@ -48,10 +47,11 @@ extra_requires = {
         'aiodns~=3.0',  # included in aiohttp speed.
         'Brotli~=1.0.9',  # included in aiohttp speed.
         'ciso8601~=2.2.0',  # Faster datetime parsing.
+        'faust-cchardet~=2.1.16',  # cchardet for python 3.11+
     ],
     'docs': [
         'sphinx==5.3.0',
-        'sphinx-hoverxref~=1.0.1',
+        'pydata-sphinx-theme~=0.12',
     ],
 }
 

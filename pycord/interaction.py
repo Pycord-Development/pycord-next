@@ -23,10 +23,9 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING
 
-from .flags import MessageFlags
-
 from .embed import Embed
 from .errors import InteractionException
+from .flags import MessageFlags
 from .member import Member
 from .message import Message
 from .snowflake import Snowflake

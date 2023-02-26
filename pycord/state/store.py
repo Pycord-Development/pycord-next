@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-from typing import Any, Generator
+from typing import Any, Type, TypeVar
 
 
 class _stored:
@@ -27,6 +27,9 @@ class _stored:
         self.parents = parents
         self.id = self_id
         self.storing = storing
+
+
+T = TypeVar('T')
 
 
 class Store:
@@ -46,10 +49,10 @@ class Store:
     async def get_without_parents(self, id: Any) -> tuple[set[Any], Any] | None:
         for store in self._store:
             if store.id == id:
-                return (store.parents, store.storing)
+                return store.parents, store.storing
 
     async def insert(self, parents: list[Any], id: Any, data: Any) -> None:
-        if len(self._store) == self.max_items:
+        if self.max_items and len(self._store) == self.max_items:
             self._store = set()
 
         self._store.add(_stored(set(parents), id, data))
@@ -65,13 +68,15 @@ class Store:
                 self._store.add(store)
                 return old_data
         else:
-            if len(self._store) == self.max_items:
+            if self.max_items and len(self._store) == self.max_items:
                 self._store = {}
 
             store = _stored(set(parents), id, data)
             self._store.add(store)
 
-    async def discard(self, parents: list[Any], id: Any) -> Any | None:
+    async def discard(
+        self, parents: list[Any], id: Any, type: Type[T] | T = Any
+    ) -> T | None:
         ps = set(parents)
 
         for store in self._store:

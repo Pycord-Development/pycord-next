@@ -23,8 +23,11 @@ from typing import Any, AsyncGenerator, Type, TypeVar
 
 from aiohttp import BasicAuth
 
+from .commands.application.command import ApplicationCommand
+
 from .commands import Group
-from .errors import NoIdentifiesLeft, OverfilledShardsException
+from .errors import BotException, NoIdentifiesLeft, OverfilledShardsException
+from .events.event_manager import Event
 from .flags import Intents
 from .gateway import PassThrough, ShardCluster, ShardManager
 from .guild import Guild
@@ -32,7 +35,7 @@ from .interface import print_banner, start_logging
 from .state import State
 from .types import AsyncFunc
 from .user import User
-from .utils import chunk
+from .utils import chunk, get_arg_defaults
 
 T = TypeVar('T')
 
@@ -46,8 +49,8 @@ class Bot:
     intents: :class:`.flags.Intents`
         The Gateway Intents to use
     print_banner_on_startup
-        Wether to print the banner on startup or not
-    logging_flavor: Union[int, str, dict[str, Any], None]
+        Whether to print the banner on startup or not
+    logging_flavor: Union[int, str, dict[str, :class:`typing.Any`], None]
         The logging flavor this bot uses
 
         Defaults to `None`.
@@ -63,6 +66,9 @@ class Bot:
         The authentication of your proxy.
 
         Defaults to `None`.
+    global_shard_status: :class:`int`
+        The amount of shards globally deployed.
+        Only supported on bots not using `.cluster`.
 
     Attributes
     ----------
@@ -78,7 +84,8 @@ class Bot:
         print_banner_on_startup: bool = True,
         logging_flavor: int | str | dict[str, Any] | None = None,
         max_messages: int = 1000,
-        shards: int | list[int] = 1,
+        shards: int | list[int] | None = None,
+        global_shard_status: int | None = None,
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
         verbose: bool = False,
@@ -93,6 +100,12 @@ class Bot:
         self._print_banner = print_banner_on_startup
         self._proxy = proxy
         self._proxy_auth = proxy_auth
+        if shards and not global_shard_status:
+            self._global_shard_status = len(shards)
+        elif global_shard_status:
+            self._global_shard_status = global_shard_status
+        else:
+            self._global_shard_status = None
 
     @property
     def user(self) -> User:
@@ -103,15 +116,33 @@ class Bot:
         self._state.bot_init(
             token=token, clustered=False, proxy=self._proxy, proxy_auth=self._proxy_auth
         )
-        shards = (
-            self._shards
-            if isinstance(self._shards, list)
-            else list(range(self._shards))
+
+        info = await self._state.http.get_gateway_bot()
+        session_start_limit = info['session_start_limit']
+
+        self._state.shard_concurrency = PassThrough(
+            session_start_limit['max_concurrency'], 7
         )
+        self._state._session_start_limit = session_start_limit
+
+        if self._shards is None:
+            shards = list(range(info['shards']))
+        else:
+            shards: list[int] = (
+                self._shards
+                if isinstance(self._shards, list)
+                else list(range(self._shards))
+            )
+
+        if session_start_limit['remaining'] == 0:
+            raise NoIdentifiesLeft('session_start_limit has been exhausted')
+        elif session_start_limit['remaining'] - len(shards) <= 0:
+            raise NoIdentifiesLeft('session_start_limit will be exhausted')
+
         sharder = ShardManager(
             self._state,
             shards,
-            self._shards,
+            self._global_shard_status or len(shards),
             proxy=self._proxy,
             proxy_auth=self._proxy_auth,
         )
@@ -122,9 +153,18 @@ class Bot:
             await self._state._raw_user_fut
 
         if self._print_banner:
+            printable_shards = 0
+
+            if self._shards is None:
+                printable_shards = len(shards)
+            else:
+                printable_shards = (
+                    self._shards if isinstance(self._shards, int) else len(self._shards)
+                )
+
             print_banner(
                 self._state._session_start_limit['remaining'],
-                self._shards if isinstance(self._shards, int) else len(self._shards),
+                printable_shards,
                 bot_name=self.user.name,
             )
 
@@ -136,15 +176,13 @@ class Bot:
         except (asyncio.CancelledError, KeyboardInterrupt):
             # most things are already handled by the asyncio.run function
             # the only thing we have to worry about are aiohttp errors
-            while True:
-                await self._state.http.close_session()
-                for sm in self._state.shard_managers:
-                    await sm.session.close()
+            await self._state.http.close_session()
+            for sm in self._state.shard_managers:
+                await sm.session.close()
 
-                if self._state._clustered:
-                    for sc in self._state.shard_clusters:
-                        sc.keep_alive.set_result(None)
-                return
+            if self._state._clustered:
+                for sc in self._state.shard_clusters:
+                    sc.keep_alive.set_result(None)
 
     def run(self, token: str) -> None:
         """
@@ -171,19 +209,24 @@ class Bot:
         info = await self._state.http.get_gateway_bot()
         session_start_limit = info['session_start_limit']
 
+        if self._shards is None:
+            shards = list(range(info['shards']))
+        else:
+            shards = (
+                self._shards
+                if isinstance(self._shards, list)
+                else list(range(self._shards))
+            )
+
         if session_start_limit['remaining'] == 0:
             raise NoIdentifiesLeft('session_start_limit has been exhausted')
+        elif session_start_limit['remaining'] - len(shards) <= 0:
+            raise NoIdentifiesLeft('session_start_limit will be exhausted')
 
         self._state.shard_concurrency = PassThrough(
             session_start_limit['max_concurrency'], 7
         )
         self._state._session_start_limit = session_start_limit
-
-        shards = (
-            self._shards
-            if isinstance(self._shards, list)
-            else list(range(self._shards))
-        )
 
         sorts = list(chunk(shards, clusters))
 
@@ -265,23 +308,50 @@ class Bot:
             )
         )
 
-    def listen(self, name: str) -> T:
+    def listen(self, event: Event | None = None) -> T:
         """
         Listen to an event
 
         Parameters
         ----------
-        name: :class:`str`
-            The name of the event to listen to.
+        event: :class:`Event` | None
+            The event to listen to.
+            Optional if using type hints.
         """
 
         def wrapper(func: T) -> T:
-            self._state.ping.add_listener(name=name, func=func)
+            if event:
+                self._state.event_manager.add_event(event, func)
+            else:
+                args = get_arg_defaults(func)
+
+                values = list(args.values())
+
+                if len(values) != 1:
+                    raise BotException(
+                        'Only one argument is allowed on event functions'
+                    )
+
+                eve = values[0]
+
+                if eve[1] is None:
+                    raise BotException(
+                        'Event must either be typed, or be present in the `event` parameter'
+                    )
+
+                if not isinstance(eve[1](), Event):
+                    raise BotException('Events must be of type Event')
+
+                self._state.event_manager.add_event(eve[1], func)
+
             return func
 
         return wrapper
 
-    def command(self, name: str, cls: T, **kwargs: Any) -> T:
+    def wait_for(self, event: T) -> asyncio.Future[T]:
+        return self._state.event_manager.wait_for(event)
+
+    def command(self, name: str | None = None, cls: T = ApplicationCommand, **kwargs: Any) -> T:
         """
         Create a command within the Bot
 
@@ -304,7 +374,7 @@ class Bot:
 
     def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
         """
-        Create a brand new Group of Commands
+        Create a brand-new Group of Commands
 
         Parameters
         ----------
