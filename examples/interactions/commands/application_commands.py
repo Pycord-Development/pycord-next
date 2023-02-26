@@ -6,16 +6,13 @@ bot = pycord.Bot(intents=pycord.Intents())
 # the guild id to deploy on. Often used for developing to
 # avoid having to wait the extraneous amount of time Discord has for global
 # commands
-GUILD_ID: int = 0
+GUILD_ID: int | pycord.UndefinedType = pycord.UNDEFINED
 
 
 # make a chat input command which
 # is named favorite and that displays
 # an autocompleted list of animes to pick from
-@bot.command(
-    description='Pick which one is your favorite anime',
-    guild_id=GUILD_ID,
-)
+@bot.command(guild_id=GUILD_ID)
 # make a function for what to do once the user
 # has completed their input.
 # this has the option anime, displayed as a Parameter,
@@ -48,6 +45,8 @@ async def favorite(
         ],
     ),
 ):
+    """Pick which one is your favorite anime"""
+
     # checks the value of the int
     # and if it matches up to an anime,
     # it responds with a custom response.
