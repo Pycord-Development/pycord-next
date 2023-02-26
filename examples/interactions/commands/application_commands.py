@@ -22,7 +22,6 @@ GUILD_ID: int = 0
 # which is parsed by Pycord to give you the information the user gave.
 async def favorite(
     inter: pycord.Interaction,
-
     # The name of this option,
     # can be set to anything but
     # try to keep it short
@@ -30,7 +29,7 @@ async def favorite(
         # The description for this option,
         # this is a longer version of name displaying
         # more detail and technicalities
-        'Your favorite Anime Show',
+        description='Your favorite Anime Show',
         # this just sets it so the user cannot proceed without
         # entering this option
         required=True,

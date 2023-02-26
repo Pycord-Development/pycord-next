@@ -144,7 +144,7 @@ class Option:
 
     def __init__(
         self,
-        name: str,
+        name: str | None = None,
         description: str | None = None,
         type: ApplicationCommandOptionType | int | Any  = ApplicationCommandOptionType.STRING,
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
@@ -161,7 +161,7 @@ class Option:
         if isinstance(type, ApplicationCommandOptionType):
             self.type = type.value
         elif not isinstance(type, int):
-            self.type = _OPTION_BIND[type]
+            self.type = _OPTION_BIND[type].value
         else:
             self.type = type
         self.autocompleter = autocompleter
@@ -523,7 +523,7 @@ class ApplicationCommand(Command):
         for name, v in arg_defaults.items():
             if name == 'self':
                 continue
-            elif isinstance(v[1], Interaction):
+            elif v[1] is Interaction:
                 continue
             elif not isinstance(v[0], Option) and v[0] is not None:
                 raise ApplicationCommandException(
@@ -532,6 +532,10 @@ class ApplicationCommand(Command):
 
             if v[0]:
                 v[0]._param = name
+                v[0].type = _OPTION_BIND[v[1]].value
+
+                if not v[0].name:
+                    v[0].name = name
 
                 self.options.append(v[0])
                 self._options_dict[v[0].name] = v[0]
