@@ -26,18 +26,17 @@ do this, you should install [git](https://git-scm.com) if not already installed.
 An automatic install should look something like
 
 ```sh
-    pip install -U git+https://github.com/pycord-development/pycord-v3
+pip install -U git+https://github.com/pycord/pycord-v3
 ```
 
 If instead, you wanted to do a manual install (in case of something like development),
 you could do the following
 
 ```sh
-    # Git command
-    git clone https://github.com/pycord-development/pycord-v3
-    cd pycord-v3
+git clone https://github.com/pycord/pycord-v3
+cd pycord-v3
 
-    pip install .
+pip install .
 ```
 
 ## Stability
