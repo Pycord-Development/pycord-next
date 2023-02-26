@@ -133,7 +133,7 @@ class Option:
         self,
         type: ApplicationCommandOptionType | int,
         name: str,
-        description: str,
+        description: str | None = None,
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         required: bool | UndefinedType = UNDEFINED,
@@ -152,7 +152,7 @@ class Option:
         self.autocompleter = autocompleter
         self.name = name
         self.name_localizations = name_localizations
-        self.description = description
+        self.description = description or 'No description provided'
         self.description_localizations = description_localizations
         self.required = required
         if autocomplete:
@@ -248,8 +248,8 @@ class Option:
 
     def command(
         self,
-        name: str,
-        description: str,
+        name: str | None = None,
+        description: str | None = None,
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
     ) -> ApplicationCommand:
@@ -271,8 +271,8 @@ class Option:
         def wrapper(func: AsyncFunc):
             command = Option(
                 type=1,
-                name=name,
-                description=description,
+                name=name or func.__name__.lower(),
+                description=description or func.__doc__ or 'No description provided',
                 name_localizations=name_localizations,
                 description_localizations=description_localizations,
             )
@@ -336,9 +336,9 @@ class ApplicationCommand(Command):
         self,
         # normal parameters
         callback: AsyncFunc | None,
-        name: str,
-        type: int | ApplicationCommandType,
         state: State,
+        name: str | UndefinedType = UNDEFINED,
+        type: int | ApplicationCommandType = ApplicationCommandType.CHAT_INPUT,
         description: str | UndefinedType = UNDEFINED,
         guild_id: int | None = None,
         group: Group | None = None,
@@ -349,6 +349,8 @@ class ApplicationCommand(Command):
         nsfw: bool | UndefinedType = UNDEFINED,
     ) -> None:
         super().__init__(callback, name, state, group)
+
+        self.name = name or callback.__name__.lower()
 
         if isinstance(type, ApplicationCommandType):
             self.type = type.value
@@ -378,7 +380,7 @@ class ApplicationCommand(Command):
 
     def command(
         self,
-        name: str,
+        name: str | UndefinedType = UNDEFINED,
         description: str | UndefinedType = UNDEFINED,
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
@@ -406,7 +408,7 @@ class ApplicationCommand(Command):
 
             command = Option(
                 type=1,
-                name=name,
+                name=name or func.__name__.lower(),
                 description=description or func.__doc__ or 'No description provided',
                 name_localizations=name_localizations,
                 description_localizations=description_localizations,
@@ -621,7 +623,7 @@ class ApplicationCommand(Command):
             self.id = res['id']
 
     def _process_options(
-        self, interaction: Interaction, options: list[InteractionOption]
+        self, interaction: Interaction, options: list[InteractionOption], grouped: bool = False
     ) -> dict[str, Any]:
         binding = {}
         for option in options:
@@ -632,9 +634,12 @@ class ApplicationCommand(Command):
                 opts = self._process_options(
                     interaction=interaction, options=option.options
                 )
-                asyncio.create_task(sub._callback(interaction, **opts))
+                if not grouped:
+                    asyncio.create_task(self._callback(interaction))
+                asyncio.create_task(sub._callback(interaction))
             elif option.type == 2:
-                self._process_options(interaction=interaction, options=option.options)
+                asyncio.create_task(self._callback(interaction, **opts))
+                self._process_options(interaction=interaction, options=option.options, grouped=True)
             elif option.type in (3, 4, 5, 10):
                 binding[o._param] = o._inter_copy(option)
             elif option.type == 6:

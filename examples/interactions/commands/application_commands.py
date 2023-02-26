@@ -13,10 +13,7 @@ GUILD_ID: int = 0
 # is named favorite and that displays
 # an autocompleted list of animes to pick from
 @bot.command(
-    'favorite',
-    pycord.ApplicationCommand,
     description='Pick which one is your favorite anime',
-    type=pycord.ApplicationCommandType.CHAT_INPUT,
     guild_id=GUILD_ID,
 )
 # make a function for what to do once the user

@@ -23,6 +23,8 @@ from typing import Any, AsyncGenerator, Type, TypeVar
 
 from aiohttp import BasicAuth
 
+from .commands.application.command import ApplicationCommand
+
 from .commands import Group
 from .errors import BotException, NoIdentifiesLeft, OverfilledShardsException
 from .events.event_manager import Event
@@ -349,7 +351,7 @@ class Bot:
     def wait_for(self, event: T) -> asyncio.Future[T]:
         return self._state.event_manager.wait_for(event)
 
-    def command(self, name: str, cls: T, **kwargs: Any) -> T:
+    def command(self, name: str | None = None, cls: T = ApplicationCommand, **kwargs: Any) -> T:
         """
         Create a command within the Bot
 
