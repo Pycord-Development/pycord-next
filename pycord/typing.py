@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
 
 class Typing:
-    def __init__(self, channel_id: Snowflake, state: State) -> None:
+    def __init__(self, channel_id: Snowflake, state: "State") -> None:
         self._state = state
         self.__channel_id = channel_id
 
