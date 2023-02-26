@@ -25,7 +25,11 @@ import ctypes.util
 import os
 import struct
 import sys
-from typing import Any
+
+try:
+    import nacl
+except ImportError:
+    nacl = None
 
 from ..enums import Enum
 from ..errors import PycordException
@@ -149,6 +153,9 @@ class OpusEncoder(BaseOpus):
         self._encoder = None
         self.sample_rate = sample_rate or 48000
         self.frame_length: int = frame_length or 20
+
+        if nacl is None:
+            raise OpusException('PyNaCl is required for Voice-related features')
 
     @property
     def frame_size(self) -> int:

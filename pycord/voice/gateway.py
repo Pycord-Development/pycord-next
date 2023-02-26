@@ -31,7 +31,7 @@ from pycord import utils
 from ..enums import SpeakingMask
 from ..gateway.passthrough import PassThrough
 from ..state.core import State
-from .sock import NativeSocket
+from .sock import VoiceSocket
 
 
 class ConnectionData(SimpleNamespace):
@@ -44,7 +44,7 @@ class ConnectionData(SimpleNamespace):
 _log = logging.getLogger(__name__)
 
 
-class NativeGateway:
+class VoiceGateway:
     """
     Implementation of the Gateway for Voice
     """
@@ -54,7 +54,7 @@ class NativeGateway:
         state: State,
         session: aiohttp.ClientSession,
         publish_frames: bool = False,
-        socket_cls: Type[NativeSocket] = NativeSocket,
+        socket_cls: Type[VoiceSocket] = VoiceSocket,
     ) -> None:
         self._state = state
         self._publish_frames = publish_frames

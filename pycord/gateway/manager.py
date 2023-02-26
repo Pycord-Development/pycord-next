@@ -113,7 +113,7 @@ class ShardManager:
 
         return shard
 
-    async def update_voice_state(self, guild_id: int, channel_id: int, self_mute: bool = False, self_deaf: bool = False) -> None | dict[str, Any]:
+    async def update_voice_state(self, guild_id: int, channel_id: int, self_mute: bool = False, self_deaf: bool = False) -> None:
         shard = self.find_shard(guild_id)
 
         await shard.send({

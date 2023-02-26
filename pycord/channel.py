@@ -23,9 +23,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Type
 
-from .voice.sock import NativeSocket
+from .voice.sock import VoiceSocket
 
-from .voice.gateway import NativeGateway
+from .voice.gateway import VoiceGateway
 
 from .embed import Embed
 from .enums import ChannelType, OverwriteType, VideoQualityMode
@@ -217,8 +217,8 @@ class AudioChannel(GuildChannel):
 
     async def connect(
         self,
-        gateway: Type[NativeGateway] = NativeGateway,
-        socket: Type[NativeSocket] = NativeSocket,
+        gateway: Type[VoiceGateway] = VoiceGateway,
+        socket: Type[VoiceSocket] = VoiceSocket,
         omit_packets: bool = True
     ) -> None:
         # TODO: Support distribution and sharding

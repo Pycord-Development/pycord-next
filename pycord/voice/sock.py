@@ -25,10 +25,12 @@ import socket
 import struct
 from typing import TYPE_CHECKING, TypedDict
 
+from ..events.other import VoiceServerUpdate
+
 from .opus import OpusEncoder
 
 if TYPE_CHECKING:
-    from .gateway import NativeGateway
+    from .gateway import VoiceGateway
 
 
 class SocketData(TypedDict):
@@ -42,7 +44,7 @@ _log = logging.getLogger(__name__)
 
 
 # TODO: add Opus packet encoding and sending
-class NativeSocket:
+class VoiceSocket:
     """
     Implementation of a Socket connection to receive and send Opus data
     """
@@ -52,7 +54,17 @@ class NativeSocket:
     _nonce: int = 0
     _encoder: OpusEncoder
 
-    async def start(self, gateway: 'NativeGateway', data: SocketData) -> None:
+    def __init__(self) -> None:
+        self._connected = False
+        self._vss = asyncio.Event()
+        self._vsts = asyncio.Event()
+
+    async def update(self, data: VoiceServerUpdate) -> None:
+        if not self._connected:
+            self._vss.set()
+            
+
+    async def start(self, gateway: 'VoiceGateway', data: SocketData) -> None:
         self._gateway = gateway
         self._socket_data = data
         self._encoder = OpusEncoder()
@@ -88,3 +100,5 @@ class NativeSocket:
 
         _log.debug(f'selecting voice socket mode: {self._DEFAULT_MODE}')
         await self._gateway.select(self.ip, self.port, self._DEFAULT_MODE)
+
+        self._connected = True

@@ -26,7 +26,7 @@ from .voice.gateway import ConnectionData
 if TYPE_CHECKING:
     from .state.core import State
 
-from .voice import NativeGateway, NativeSocket
+from .voice import VoiceGateway, VoiceSocket
 from .gateway import ShardManager
 
 
@@ -36,8 +36,8 @@ class VoiceClient:
         guild_id: int,
         channel_id: int,
         state: State,
-        gateway: Type[NativeGateway] = NativeGateway,
-        socket: Type[NativeSocket] = NativeSocket,
+        gateway: Type[VoiceGateway] = VoiceGateway,
+        socket: Type[VoiceSocket] = VoiceSocket,
         send_packets_as_events: bool = False,
     ) -> None:
         self.guild_id = guild_id

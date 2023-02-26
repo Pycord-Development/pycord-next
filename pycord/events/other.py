@@ -130,3 +130,22 @@ class VoiceServerUpdate(Event):
 
         self.token: str = data['token']
         self.endpoint: str | None = data.get('endpoint')
+
+class UserVoiceStateUpdate(Event):
+    _name = 'VOICE_STATE_UPDATE'
+
+    def __init__(self, guild_id: int | str) -> None:
+        self.real_guild_id = str(guild_id)
+
+    @property
+    def guild_id(self) -> int:
+        return int(self.real_guild_id)
+
+    def __call__(self) -> None:
+        return
+
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
+        if data['guild_id'] != self.real_guild_id:
+            return False
+
+        self.state = VoiceState(data, state)
