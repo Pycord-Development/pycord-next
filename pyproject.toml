@@ -17,22 +17,23 @@ exclude_lines = [
 package = "pycord"
 package_dir = "pycord"
 # For writing into the correct file
-filename = "NEWS.md"
+filename = "CHANGELOG.md"
+start_string = "<!-- tc.s -->\n"
 # For finding the news fragments
-directory = "news/"
+directory = "changes/"
 
 # For rendering properly for this project
-title_format = "## [{version}](https://github.com/pycord/pycord-v3/tree/{version}) - {project_date}"
+title_format = "## [{version}](https://github.com/pycord/pycord-v3/tree/{version}) ({project_date})"
 underlines = ["", "", ""]
 issue_format = "[#{issue}](https://github.com/pycord/pycord-v3/issues/{issue})"
 template = "templates/towncrier.jinja"
 
 # Grouping of entries, within our changelog
 type = [
-  { name = "Deprecations and Removals", directory = "removal",  showcontent = true },
-  { name = "Features",                  directory = "feature",  showcontent = true },
-  { name = "Bug Fixes",                 directory = "bugs",     showcontent = true },
-  { name = "Improved Documentation",    directory = "doc",      showcontent = true },
+  { name = "Deprecations and Removals", directory = "removal",  showcontent = true  },
+  { name = "Features",                  directory = "feature",  showcontent = true  },
+  { name = "Bug Fixes",                 directory = "bugs",     showcontent = true  },
+  { name = "Documentation",             directory = "doc",      showcontent = true  },
   { name = "Etcetera",                  directory = "etc",      showcontent = false },
   { name = "Trivial Changes",           directory = "trivial",  showcontent = false },
 ]

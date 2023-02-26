@@ -7,5 +7,4 @@ to use Towncrier.
 Notable changes are:
 
 - Simply adding towncrier config
-- Creation of `news` and `template directories`
-
+- Creation of `changes` and `template` directories
