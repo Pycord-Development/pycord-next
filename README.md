@@ -88,5 +88,10 @@ async def on_ready(event: pycord.Ready) -> None:
     print('I am ready!')
 
 
+@bot.command()
+async def echo(pre: pycord.Prelude, text: str) -> None:
+    await pre.send(f'{pre.user.mention} said {text}')
+
+
 bot.run('token')
 ```
