@@ -645,7 +645,7 @@ class AnnouncementThread(Thread):
         )
 
 
-class StageChannel(AudioChannel):
+class StageChannel(AudioChannel, MessageableChannel):
     # Type 13
     async def edit(
         self,
