@@ -7,3 +7,5 @@ Implementation of Application Commands
 :license: MIT
 """
 from .command import *
+from .errors import *
+from .prelude import *

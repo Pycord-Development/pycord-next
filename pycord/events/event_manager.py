@@ -76,7 +76,10 @@ class EventManager:
         return fut
 
     async def publish(self, event_str: str, data: dict[str, Any]) -> None:
-        for event, funcs in self.events.items():
+        # in certain cases, events may be inserted during runtime which breaks dispatching
+        items = list(self.events.items())
+
+        for event, funcs in items:
             if event._name == event_str:
                 eve = event()
                 dispatch = await eve._is_publishable(data, self._state)
@@ -98,7 +101,3 @@ class EventManager:
                     for wait_for in wait_fors:
                         wait_for.set_result(eve)
                     self.wait_fors.pop(event)
-
-                for command in self._state.commands:
-                    if command._processor_event == event:
-                        asyncio.create_task(command._invoke(eve))

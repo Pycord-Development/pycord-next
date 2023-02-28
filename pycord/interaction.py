@@ -157,14 +157,17 @@ class InteractionResponse:
         self.responded = True
 
     async def defer(self) -> None:
-        if self._deferred:
-            raise InteractionException('This interaction has already been deferred')
+        if self._deferred or self.responded:
+            raise InteractionException(
+                'This interaction has already been deferred or responded to'
+            )
 
         await self._parent._state.http.create_interaction_response(
             self._parent.id, self._parent.token, {'type': 5}
         )
 
         self._deferred = True
+        self.responded = True
 
     async def send_modal(self, modal: Modal) -> None:
         if self.responded:

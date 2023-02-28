@@ -24,7 +24,9 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, Generic, Type, TypeVar
 
 from ...commands import Command, Group
+from ...commands.application.command import ApplicationCommand
 from ...types import AsyncFunc
+from ...undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from ...bot import Bot
@@ -87,7 +89,12 @@ class Gear(Generic[ContextT]):
 
         return wrapper
 
-    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+    def command(
+        self,
+        name: str | UndefinedType = UNDEFINED,
+        cls: Type[T] = ApplicationCommand,
+        **kwargs: Any,
+    ) -> T:
         """
         Create a command within the Gear
 
@@ -101,8 +108,8 @@ class Gear(Generic[ContextT]):
             The kwargs to entail onto the instantiated command.
         """
 
-        def wrapper(func: T) -> T:
-            command = cls(func, name, None, **kwargs)
+        def wrapper(func: AsyncFunc) -> Command:
+            command = cls(func, state=None, name=name, **kwargs)
             self._commands.append(command)
             return command
 

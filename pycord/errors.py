@@ -99,3 +99,7 @@ class FlagException(BotException):
 
 class ComponentException(BotException):
     pass
+
+
+class NoFetchOrGet(BotException):
+    pass

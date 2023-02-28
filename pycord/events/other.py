@@ -21,7 +21,9 @@
 
 
 import asyncio
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Type
+
+import typing_extensions
 
 from ..interaction import Interaction
 from ..user import User
@@ -49,7 +51,9 @@ class Ready(Event):
             state._ready = True
 
             for gear in state.gears:
-                asyncio.create_task(gear.on_attach(), name=f'Attaching Gear: {gear.name}')
+                asyncio.create_task(
+                    gear.on_attach(), name=f'Attaching Gear: {gear.name}'
+                )
 
             state.application_commands = []
             state.application_commands.extend(
@@ -59,6 +63,7 @@ class Ready(Event):
 
             for command in state.commands:
                 await command.instantiate()
+                state.event_manager.add_event(command._processor_event, command._invoke)
                 if hasattr(command, 'name'):
                     state._application_command_names.append(command.name)
 
@@ -92,8 +97,17 @@ class UserUpdate(Event):
 class InteractionCreate(Event):
     _name = 'INTERACTION_CREATE'
 
+    def __init__(self, interaction: Type[Interaction] = Interaction) -> None:
+        self.__interaction_object = interaction
+
+    def __call__(self) -> typing_extensions.Self:
+        """
+        Function to circumnavigate the event manager's event()
+        """
+        return self
+
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        interaction = Interaction(data, state, True)
+        interaction = self.__interaction_object(data, state, True)
 
         for component in state.components:
             asyncio.create_task(component._invoke(interaction))

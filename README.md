@@ -26,18 +26,17 @@ do this, you should install [git](https://git-scm.com) if not already installed.
 An automatic install should look something like
 
 ```sh
-    pip install -U git+https://github.com/pycord-development/pycord-v3
+pip install -U git+https://github.com/pycord/pycord-v3
 ```
 
 If instead, you wanted to do a manual install (in case of something like development),
 you could do the following
 
 ```sh
-    # Git command
-    git clone https://github.com/pycord-development/pycord-v3
-    cd pycord-v3
+git clone https://github.com/pycord/pycord-v3
+cd pycord-v3
 
-    pip install .
+pip install .
 ```
 
 ## Stability
@@ -87,6 +86,11 @@ bot = pycord.Bot(intents=pycord.Intents())
 @bot.listen()
 async def on_ready(event: pycord.Ready) -> None:
     print('I am ready!')
+
+
+@bot.command()
+async def echo(pre: pycord.Prelude, text: str) -> None:
+    await pre.send(f'{pre.user.mention} said {text}')
 
 
 bot.run('token')

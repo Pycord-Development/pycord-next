@@ -31,6 +31,8 @@ packages = [
     'pycord.ui',
     'pycord.voice',
     'pycord.types',
+    'pycord.events',
+    'pycord.state',
     'pycord.api',
     'pycord.api.execution',
     'pycord.gateway',
@@ -48,7 +50,7 @@ extra_requires = {
         'aiodns~=3.0',  # included in aiohttp speed.
         'Brotli~=1.0.9',  # included in aiohttp speed.
         'ciso8601~=2.2.0',  # Faster datetime parsing.
-        'faust-cchardet~=2.1.16' # cchardet for python 3.11+
+        'faust-cchardet~=2.1.16',  # cchardet for python 3.11+
     ],
     'docs': [
         'sphinx==5.3.0',
