@@ -55,11 +55,10 @@ Every aspect of v2 has been remade and improved upon to make your development ex
 quicker, easier, and mucho gracias. Breaking changes are everywhere, from typings to
 Python version increases.
 
-That being said, if you want to move your bot to v3 you'll have to rewrite it. We've
-made sure to make the rewriting experience easier though, providing less boilerplate
-than v2 and letting you do anything in smaller snippets.
+That being said, if you want to move your bot to v3 you'll have to reform it to fit our new standards.
+Rewriting is, in most cases, not needed since v3 is still mostly similar to v2 in cases like naming and parameters.
 
-## Making Good Bots Happen
+## Paradigm-changing
 
 v3 is made to be the best experience for both
 developers and users, providing a fast
