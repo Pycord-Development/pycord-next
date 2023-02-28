@@ -41,6 +41,7 @@ from ...utils import get_arg_defaults, remove_undefined
 from ..command import Command
 from ..group import Group
 from .errors import ApplicationCommandException
+from .prelude import Prelude
 
 if TYPE_CHECKING:
     from ...state import State
@@ -94,7 +95,6 @@ class CommandChoice:
         }
 
 
-
 _OPTION_BIND = {
     str: ApplicationCommandOptionType.STRING,
     int: ApplicationCommandOptionType.INTEGER,
@@ -103,7 +103,7 @@ _OPTION_BIND = {
     User: ApplicationCommandOptionType.USER,
     Channel: ApplicationCommandOptionType.CHANNEL,
     Role: ApplicationCommandOptionType.ROLE,
-    Attachment: ApplicationCommandOptionType.ATTACHMENT
+    Attachment: ApplicationCommandOptionType.ATTACHMENT,
 }
 
 
@@ -146,7 +146,9 @@ class Option:
         self,
         name: str | None = None,
         description: str | None = None,
-        type: ApplicationCommandOptionType | int | Any  = ApplicationCommandOptionType.STRING,
+        type: ApplicationCommandOptionType
+        | int
+        | Any = ApplicationCommandOptionType.STRING,
         name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
         required: bool | UndefinedType = UNDEFINED,
@@ -344,7 +346,7 @@ class ApplicationCommand(Command):
         Defaults to False.
     """
 
-    _processor_event = InteractionCreate
+    _processor_event = InteractionCreate(Prelude)
     sub_level: int = 0
 
     def __init__(
@@ -387,10 +389,6 @@ class ApplicationCommand(Command):
         self._parse_arguments()
         if self.type == 1:
             self._subs: dict[str, ApplicationCommand] = {}
-            if not description:
-                raise ApplicationCommandException(
-                    'Chat Input commands must include a description'
-                )
         self._created: bool = False
 
     def command(
@@ -523,7 +521,7 @@ class ApplicationCommand(Command):
         for name, v in arg_defaults.items():
             if name == 'self':
                 continue
-            elif v[1] is Interaction:
+            elif v[1] is Interaction or v[1] is Prelude:
                 continue
             elif not isinstance(v[0], Option) and v[0] is not None:
                 raise ApplicationCommandException(
@@ -541,12 +539,9 @@ class ApplicationCommand(Command):
                 self._options_dict[v[0].name] = v[0]
             else:
                 if v[1] is None:
-                    raise 
+                    raise
 
-                option = Option(
-                    name=name,
-                    type=v[1]
-                )
+                option = Option(name=name, type=v[1])
                 option._param = name
                 self.options.append(option)
                 self._options_dict[name] = option
@@ -645,7 +640,10 @@ class ApplicationCommand(Command):
             self.id = res['id']
 
     def _process_options(
-        self, interaction: Interaction, options: list[InteractionOption], grouped: bool = False
+        self,
+        interaction: Interaction,
+        options: list[InteractionOption],
+        grouped: bool = False,
     ) -> dict[str, Any]:
         binding = {}
         for option in options:
@@ -661,7 +659,9 @@ class ApplicationCommand(Command):
                 asyncio.create_task(sub._callback(interaction, **opts))
             elif option.type == 2:
                 asyncio.create_task(self._callback(interaction))
-                self._process_options(interaction=interaction, options=option.options, grouped=True)
+                self._process_options(
+                    interaction=interaction, options=option.options, grouped=True
+                )
             elif option.type in (3, 4, 5, 10):
                 binding[o._param] = o._inter_copy(option).value
             elif option.type == 6:

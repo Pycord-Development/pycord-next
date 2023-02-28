@@ -20,7 +20,7 @@
 # SOFTWARE
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 
 from ..events.event_manager import Event
 
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 
 
 class Command:
-    _processor_event: Event
+    _processor_event: Type[Event] | Event
 
     def __init__(
         self, callback: AsyncFunc, name: str, state: State, group: Group | None = None

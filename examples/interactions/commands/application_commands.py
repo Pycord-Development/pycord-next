@@ -18,7 +18,7 @@ GUILD_ID: int | pycord.UndefinedType = pycord.UNDEFINED
 # this has the option anime, displayed as a Parameter,
 # which is parsed by Pycord to give you the information the user gave.
 async def favorite(
-    inter: pycord.Interaction,
+    pre: pycord.Prelude,
     # The name of this option,
     # can be set to anything but
     # try to keep it short
@@ -52,19 +52,17 @@ async def favorite(
     # it responds with a custom response.
     match anime:
         case 'Attack on Titan':
-            await inter.resp.send('It seems like you like Attack on Titan, Nice!')
+            await pre.send('It seems like you like Attack on Titan, Nice!')
         case "JoJo's Bizzare Adventure":
-            await inter.resp.send(
-                "おにいちゃんありがとう. You like JoJo's Bizzare Adventure. Nice!"
-            )
+            await pre.send("おにいちゃんありがとう. You like JoJo's Bizzare Adventure. Nice!")
         case 'Cowboy Bebop':
-            await inter.resp.send('良い！あなたはカウボーイビバップが好きです')
+            await pre.send('良い！あなたはカウボーイビバップが好きです')
         case 'Hunter x Hunter':
-            await inter.resp.send(
+            await pre.send(
                 'I ran out of responses... Well anyway, you like Hunter x Hunter which is Nice!'
             )
         case 'Spy x Family':
-            await inter.resp.send(
+            await pre.send(
                 'I have a friend which really likes this anime, '
                 "it's good seeing you like it too. Of course, Spy x Family!"
             )

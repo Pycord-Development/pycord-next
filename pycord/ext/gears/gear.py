@@ -23,12 +23,10 @@ from __future__ import annotations
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, Generic, Type, TypeVar
 
-from ...undefined import UNDEFINED, UndefinedType
-
-from ...commands.application.command import ApplicationCommand
-
 from ...commands import Command, Group
+from ...commands.application.command import ApplicationCommand
 from ...types import AsyncFunc
+from ...undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from ...bot import Bot
@@ -91,7 +89,12 @@ class Gear(Generic[ContextT]):
 
         return wrapper
 
-    def command(self, name: str | UndefinedType = UNDEFINED, cls: Type[T] = ApplicationCommand, **kwargs: Any) -> T:
+    def command(
+        self,
+        name: str | UndefinedType = UNDEFINED,
+        cls: Type[T] = ApplicationCommand,
+        **kwargs: Any,
+    ) -> T:
         """
         Create a command within the Gear
 

@@ -20,6 +20,7 @@
 # SOFTWARE
 from __future__ import annotations
 
+from functools import cached_property
 from typing import TYPE_CHECKING
 
 from .color import Color
@@ -72,3 +73,7 @@ class User:
             if self._public_flags is not UNDEFINED
             else UNDEFINED
         )
+
+    @cached_property
+    def mention(self) -> str:
+        return f'<@{self.id}>'
