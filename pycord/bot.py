@@ -101,7 +101,10 @@ class Bot:
         self._proxy = proxy
         self._proxy_auth = proxy_auth
         if shards and not global_shard_status:
-            self._global_shard_status = len(shards)
+            if isinstance(shards, list):
+                self._global_shard_status = len(shards)
+            else:
+                self._global_shard_status = int(shards)
         elif global_shard_status:
             self._global_shard_status = global_shard_status
         else:
