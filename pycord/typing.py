@@ -30,6 +30,8 @@ if TYPE_CHECKING:
 
 
 class Typing:
+    __slots__ = ('_state', '__channel_id')
+
     def __init__(self, channel_id: Snowflake, state: "State") -> None:
         self._state = state
         self.__channel_id = channel_id
