@@ -156,7 +156,8 @@ class AutoModRule:
         Parameters
         ----------
         reason: :class:`str` | None
-            The reason for deleting this rule. Appears in the guild's audit log."""
+            The reason for deleting this rule. Appears in the guild's audit log.
+        """
         await self._state.http.delete_auto_moderation_rule(
             self.guild_id, self.id, reason=reason
         )
