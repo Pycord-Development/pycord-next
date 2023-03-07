@@ -57,7 +57,7 @@ class Guilds(BaseRouter):
         self,
         *,
         name: str,
-        icon: File | UndefinedType = UNDEFINED,  # TODO
+        icon: File | UndefinedType = UNDEFINED,
         verification_level: int | UndefinedType = UNDEFINED,
         default_message_notifications: int | UndefinedType = UNDEFINED,
         explicit_content_filter: int | UndefinedType = UNDEFINED,
@@ -112,11 +112,11 @@ class Guilds(BaseRouter):
         explicit_content_filter: int | None | UndefinedType = UNDEFINED,
         afk_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
         afk_timeout: int | UndefinedType = UNDEFINED,
-        icon: File | None | UndefinedType = UNDEFINED,  # TODO
+        icon: File | None | UndefinedType = UNDEFINED, 
         owner_id: Snowflake | UndefinedType = UNDEFINED,
-        splash: bytes | None | UndefinedType = UNDEFINED,  # TODO
-        discovery_splash: bytes | None | UndefinedType = UNDEFINED,  # TODO
-        banner: File | None | UndefinedType = UNDEFINED,  # TODO
+        splash: bytes | None | UndefinedType = UNDEFINED,
+        discovery_splash: bytes | None | UndefinedType = UNDEFINED,
+        banner: File | None | UndefinedType = UNDEFINED,
         system_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
         system_channel_flags: int | UndefinedType = UNDEFINED,
         rules_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
