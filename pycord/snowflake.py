@@ -20,6 +20,7 @@
 # SOFTWARE
 """Implementation of Discord's Snowflake ID"""
 
+from __future__ import annotations
 from datetime import datetime, timezone
 
 from .utils import DISCORD_EPOCH
@@ -48,5 +49,5 @@ class Snowflake(int):
         return self >> 22
 
     @classmethod
-    def from_datetime(cls, dt: datetime) -> 'Snowflake':
+    def from_datetime(cls, dt: datetime) -> Snowflake:
         return cls((int(dt.timestamp()) - DISCORD_EPOCH) << 22)
