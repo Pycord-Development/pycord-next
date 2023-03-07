@@ -79,6 +79,8 @@ if TYPE_CHECKING:
 
 
 class ChannelPosition:
+    __slots__ = ('id', 'position', 'lock_permissions', 'parent_id')
+
     def __init__(
         self,
         id: Snowflake,

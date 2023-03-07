@@ -38,6 +38,22 @@ from .user import User
 
 
 class Member:
+    __slots__ = (
+        '_state',
+        '_guild_id',
+        'user',
+        'nick',
+        '_avatar',
+        'roles',
+        'joined_at',
+        'premium_since',
+        'deaf',
+        'mute',
+        'pending',
+        'permissions',
+        'communication_disabled_until',
+    )
+
     def __init__(
         self, data: GuildMember, state: State, *, guild_id: Snowflake | None = None
     ) -> None:

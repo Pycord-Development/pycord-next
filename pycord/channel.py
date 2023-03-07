@@ -113,6 +113,8 @@ class ThreadMember:
 
 
 class ForumTag:
+    __slots__ = ('id', 'name', 'moderated', 'emoji_id', 'emoji_name')
+
     def __init__(
         self,
         *,
@@ -160,14 +162,15 @@ class DefaultReaction:
 
 
 class FollowedChannel:
+    __slots__ = ('channel_id', 'webhook_id')
+
     def __init__(self, data: dict[str, Any]) -> None:
         self.channel_id: Snowflake = Snowflake(data['channel_id'])
         self.webhook_id: Snowflake = Snowflake(data['webhook_id'])
 
 
 class Channel:
-    """
-    Represents a Discord channel. All other channel types inherit from this.
+    """Represents a Discord channel. All other channel types inherit from this.
 
     Attributes
     ----------
@@ -197,8 +200,7 @@ class Channel:
         return self.__class__(data, self._state)
 
     async def delete(self, reason: str | None = None) -> None:
-        """
-        Delete this channel.
+        """Delete this channel.
 
         Parameters
         ----------
@@ -209,8 +211,7 @@ class Channel:
 
 
 class GuildChannel(Channel):
-    """
-    Represents a Discord guild channel. All other guild channel types inherit from this.
+    """Represents a Discord guild channel. All other guild channel types inherit from this.
 
     Attributes
     ----------
@@ -241,6 +242,18 @@ class GuildChannel(Channel):
     default_auto_archive_duration: :class:`int` | :class:`UndefinedType`
         The default auto archive duration of the channel.
     """
+
+    __slots__ = (
+        'guild_id',
+        'position',
+        'permission_overwrites',
+        'topic',
+        'nsfw',
+        'permissions',
+        'parent_id',
+        'rate_limit_per_user',
+        'default_auto_archive_duration'
+    )
 
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)

@@ -43,7 +43,7 @@ class ApplicationRoleConnectionMetadata:
         The name of the role connection metadata field.
     description: :class:`str`
         The description of the role connection metadata field.
-    name_localizations: :class:`dict[str, str]`
+    name_localizations: :class:`dict`\\[:class:`str`, :class:`str`]
         The localizations for the name of the role connection metadata field.
     description_localizations: :class:`dict[str, str]`
         The localizations for the description of the role connection metadata field.
