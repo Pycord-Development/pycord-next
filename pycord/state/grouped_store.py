@@ -24,6 +24,8 @@ from .store import Store
 
 
 class GroupedStore:
+    __slots__ = ('_stores', '_stores_dict', '_kwargs')
+
     def __init__(self, **max_items) -> None:
         self._stores = []
         self._stores_dict = {}

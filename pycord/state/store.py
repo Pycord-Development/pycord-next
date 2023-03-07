@@ -23,6 +23,8 @@ from typing import Any, Type, TypeVar
 
 
 class _stored:
+    __slots__ = ('parents', 'id', 'storing')
+
     def __init__(self, parents: set[Any], self_id: Any, storing: Any) -> None:
         self.parents = parents
         self.id = self_id
@@ -33,6 +35,8 @@ T = TypeVar('T')
 
 
 class Store:
+    __slots__ = ('_store', 'max_items')
+
     _store: set[_stored]
 
     def __init__(self, max_items: int | None = None) -> None:

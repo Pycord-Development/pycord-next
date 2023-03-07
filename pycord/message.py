@@ -63,6 +63,8 @@ if TYPE_CHECKING:
 
 
 class ChannelMention:
+    __slots__ = ('id', 'guild_id', 'type', 'name')
+
     def __init__(self, data: DiscordChannelMention) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self.guild_id: Snowflake = Snowflake(data['guild_id'])
@@ -71,6 +73,8 @@ class ChannelMention:
 
 
 class Reaction:
+    __slots__ = ('count', 'me', 'emoji')
+
     def __init__(self, data: DiscordReaction) -> None:
         self.count: int = data['count']
         self.me: bool = data['me']
@@ -78,12 +82,16 @@ class Reaction:
 
 
 class MessageActivity:
+    __slots__ = ('type', 'party_id')
+
     def __init__(self, data: DiscordMessageActivity) -> None:
         self.type: MessageActivityType = MessageActivityType(data['type'])
         self.party_id: UndefinedType | str = data.get('party_id', UNDEFINED)
 
 
 class MessageReference:
+    __slots__ = ('message_id', 'channel_id', 'guild_id', 'fail_if_not_exists')
+
     def __init__(self, data: DiscordMessageReference) -> None:
         self.message_id: Snowflake | UndefinedType = (
             Snowflake(data.get('message_id'))
@@ -139,6 +147,8 @@ class MessageReference:
 
 
 class MessageInteraction:
+    __slots__ = ('id', 'type', 'name', 'user', 'member')
+
     def __init__(self, data: DiscordMessageInteraction, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self.type: InteractionType = InteractionType(data['type'])
@@ -152,6 +162,8 @@ class MessageInteraction:
 
 
 class AllowedMentions:
+    __slots__ = ('everyone', 'roles', 'users', 'replied_user')
+
     def __init__(
         self,
         *,
@@ -186,6 +198,38 @@ class AllowedMentions:
 
 
 class Message:
+    __slots__ = (
+        '_state',
+        'id',
+        'channel_id',
+        'author',
+        'content',
+        'timestamp',
+        'edited_timestamp',
+        'tts',
+        'mentions',
+        'mention_roles',
+        'attachments',
+        'embeds',
+        'reactions',
+        'nonce',
+        'pinned',
+        'webhook_id',
+        'type',
+        'activity',
+        'application',
+        'application_id',
+        'reference',
+        'flags',
+        'referenced_message',
+        'interaction',
+        'thread',
+        'sticker_items',
+        'stickers',
+        'position',
+        'channel'
+    )
+
     def __init__(self, data: DiscordMessage, state: State) -> None:
         self._state = state
         self.id: Snowflake = Snowflake(data['id'])
@@ -283,6 +327,43 @@ class Message:
             self.channel: TextChannel | DMChannel | VoiceChannel | CategoryChannel | AnnouncementChannel | AnnouncementThread | Thread | StageChannel | DirectoryChannel | ForumChannel | None = (
                 None
             )
+
+    def _modify_from_cache(self, **keys) -> None:
+        # this is a bit finnicky but works well
+        for k, v in keys.items():
+            if hasattr(self, k):
+                setattr(self, k, v)
+
+                match k:
+                    case "edited_timestamp":
+                        # edited timestamp can't be none on edited messages, I think?
+                        self.edited_timestamp = (
+                            datetime.fromisoformat(v)
+                        )
+                    case "mentions":
+                        self.mentions: list[User] = [User(d, self._state) for d in v]
+                    case "mention_roles":
+                        self.mention_roles: list[Snowflake] = [
+                            Snowflake(i) for i in v
+                        ]
+                    case "mention_channels":
+                        self.mention_channels: list[ChannelMention] = [
+                            ChannelMention(d) for d in v
+                        ]
+                    case "attachments":
+                        self.attachments: list[Attachment] = [
+                            Attachment(a, self._state) for a in v
+                        ]
+                    case "embeds":
+                        self.embeds: list[Embed] = [Embed._from_data(e) for e in v]
+                    case "reactions":
+                        self.reactions: list[Reaction] = [
+                            Reaction(r) for r in v
+                        ]
+                    case "flags":
+                        self.flags: MessageFlags = (
+                            MessageFlags.from_value(v)
+                        )
 
     async def crosspost(self) -> Message:
         data = await self._state.http.crosspost_message(self.channel_id, self.id)

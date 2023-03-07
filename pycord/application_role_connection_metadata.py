@@ -49,6 +49,15 @@ class ApplicationRoleConnectionMetadata:
         The localizations for the description of the role connection metadata field.
     """
 
+    __slots__ = (
+        'type',
+        'key',
+        'name',
+        'description',
+        'name_localizations',
+        'description_localizations',
+    )
+
     def __init__(
         self,
         *,

@@ -48,6 +48,13 @@ if TYPE_CHECKING:
 
 
 class _Overwrite:
+    __slots__ = (
+        'id',
+        'type',
+        'allow',
+        'deny'
+    )
+
     def __init__(
         self,
         id: int,
@@ -80,6 +87,15 @@ class _Overwrite:
 
 
 class ThreadMetadata:
+    __slots__ = (
+        'archived',
+        'auto_archive_duration',
+        'archive_timestamp',
+        'locked',
+        'invitable',
+        'create_timestamp'
+    )
+
     def __init__(self, metadata: DiscordThreadMetadata) -> None:
         self.archived: bool = metadata['archived']
         self.auto_archive_duration: int = metadata['auto_archive_duration']
@@ -96,14 +112,22 @@ class ThreadMetadata:
 
 
 class ThreadMember:
+    __slots__ = (
+        'id',
+        'user_id',
+        'join_timestamp',
+        'flags',
+        'member'
+    )
+
     def __init__(self, member: DiscordThreadMember) -> None:
-        self._id: str | None = member.get('id')
+        _id: str | None = member.get('id')
         self.id: Snowflake | UndefinedType = (
-            Snowflake(self._id) if self._id is not None else UNDEFINED
+            Snowflake(_id) if _id is not None else UNDEFINED
         )
-        self._user_id: str | None = member.get('user_id')
+        _user_id: str | None = member.get('user_id')
         self.user_id: Snowflake | UndefinedType = (
-            Snowflake(self._user_id) if self._user_id is not None else UNDEFINED
+            Snowflake(_user_id) if _user_id is not None else UNDEFINED
         )
         self.join_timestamp: datetime = datetime.fromisoformat(member['join_timestamp'])
         self.flags: int = member['flags']
@@ -153,10 +177,15 @@ class ForumTag:
 
 
 class DefaultReaction:
+    __slots__ = (
+        'emoji_id',
+        'emoji_name'
+    )
+
     def __init__(self, data: DiscordDefaultReaction) -> None:
-        self._emoji_id: str | None = data.get('emoji_id')
+        _emoji_id: str | None = data.get('emoji_id')
         self.emoji_id: Snowflake | None = (
-            Snowflake(self._emoji_id) if self._emoji_id is not None else None
+            Snowflake(_emoji_id) if _emoji_id is not None else None
         )
         self.emoji_name: str | None = data['emoji_name']
 
@@ -183,6 +212,13 @@ class Channel:
     flags: :class:`ChannelFlags` | :class:`UndefinedType`
         The flags of the channel.
     """
+    __slots__ = (
+        '_state',
+        'id',
+        'type',
+        'name',
+        'flags'
+    )
 
     def __init__(self, data: DiscordChannel, state: State) -> None:
         self._state = state

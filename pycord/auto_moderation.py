@@ -114,8 +114,7 @@ class AutoModRule:
         exempt_channels: list[Snowflake] | UndefinedType = UNDEFINED,
         reason: str | None = None,
     ) -> AutoModRule:
-        """
-        Edits the auto moderation rule.
+        """Edits the auto moderation rule.
 
         Parameters
         ----------

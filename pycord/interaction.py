@@ -40,6 +40,14 @@ if TYPE_CHECKING:
 
 
 class InteractionOption:
+    __slots__ = (
+        'name',
+        'type',
+        'value',
+        'options',
+        'focused'
+    )
+
     def __init__(
         self,
         name: str,
@@ -56,6 +64,35 @@ class InteractionOption:
 
 
 class Interaction:
+    __slots__ = (
+        '_state',
+        'response',
+        'id',
+        'application_id',
+        'type',
+        'data',
+        'guild_id',
+        'channel_id',
+        'member',
+        'user',
+        'token',
+        'version',
+        'message',
+        'app_permissions',
+        'locale',
+        'guild_locale',
+        'options',
+        'command_id',
+        'name',
+        'application_command_type',
+        'resolved',
+        'options',
+        'guild_id',
+        'custom_id',
+        'component_type',
+        'values'
+    )
+
     def __init__(
         self, data: InteractionData, state: State, response: bool = False
     ) -> None:
@@ -123,6 +160,8 @@ class Interaction:
 
 
 class InteractionResponse:
+    __slots__ = ('_parent', '_deferred', 'responded')
+
     def __init__(self, parent: Interaction) -> None:
         self._parent = parent
         self.responded: bool = False

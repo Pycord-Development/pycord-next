@@ -33,7 +33,7 @@ class Page(Protocol[T]):
     The class for all Page Types to subclass.
     """
 
-    value: Any
+    value: T
 
     async def interact_forward(self, *args, **kwargs) -> None:
         """
@@ -85,7 +85,7 @@ class Paginator(Generic[P]):
 
         return page
 
-    async def forward(self, *args, **kwargs) -> Any:
+    async def forward(self, *args, **kwargs) -> P:
         """
         Go forward through pages.
 
@@ -99,7 +99,7 @@ class Paginator(Generic[P]):
         await page.interact_forward(*args, **kwargs)
         return page.value
 
-    async def backward(self, *args, **kwargs) -> Any:
+    async def backward(self, *args, **kwargs) -> P:
         """
         Go backwards from the paginator.
         Only works if the page is not the first page.
@@ -123,7 +123,7 @@ class Paginator(Generic[P]):
         return page.value
 
     @property
-    def previous(self) -> Any | None:
+    def previous(self) -> P | None:
         """
         The Previous page of this Paginator
         """
@@ -155,7 +155,7 @@ class Paginator(Generic[P]):
             raise PagerException('This page is not part of this paginator')
         self._pages.remove(page)
 
-    async def __anext__(self) -> Any:
+    async def __anext__(self) -> P:
         try:
             return await self.forward()
         except NoMorePages:
