@@ -23,6 +23,12 @@ from typing import Any, AsyncGenerator, Type, TypeVar
 
 from aiohttp import BasicAuth
 
+from .file import File
+
+from .audit_log import AuditLog
+
+from .types.audit_log import AUDIT_LOG_EVENT_TYPE
+
 from .application_role_connection_metadata import ApplicationRoleConnectionMetadata
 from .undefined import UNDEFINED, UndefinedType
 from .commands.application.command import ApplicationCommand
@@ -452,7 +458,7 @@ class Bot:
         self,
         name: str,
         *,
-        icon: bytes | UndefinedType = UNDEFINED,
+        icon: File | UndefinedType = UNDEFINED,
         verification_level: VerificationLevel | UndefinedType = UNDEFINED,
         default_message_notifications: DefaultMessageNotificationLevel
         | UndefinedType = UNDEFINED,
@@ -470,7 +476,7 @@ class Bot:
         ----------
         name: :class:`str`
             The name of the guild.
-        icon: :class:`bytes`
+        icon: :class:`.File`
             The icon of the guild.
         verification_level: :class:`VerificationLevel`
             The verification level of the guild.
@@ -542,3 +548,29 @@ class Bot:
         """
         data = await self._state.http.get_guild_preview(guild_id)
         return GuildPreview(data, self._state)
+
+    async def fetch_guild_audit_log(
+        self,
+        guild_id: Snowflake,
+        user_id: Snowflake | UndefinedType = UNDEFINED,
+        action_type: AUDIT_LOG_EVENT_TYPE | UndefinedType = UNDEFINED,
+        before: Snowflake | UndefinedType = UNDEFINED,
+        after: Snowflake | UndefinedType = UNDEFINED,
+        limit: int | UndefinedType = UNDEFINED
+    ) -> AuditLog:
+        """
+        Fetches and returns the audit log.
+
+        Returns
+        -------
+        :class:`.AuditLog`
+        """
+        raw_audit_log = await self._state.http.get_guild_audit_log(
+            guild_id=guild_id,
+            user_id=user_id,
+            action_type=action_type,
+            before=before,
+            after=after,
+            limit=limit
+        )
+        return AuditLog(raw_audit_log, self._state)

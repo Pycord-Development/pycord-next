@@ -24,6 +24,8 @@ from datetime import datetime
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
+from .file import File
+
 from .embed import Embed
 from .enums import ChannelType, OverwriteType, VideoQualityMode
 from .errors import ComponentException
@@ -346,6 +348,7 @@ class MessageableChannel(Channel):
         allowed_mentions: AllowedMentions | UndefinedType = UNDEFINED,
         message_reference: MessageReference | UndefinedType = UNDEFINED,
         sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
+        files: list[File] | UndefinedType = UNDEFINED,
         flags: int | UndefinedType = UNDEFINED,
         houses: list[House] | UndefinedType = UNDEFINED,
     ) -> Message:
@@ -375,6 +378,7 @@ class MessageableChannel(Channel):
             sticker_ids=sticker_ids,
             flags=flags,
             components=components,
+            files=files
         )
         return Message(data, state=self._state)
 
@@ -385,6 +389,11 @@ class MessageableChannel(Channel):
     async def bulk_delete(self, *messages: Message, reason: str | None = None) -> None:
         await self._state.http.bulk_delete_messages(
             self.id, [m.id for m in messages], reason=reason
+        )
+
+    async def bulk_delete_ids(self, *messages: Snowflake, reason: str | None = None) -> None:
+        await self._state.http.bulk_delete_messages(
+            self.id, messages, reason=reason
         )
 
 

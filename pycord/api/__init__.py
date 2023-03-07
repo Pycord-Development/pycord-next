@@ -13,6 +13,7 @@ from typing import Any
 from aiohttp import BasicAuth, ClientSession, FormData, __version__ as aiohttp_version
 
 from pycord._about import __version__
+from .routers.scheduled_events import ScheduledEvents
 
 from .. import utils
 from ..errors import BotException, Forbidden, HTTPException, InternalError, NotFound
@@ -36,6 +37,7 @@ class HTTPClient(
     Emojis,
     Guilds,
     Messages,
+    ScheduledEvents,
 ):
     def __init__(
         self,

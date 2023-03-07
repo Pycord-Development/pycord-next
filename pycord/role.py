@@ -34,6 +34,8 @@ from .undefined import UNDEFINED, UndefinedType
 
 
 class RoleTags:
+    __slots__ = ('bot_id', 'integration_id', 'premium_subscriber')
+
     def __init__(self, data: DiscordRoleTags) -> None:
         self.bot_id: UndefinedType | Snowflake = (
             Snowflake(data.get('bot_id'))
@@ -51,7 +53,24 @@ class RoleTags:
 
 
 class Role:
+    __slots__ = (
+        '_state',
+        '_tags',
+        'id',
+        'name',
+        'color',
+        'hoist',
+        'icon',
+        'unicode_emoji',
+        'position',
+        'permissions',
+        'managed',
+        'mentionable',
+        'tags'
+    )
+
     def __init__(self, data: DiscordRole, state: State) -> None:
+        self._state = state
         self.id: Snowflake = Snowflake(data['id'])
         self.name: str = data['name']
         self.color: Color = Color(data['color'])

@@ -20,6 +20,8 @@
 # SOFTWARE
 import datetime
 
+from ...file import File
+
 from ...snowflake import Snowflake
 from ...types import (
     MFA_LEVEL,
@@ -45,7 +47,7 @@ from ...types import (
     WidgetSettings,
 )
 from ...undefined import UNDEFINED, UndefinedType
-from ...utils import remove_undefined
+from ...utils import remove_undefined, to_datauri
 from ..route import Route
 from .base import BaseRouter
 
@@ -55,7 +57,7 @@ class Guilds(BaseRouter):
         self,
         *,
         name: str,
-        icon: bytes | UndefinedType = UNDEFINED,  # TODO
+        icon: File | UndefinedType = UNDEFINED,  # TODO
         verification_level: int | UndefinedType = UNDEFINED,
         default_message_notifications: int | UndefinedType = UNDEFINED,
         explicit_content_filter: int | UndefinedType = UNDEFINED,
@@ -79,6 +81,10 @@ class Guilds(BaseRouter):
             'system_channel_id': system_channel_id,
             'system_channel_flags': system_channel_flags,
         }
+
+        if payload.get('icon'):
+            payload['icon'] = to_datauri(payload['icon'])
+
         return await self.request('POST', Route('/guilds'), remove_undefined(**payload))
 
     async def get_guild(
@@ -106,11 +112,11 @@ class Guilds(BaseRouter):
         explicit_content_filter: int | None | UndefinedType = UNDEFINED,
         afk_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
         afk_timeout: int | UndefinedType = UNDEFINED,
-        icon: bytes | None | UndefinedType = UNDEFINED,  # TODO
+        icon: File | None | UndefinedType = UNDEFINED,  # TODO
         owner_id: Snowflake | UndefinedType = UNDEFINED,
         splash: bytes | None | UndefinedType = UNDEFINED,  # TODO
         discovery_splash: bytes | None | UndefinedType = UNDEFINED,  # TODO
-        banner: bytes | None | UndefinedType = UNDEFINED,  # TODO
+        banner: File | None | UndefinedType = UNDEFINED,  # TODO
         system_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
         system_channel_flags: int | UndefinedType = UNDEFINED,
         rules_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
@@ -142,6 +148,16 @@ class Guilds(BaseRouter):
             'description': description,
             'premium_progress_bar_enabled': premium_progress_bar_enabled,
         }
+
+        if payload.get('icon'):
+            payload['icon'] = to_datauri(payload['icon'])
+        if payload.get('banner'):
+            payload['banner'] = to_datauri(payload['banner'])
+        if payload.get('discovery_splash'):
+            payload['discovery_splash'] = to_datauri(payload['discovery_splash'])
+        if payload.get('splash'):
+            payload['splash'] = to_datauri(payload['splash'])
+
         return await self.request(
             'PATCH',
             Route('/guilds/{guild_id}', guild_id=guild_id),

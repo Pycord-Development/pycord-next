@@ -23,6 +23,10 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
+from .file import File
+
+from .scheduled_event import ScheduledEvent
+
 from .auto_moderation import (
     AutoModAction,
     AutoModEventType,
@@ -469,11 +473,11 @@ class Guild:
         | UndefinedType = UNDEFINED,
         afk_channel: VoiceChannel | None | UndefinedType = UNDEFINED,
         afk_timeout: int | UndefinedType = UNDEFINED,
-        icon: bytes | None | UndefinedType = UNDEFINED,  # TODO
+        icon: File | None | UndefinedType = UNDEFINED,
         owner: User | UndefinedType = UNDEFINED,
-        splash: bytes | None | UndefinedType = UNDEFINED,  # TODO
-        discovery_splash: bytes | None | UndefinedType = UNDEFINED,  # TODO
-        banner: bytes | None | UndefinedType = UNDEFINED,  # TODO
+        splash: File | None | UndefinedType = UNDEFINED,
+        discovery_splash: File | None | UndefinedType = UNDEFINED,
+        banner: File | None | UndefinedType = UNDEFINED,
         system_channel: TextChannel | None | UndefinedType = UNDEFINED,
         rules_channel: TextChannel | None | UndefinedType = UNDEFINED,
         public_updates_channel: TextChannel | None | UndefinedType = UNDEFINED,
@@ -499,15 +503,15 @@ class Guild:
             The new AFK channel of the guild.
         afk_timeout: :class:`int`
             The new AFK timeout of the guild.
-        icon: :class:`bytes`
+        icon: :class:`.File`
             The new icon of the guild.
         owner: :class:`User`
             The new owner of the guild.
-        splash: :class:`bytes`
+        splash: :class:`.File`
             The new splash of the guild.
-        discovery_splash: :class:`bytes`
+        discovery_splash: :class:`.File`
             The new discovery splash of the guild.
-        banner: :class:`bytes`
+        banner: :class:`.File`
             The new banner of the guild.
         system_channel: :class:`TextChannel`
             The new system channel of the guild.
@@ -904,6 +908,21 @@ class Guild:
         """
         await self._state.http.remove_guild_ban(self.id, user.id, reason=reason)
 
+    async def get_scheduled_events(self, with_user_count: bool) -> list[ScheduledEvent]:
+        """
+        Get the scheduled events in this guild.
+
+        Parameters
+        ----------
+        with_user_count: :class:`bool`
+            include number of users subscribed to each event
+
+        Returns
+        -------
+        :class:`list`[:class:`.ScheduledEvent`]
+        """
+        scheds = await self._state.http.list_scheduled_events(self.id, with_user_count=with_user_count)
+        return [ScheduledEvent(s, self._state) for s in scheds]
 
 class GuildPreview:
     def __init__(self, data: DiscordGuildPreview, state: State) -> None:
