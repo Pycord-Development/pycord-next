@@ -79,7 +79,7 @@ class _Overwrite:
             deny=Permissions.from_value(overwrite['deny']),
         )
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> DiscordOverwrite:
         return {
             'id': self.id,
             'type': self.type,
@@ -168,7 +168,7 @@ class ForumTag:
         obj.id = Snowflake(data['id'])
         return obj
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> DiscordForumTag:
         # omit ID because we don't send that to Discord
         return {
             'name': self.name,
