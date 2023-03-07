@@ -58,8 +58,11 @@ class Paginator(Generic[P]):
         Predefined pages
     """
 
-    def __init__(self, pages: list[P] = []) -> None:
-        self._pages = pages
+    def __init__(self, pages: list[P] | None = None) -> None:
+        if pages is None:
+            self._pages = []
+        else:
+            self._pages = pages
         self._previous_page: tuple[int, Page] | None = None
 
     # not meant to be directly called like this
