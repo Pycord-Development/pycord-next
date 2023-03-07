@@ -71,7 +71,7 @@ from .types import (
     GuildPreview as DiscordGuildPreview,
     UnavailableGuild,
     Widget as DiscordWidget,
-    WidgetSettings as DiscordWidgetSettings,
+    WidgetSettings as DiscordWidgetSettings
 )
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
@@ -611,33 +611,33 @@ class Guild:
             The name of the channel.
         type: :class:`ChannelType`
             The type of the channel.
-        topic: :class:`str` | None | :attr:`UNDEFINED`
+        topic: :class:`str` | None | :class:`.UndefinedType`
             The topic of the channel.
-        bitrate: :class:`int` | None | :attr:`UNDEFINED`
+        bitrate: :class:`int` | None | :class:`.UndefinedType`
             The bitrate of the channel.
-        user_limit: :class:`int` | None | :attr:`UNDEFINED`
+        user_limit: :class:`int` | None | :class:`.UndefinedType`
             The user limit of the channel.
-        rate_limit_per_user: :class:`int` | None | :attr:`UNDEFINED`
+        rate_limit_per_user: :class:`int` | None | :class:`.UndefinedType`
             The rate limit per user of the channel.
-        position: :class:`int` | None | :attr:`UNDEFINED`
+        position: :class:`int` | None | :class:`.UndefinedType`
             The position of the channel.
         permission_overwrites: list[:class:`_Overwrite`]
             The permission overwrites of the channel.
-        parent: :class:`CategoryChannel` | None | :attr:`UNDEFINED`
+        parent: :class:`CategoryChannel` | None | :class:`.UndefinedType`
             The parent of the channel.
-        nsfw: :class:`bool` | :attr:`UNDEFINED`
+        nsfw: :class:`bool` | :class:`.UndefinedType`
             Whether the channel is NSFW.
-        rtc_region: :class:`str` | None | :attr:`UNDEFINED`
+        rtc_region: :class:`str` | None | :class:`.UndefinedType`
             The RTC region of the channel.
-        video_quality_mode: :class:`VideoQualityMode` | None | :attr:`UNDEFINED`
+        video_quality_mode: :class:`VideoQualityMode` | None | :class:`.UndefinedType`
             The video quality mode of the channel.
-        default_auto_archive_duration: :class:`int` | None | :attr:`UNDEFINED`
+        default_auto_archive_duration: :class:`int` | None | :class:`.UndefinedType`
             The default auto archive duration of the channel.
-        default_reaction_emoji: :class:`str` | None | :attr:`UNDEFINED`
+        default_reaction_emoji: :class:`str` | None | :class:`.UndefinedType`
             The default reaction emoji of the channel.
-        available_tags: list[:class:`ForumTag`] | None | :attr:`UNDEFINED`
+        available_tags: list[:class:`ForumTag`] | None | :class:`.UndefinedType`
             The available tags of the channel.
-        default_sort_order: :class:`SortOrderType` | None | :attr:`UNDEFINED`
+        default_sort_order: :class:`SortOrderType` | None | :class:`.UndefinedType`
             The default sort order of the channel.
         reason: :class:`str` | None
             The reason for creating the channel. Shows up on the audit log.
