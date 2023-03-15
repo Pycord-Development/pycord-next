@@ -28,12 +28,13 @@ import string
 import sys
 import time
 import warnings
+from typing import Sequence
 
 import colorlog
 
 from pycord._about import __copyright__, __git_sha1__, __license__, __version__
 
-__all__ = ['start_logging', 'print_banner']
+__all__: Sequence[str] = ('start_logging', 'print_banner')
 
 
 day_prefixes: dict[int, str] = {

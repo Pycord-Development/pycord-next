@@ -63,6 +63,20 @@ class OptionalAuditEntryInfo:
     type: :class:`int` | :class:`.undefined.UndefinedType`
     """
 
+    __slots__ = (
+        'application_id',
+        'auto_moderation_rule_name',
+        'auto_moderation_rule_trigger_type',
+        'channel_id',
+        'count',
+        'delete_member_days',
+        'id',
+        'members_removed',
+        'message_id',
+        'role_name',
+        'type',
+    )
+
     def __init__(self, data: DiscordOptionalAuditEntryInfo) -> None:
         self.application_id: Snowflake | UndefinedType = (
             Snowflake(data['application_id']) if 'application_id' in data else UNDEFINED
@@ -110,6 +124,8 @@ class AuditLogChange:
     old_value: :class:`typing.Any` | :class:`.undefined.UndefinedType`
     """
 
+    __slots__ = ('key', 'new_value', 'old_value')
+
     def __init__(self, data: DiscordAuditLogChange) -> None:
         self.key: str = data['key']
         self.new_value: Any | UndefinedType = data.get('new_value', UNDEFINED)
@@ -129,6 +145,16 @@ class AuditLogEntry:
     options: :class:`.audit_log.OptionalAuditEntryInfo` | :class:`.undefined.UndefinedType`
     reason: :class:`str` | :class:`.undefined.UndefinedType`
     """
+
+    __slots__ = (
+        '_changes',
+        'id',
+        'target_id',
+        'user_id',
+        'action_type',
+        'options',
+        'reason',
+    )
 
     def __init__(self, data: DiscordAuditLogEntry) -> None:
         self.target_id: Snowflake | UndefinedType = (

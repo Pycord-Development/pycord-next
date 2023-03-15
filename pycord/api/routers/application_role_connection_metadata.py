@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,17 +18,35 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import Any
+from ...snowflake import Snowflake
+from ...types import ApplicationRoleConnectionMetadata
+from ..route import Route
+from .base import BaseRouter
 
-from ..utils import loads
 
+class ApplicationRoleConnections(BaseRouter):
+    async def get_application_role_connection_metadata_records(
+        self,
+        application_id: Snowflake,
+    ) -> list[ApplicationRoleConnectionMetadata]:
+        return await self.request(
+            'GET',
+            Route(
+                '/applications/{application_id}/role-connections/metadata',
+                application_id=application_id,
+            ),
+        )
 
-class JSONDecoder:
-    def __init__(self, *args, **kwargs) -> None:
-        ...
-
-    def decode(self, s: str) -> Any:
-        return loads(s)
-
-    def __call__(self, s: str) -> Any:
-        return self.decode(s)
+    async def update_application_role_connection_metadata_records(
+        self,
+        application_id: Snowflake,
+        records: list[ApplicationRoleConnectionMetadata],
+    ) -> list[ApplicationRoleConnectionMetadata]:
+        return self.request(
+            'PUT',
+            Route(
+                '/applications/{application_id}/role-connections/metadata',
+                application_id=application_id,
+            ),
+            records,
+        )

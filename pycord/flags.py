@@ -22,14 +22,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Type, TypeVar
+from typing import Sequence, Type, TypeVar
 
 from .errors import FlagException
 
 F = TypeVar('F', bound='Flags')
 FF = TypeVar('FF')
 
-__all__ = [
+__all__: Sequence[str] = (
     'Intents',
     'Permissions',
     'ChannelFlags',
@@ -37,7 +37,7 @@ __all__ = [
     'SystemChannelFlags',
     'ApplicationFlags',
     'UserFlags',
-]
+)
 
 
 class flag:
@@ -550,3 +550,22 @@ class UserFlags(Flags):
     @flag
     def active_developer(self) -> bool | int:
         return 1 << 22
+
+
+@fill()
+class MemberFlags(Flags):
+    @flag
+    def did_rejoin(self) -> bool | int:
+        return 1 << 0
+
+    @flag
+    def completed_onboarding(self) -> bool | int:
+        return 1 << 1
+
+    @flag
+    def bypasses_verification(self) -> bool | int:
+        return 1 << 2
+
+    @flag
+    def started_onboarding(self) -> bool | int:
+        return 1 << 3

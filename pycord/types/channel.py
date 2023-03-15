@@ -18,12 +18,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from typing_extensions import NotRequired, TypedDict
 
 from .snowflake import Snowflake
 from .user import User
+
+if TYPE_CHECKING:
+    from .guild import GuildMember
 
 CTYPE = Literal[0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15]
 
@@ -49,6 +52,7 @@ class ThreadMember(TypedDict):
     user_id: NotRequired[Snowflake]
     join_timestamp: str
     flags: int
+    member: NotRequired['GuildMember']
 
 
 class ForumTag(TypedDict):
@@ -108,3 +112,14 @@ class AllowedMentions(TypedDict):
     roles: list[Snowflake]
     users: list[Snowflake]
     replied_user: bool
+
+
+class FollowedChannel(TypedDict):
+    channel_id: Snowflake
+    webhook_id: Snowflake
+
+
+class ListThreadsResponse(TypedDict):
+    threads: list[Channel]
+    members: list[ThreadMember]
+    has_more: bool

@@ -18,38 +18,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import Protocol, TypeVar
+from typing import Any, Generic, Protocol, Sequence, TypeVar
 
 from .errors import NoMorePages, PagerException
 
 T = TypeVar('T', covariant=True)
+P = TypeVar('P', bound='Page')
 
-
-__all__ = ['Page', 'Paginator']
+__all__: Sequence[str] = ('Page', 'Paginator')
 
 
 class Page(Protocol[T]):
-    """
-    The class for all Page Types to subclass.
-    """
+    """The class for all Page Types to subclass."""
 
-    def __init__(self):
-        ...
+    value: T
 
     async def interact_forward(self, *args, **kwargs) -> None:
-        """
-        Interactions to do when the paginator issues a forwarded statement
-        """
-        ...
+        """Interactions to do when the paginator issues a forwarded statement"""
 
     async def interact_backward(self, *args, **kwargs) -> None:
-        """
-        Interactions to do when the paginator issues a backward statement
-        """
-        ...
+        """Interactions to do when the paginator issues a backward statement"""
 
 
-class Paginator:
+class Paginator(Generic[P]):
     """
     Class for paginating between pages.
 
@@ -59,11 +50,15 @@ class Paginator:
         Predefined pages
     """
 
-    def __init__(self, pages: list[Page] = []) -> None:
-        self._pages = pages
+    def __init__(self, pages: list[P] | None = None) -> None:
+        if pages is None:
+            self._pages = []
+        else:
+            self._pages = pages
         self._previous_page: tuple[int, Page] | None = None
 
-    def __next__(self) -> Page:
+    # not meant to be directly called like this
+    def __next__(self) -> P:
         if self._previous_page is None:
             try:
                 page = self._pages[0]
@@ -85,7 +80,7 @@ class Paginator:
 
         return page
 
-    async def forward(self, *args, **kwargs) -> Page:
+    async def forward(self, *args, **kwargs) -> P:
         """
         Go forward through pages.
 
@@ -97,9 +92,9 @@ class Paginator:
         page = next(self)
 
         await page.interact_forward(*args, **kwargs)
-        return page
+        return page.value
 
-    async def backward(self, *args, **kwargs) -> Page:
+    async def backward(self, *args, **kwargs) -> P:
         """
         Go backwards from the paginator.
         Only works if the page is not the first page.
@@ -120,16 +115,16 @@ class Paginator:
         )
 
         await page.interact_backward(*args, **kwargs)
-        return page
+        return page.value
 
     @property
-    def previous(self) -> Page | None:
+    def previous(self) -> P | None:
         """
         The Previous page of this Paginator
         """
-        return None if self._previous_page is None else self._previous_page[1]
+        return None if self._previous_page is None else self._previous_page[1].value
 
-    def add_page(self, page: Page) -> None:
+    def add_page(self, page: P) -> None:
         """
         Appends a new page to this Paginator
 
@@ -142,7 +137,7 @@ class Paginator:
             raise PagerException('This page has already been added to this paginator')
         self._pages.append(page)
 
-    def remove_page(self, page: Page) -> None:
+    def remove_page(self, page: P) -> None:
         """
         Removes a page from this paginator
 
@@ -154,3 +149,12 @@ class Paginator:
         if page not in self._pages:
             raise PagerException('This page is not part of this paginator')
         self._pages.remove(page)
+
+    async def __anext__(self) -> P:
+        try:
+            return await self.forward()
+        except NoMorePages:
+            raise StopAsyncIteration
+
+    def __aiter__(self):
+        return self
