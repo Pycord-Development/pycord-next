@@ -74,7 +74,7 @@ class OptionalAuditEntryInfo:
         'members_removed',
         'message_id',
         'role_name',
-        'type'
+        'type',
     )
 
     def __init__(self, data: DiscordOptionalAuditEntryInfo) -> None:
@@ -153,7 +153,7 @@ class AuditLogEntry:
         'user_id',
         'action_type',
         'options',
-        'reason'
+        'reason',
     )
 
     def __init__(self, data: DiscordAuditLogEntry) -> None:

@@ -40,13 +40,7 @@ if TYPE_CHECKING:
 
 
 class InteractionOption:
-    __slots__ = (
-        'name',
-        'type',
-        'value',
-        'options',
-        'focused'
-    )
+    __slots__ = ('name', 'type', 'value', 'options', 'focused')
 
     def __init__(
         self,
@@ -90,7 +84,7 @@ class Interaction:
         'guild_id',
         'custom_id',
         'component_type',
-        'values'
+        'values',
     )
 
     def __init__(

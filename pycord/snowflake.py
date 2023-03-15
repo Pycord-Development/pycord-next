@@ -21,6 +21,7 @@
 """Implementation of Discord's Snowflake ID"""
 
 from __future__ import annotations
+
 from datetime import datetime, timezone
 
 from .utils import DISCORD_EPOCH

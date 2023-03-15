@@ -20,7 +20,7 @@
 # SOFTWARE
 from __future__ import annotations
 
-from .utils import remove_undefined
+from typing import Sequence
 
 from .enums import ApplicationRoleConnectionMetadataType
 from .types import (
@@ -28,8 +28,9 @@ from .types import (
 )
 from .undefined import UNDEFINED, UndefinedType
 from .user import LOCALE
+from .utils import remove_undefined
 
-__all__: tuple[str] = ('ApplicationRoleConnectionMetadata',)
+__all__: Sequence[str] = ('ApplicationRoleConnectionMetadata',)
 
 
 class ApplicationRoleConnectionMetadata:
@@ -90,11 +91,13 @@ class ApplicationRoleConnectionMetadata:
         return cls(type=type, **data)
 
     def to_dict(self) -> DiscordApplicationRoleConnectionMetadata:
-        return remove_undefined(**{
-            'type': self.type.value,
-            'key': self.key,
-            'name': self.name,
-            'description': self.description,
-            'name_localizations': self.name_localizations,
-            'description_localizations': self.description_localizations,
-        })
+        return remove_undefined(
+            **{
+                'type': self.type.value,
+                'key': self.key,
+                'name': self.name,
+                'description': self.description,
+                'name_localizations': self.name_localizations,
+                'description_localizations': self.description_localizations,
+            }
+        )

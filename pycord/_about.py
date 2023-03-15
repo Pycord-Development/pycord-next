@@ -44,7 +44,7 @@ version_info: VersionInfo = VersionInfo(
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-__all__: tuple[str] = (
+__all__: typing.Sequence[str] = (
     '__title__',
     '__author__',
     '__license__',

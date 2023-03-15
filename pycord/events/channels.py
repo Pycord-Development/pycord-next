@@ -100,10 +100,14 @@ class MessageUpdate(Event):
     message: Message
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        self.previous: Message | None = await (state.store.sift('messages')).get_one([int(data['channel_id'])], int(data['id']))
+        self.previous: Message | None = await (state.store.sift('messages')).get_one(
+            [int(data['channel_id'])], int(data['id'])
+        )
         if self.previous is None:
             message = Message(data, state)
-            await state.store.sift('messages').insert([message.channel_id], message.id, message)
+            await state.store.sift('messages').insert(
+                [message.channel_id], message.id, message
+            )
         else:
             message: Message = self.previous
             message._modify_from_cache(**data)

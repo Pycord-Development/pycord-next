@@ -22,7 +22,7 @@ from typing import Literal
 
 from ...file import File
 from ...snowflake import Snowflake
-from ...types import GuildScheduledEvent, EntityMetadata, PRIVACY_LEVEL
+from ...types import PRIVACY_LEVEL, EntityMetadata, GuildScheduledEvent
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined, to_datauri
 from ..route import Route
@@ -30,14 +30,13 @@ from .base import BaseRouter
 
 
 class ScheduledEvents(BaseRouter):
-    async def list_scheduled_events(self, guild_id: Snowflake, with_user_count: bool | UndefinedType = UNDEFINED) -> list[GuildScheduledEvent]:
+    async def list_scheduled_events(
+        self, guild_id: Snowflake, with_user_count: bool | UndefinedType = UNDEFINED
+    ) -> list[GuildScheduledEvent]:
         return await self.request(
             'GET',
-            Route(
-                '/guilds/{guild_id}/scheduled-events',
-                guild_id=guild_id
-            ),
-            remove_undefined(with_user_count=with_user_count)
+            Route('/guilds/{guild_id}/scheduled-events', guild_id=guild_id),
+            remove_undefined(with_user_count=with_user_count),
         )
 
     async def create_guild_scheduled_event(
@@ -51,7 +50,7 @@ class ScheduledEvents(BaseRouter):
         privacy_level: PRIVACY_LEVEL | UndefinedType = UNDEFINED,
         scheduled_end_time: str | UndefinedType = UNDEFINED,
         description: str | UndefinedType = UNDEFINED,
-        image: File | UndefinedType = UNDEFINED
+        image: File | UndefinedType = UNDEFINED,
     ) -> GuildScheduledEvent:
         fields = remove_undefined(
             name=name,
@@ -62,7 +61,7 @@ class ScheduledEvents(BaseRouter):
             privacy_level=privacy_level,
             scheduled_end_time=scheduled_end_time,
             description=description,
-            image=image
+            image=image,
         )
 
         if fields.get('image'):
@@ -71,5 +70,4 @@ class ScheduledEvents(BaseRouter):
         # TODO
         await self.request(
             'POST',
-            
         )

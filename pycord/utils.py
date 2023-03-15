@@ -22,15 +22,14 @@
 import base64
 import functools
 import inspect
+import warnings
 from collections.abc import Iterator, Sequence
 from itertools import accumulate
 from typing import Any, AsyncGenerator, Callable, Type, TypeVar
-import warnings
 
 from aiohttp import ClientResponse
 
 from .file import File
-
 from .types import AsyncFunc
 from .undefined import UNDEFINED
 

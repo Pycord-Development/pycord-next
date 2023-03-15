@@ -24,11 +24,10 @@ from datetime import datetime
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
-from .file import File
-
 from .embed import Embed
 from .enums import ChannelType, OverwriteType, VideoQualityMode
 from .errors import ComponentException
+from .file import File
 from .flags import ChannelFlags, Permissions
 from .member import Member
 from .message import AllowedMentions, Message, MessageReference
@@ -50,12 +49,7 @@ if TYPE_CHECKING:
 
 
 class _Overwrite:
-    __slots__ = (
-        'id',
-        'type',
-        'allow',
-        'deny'
-    )
+    __slots__ = ('id', 'type', 'allow', 'deny')
 
     def __init__(
         self,
@@ -95,7 +89,7 @@ class ThreadMetadata:
         'archive_timestamp',
         'locked',
         'invitable',
-        'create_timestamp'
+        'create_timestamp',
     )
 
     def __init__(self, metadata: DiscordThreadMetadata) -> None:
@@ -114,13 +108,7 @@ class ThreadMetadata:
 
 
 class ThreadMember:
-    __slots__ = (
-        'id',
-        'user_id',
-        'join_timestamp',
-        'flags',
-        'member'
-    )
+    __slots__ = ('id', 'user_id', 'join_timestamp', 'flags', 'member')
 
     def __init__(self, member: DiscordThreadMember) -> None:
         _id: str | None = member.get('id')
@@ -179,10 +167,7 @@ class ForumTag:
 
 
 class DefaultReaction:
-    __slots__ = (
-        'emoji_id',
-        'emoji_name'
-    )
+    __slots__ = ('emoji_id', 'emoji_name')
 
     def __init__(self, data: DiscordDefaultReaction) -> None:
         _emoji_id: str | None = data.get('emoji_id')
@@ -214,13 +199,8 @@ class Channel:
     flags: :class:`ChannelFlags` | :class:`UndefinedType`
         The flags of the channel.
     """
-    __slots__ = (
-        '_state',
-        'id',
-        'type',
-        'name',
-        'flags'
-    )
+
+    __slots__ = ('_state', 'id', 'type', 'name', 'flags')
 
     def __init__(self, data: DiscordChannel, state: State) -> None:
         self._state = state
@@ -290,7 +270,7 @@ class GuildChannel(Channel):
         'permissions',
         'parent_id',
         'rate_limit_per_user',
-        'default_auto_archive_duration'
+        'default_auto_archive_duration',
     )
 
     def __init__(self, data: DiscordChannel, state: State) -> None:
@@ -378,7 +358,7 @@ class MessageableChannel(Channel):
             sticker_ids=sticker_ids,
             flags=flags,
             components=components,
-            files=files
+            files=files,
         )
         return Message(data, state=self._state)
 
@@ -391,10 +371,10 @@ class MessageableChannel(Channel):
             self.id, [m.id for m in messages], reason=reason
         )
 
-    async def bulk_delete_ids(self, *messages: Snowflake, reason: str | None = None) -> None:
-        await self._state.http.bulk_delete_messages(
-            self.id, messages, reason=reason
-        )
+    async def bulk_delete_ids(
+        self, *messages: Snowflake, reason: str | None = None
+    ) -> None:
+        await self._state.http.bulk_delete_messages(self.id, messages, reason=reason)
 
 
 class AudioChannel(GuildChannel):

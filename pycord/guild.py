@@ -23,10 +23,6 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from .file import File
-
-from .scheduled_event import ScheduledEvent
-
 from .auto_moderation import (
     AutoModAction,
     AutoModEventType,
@@ -57,11 +53,13 @@ from .enums import (
     VerificationLevel,
     VideoQualityMode,
 )
+from .file import File
 from .flags import Permissions, SystemChannelFlags
 from .media import Emoji, Sticker
 from .member import Member, MemberPaginator
 from .pages.paginator import Page, Paginator
 from .role import Role
+from .scheduled_event import ScheduledEvent
 from .snowflake import Snowflake
 from .types import (
     GUILD_FEATURE,
@@ -71,7 +69,7 @@ from .types import (
     GuildPreview as DiscordGuildPreview,
     UnavailableGuild,
     Widget as DiscordWidget,
-    WidgetSettings as DiscordWidgetSettings
+    WidgetSettings as DiscordWidgetSettings,
 )
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
@@ -921,8 +919,11 @@ class Guild:
         -------
         :class:`list`[:class:`.ScheduledEvent`]
         """
-        scheds = await self._state.http.list_scheduled_events(self.id, with_user_count=with_user_count)
+        scheds = await self._state.http.list_scheduled_events(
+            self.id, with_user_count=with_user_count
+        )
         return [ScheduledEvent(s, self._state) for s in scheds]
+
 
 class GuildPreview:
     def __init__(self, data: DiscordGuildPreview, state: State) -> None:

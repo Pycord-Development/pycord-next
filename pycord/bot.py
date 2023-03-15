@@ -23,16 +23,10 @@ from typing import Any, AsyncGenerator, Type, TypeVar
 
 from aiohttp import BasicAuth
 
-from .file import File
-
-from .audit_log import AuditLog
-
-from .types.audit_log import AUDIT_LOG_EVENT_TYPE
-
 from .application_role_connection_metadata import ApplicationRoleConnectionMetadata
-from .undefined import UNDEFINED, UndefinedType
-from .commands.application.command import ApplicationCommand
+from .audit_log import AuditLog
 from .commands import Group
+from .commands.application.command import ApplicationCommand
 from .enums import (
     DefaultMessageNotificationLevel,
     ExplicitContentFilterLevel,
@@ -40,6 +34,7 @@ from .enums import (
 )
 from .errors import BotException, NoIdentifiesLeft, OverfilledShardsException
 from .events.event_manager import Event
+from .file import File
 from .flags import Intents, SystemChannelFlags
 from .gateway import PassThrough, ShardCluster, ShardManager
 from .guild import Guild, GuildPreview
@@ -47,6 +42,7 @@ from .interface import print_banner, start_logging
 from .snowflake import Snowflake
 from .state import State
 from .types import AsyncFunc
+from .types.audit_log import AUDIT_LOG_EVENT_TYPE
 from .undefined import UNDEFINED, UndefinedType
 from .user import User
 from .utils import chunk, get_arg_defaults
@@ -556,7 +552,7 @@ class Bot:
         action_type: AUDIT_LOG_EVENT_TYPE | UndefinedType = UNDEFINED,
         before: Snowflake | UndefinedType = UNDEFINED,
         after: Snowflake | UndefinedType = UNDEFINED,
-        limit: int | UndefinedType = UNDEFINED
+        limit: int | UndefinedType = UNDEFINED,
     ) -> AuditLog:
         """
         Fetches and returns the audit log.
@@ -571,6 +567,6 @@ class Bot:
             action_type=action_type,
             before=before,
             after=after,
-            limit=limit
+            limit=limit,
         )
         return AuditLog(raw_audit_log, self._state)

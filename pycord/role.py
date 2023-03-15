@@ -66,7 +66,7 @@ class Role:
         'permissions',
         'managed',
         'mentionable',
-        'tags'
+        'tags',
     )
 
     def __init__(self, data: DiscordRole, state: State) -> None:

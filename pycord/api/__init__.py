@@ -8,12 +8,11 @@ Implementation of the Discord API.
 """
 import logging
 import sys
-from typing import Any
+from typing import Any, Sequence
 
 from aiohttp import BasicAuth, ClientSession, FormData, __version__ as aiohttp_version
 
 from pycord._about import __version__
-from .routers.scheduled_events import ScheduledEvents
 
 from .. import utils
 from ..errors import BotException, Forbidden, HTTPException, InternalError, NotFound
@@ -22,8 +21,9 @@ from ..utils import dumps
 from .execution import Executer
 from .route import BaseRoute, Route
 from .routers import *
+from .routers.scheduled_events import ScheduledEvents
 
-__all__: tuple[str] = ('Route', 'BaseRoute', 'HTTPClient')
+__all__: Sequence[str] = ('Route', 'BaseRoute', 'HTTPClient')
 
 _log = logging.getLogger(__name__)
 

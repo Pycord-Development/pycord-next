@@ -43,7 +43,7 @@ class GuildTemplate:
         'updated_at',
         'source_guild_id',
         'serialized_source_guild',
-        'is_dirty'
+        'is_dirty',
     )
 
     def __init__(self, data: DiscordGuildTemplate, state: State) -> None:

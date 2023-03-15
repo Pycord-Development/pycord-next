@@ -118,7 +118,7 @@ class Application:
         'flags',
         'tags',
         'install_params',
-        'custom_install_url'
+        'custom_install_url',
     )
 
     def __init__(self, data: DiscordApplication, state: State) -> None:

@@ -25,6 +25,7 @@ from ..route import BaseRoute
 
 REQUEST_RETURN = str | dict[str, Any] | list[Any] | bytes
 
+
 class BaseRouter:
     async def request(
         self,

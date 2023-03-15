@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import asyncio
 from copy import copy
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Sequence, Union
 
 from ...channel import Channel, identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
@@ -46,7 +46,7 @@ from .prelude import Prelude
 if TYPE_CHECKING:
     from ...state import State
 
-__all__: tuple[str] = ('CommandChoice', 'Option', 'ApplicationCommand')
+__all__: Sequence[str] = ('CommandChoice', 'Option', 'ApplicationCommand')
 
 
 async def _autocomplete(
@@ -107,7 +107,21 @@ _OPTION_BIND = {
 }
 
 
-class Option:
+if TYPE_CHECKING:
+    # this is a little type hack to
+    # make LSPs and type checkers think that
+    # doing something like "opt: str = pycord.Option()" is fine
+    # since pycord.Option "subclasses" str. Though this may break with boolean types.
+    class _BaseOption(str, int, float, User, Channel, Role, Attachment):  # type: ignore
+        ...
+
+else:
+
+    class _BaseOption:
+        ...
+
+
+class Option(_BaseOption):
     """
     An option of a Chat Input Command.
 

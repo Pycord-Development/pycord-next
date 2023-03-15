@@ -22,14 +22,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Type, TypeVar
+from typing import Sequence, Type, TypeVar
 
 from .errors import FlagException
 
 F = TypeVar('F', bound='Flags')
 FF = TypeVar('FF')
 
-__all__: tuple[str] = (
+__all__: Sequence[str] = (
     'Intents',
     'Permissions',
     'ChannelFlags',

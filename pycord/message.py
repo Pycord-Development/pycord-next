@@ -227,7 +227,7 @@ class Message:
         'sticker_items',
         'stickers',
         'position',
-        'channel'
+        'channel',
     )
 
     def __init__(self, data: DiscordMessage, state: State) -> None:
@@ -335,35 +335,27 @@ class Message:
                 setattr(self, k, v)
 
                 match k:
-                    case "edited_timestamp":
+                    case 'edited_timestamp':
                         # edited timestamp can't be none on edited messages, I think?
-                        self.edited_timestamp = (
-                            datetime.fromisoformat(v)
-                        )
-                    case "mentions":
+                        self.edited_timestamp = datetime.fromisoformat(v)
+                    case 'mentions':
                         self.mentions: list[User] = [User(d, self._state) for d in v]
-                    case "mention_roles":
-                        self.mention_roles: list[Snowflake] = [
-                            Snowflake(i) for i in v
-                        ]
-                    case "mention_channels":
+                    case 'mention_roles':
+                        self.mention_roles: list[Snowflake] = [Snowflake(i) for i in v]
+                    case 'mention_channels':
                         self.mention_channels: list[ChannelMention] = [
                             ChannelMention(d) for d in v
                         ]
-                    case "attachments":
+                    case 'attachments':
                         self.attachments: list[Attachment] = [
                             Attachment(a, self._state) for a in v
                         ]
-                    case "embeds":
+                    case 'embeds':
                         self.embeds: list[Embed] = [Embed._from_data(e) for e in v]
-                    case "reactions":
-                        self.reactions: list[Reaction] = [
-                            Reaction(r) for r in v
-                        ]
-                    case "flags":
-                        self.flags: MessageFlags = (
-                            MessageFlags.from_value(v)
-                        )
+                    case 'reactions':
+                        self.reactions: list[Reaction] = [Reaction(r) for r in v]
+                    case 'flags':
+                        self.flags: MessageFlags = MessageFlags.from_value(v)
 
     async def crosspost(self) -> Message:
         data = await self._state.http.crosspost_message(self.channel_id, self.id)

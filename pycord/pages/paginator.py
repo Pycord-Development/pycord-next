@@ -18,20 +18,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import Any, Generic, Protocol, TypeVar
+from typing import Any, Generic, Protocol, Sequence, TypeVar
 
 from .errors import NoMorePages, PagerException
 
 T = TypeVar('T', covariant=True)
 P = TypeVar('P', bound='Page')
 
-__all__: tuple[str] = ('Page', 'Paginator')
+__all__: Sequence[str] = ('Page', 'Paginator')
 
 
 class Page(Protocol[T]):
-    """
-    The class for all Page Types to subclass.
-    """
+    """The class for all Page Types to subclass."""
 
     value: T
 

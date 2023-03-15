@@ -21,7 +21,6 @@
 import datetime
 
 from ...file import File
-
 from ...snowflake import Snowflake
 from ...types import (
     MFA_LEVEL,
@@ -112,7 +111,7 @@ class Guilds(BaseRouter):
         explicit_content_filter: int | None | UndefinedType = UNDEFINED,
         afk_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
         afk_timeout: int | UndefinedType = UNDEFINED,
-        icon: File | None | UndefinedType = UNDEFINED, 
+        icon: File | None | UndefinedType = UNDEFINED,
         owner_id: Snowflake | UndefinedType = UNDEFINED,
         splash: bytes | None | UndefinedType = UNDEFINED,
         discovery_splash: bytes | None | UndefinedType = UNDEFINED,

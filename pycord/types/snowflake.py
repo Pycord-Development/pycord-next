@@ -21,9 +21,9 @@
 
 from __future__ import annotations
 
-from typing import TypeVar, Union
+from typing import Sequence, TypeVar, Union
 
-__all__: tuple[str] = ('Snowflake', 'SnowflakeL', 'SnowflakeOr')
+__all__: Sequence[str] = ('Snowflake', 'SnowflakeL', 'SnowflakeOr')
 
 T = TypeVar('T', covariant=True)
 
