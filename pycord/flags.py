@@ -29,7 +29,7 @@ from .errors import FlagException
 F = TypeVar('F', bound='Flags')
 FF = TypeVar('FF')
 
-__all__ = [
+__all__: tuple[str] = (
     'Intents',
     'Permissions',
     'ChannelFlags',
@@ -37,7 +37,7 @@ __all__ = [
     'SystemChannelFlags',
     'ApplicationFlags',
     'UserFlags',
-]
+)
 
 
 class flag:

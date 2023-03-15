@@ -25,7 +25,7 @@ from .errors import NoMorePages, PagerException
 T = TypeVar('T', covariant=True)
 P = TypeVar('P', bound='Page')
 
-__all__ = ['Page', 'Paginator']
+__all__: tuple[str] = ('Page', 'Paginator')
 
 
 class Page(Protocol[T]):
@@ -36,16 +36,10 @@ class Page(Protocol[T]):
     value: T
 
     async def interact_forward(self, *args, **kwargs) -> None:
-        """
-        Interactions to do when the paginator issues a forwarded statement
-        """
-        ...
+        """Interactions to do when the paginator issues a forwarded statement"""
 
     async def interact_backward(self, *args, **kwargs) -> None:
-        """
-        Interactions to do when the paginator issues a backward statement
-        """
-        ...
+        """Interactions to do when the paginator issues a backward statement"""
 
 
 class Paginator(Generic[P]):

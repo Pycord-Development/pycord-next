@@ -20,7 +20,7 @@
 # SOFTWARE
 from ..errors import PycordException
 
-__all__ = ['PagerException', 'NoMorePages']
+__all__: tuple[str] = ('PagerException', 'NoMorePages')
 
 
 class PagerException(PycordException):

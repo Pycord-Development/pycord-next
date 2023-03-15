@@ -31,9 +31,9 @@ __git_sha1__: str = 'HEAD'
 
 
 class VersionInfo(typing.NamedTuple):
-    major: str
-    minor: str
-    micro: str
+    major: int
+    minor: int
+    micro: int
     releaselevel: typing.Literal['alpha', 'beta', 'candidate', 'final']
     serial: int
 
@@ -44,7 +44,7 @@ version_info: VersionInfo = VersionInfo(
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-__all__: list[str] = [
+__all__: tuple[str] = (
     '__title__',
     '__author__',
     '__license__',
@@ -52,4 +52,4 @@ __all__: list[str] = [
     '__version__',
     'VersionInfo',
     'version_info',
-]
+)

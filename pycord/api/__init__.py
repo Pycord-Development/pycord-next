@@ -23,7 +23,7 @@ from .execution import Executer
 from .route import BaseRoute, Route
 from .routers import *
 
-__all__ = ['Route', 'BaseRoute', 'HTTPClient']
+__all__: tuple[str] = ('Route', 'BaseRoute', 'HTTPClient')
 
 _log = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ class HTTPClient(
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,
-    ) -> str | dict[str, Any] | list[Any] | bytes:
+    ) -> REQUEST_RETURN:
         endpoint = route.merge(self.base_url)
 
         if self._session is None:

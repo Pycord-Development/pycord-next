@@ -20,6 +20,8 @@
 # SOFTWARE
 from __future__ import annotations
 
+from .utils import remove_undefined
+
 from .enums import ApplicationRoleConnectionMetadataType
 from .types import (
     ApplicationRoleConnectionMetadata as DiscordApplicationRoleConnectionMetadata,
@@ -27,7 +29,7 @@ from .types import (
 from .undefined import UNDEFINED, UndefinedType
 from .user import LOCALE
 
-__all__ = ('ApplicationRoleConnectionMetadata',)
+__all__: tuple[str] = ('ApplicationRoleConnectionMetadata',)
 
 
 class ApplicationRoleConnectionMetadata:
@@ -88,11 +90,11 @@ class ApplicationRoleConnectionMetadata:
         return cls(type=type, **data)
 
     def to_dict(self) -> DiscordApplicationRoleConnectionMetadata:
-        return {
+        return remove_undefined(**{
             'type': self.type.value,
             'key': self.key,
             'name': self.name,
             'description': self.description,
             'name_localizations': self.name_localizations,
             'description_localizations': self.description_localizations,
-        }
+        })

@@ -23,6 +23,7 @@ from typing import Any
 from ...file import File
 from ..route import BaseRoute
 
+REQUEST_RETURN = str | dict[str, Any] | list[Any] | bytes
 
 class BaseRouter:
     async def request(
@@ -35,5 +36,5 @@ class BaseRouter:
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,
-    ) -> str | dict[str, Any] | list[Any] | bytes:
+    ) -> REQUEST_RETURN:
         ...

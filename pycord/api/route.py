@@ -18,11 +18,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from typing import Optional
-
 from pycord.types import Snowflake
 
-__all__ = ['Route', 'BaseRoute']
+__all__: tuple[str] = ('Route', 'BaseRoute')
 
 
 class BaseRoute:

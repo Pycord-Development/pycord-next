@@ -23,7 +23,7 @@ from __future__ import annotations
 
 from typing import TypeVar, Union
 
-__all__ = ['Snowflake', 'SnowflakeL', 'SnowflakeOr']
+__all__: tuple[str] = ('Snowflake', 'SnowflakeL', 'SnowflakeOr')
 
 T = TypeVar('T', covariant=True)
 

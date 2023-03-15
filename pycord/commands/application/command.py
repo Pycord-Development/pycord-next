@@ -46,7 +46,7 @@ from .prelude import Prelude
 if TYPE_CHECKING:
     from ...state import State
 
-__all__ = ['CommandChoice', 'Option', 'ApplicationCommand']
+__all__: tuple[str] = ('CommandChoice', 'Option', 'ApplicationCommand')
 
 
 async def _autocomplete(
