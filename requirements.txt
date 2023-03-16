@@ -6,3 +6,5 @@ colorlog~=6.7
 fastenum~=1.0.4
 # extensions for the typing module
 typing-extensions~=4.5.0
+# rust-like options for python
+option~=2.1

@@ -53,9 +53,6 @@ from ..events.guilds import (
     GuildUpdate,
 )
 from ..events.other import InteractionCreate, Ready, UserUpdate
-from ..ui import Component
-from ..ui.house import House
-from ..ui.text_input import Modal
 from ..undefined import UNDEFINED
 from ..user import User
 from .grouped_store import GroupedStore
@@ -117,17 +114,16 @@ class State:
         self.application_commands: list[ApplicationCommand] = []
         self.update_commands: bool = options.get('update_commands', True)
         self.verbose: bool = options.get('verbose', False)
-        self.components: list[Component] = []
-        self._component_custom_ids: list[str] = []
-        self._components_via_custom_id: dict[str, Component] = {}
-        self.modals: list[Modal] = []
+        self.components: list[Any] = []
+        self._tracked_components: dict[str, Any] = {}
+        self.modals: list[Any] = []
         self.cache_guild_members: bool = options.get('cache_guild_members', True)
 
-    def sent_modal(self, modal: Modal) -> None:
+    def track_modal(self, modal: Any) -> None:
         if modal not in self.modals:
             self.modals.append(modal)
 
-    def sent_component(self, comp: Component) -> None:
+    def track_component(self, comp: Any) -> None:
         if comp.id not in self._component_custom_ids and comp.id is not UNDEFINED:
             self.components.append(comp)
             self._component_custom_ids.append(comp.id)
@@ -138,7 +134,7 @@ class State:
             self.components.append(comp)
             self._components_via_custom_id[comp.id] = comp
 
-    def sent_house(self, house: House) -> None:
+    def sent_house(self, house: Any) -> None:
         for comp in house.components.values():
             self.sent_component(comp)
 

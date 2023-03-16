@@ -23,9 +23,8 @@
 import asyncio
 from typing import TYPE_CHECKING, Any, Type
 
-import typing_extensions
-
 from ..interaction import Interaction
+from ..message import Message
 from ..user import User
 from .event_manager import Event
 
@@ -99,19 +98,60 @@ class InteractionCreate(Event):
     def __init__(self, interaction: Type[Interaction] = Interaction) -> None:
         self.__interaction_object = interaction
 
-    def __call__(self) -> typing_extensions.Self:
-        """
-        Function to circumnavigate the event manager's event()
-        """
-        return self
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
+        interaction = self.__interaction_object(data, state, True)
+
+        self.interaction = interaction
+
+
+class InteractionInvoke(Event):
+    _name = 'INTERACTION_CREATE'
+
+    def __init__(
+        self, custom_id: str, interaction: Type[Interaction] = Interaction
+    ) -> None:
+        self.__interaction_object = interaction
+        self.__custom_id = custom_id
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
         interaction = self.__interaction_object(data, state, True)
 
-        for component in state.components:
-            asyncio.create_task(component._invoke(interaction))
-
-        for modal in state.modals:
-            asyncio.create_task(modal._invoke(interaction))
-
         self.interaction = interaction
+
+        if self.__custom_id != interaction.custom_id:
+            return False
+
+
+class WaitForMessage(Event):
+    _name = 'MESSAGE_CREATE'
+
+    def __init__(
+        self, user_id: int | None = None, channel_id: int | None = None
+    ) -> None:
+        self.__user_id = user_id
+        self.__channel_id = channel_id
+
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
+        message = Message(data, state)
+        self.message = message
+        self.is_human = message.author.bot is False
+        self.content = self.message.content
+
+        await (state.store.sift('messages')).save(
+            [message.channel_id], message.id, message
+        )
+
+        if self.__user_id and self.__channel_id:
+            if (
+                self.__user_id != message.author.id
+                or self.__channel_id != message.channel_id
+            ):
+                return False
+
+        elif self.__user_id:
+            if self.__user_id != message.author.id:
+                return False
+
+        elif self.__channel_id:
+            if self.__channel_id != message.channel_id:
+                return False

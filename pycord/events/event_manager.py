@@ -24,6 +24,8 @@ import asyncio
 from asyncio import Future
 from typing import TYPE_CHECKING, Any, Type, TypeVar
 
+import typing_extensions
+
 from ..types import AsyncFunc
 
 if TYPE_CHECKING:
@@ -36,6 +38,12 @@ T = TypeVar('T', bound='Event')
 class Event:
     _name: str
     _state: 'State'
+
+    def __call__(self) -> typing_extensions.Self:
+        """
+        Function to circumnavigate the event manager's event()
+        """
+        return self
 
     async def _is_publishable(self, data: dict[str, Any], state: 'State') -> bool:
         return True
@@ -64,6 +72,9 @@ class EventManager:
             self.events[event].append(func)
         except KeyError:
             self.events[event] = [func]
+
+    def remove_event(self, event: Type[Event], func: AsyncFunc) -> None:
+        self.events[event].remove(func)
 
     def wait_for(self, event: Type[T]) -> Future[T]:
         fut = Future()

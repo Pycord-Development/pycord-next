@@ -45,7 +45,6 @@ from .undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from .state import State
-    from .ui.house import House
 
 
 class _Overwrite:
@@ -330,19 +329,7 @@ class MessageableChannel(Channel):
         sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
         files: list[File] | UndefinedType = UNDEFINED,
         flags: int | UndefinedType = UNDEFINED,
-        houses: list[House] | UndefinedType = UNDEFINED,
     ) -> Message:
-        if houses:
-            if len(houses) > 5:
-                raise ComponentException('Cannot have over five houses at once')
-
-            components = [(house.action_row())._to_dict() for house in houses]
-
-            for house in houses:
-                self._state.sent_house(house)
-        else:
-            components = UNDEFINED
-
         data = await self._state.http.create_message(
             channel_id=self.id,
             content=content,
@@ -357,7 +344,6 @@ class MessageableChannel(Channel):
             else UNDEFINED,
             sticker_ids=sticker_ids,
             flags=flags,
-            components=components,
             files=files,
         )
         return Message(data, state=self._state)

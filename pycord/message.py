@@ -59,7 +59,6 @@ if TYPE_CHECKING:
         VoiceChannel,
     )
     from .state import State
-    from .ui.house import House
 
 
 class ChannelMention:
@@ -430,19 +429,7 @@ class Message:
         allowed_mentions: AllowedMentions | None | UndefinedType = UNDEFINED,
         attachments: list[Attachment] | None | UndefinedType = UNDEFINED,
         flags: MessageFlags | None | UndefinedType = UNDEFINED,
-        houses: list[House] | UndefinedType = UNDEFINED,
     ) -> Message:
-        if houses:
-            if len(houses) > 5:
-                raise ComponentException('Cannot have over five houses at once')
-
-            components = [(house.action_row())._to_dict() for house in houses]
-
-            for house in houses:
-                self._state.sent_house(house)
-        else:
-            components = UNDEFINED
-
         data = await self._state.http.edit_message(
             self.channel_id,
             self.id,
@@ -450,7 +437,6 @@ class Message:
             embeds=embeds,
             allowed_mentions=allowed_mentions,
             attachments=attachments,
-            components=components,
             flags=flags,
         )
         return Message(data, self._state)
