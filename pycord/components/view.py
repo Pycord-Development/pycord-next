@@ -94,13 +94,14 @@ class View:
 
     async def __loop_for_timeout(self) -> None:
         try:
+            # run until timeout occurs
             async with self._timeout:
-                ...
+                await asyncio.Future()
         except asyncio.TimeoutError:
-            ...
+            await self._time_out()
 
     async def _invoke(self, prelude: Prelude) -> None:
-        if not self._timeout.when() is not None:
+        if not self._timeout.expired():
             self._timeout.reschedule(self)
         else:
             self._message._state.event_manager.remove_event(
