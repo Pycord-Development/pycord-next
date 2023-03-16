@@ -114,29 +114,7 @@ class State:
         self.application_commands: list[ApplicationCommand] = []
         self.update_commands: bool = options.get('update_commands', True)
         self.verbose: bool = options.get('verbose', False)
-        self.components: list[Any] = []
-        self._tracked_components: dict[str, Any] = {}
-        self.modals: list[Any] = []
         self.cache_guild_members: bool = options.get('cache_guild_members', True)
-
-    def track_modal(self, modal: Any) -> None:
-        if modal not in self.modals:
-            self.modals.append(modal)
-
-    def track_component(self, comp: Any) -> None:
-        if comp.id not in self._component_custom_ids and comp.id is not UNDEFINED:
-            self.components.append(comp)
-            self._component_custom_ids.append(comp.id)
-            self._components_via_custom_id[comp.id] = comp
-        elif comp.disabled != self._components_via_custom_id[comp.id].disabled:
-            oldc = self._components_via_custom_id[comp.id]
-            self.components.remove(oldc)
-            self.components.append(comp)
-            self._components_via_custom_id[comp.id] = comp
-
-    def sent_house(self, house: Any) -> None:
-        for comp in house.components.values():
-            self.sent_component(comp)
 
     def bot_init(
         self,
