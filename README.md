@@ -87,22 +87,22 @@ bot.run('token')
 
     Example of Gears:
         
-        ```py
+    ```py
         from pycord.ext import gears
 
         gear = gears.Gear(__name__, BaseContext())
 
         # somewhere else...
         gear.attach(bot)
-        ```
+    ```
 - Commands
 
     Restructured to provide a better command experience.
 
     Example of the new command system:
         
-        ```py
+    ```py
         @bot.command()
         async def push(ctx: pycord.Context, user: pycord.User) -> None:
             await pre.send(f'{ctx.user.mention} pushed {user.mention}!')
-        ```
+    ```
