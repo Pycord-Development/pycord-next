@@ -62,12 +62,15 @@ class Gear(Generic[ContextT]):
 
     ctx: ContextT
 
-    def __init__(self, name: str, ctx: ContextT) -> None:
+    def __init__(self, name: str, ctx: ContextT | None = None) -> None:
         self.name = name
         self._listener_functions: dict[Type[Event], list[AsyncFunc]] = {}
         self.bot: Bot
         self._commands: list[Command | Group] = []
-        self.ctx = ctx
+        if ctx is None:
+            self.ctx = BaseContext()
+        else:
+            self.ctx = ctx
 
     async def on_attach(self, *args, **kwargs) -> None:
         ...

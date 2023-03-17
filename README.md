@@ -62,18 +62,18 @@ async def on_ready() -> None:
 
 # give a high five to a user
 @bot.command()
-async def highfive(pre: pycord.Prelude) -> None:
+async def highfive(ctx: pycord.Context) -> None:
     # send a response to the command
-    await pre.send(':raised_hand: High Five!')
+    await ctx.send(':raised_hand: High Five!')
 
 # this is only for certain things, which we allow the builder api for
 view = pycord.View().url_button('Google it!', 'https://google.com')
 
 # a command which sends a button to go to Google.
 @bot.command()
-async def google(pre: pycord.Prelude) -> None:
+async def google(ctx: pycord.Context) -> None:
     iview = view()
-    await pre.send('Just go to Google!', view=iview)
+    await ctx.send('Just go to Google!', view=iview)
 
 # REMEMBER TO CHANGE THIS!
 bot.run('token')
@@ -103,6 +103,6 @@ bot.run('token')
         
         ```py
         @bot.command()
-        async def push(pre: pycord.Prelude, user: pycord.User) -> None:
-            await pre.send(f'{pre.user.mention} pushed {user.mention}!')
+        async def push(ctx: pycord.Context, user: pycord.User) -> None:
+            await pre.send(f'{ctx.user.mention} pushed {user.mention}!')
         ```

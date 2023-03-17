@@ -41,7 +41,7 @@ from ...utils import get_arg_defaults, remove_undefined
 from ..command import Command
 from ..group import Group
 from .errors import ApplicationCommandException
-from .prelude import Prelude
+from .context import Context
 
 if TYPE_CHECKING:
     from ...state import State
@@ -360,7 +360,7 @@ class ApplicationCommand(Command):
         Defaults to False.
     """
 
-    _processor_event = InteractionCreate(Prelude)
+    _processor_event = InteractionCreate(Context)
     sub_level: int = 0
 
     def __init__(
@@ -535,7 +535,7 @@ class ApplicationCommand(Command):
         for name, v in arg_defaults.items():
             if name == 'self':
                 continue
-            elif v[1] is Interaction or v[1] is Prelude:
+            elif v[1] is Interaction or v[1] is Context:
                 continue
             elif not isinstance(v[0], Option) and v[0] is not None:
                 raise ApplicationCommandException(

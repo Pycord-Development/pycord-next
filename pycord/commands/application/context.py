@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from ...types import Interaction as InteractionData
 
 
-class Prelude(Interaction):
+class Context(Interaction):
     """
     Contextual prelude to Interactions.
     """
