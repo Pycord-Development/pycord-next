@@ -62,6 +62,8 @@ class Gear(Generic[ContextT]):
 
     ctx: ContextT
 
+    __slots__ = ('_listener_functions', '_commands', 'name', 'ctx', 'bot')
+
     def __init__(self, name: str, ctx: ContextT | None = None) -> None:
         self.name = name
         self._listener_functions: dict[Type[Event], list[AsyncFunc]] = {}
