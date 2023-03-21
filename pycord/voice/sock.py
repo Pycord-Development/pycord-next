@@ -79,7 +79,7 @@ class VoiceSocket:
         self.voko_ip = data['ip']
 
         # form a new packet
-        packet = bytearray(70)
+        packet = bytearray(74)
         struct.pack_into('>H', packet, 0, 1)  # 1 = Send
         struct.pack_into('>H', packet, 2, 70)  # 70 = Length
         struct.pack_into('>I', packet, 4, self.ssrc)
