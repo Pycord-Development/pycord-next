@@ -392,7 +392,7 @@ class SystemChannelFlags(Flags):
         return 1 << 2
 
     @flag
-    def supress_join_notifications_replies(self) -> bool | int:
+    def suppress_join_notifications_replies(self) -> bool | int:
         return 1 << 3
 
 
