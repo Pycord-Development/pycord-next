@@ -27,7 +27,6 @@ from typing import TYPE_CHECKING
 from uuid import uuid4
 
 import typing_extensions
-from option import Err, Ok, Result
 
 from ..commands.application.prelude import Prelude
 from ..events.other import InteractionInvoke, WaitForMessage
@@ -65,9 +64,9 @@ class View:
             cls._custom_id = str(uuid4())
         return cls
 
-    def overwatch(
+    def watch(
         self, message: Message, timeout: int | None | UndefinedType = UNDEFINED
-    ) -> Result[None, str]:
+    ) -> None:
         """
         Watch over a message for interactions.
         """
@@ -81,7 +80,7 @@ class View:
         self._timeout_secs = timeout
 
         if message.author.id != message._state.user.id:
-            return Err('Cannot overwatch a message not sent by the bot user')
+            raise RuntimeError('Cannot watch a message not authored by this bot.')
 
         self._timeout = asyncio.Timeout(timeout)
 
@@ -89,8 +88,6 @@ class View:
         message._state.event_manager.add_event(self._inter_invoke, self._invoke)
         self._message = message
         asyncio.create_task(self.__loop_for_timeout())
-
-        return Ok(None)
 
     async def __loop_for_timeout(self) -> None:
         try:
