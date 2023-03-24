@@ -104,5 +104,5 @@ bot.run('token')
     ```py
         @bot.command()
         async def push(ctx: pycord.Context, user: pycord.User) -> None:
-            await pre.send(f'{ctx.user.mention} pushed {user.mention}!')
+            await ctx.send(f'{ctx.user.mention} pushed {user.mention}!')
     ```
