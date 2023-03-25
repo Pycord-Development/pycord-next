@@ -10,6 +10,7 @@ from typing import Any, Callable, Coroutine
 
 from .application import *
 from .application_commands import *
+from .application_role_connection_metadata import *
 from .audit_log import *
 from .auto_moderation import *
 from .channel import *

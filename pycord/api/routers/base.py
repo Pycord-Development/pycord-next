@@ -20,7 +20,10 @@
 # SOFTWARE
 from typing import Any
 
+from ...file import File
 from ..route import BaseRoute
+
+REQUEST_RETURN = str | dict[str, Any] | list[Any] | bytes
 
 
 class BaseRouter:
@@ -29,8 +32,10 @@ class BaseRouter:
         method: str,
         route: BaseRoute,
         data: dict[str, Any] | None = None,
+        files: list[File] | None = None,
+        form: list[dict[str, Any]] | None = None,
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,
-    ) -> None:
+    ) -> REQUEST_RETURN:
         ...

@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,37 +18,16 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-"""Implementation of Discord's Snowflake ID"""
+from typing import Sequence
 
-from __future__ import annotations
+from ..errors import PycordException
 
-from datetime import datetime, timezone
-
-from .utils import DISCORD_EPOCH
+__all__: Sequence[str] = ('PagerException', 'NoMorePages')
 
 
-class Snowflake(int):
-    @property
-    def timestamp(self) -> datetime:
-        return datetime.fromtimestamp(
-            ((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc
-        )
+class PagerException(PycordException):
+    ...
 
-    @property
-    def worker_id(self) -> int:
-        return (self & 0x3E0000) >> 17
 
-    @property
-    def process_id(self) -> int:
-        return (self & 0x1F000) >> 12
-
-    @property
-    def increment(self) -> int:
-        return self & 0xFFF
-
-    def __hash__(self) -> int:
-        return self >> 22
-
-    @classmethod
-    def from_datetime(cls, dt: datetime) -> Snowflake:
-        return cls((int(dt.timestamp()) - DISCORD_EPOCH) << 22)
+class NoMorePages(PagerException):
+    ...

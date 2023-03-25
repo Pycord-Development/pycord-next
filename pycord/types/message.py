@@ -23,7 +23,7 @@ from typing import Literal
 from typing_extensions import NotRequired, TypedDict
 
 from .application import Application
-from .channel import CTYPE, Channel
+from .channel import CTYPE, AllowedMentions, Channel
 from .component import Component
 from .embed import Embed
 from .guild import GuildMember
@@ -125,3 +125,14 @@ class Message(TypedDict):
     sticker_items: NotRequired[list[StickerItem]]
     stickers: NotRequired[list[Sticker]]
     position: NotRequired[int]
+
+
+class ForumThreadMessageParams(TypedDict):
+    content: NotRequired[str]
+    embeds: NotRequired[list[Embed]]
+    allowed_mentions: NotRequired[AllowedMentions]
+    components: NotRequired[list[Component]]
+    sticker_ids: NotRequired[list[Snowflake]]
+    payload_json: NotRequired[str]
+    attachments: NotRequired[list[Attachment]]
+    flags: NotRequired[int]

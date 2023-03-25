@@ -32,6 +32,20 @@ if TYPE_CHECKING:
 
 
 class GuildTemplate:
+    __slots__ = (
+        'code',
+        'name',
+        'description',
+        'usage_count',
+        'creator_id',
+        'creator',
+        'created_at',
+        'updated_at',
+        'source_guild_id',
+        'serialized_source_guild',
+        'is_dirty',
+    )
+
     def __init__(self, data: DiscordGuildTemplate, state: State) -> None:
         self.code: str = data['code']
         self.name: str = data['name']

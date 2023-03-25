@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Copyright (c) 2021-present Pycord Development
+# Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,30 +18,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-import inspect
-from typing import Any
 
-from .types import AsyncFunc
+from typing import Literal
+
+from typing_extensions import NotRequired, TypedDict
+
+from .user import LOCALE
+
+RCMTYPE = Literal[
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+]
 
 
-class ArgumentParser:
-    def __init__(self) -> None:
-        pass
-
-    def get_arg_defaults(self, fnc: AsyncFunc) -> dict[str, Any]:
-        signature = inspect.signature(fnc)
-        ret = {}
-        for k, v in signature.parameters.items():
-            if (
-                v.default is not inspect.Parameter.empty
-                and v.annotation is not inspect.Parameter.empty
-            ):
-                ret[k] = (v.default, v.annotation)
-            elif v.default is not inspect.Parameter.empty:
-                ret[k] = (v.default, None)
-            elif v.annotation is not inspect.Parameter.empty:
-                ret[k] = (None, v.annotation)
-            else:
-                ret[k] = (None, None)
-
-        return ret
+class ApplicationRoleConnectionMetadata(TypedDict):
+    type: RCMTYPE
+    key: str
+    name: str
+    name_localizations: NotRequired[dict[LOCALE, str]]
+    description: str
+    description_localizations: NotRequired[dict[LOCALE, str]]

@@ -81,6 +81,7 @@ class AutoModAction:
 
 class AutoModRule:
     def __init__(self, data: DiscordAutoModerationRule, state: State) -> None:
+        self._state: State = state
         self.id: Snowflake = Snowflake(data['id'])
         self.guild_id: Snowflake = Snowflake(data['guild_id'])
         self.name: str = data['name']
@@ -100,3 +101,62 @@ class AutoModRule:
         self.exempt_channels: list[Snowflake] = [
             Snowflake(member) for member in data.get('exempt_channels', [])
         ]
+
+    async def edit(
+        self,
+        *,
+        name: str | UndefinedType = UNDEFINED,
+        event_type: AutoModEventType | UndefinedType = UNDEFINED,
+        trigger_metadata: AutoModTriggerMetadata | UndefinedType = UNDEFINED,
+        actions: list[AutoModAction] | UndefinedType = UNDEFINED,
+        enabled: bool | UndefinedType = UNDEFINED,
+        exempt_roles: list[Snowflake] | UndefinedType = UNDEFINED,
+        exempt_channels: list[Snowflake] | UndefinedType = UNDEFINED,
+        reason: str | None = None,
+    ) -> AutoModRule:
+        """Edits the auto moderation rule.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The rule name.
+        event_type: :class:`AutoModEventType`
+            The event type.
+        trigger_metadata: :class:`AutoModTriggerMetadata`
+            The trigger metadata.
+        actions: list[:class:`AutoModAction`]
+            The actions to take when the rule is triggered.
+        enabled: :class:`bool`
+            Whether the rule is enabled.
+        exempt_roles: list[:class:`Snowflake`]
+            The roles exempt from the rule.
+        exempt_channels: list[:class:`Snowflake`]
+            The channels exempt from the rule.
+        reason: :class:`str` | None
+            The reason for editing this rule. Appears in the guild's audit log.
+        """
+        data = await self._state.http.modify_auto_moderation_rule(
+            self.guild_id,
+            self.id,
+            name=name,
+            event_type=event_type,
+            trigger_metadata=trigger_metadata,
+            actions=actions,
+            enabled=enabled,
+            exempt_roles=exempt_roles,
+            exempt_channels=exempt_channels,
+            reason=reason,
+        )
+        return AutoModRule(data, self._state)
+
+    async def delete(self, *, reason: str | None = None) -> None:
+        """Deletes the auto moderation rule.
+
+        Parameters
+        ----------
+        reason: :class:`str` | None
+            The reason for deleting this rule. Appears in the guild's audit log.
+        """
+        await self._state.http.delete_auto_moderation_rule(
+            self.guild_id, self.id, reason=reason
+        )

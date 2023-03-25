@@ -62,5 +62,10 @@ class Executer:
 
         event = asyncio.Event()
 
-        self._request_queue.put_nowait(event)
+        if self._request_queue:
+            self._request_queue.put_nowait(event)
+        else:
+            raise ValueError(
+                'Request queue does not exist, rate limit may have been solved.'
+            )
         await event.wait()

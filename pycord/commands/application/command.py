@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import asyncio
 from copy import copy
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Sequence, Union
 
 from ...channel import Channel, identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
@@ -41,12 +41,12 @@ from ...utils import get_arg_defaults, remove_undefined
 from ..command import Command
 from ..group import Group
 from .errors import ApplicationCommandException
-from .prelude import Prelude
+from .context import Context
 
 if TYPE_CHECKING:
     from ...state import State
 
-__all__ = ['CommandChoice', 'Option', 'ApplicationCommand']
+__all__: Sequence[str] = ('CommandChoice', 'Option', 'ApplicationCommand')
 
 
 async def _autocomplete(
@@ -107,7 +107,21 @@ _OPTION_BIND = {
 }
 
 
-class Option:
+if TYPE_CHECKING:
+    # this is a little type hack to
+    # make LSPs and type checkers think that
+    # doing something like "opt: str = pycord.Option()" is fine
+    # since pycord.Option "subclasses" str. Though this may break with boolean types.
+    class _BaseOption(str, int, float, User, Channel, Role, Attachment):  # type: ignore
+        ...
+
+else:
+
+    class _BaseOption:
+        ...
+
+
+class Option(_BaseOption):
     """
     An option of a Chat Input Command.
 
@@ -346,7 +360,7 @@ class ApplicationCommand(Command):
         Defaults to False.
     """
 
-    _processor_event = InteractionCreate(Prelude)
+    _processor_event = InteractionCreate(Context)
     sub_level: int = 0
 
     def __init__(
@@ -521,7 +535,7 @@ class ApplicationCommand(Command):
         for name, v in arg_defaults.items():
             if name == 'self':
                 continue
-            elif v[1] is Interaction or v[1] is Prelude:
+            elif v[1] is Interaction or v[1] is Context:
                 continue
             elif not isinstance(v[0], Option) and v[0] is not None:
                 raise ApplicationCommandException(
@@ -673,6 +687,7 @@ class ApplicationCommand(Command):
                     member = Member(
                         interaction.data['resolved']['members'][option.value],
                         self._state,
+                        guild_id=interaction.guild_id,
                     )
                     member.user = user
 
