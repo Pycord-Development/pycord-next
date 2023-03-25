@@ -125,7 +125,24 @@ class Control(Enum):
     SET_PLP = 4014
 
 
-class OpusEncoder(BaseOpus):
+class BaseOpusEncoderFunctions:
+    def opus_encoder_get_size(self, channels: ctypes.c_int) -> ctypes.c_int:
+        ...
+
+    def opus_encoder_create(self, samping_rate: ctypes.c_int, channels: ctypes.c_int, mode: ctypes.c_int, error: c_int_ptr) -> EncoderStructPtr:
+        ...
+
+    def opus_encode(self, st: EncoderStructPtr, pcm: c_int16_ptr, frame_size: ctypes.c_int, unsigned: ctypes.c_char_p, max_data_bytes: ctypes.c_int32) -> ctypes.c_int32:
+        ...
+
+    def opus_encoder_ctl(self) -> ctypes.c_int32:
+        ...
+
+    def opus_encoder_destroy(self, st: EncoderStructPtr) -> None:
+        ...
+
+
+class OpusEncoder(BaseOpus, BaseOpusEncoderFunctions):
     _EXPORT = {
         'opus_encoder_get_size': ([ctypes.c_int], ctypes.c_int),
         'opus_encoder_create': (
