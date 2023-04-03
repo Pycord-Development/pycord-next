@@ -19,14 +19,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+import base64
+import functools
 import inspect
+import warnings
 from collections.abc import Iterator, Sequence
 from itertools import accumulate
-from typing import Any, AsyncGenerator, Type, TypeVar
+from typing import Any, AsyncGenerator, Callable, Type, TypeVar
 
 from aiohttp import ClientResponse
 
-from .errors import NoFetchOrGet
+from .file import File
 from .types import AsyncFunc
 from .undefined import UNDEFINED
 
@@ -42,9 +45,9 @@ S = TypeVar('S', bound=Sequence)
 T = TypeVar('T')
 
 
-async def _text_or_json(cr: ClientResponse, self) -> str | dict[str, Any]:
+async def _text_or_json(cr: ClientResponse) -> str | dict[str, Any]:
     if cr.content_type == 'application/json':
-        return await cr.json(encoding='utf-8', loads=self._json_decoder)
+        return await cr.json(encoding='utf-8', loads=loads)
     return await cr.text('utf-8')
 
 
@@ -165,7 +168,7 @@ async def find(cls: Type[T], *args: Any, **kwargs: Any) -> T:
     """
 
     if not hasattr(cls, 'fetch') or not hasattr(cls, 'get'):
-        raise NoFetchOrGet('This class has no get or fetch function')
+        raise RuntimeError('This class has no get or fetch function')
 
     mret = await cls.get(*args, **kwargs)
 
@@ -173,3 +176,97 @@ async def find(cls: Type[T], *args: Any, **kwargs: Any) -> T:
         return await cls.fetch(*args, **kwargs)
     else:
         return mret
+
+
+# these two (@deprecated & @experimental) are mostly added for the future
+def deprecated(alternative: str | None = None, removal: str | None = None):
+    """
+    Used to show that a provided API is in its deprecation period.
+
+    Parameters
+    ----------
+    alternative: :class:`str` | None
+        An optional alternative to use instead of this.
+    removal: :class:`str`
+        Planned removal version.
+    """
+
+    def wrapper(func: Callable):
+        @functools.wraps(func)
+        def decorator(*args, **kwargs):
+            message = f'{func.__name__} has been deprecated.'
+
+            if alternative:
+                message += f' You can use {alternative} instead.'
+
+            if removal:
+                message += f' This feature will be removed by version {removal}.'
+
+            warnings.warn(message, DeprecationWarning, 3)
+            return func(*args, **kwargs)
+
+        return decorator
+
+    return wrapper
+
+
+def experimental():
+    """
+    Used for showing that a provided API is still experimental.
+    """
+
+    def wrapper(func: Callable):
+        @functools.wraps(func)
+        def decorator(*args, **kwargs):
+            message = f'{func.__name__} is an experimental feature, it may be removed at any time and breaking changes can happen without warning.'
+
+            warnings.warn(message, DeprecationWarning, 3)
+            return func(*args, **kwargs)
+
+        return decorator
+
+    return wrapper
+
+
+def find_mimetype(data: bytes):
+    """
+    Gets the mimetype of the given bytes.
+
+    Exceptions
+    ----------
+    ValueError: :class:`ValueError`
+        The image mime type is not supported
+    """
+
+    if data.startswith(b'\x89\x50\x4E\x47\x0D\x0A\x1A\x0A'):
+        return 'image/png'
+    elif data[0:3] == b'\xff\xd8\xff' or data[6:10] in (b'JFIF', b'Exif'):
+        return 'image/jpeg'
+    elif data.startswith((b'\x47\x49\x46\x38\x37\x61', b'\x47\x49\x46\x38\x39\x61')):
+        return 'image/gif'
+    elif data.startswith(b'RIFF') and data[8:12] == b'WEBP':
+        return 'image/webp'
+    else:
+        raise ValueError('Unsupported image mime type given')
+
+
+def to_datauri(f: File) -> str:
+    """
+    Turns a file into a data uri string.
+
+    Parameters
+    ----------
+    f: :class:`.File`
+        The file to turn into a data uri format.
+
+    Returns
+    -------
+    :class:`str`
+    """
+    b = f.file.read()
+
+    m = find_mimetype(b)
+
+    b64 = base64.b64encode(b)
+
+    return f'data:{m};base64,{b64}'

@@ -3,6 +3,9 @@
     <p>
         <a href="https://github.com/Pycord-Development/pycord-v3"><img src="https://raw.githubusercontent.com/Pycord-Development/pycord-v3/main/docs/assets/pycord-v3.png" width="546" alt="Pycord v3" /></a>
     </p>
+    <p align='center'>
+     <b>Empowering developers to build the next generation of Python Discord bots.</b>
+    </p>
     <br />
     <p>
         <a href="https://discord.gg/pycord"><img src="https://img.shields.io/discord/881207955029110855?color=5865F2&logo=discord&logoColor=white" alt="discord"> </a>
@@ -11,83 +14,95 @@
     </p>
 </div>
 
-<p align='center'>
- <b>Empowering developers to build the next generation of Python Discord bots.</b>
-</p>
+## Introduction
 
-Welcome! This is the repository for the pre-alpha and heavy conception next major
-version of Pycord.
+**WARNING: Pycord v3 is pre-alpha, and is highly unstable. We suggest waiting for a alpha, beta, or release candidate before fully migrating.**
 
-## Installation
+Welcome! This is the repository of the shiny new Pycord v3.
+Please remember Pycord v3 is still in pre-alpha and anything can change at any time.
 
-Pycord v3 is not yet published onto PyPI, so for now you'll have to install via git. To
-do this, you should install [git](https://git-scm.com) if not already installed.
+The goal of Pycord v3 is to create a more modern Discord library for development of bots in Python.
+This comes at the expense of stripping Pycord v2 of many of its either hard to implement, or hard to justify aspects.
 
-An automatic install should look something like
+Systems like Views (components,) Gears (cogs,) and Commands, have been built from the ground up to provide better systems
+for creating Discord bots in Python.
 
-```sh
-    pip install -U git+https://github.com/pycord-development/pycord-v3
-```
+Because of this, many breaking changes have occured. Moreover, the entire library has been rewritten from the ground up
+to provide a better internal to take care of. Want to implement your own cache? You can do it! Want to use HTTP-based Interactions, sure!
 
-If instead, you wanted to do a manual install (in case of something like development),
-you could do the following
+The old v2 core would've made this nearly impossible (with caching being non-replaceable, and interactions only receivable from the Gateway.)
 
-```sh
-    # Git command
-    git clone https://github.com/pycord-development/pycord-v3
-    cd pycord-v3
+## Inspiration
 
-    pip install .
-```
+Pycord v3 takes some inspiration from some places to try and form an easy to use yet non-limiting library.
+Firstly, we take inspiration from Pycord v2 and discord.py for parts of the user parts of the library.
+These are mostly parts which obviously don't need changing, like naming, or other such.
 
-## Stability
+Next, we take inspiration from hikari and the hikari ecosystem.
+This is for parts of the library like customization, logging, components, gears, etc.
+What we try to do differently from hikari is try to provide a higher-level API, and also try to provide
+both an easier to use experience and more efficient experience.
 
-While we are working and striving for stability throughout v3, it's still quite a new
-library so breakages can still happen especially with us still being in a pre-alpha
-stage.
+Finally, we take some inspiration from some JavaScript libraries for our CLI.
+These libraries are the inspiration for the Pycord v3 CLI, and will be a blockpoint for new Pycord bots.
 
-## Breaking Changes
+## Example
 
-v3 is a new **major version** of pycord, meaning breaking changes have occurred.
-Although a much larger amount than v2, v3 introduces a new paradigm for Pycord bots and
-ensures code quality for developers (of the library.)
-
-Every aspect of v2 has been remade and improved upon to make your development experience
-quicker, easier, and mucho gracias. Breaking changes are everywhere, from typings to
-Python version increases.
-
-That being said, if you want to move your bot to v3 you'll have to rewrite it. We've
-made sure to make the rewriting experience easier though, providing less boilerplate
-than v2 and letting you do anything in smaller snippets.
-
-## Making Good Bots Happen
-
-v3 is made to be the best experience for both
-developers and users, providing a fast
-experience for users and a good interface for that for the developer.
-
-We've adopted a modern interface inspired by
-Hikari to form an interface easier, smarter, and objectively better than discord.py.
-
-Instead of following a mix of object-instance paradigm (in this case think of cog-bot)
-we're following an instance-only paradigm completely restructuring old features and stripping useless parts from them.
-Overall a cleanup of v2, and new better interface.
-
-## Code Example
-
-A small code snippet of a basic Pycord v3 bot.
+Example of usage of many of Discord's biggest features.
 
 ```py
 import pycord
 
+bot = pycord.Bot(pycord.Intents())
 
-bot = pycord.Bot(intents=pycord.Intents())
+# listen for when the bot becomes ready
+@bot.listen(pycord.Ready)
+async def on_ready() -> None:
+    print('Bot is ready!')
 
+# give a high five to a user
+@bot.command()
+async def highfive(ctx: pycord.Context) -> None:
+    # send a response to the command
+    await ctx.send(':raised_hand: High Five!')
 
-@bot.listen()
-async def on_ready(event: pycord.Ready) -> None:
-    print('I am ready!')
+# this is only for certain things, which we allow the builder api for
+view = pycord.View().url_button('Google it!', 'https://google.com')
 
+# a command which sends a button to go to Google.
+@bot.command()
+async def google(ctx: pycord.Context) -> None:
+    iview = view()
+    await ctx.send('Just go to Google!', view=iview)
 
+# REMEMBER TO CHANGE THIS!
 bot.run('token')
 ```
+
+## Breaking Changes
+
+- Cogs
+
+    Restructured into Gears.
+
+    Example of Gears:
+        
+    ```py
+        from pycord.ext import gears
+
+        gear = gears.Gear(__name__, BaseContext())
+
+        # somewhere else...
+        gear.attach(bot)
+    ```
+- Commands
+
+    Restructured to provide a better command experience.
+
+    Example of the new command system:
+        
+    ```py
+        @bot.command()
+        async def push(ctx: pycord.Context, user: pycord.User) -> None:
+            await ctx.send(f'{ctx.user.mention} pushed {user.mention}!')
+    ```

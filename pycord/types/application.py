@@ -70,3 +70,4 @@ class Application(TypedDict):
     tags: NotRequired[list[str]]
     install_params: InstallParams
     custom_install_url: NotRequired[str]
+    role_connections_verification_url: NotRequired[str]

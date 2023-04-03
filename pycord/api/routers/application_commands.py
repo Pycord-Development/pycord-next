@@ -20,6 +20,11 @@
 # SOFTWARE
 from ...snowflake import Snowflake
 from ...types import ATYPE, ApplicationCommandOption
+from ...types.application_commands import (
+    ApplicationCommand,
+    ApplicationCommandPermissions,
+    GuildApplicationCommandPermissions,
+)
 from ...types.interaction import InteractionResponse
 from ...undefined import UNDEFINED, UndefinedType
 from ...utils import remove_undefined
@@ -228,6 +233,77 @@ class ApplicationCommands(BaseRouter):
             ),
         )
 
+    async def bulk_overwrite_global_commands(
+        self, application_id: Snowflake, application_commands: list[ApplicationCommand]
+    ) -> list[ApplicationCommand]:
+        await self.request(
+            'PUT',
+            Route(
+                '/applications/{application_id}/commands', application_id=application_id
+            ),
+            application_commands,
+        )
+
+    async def bulk_overwrite_guild_commands(
+        self,
+        application_id: Snowflake,
+        guild_id: Snowflake,
+        application_commands: list[ApplicationCommand],
+    ) -> list[ApplicationCommand]:
+        await self.request(
+            'PUT',
+            Route(
+                '/applications/{application_id}/guilds/{guild_id}/commands',
+                application_id=application_id,
+                guild_id=guild_id,
+            ),
+            application_commands,
+        )
+
+    async def get_guild_application_command_permissions(
+        self, application_id: Snowflake, guild_id: Snowflake
+    ):
+        return await self.request(
+            'GET',
+            Route(
+                '/applications/{application_id}/guilds/{guild_id}/commands/permissions',
+                guild_id=guild_id,
+                application_id=application_id,
+            ),
+        )
+
+    async def get_application_command_permissions(
+        self, application_id: Snowflake, guild_id: Snowflake, command_id: Snowflake
+    ):
+        return await self.request(
+            'GET',
+            Route(
+                '/applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions',
+                guild_id=guild_id,
+                application_id=application_id,
+                command_id=command_id,
+            ),
+        )
+
+    async def edit_application_command_permissions(
+        self,
+        application_id: Snowflake,
+        guild_id: Snowflake,
+        command_id: Snowflake,
+        permissions: list[ApplicationCommandPermissions],
+    ) -> GuildApplicationCommandPermissions:
+        return await self.request(
+            'PUT',
+            Route(
+                '/applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions',
+                application_id=application_id,
+                guild_id=guild_id,
+                command_id=command_id,
+            ),
+            {'permissions': permissions},
+        )
+
+    # interactions
     async def create_interaction_response(
         self,
         interaction_id: Snowflake,
@@ -242,4 +318,16 @@ class ApplicationCommands(BaseRouter):
                 interaction_token=interaction_token,
             ),
             data=response,
+        )
+
+    async def get_original_interaction_response(
+        self, interaction_id: Snowflake, interaction_token: str
+    ) -> InteractionResponse:
+        await self.request(
+            'GET',
+            Route(
+                '/interactions/{interaction_id}/{interaction_token}/messages/@original',
+                interaction_id=interaction_id,
+                interaction_token=interaction_token,
+            ),
         )

@@ -18,14 +18,37 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from ...errors import PycordException
+from ...snowflake import Snowflake
+from ...types import AUDIT_LOG_EVENT_TYPE, AuditLog
+from ...undefined import UNDEFINED, UndefinedType
+from ...utils import remove_undefined
+from ..route import Route
+from .base import BaseRouter
 
-__all__ = ['PagerException', 'NoMorePages']
 
-
-class PagerException(PycordException):
-    ...
-
-
-class NoMorePages(PagerException):
-    ...
+class AuditLogs(BaseRouter):
+    async def get_guild_audit_log(
+        self,
+        guild_id: Snowflake,
+        *,
+        user_id: Snowflake | UndefinedType = UNDEFINED,
+        action_type: AUDIT_LOG_EVENT_TYPE | UndefinedType = UNDEFINED,
+        before: Snowflake | UndefinedType = UNDEFINED,
+        after: Snowflake | UndefinedType = UNDEFINED,
+        limit: int | UndefinedType = UNDEFINED,
+    ) -> AuditLog:
+        params = {
+            'user_id': user_id,
+            'action_type': action_type,
+            'before': before,
+            'after': after,
+            'limit': limit,
+        }
+        return await self.request(
+            'GET',
+            Route(
+                '/guilds/{guild_id}/audit-logs',
+                guild_id=guild_id,
+            ),
+            query_params=remove_undefined(params),
+        )

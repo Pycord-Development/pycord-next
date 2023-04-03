@@ -96,12 +96,22 @@ class MessageCreate(Event):
 class MessageUpdate(Event):
     _name = 'MESSAGE_UPDATE'
 
-    async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        message = Message(data, state)
+    previous: Message | None
+    message: Message
 
-        self.previous: Message = await (state.store.sift('messages')).save(
-            [message.channel_id], message.id, message
+    async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
+        self.previous: Message | None = await (state.store.sift('messages')).get_one(
+            [int(data['channel_id'])], int(data['id'])
         )
+        if self.previous is None:
+            message = Message(data, state)
+            await state.store.sift('messages').insert(
+                [message.channel_id], message.id, message
+            )
+        else:
+            message: Message = self.previous
+            message._modify_from_cache(**data)
+
         self.message = message
 
 
@@ -109,10 +119,13 @@ class MessageDelete(Event):
     _name = 'MESSAGE_DELETE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        self.message_id = Snowflake('id')
-        self.channel_id = Snowflake('channel_id')
+        self.message_id: Snowflake = Snowflake(data['id'])
+        self.channel_id: Snowflake = Snowflake(data['channel_id'])
+        self.guild_id: Snowflake | None = (
+            Snowflake(data['guild_id']) if 'guild_id' in data else None
+        )
 
-        self.message: Message = await (state.store.sift('messages')).discard(
+        self.message: Message | None = await (state.store.sift('messages')).discard(
             [self.channel_id], self.message_id
         )
 

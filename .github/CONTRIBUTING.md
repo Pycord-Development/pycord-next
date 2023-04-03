@@ -1,4 +1,4 @@
-# Pycord-v3 Contribution Guide
+# Pycord v3 Contribution Guide
 
 This is an extremely basic guide for contributing to the repo.
 
@@ -27,6 +27,52 @@ However, before you create your PR, please ensure you've done a couple of things
    1. Make sure your code is as clean as possible and looks similar to the rest of the codebase. This includes spacing, function signatures/definitions, and commenting/documentation format.
    2. Ensure that your opened pull request follows the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/#summary) styling guide. This helps people understand the purpose of the PR, and how it should be reviewed.
 3. If possible, try to use our pre-commit hooks to format your code. These hooks format the code before you push it to GitHub, and could vastly improve your own experience by not needing to use other formatting commands.
+
+## Appending to the Changelog
+
+Pycord tries to keep an up-to-date changelog of every change to ensure easy tracking of breaking or non-breaking changes.
+
+This does mean however that you need to changelog every pull request you make.
+We try to make this as easy as possible to ensure *you* the developer can easily make and get a pull request merged.
+
+Firstly, if you haven't already, download Towncrier (the tool we use for changelog upkeep):
+
+```sh
+pip install -U towncrier
+```
+
+Now, you are ready to create the house of your change, its file. To start:
+
+```sh
+towncrier create {pull_request_shortname}.{pull_request_number}.{pull_request_type}
+```
+
+This command means multiple things, in which:
+
+- `pull_request_shortname`: the name of your PR lowercased and in the shortest form possible.
+- `pull_request_number`: the pull request your making this for. i.e.: #178
+- `pull_request_type`: the type of pull request (doc, feature, removal, bug, trivial, etc).
+
+Once you've formed that, you can make the content of your changelog. There's are not too much rules about what you *can* and *can't*
+put in this. Of course, they have to be relevant to the pull request, however, they do have to have one general form:
+
+```md
+[#{pull_request_number}](https://github.com/pycord/pycord-v3/issues/{pull_request_number}): {pull_request_name}
+
+{Details on what this pull request does, and why}
+
+- {An exact}
+- {List of}
+- {Changes}
+```
+
+This only introduces one notable variable: `{pull_request_name}`.
+
+This variable is simply a version of your pull request name without Conventional Commits. Such as:
+
+- "Adds Towncrier"
+- "Implement Modals"
+- "Switch to Ruff," etc..
 
 ## Where can I get more help with my issue/PR?
 

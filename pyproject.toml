@@ -11,3 +11,56 @@ combine_star = true
 exclude_lines = [
     "if TYPE_CHECKING:",
 ]
+
+[tool.towncrier]
+# For finding the __version__
+package = "pycord"
+package_dir = "pycord"
+# For writing into the correct file
+filename = "CHANGELOG.md"
+start_string = "<!-- tc.s -->\n"
+# For finding the news fragments
+directory = "changes/"
+
+# For rendering properly for this project
+title_format = "## [{version}](https://github.com/pycord/pycord-v3/tree/{version}) ({project_date})"
+underlines = ["", "", ""]
+template = "templates/towncrier.jinja"
+
+# Grouping of entries, within our changelog
+type = [
+  { name = "Deprecations and Removals", directory = "removal",  showcontent = true  },
+  { name = "Features",                  directory = "feature",  showcontent = true  },
+  { name = "Bug Fixes",                 directory = "bug",     showcontent = true  },
+  { name = "Documentation",             directory = "doc",      showcontent = true  },
+  { name = "Etcetera",                  directory = "etc",      showcontent = false },
+  { name = "Trivial Changes",           directory = "trivial",  showcontent = false },
+]
+
+[tool.mypy]
+strict = false
+check_untyped_defs = false
+incremental = true
+namespace_packages = true
+no_implicit_optional = true
+pretty = true
+python_version = 3.11
+show_column_numbers = true
+show_error_codes = true
+show_error_context = true
+
+# allowed
+allow_untyped_globals = false
+allow_redefinition = true
+
+# disallowed
+disallow_untyped_decorators = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+
+# warnings
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true

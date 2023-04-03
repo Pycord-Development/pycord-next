@@ -47,6 +47,8 @@ class InstallParams:
     permissions: :class:`.flags.Permissions`
     """
 
+    __slots__ = ('scopes', 'permissions')
+
     def __init__(self, data: DiscordInstallParams) -> None:
         self.scopes: list[SCOPE] = data['scopes']
         self.permissions: Permissions = Permissions.from_value(data['permissions'])
@@ -95,6 +97,29 @@ class Application:
     custom_install_url: :class:`str` | :class:`.undefined.UndefinedType`
         The Custom Installation URL of this Application
     """
+
+    __slots__ = (
+        '_cover_image',
+        'id',
+        'name',
+        'icon',
+        'description',
+        'rpc_origins',
+        'bot_public',
+        'bot_require_code_grant',
+        'terms_of_service_url',
+        'privacy_policy_url',
+        'owner',
+        'verify_key',
+        'team',
+        'guild_id',
+        'primary_sku_id',
+        'slug',
+        'flags',
+        'tags',
+        'install_params',
+        'custom_install_url',
+    )
 
     def __init__(self, data: DiscordApplication, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])

@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Copyright (c) 2022-present Pycord Development
+# Copyright (c) 2021-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,37 +18,30 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-"""Implementation of Discord's Snowflake ID"""
-
-from __future__ import annotations
-
-from datetime import datetime, timezone
-
-from .utils import DISCORD_EPOCH
 
 
-class Snowflake(int):
-    @property
-    def timestamp(self) -> datetime:
-        return datetime.fromtimestamp(
-            ((self >> 22) + DISCORD_EPOCH) / 1000, tz=timezone.utc
-        )
+import typing
+from typing import TYPE_CHECKING, Any
 
-    @property
-    def worker_id(self) -> int:
-        return (self & 0x3E0000) >> 17
+from .types.snowflake import Snowflake
 
-    @property
-    def process_id(self) -> int:
-        return (self & 0x1F000) >> 12
+if TYPE_CHECKING:
+    from .state import State
 
-    @property
-    def increment(self) -> int:
-        return self & 0xFFF
 
-    def __hash__(self) -> int:
-        return self >> 22
+class Typing:
+    __slots__ = ('_state', '__channel_id')
 
-    @classmethod
-    def from_datetime(cls, dt: datetime) -> Snowflake:
-        return cls((int(dt.timestamp()) - DISCORD_EPOCH) << 22)
+    def __init__(self, channel_id: Snowflake, state: 'State') -> None:
+        self._state = state
+        self.__channel_id = channel_id
+
+    async def trigger(self) -> None:
+        await self._state.http.trigger_typing_indicator(self.__channel_id)
+
+    async def __aenter__(self) -> typing.Self:
+        await self.trigger()
+        return self
+
+    async def __aexit__(self, exc_t: Any, exc_v: Any, exc_tb: Any) -> None:
+        await self.trigger()

@@ -42,6 +42,24 @@ class Webhook:
         self.token = token
         self._http = HTTPClient()
 
+    async def send(
+        self,
+        content: str | UndefinedType = UNDEFINED,
+        username: str | UndefinedType = UNDEFINED,
+        tts: bool | UndefinedType = UNDEFINED,
+        embeds: list[Embed] | UndefinedType = UNDEFINED,
+        sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
+        flags: int | UndefinedType = UNDEFINED,
+    ):
+        await self.execute(
+            content=content,
+            username=username,
+            tts=tts,
+            embeds=embeds,
+            sticker_ids=sticker_ids,
+            flags=flags,
+        )
+
     async def execute(
         self,
         content: str | UndefinedType = UNDEFINED,

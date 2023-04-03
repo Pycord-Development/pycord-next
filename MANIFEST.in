@@ -4,17 +4,19 @@ include requirements.txt
 include pycord/bin/*.dll
 include pycord/py.typed
 include pycord/banner.txt
+include pycord/ibanner.txt
 
 prune .github
 prune docs
 prune examples
 prune tests
+prune news
+prune templates
 exclude pycord/bin/COPYING
 exclude .flake8
 exclude .gitignore
 exclude .pre-commit-config.yaml
 exclude .prettierrc
 exclude .readthedocs.yml
-exclude CHANGELOG.md
 exclude FUNDING.yml
 exclude requirements-dev.txt

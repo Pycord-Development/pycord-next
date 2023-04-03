@@ -30,6 +30,8 @@ packages = [
     'pycord',
     'pycord.ui',
     'pycord.types',
+    'pycord.events',
+    'pycord.state',
     'pycord.api',
     'pycord.api.execution',
     'pycord.gateway',
@@ -50,8 +52,8 @@ extra_requires = {
         'faust-cchardet~=2.1.16',  # cchardet for python 3.11+
     ],
     'docs': [
-        'sphinx==5.3.0',
-        'pydata-sphinx-theme~=0.12',
+        'sphinx==6.1.3',
+        'pydata-sphinx-theme~=0.13',
     ],
 }
 

@@ -200,8 +200,8 @@ class GuildMemberAdd(_GuildAttr):
     _name = 'GUILD_MEMBER_ADD'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        member = Member(data, state)
         guild_id = Snowflake(data['guild_id'])
+        member = Member(data, state, guild_id=guild_id)
         if state.cache_guild_members:
             await (state.store.sift('members')).insert(
                 [guild_id], member.user.id, member
@@ -218,8 +218,8 @@ class GuildMemberUpdate(_GuildAttr):
     _name = 'GUILD_MEMBER_UPDATE'
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        member = Member(data, state)
         guild_id = Snowflake(data['guild_id'])
+        member = Member(data, state, guild_id=guild_id)
 
         res = await (state.store.sift('members')).save(
             [guild_id], member.user.id, member
@@ -259,7 +259,8 @@ class GuildMemberChunk(Event):
         ms: list[Member] = [
             await (state.store.sift('members')).save([guild_id], member.user.id, member)
             for member in (
-                Member(member_data, state) for member_data in data['members']
+                Member(member_data, state, guild_id=guild_id)
+                for member_data in data['members']
             )
         ]
         self.members = ms

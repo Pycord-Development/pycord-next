@@ -21,16 +21,20 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, Any, Generic, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Generic, Type, TypeVar
 
 from ...commands import Command, Group
+from ...commands.application.command import ApplicationCommand
+from ...events.event_manager import Event
 from ...types import AsyncFunc
+from ...undefined import UNDEFINED, UndefinedType
 
 if TYPE_CHECKING:
     from ...bot import Bot
 
 
 T = TypeVar('T')
+AF = TypeVar('AF', AsyncFunc)
 
 
 class BaseContext(SimpleNamespace):
@@ -58,12 +62,17 @@ class Gear(Generic[ContextT]):
 
     ctx: ContextT
 
-    def __init__(self, name: str, ctx: ContextT) -> None:
+    __slots__ = ('_listener_functions', '_commands', 'name', 'ctx', 'bot')
+
+    def __init__(self, name: str, ctx: ContextT | None = None) -> None:
         self.name = name
-        self._listener_functions: dict[str, list[AsyncFunc]] = {}
+        self._listener_functions: dict[Type[Event], list[AsyncFunc]] = {}
         self.bot: Bot
         self._commands: list[Command | Group] = []
-        self.ctx = ctx
+        if ctx is None:
+            self.ctx = BaseContext()
+        else:
+            self.ctx = ctx
 
     async def on_attach(self, *args, **kwargs) -> None:
         ...
@@ -87,7 +96,12 @@ class Gear(Generic[ContextT]):
 
         return wrapper
 
-    def command(self, name: str, cls: Type[Command], **kwargs: Any) -> T:
+    def command(
+        self,
+        name: str | UndefinedType = UNDEFINED,
+        cls: Type[T] = ApplicationCommand,
+        **kwargs: Any,
+    ) -> T:
         """
         Create a command within the Gear
 
@@ -101,14 +115,14 @@ class Gear(Generic[ContextT]):
             The kwargs to entail onto the instantiated command.
         """
 
-        def wrapper(func: T) -> T:
-            command = cls(func, name, None, **kwargs)
+        def wrapper(func: AsyncFunc) -> Command:
+            command = cls(func, state=None, name=name, **kwargs)
             self._commands.append(command)
             return command
 
         return wrapper
 
-    def group(self, name: str, cls: Type[Group], **kwargs: Any) -> T:
+    def group(self, name: str, cls: Type[Group], **kwargs: Any) -> Callable[[AF], AF]:
         """
         Create a brand-new Group of Commands
 
@@ -122,8 +136,11 @@ class Gear(Generic[ContextT]):
             The kwargs to entail onto the instantiated group.
         """
 
-        def wrapper(func: T) -> T:
-            r = cls(func, name, None, **kwargs)
+        def wrapper(func: AF) -> AF:
+            # I know this partially ruins typing, but
+            # Gears are loaded before events are taken in, so
+            # theoretically nothing can break with state being None.
+            r = cls(func, name, None, **kwargs)  # type: ignore
             self._commands.append(r)
             return r
 
@@ -142,7 +159,7 @@ class Gear(Generic[ContextT]):
 
         for name, funcs in self._listener_functions.items():
             for func in funcs:
-                bot._state.emitter.add_listener(name, func)
+                bot._state.event_manager.add_event(name, func)
 
         for cmd in self._commands:
             if isinstance(cmd, Command):

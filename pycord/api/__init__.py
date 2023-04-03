@@ -8,26 +8,37 @@ Implementation of the Discord API.
 """
 import logging
 import sys
-from typing import Any
+from typing import Any, Sequence
 
-from aiohttp import BasicAuth, ClientSession, __version__ as aiohttp_version
+from aiohttp import BasicAuth, ClientSession, FormData, __version__ as aiohttp_version
 
 from pycord._about import __version__
 
 from .. import utils
 from ..errors import BotException, Forbidden, HTTPException, InternalError, NotFound
+from ..file import File
 from ..utils import dumps
 from .execution import Executer
-from .json_decoder import JSONDecoder
 from .route import BaseRoute, Route
 from .routers import *
+from .routers.scheduled_events import ScheduledEvents
 
-__all__ = ['Route', 'BaseRoute', 'HTTPClient']
+__all__: Sequence[str] = ('Route', 'BaseRoute', 'HTTPClient')
 
 _log = logging.getLogger(__name__)
 
 
-class HTTPClient(ApplicationCommands, Messages):
+class HTTPClient(
+    ApplicationCommands,
+    ApplicationRoleConnections,
+    AuditLogs,
+    AutoModeration,
+    Channels,
+    Emojis,
+    Guilds,
+    Messages,
+    ScheduledEvents,
+):
     def __init__(
         self,
         token: str | None = None,
@@ -37,7 +48,6 @@ class HTTPClient(ApplicationCommands, Messages):
         verbose: bool = False,
     ) -> None:
         self.base_url = base_url
-        self._json_decoder = JSONDecoder()
         self._proxy = proxy
         self._proxy_auth = proxy_auth
         self._headers = {
@@ -64,10 +74,12 @@ class HTTPClient(ApplicationCommands, Messages):
         method: str,
         route: BaseRoute,
         data: dict[str, Any] | None = None,
+        files: list[File] | None = None,
+        form: list[dict[str, Any]] | None = None,
         *,
         reason: str | None = None,
         query_params: dict[str, str] | None = None,
-    ) -> str | dict[str, Any] | bytes:
+    ) -> REQUEST_RETURN:
         endpoint = route.merge(self.base_url)
 
         if self._session is None:
@@ -79,9 +91,25 @@ class HTTPClient(ApplicationCommands, Messages):
             headers['X-Audit-Log-Reason'] = reason
 
         if data:
-            # TODO: Support msgspec
             data: str = dumps(data=data)
             headers.update({'Content-Type': 'application/json'})
+
+        if form and data:
+            form.append({'name': 'payload_json', 'value': data})
+
+        if files:
+            if not form:
+                form = []
+
+            for idx, file in enumerate(files):
+                form.append(
+                    {
+                        'name': f'files[{idx}]',
+                        'value': file.file.read(),
+                        'filename': file.filename,
+                        'content_type': 'application/octet-stream',
+                    }
+                )
 
         _log.debug(f'Requesting to {endpoint} with {data}, {headers}')
 
@@ -90,7 +118,16 @@ class HTTPClient(ApplicationCommands, Messages):
                 _log.debug(f'Pausing request to {endpoint}: Found rate limit executer')
                 await executer.wait()
 
-        for _ in range(5):
+        for try_ in range(5):
+            if files:
+                for file in files:
+                    file.reset(try_)
+
+            if form:
+                data = FormData(quote_fields=False)
+                for params in form:
+                    data.add_field(**params)
+
             r = await self._session.request(
                 method,
                 endpoint,
@@ -102,7 +139,7 @@ class HTTPClient(ApplicationCommands, Messages):
             )
             _log.debug(f'Received back {await r.text()}')
 
-            data = await utils._text_or_json(cr=r, self=self)
+            data = await utils._text_or_json(cr=r)
 
             if r.status == 429:
                 _log.debug(f'Request to {endpoint} failed: Request returned rate limit')

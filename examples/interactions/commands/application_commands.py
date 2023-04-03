@@ -6,23 +6,19 @@ bot = pycord.Bot(intents=pycord.Intents())
 # the guild id to deploy on. Often used for developing to
 # avoid having to wait the extraneous amount of time Discord has for global
 # commands
-GUILD_ID: int = 0
+GUILD_ID: int | pycord.UndefinedType = pycord.UNDEFINED
 
 
 # make a chat input command which
 # is named favorite and that displays
 # an autocompleted list of animes to pick from
-@bot.command(
-    description='Pick which one is your favorite anime',
-    guild_id=GUILD_ID,
-)
+@bot.command(guild_id=GUILD_ID)
 # make a function for what to do once the user
 # has completed their input.
 # this has the option anime, displayed as a Parameter,
 # which is parsed by Pycord to give you the information the user gave.
 async def favorite(
-    inter: pycord.Interaction,
-
+    ctx: pycord.Context,
     # The name of this option,
     # can be set to anything but
     # try to keep it short
@@ -30,7 +26,7 @@ async def favorite(
         # The description for this option,
         # this is a longer version of name displaying
         # more detail and technicalities
-        'Your favorite Anime Show',
+        description='Your favorite Anime Show',
         # this just sets it so the user cannot proceed without
         # entering this option
         required=True,
@@ -49,24 +45,24 @@ async def favorite(
         ],
     ),
 ):
+    """Pick which one is your favorite anime"""
+
     # checks the value of the int
     # and if it matches up to an anime,
     # it responds with a custom response.
     match anime:
         case 'Attack on Titan':
-            await inter.resp.send('It seems like you like Attack on Titan, Nice!')
+            await ctx.send('It seems like you like Attack on Titan, Nice!')
         case "JoJo's Bizzare Adventure":
-            await inter.resp.send(
-                "おにいちゃんありがとう. You like JoJo's Bizzare Adventure. Nice!"
-            )
+            await ctx.send("おにいちゃんありがとう. You like JoJo's Bizzare Adventure. Nice!")
         case 'Cowboy Bebop':
-            await inter.resp.send('良い！あなたはカウボーイビバップが好きです')
+            await ctx.send('良い！あなたはカウボーイビバップが好きです')
         case 'Hunter x Hunter':
-            await inter.resp.send(
+            await ctx.send(
                 'I ran out of responses... Well anyway, you like Hunter x Hunter which is Nice!'
             )
         case 'Spy x Family':
-            await inter.resp.send(
+            await ctx.send(
                 'I have a friend which really likes this anime, '
                 "it's good seeing you like it too. Of course, Spy x Family!"
             )

@@ -46,6 +46,7 @@ class Emoji:
     )
 
     def __init__(self, data: DiscordEmoji, state: State) -> None:
+        self._state: State = state
         self.id: Snowflake | None = (
             Snowflake(data['id']) if data['id'] is not None else None
         )

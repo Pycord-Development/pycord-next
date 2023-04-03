@@ -47,3 +47,8 @@ class Invite(TypedDict):
     approximate_member_count: NotRequired[int]
     expires_at: NotRequired[str]
     guild_scheduled_event: NotRequired[GuildScheduledEvent]
+
+
+class PartialInvite(TypedDict):
+    code: str | None
+    uses: int
