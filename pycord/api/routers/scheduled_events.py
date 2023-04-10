@@ -23,7 +23,7 @@ from typing import Literal
 from ...file import File
 from ...snowflake import Snowflake
 from ...types import PRIVACY_LEVEL, EntityMetadata, GuildScheduledEvent
-from ...undefined import UNDEFINED, UndefinedType
+from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined, to_datauri
 from ..route import Route
 from .base import BaseRouter
@@ -31,7 +31,7 @@ from .base import BaseRouter
 
 class ScheduledEvents(BaseRouter):
     async def list_scheduled_events(
-        self, guild_id: Snowflake, with_user_count: bool | UndefinedType = UNDEFINED
+        self, guild_id: Snowflake, with_user_count: bool | MissingEnum = MISSING
     ) -> list[GuildScheduledEvent]:
         return await self.request(
             'GET',
@@ -45,12 +45,12 @@ class ScheduledEvents(BaseRouter):
         name: str,
         scheduled_start_time: str,
         entity_type: Literal[1, 2, 3],
-        channel_id: Snowflake | UndefinedType = UNDEFINED,
-        entity_metadata: EntityMetadata | UndefinedType = UNDEFINED,
-        privacy_level: PRIVACY_LEVEL | UndefinedType = UNDEFINED,
-        scheduled_end_time: str | UndefinedType = UNDEFINED,
-        description: str | UndefinedType = UNDEFINED,
-        image: File | UndefinedType = UNDEFINED,
+        channel_id: Snowflake | MissingEnum = MISSING,
+        entity_metadata: EntityMetadata | MissingEnum = MISSING,
+        privacy_level: PRIVACY_LEVEL | MissingEnum = MISSING,
+        scheduled_end_time: str | MissingEnum = MISSING,
+        description: str | MissingEnum = MISSING,
+        image: File | MissingEnum = MISSING,
     ) -> GuildScheduledEvent:
         fields = remove_undefined(
             name=name,

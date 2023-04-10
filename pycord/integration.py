@@ -34,7 +34,7 @@ from .types import (
     Integration as DiscordIntegration,
     IntegrationApplication as DiscordIntegrationApplication,
 )
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -53,8 +53,8 @@ class IntegrationApplication:
         self.name: str = data['name']
         self.icon: str | None = data['icon']
         self.description: str | None = data['description']
-        self.bot: User | UndefinedType = (
-            User(data['bot'], state) if data.get('bot') is not None else UNDEFINED
+        self.bot: User | MissingEnum = (
+            User(data['bot'], state) if data.get('bot') is not None else MISSING
         )
 
 
@@ -63,36 +63,36 @@ class Integration:
         self.id: Snowflake = Snowflake(data['id'])
         self.name: str = data['name']
         self.type: INTEGRATION_TYPE = data['type']
-        self.enabled: bool | UndefinedType = data.get('enabled', UNDEFINED)
-        self.syncing: bool | UndefinedType = data.get('syncing', UNDEFINED)
-        self.role_id: Snowflake | UndefinedType = (
-            Snowflake(data['role_id']) if data.get('role_id') else UNDEFINED
+        self.enabled: bool | MissingEnum = data.get('enabled', MISSING)
+        self.syncing: bool | MissingEnum = data.get('syncing', MISSING)
+        self.role_id: Snowflake | MissingEnum = (
+            Snowflake(data['role_id']) if data.get('role_id') else MISSING
         )
-        self.enable_emoticons: bool | UndefinedType = data.get(
-            'enable_emoticons', UNDEFINED
+        self.enable_emoticons: bool | MissingEnum = data.get(
+            'enable_emoticons', MISSING
         )
-        self.expire_behavior: INTEGRATION_EXPIRE_BEHAVIOR | UndefinedType = data.get(
-            'expire_behavior', UNDEFINED
+        self.expire_behavior: INTEGRATION_EXPIRE_BEHAVIOR | MissingEnum = data.get(
+            'expire_behavior', MISSING
         )
-        self.expire_grace_period: int | UndefinedType = data.get(
-            'expire_grace_period', UNDEFINED
+        self.expire_grace_period: int | MissingEnum = data.get(
+            'expire_grace_period', MISSING
         )
-        self.user: User | UndefinedType = (
-            User(data['user'], state) if data.get('user') is not None else UNDEFINED
+        self.user: User | MissingEnum = (
+            User(data['user'], state) if data.get('user') is not None else MISSING
         )
         self.account: Account = Account(data['account'])
-        self.synced_at: UndefinedType | datetime = (
+        self.synced_at: MissingEnum | datetime = (
             datetime.fromisoformat(data['synced_at'])
             if data.get('synced_at') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.subscriber_count: int | UndefinedType = data.get(
-            'subscriber_count', UNDEFINED
+        self.subscriber_count: int | MissingEnum = data.get(
+            'subscriber_count', MISSING
         )
-        self.revoked: bool | UndefinedType = data.get('revoked', UNDEFINED)
-        self.application: Application | UndefinedType = (
+        self.revoked: bool | MissingEnum = data.get('revoked', MISSING)
+        self.application: Application | MissingEnum = (
             IntegrationApplication(data['application'], state)
             if data.get('application') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.scopes: list[SCOPE] | UndefinedType = data.get('scopes', UNDEFINED)
+        self.scopes: list[SCOPE] | MissingEnum = data.get('scopes', MISSING)

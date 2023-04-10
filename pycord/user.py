@@ -28,7 +28,7 @@ from .enums import PremiumType
 from .flags import UserFlags
 from .snowflake import Snowflake
 from .types import LOCALE, User as DiscordUser
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State
@@ -40,38 +40,38 @@ class User:
         self.name: str = data['username']
         self.discriminator: str = data['discriminator']
         self._avatar: str | None = data['avatar']
-        self.bot: bool | UndefinedType = data.get('bot', UNDEFINED)
-        self.system: bool | UndefinedType = data.get('system', UNDEFINED)
-        self.mfa_enabled: bool | UndefinedType = data.get('mfa_enabled', UNDEFINED)
-        self._banner: UndefinedType | str | None = data.get('banner', UNDEFINED)
-        self._accent_color: UndefinedType | int | None = data.get(
-            'accent_color', UNDEFINED
+        self.bot: bool | MissingEnum = data.get('bot', MISSING)
+        self.system: bool | MissingEnum = data.get('system', MISSING)
+        self.mfa_enabled: bool | MissingEnum = data.get('mfa_enabled', MISSING)
+        self._banner: MissingEnum | str | None = data.get('banner', MISSING)
+        self._accent_color: MissingEnum | int | None = data.get(
+            'accent_color', MISSING
         )
-        self.accent_color: UndefinedType | Color | None = (
+        self.accent_color: MissingEnum | Color | None = (
             Color(self._accent_color)
-            if self._accent_color not in [UNDEFINED, None]
+            if self._accent_color not in [MISSING, None]
             else self._accent_color
         )
-        self.locale: UndefinedType | LOCALE = data.get('locale', UNDEFINED)
-        self.verified: UndefinedType | bool = data.get('verified', UNDEFINED)
-        self.email: str | None | UndefinedType = data.get('email', UNDEFINED)
-        self._flags: UndefinedType | int = data.get('flags', UNDEFINED)
-        self.flags: UndefinedType | UserFlags = (
+        self.locale: MissingEnum | LOCALE = data.get('locale', MISSING)
+        self.verified: MissingEnum | bool = data.get('verified', MISSING)
+        self.email: str | None | MissingEnum = data.get('email', MISSING)
+        self._flags: MissingEnum | int = data.get('flags', MISSING)
+        self.flags: MissingEnum | UserFlags = (
             UserFlags.from_value(self._flags)
-            if self._flags is not UNDEFINED
-            else UNDEFINED
+            if self._flags is not MISSING
+            else MISSING
         )
-        self._premium_type: UndefinedType | int = data.get('premium_type', UNDEFINED)
-        self.premium_type: PremiumType | UndefinedType = (
+        self._premium_type: MissingEnum | int = data.get('premium_type', MISSING)
+        self.premium_type: PremiumType | MissingEnum = (
             PremiumType(self._premium_type)
-            if self._premium_type is not UNDEFINED
-            else UNDEFINED
+            if self._premium_type is not MISSING
+            else MISSING
         )
-        self._public_flags: UndefinedType | int = data.get('public_flags', UNDEFINED)
-        self.public_flags: UndefinedType | UserFlags = (
+        self._public_flags: MissingEnum | int = data.get('public_flags', MISSING)
+        self.public_flags: MissingEnum | UserFlags = (
             UserFlags.from_value(self._public_flags)
-            if self._public_flags is not UNDEFINED
-            else UNDEFINED
+            if self._public_flags is not MISSING
+            else MISSING
         )
 
     @cached_property

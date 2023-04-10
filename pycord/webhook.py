@@ -28,7 +28,7 @@ from .enums import WebhookType
 from .guild import Guild
 from .snowflake import Snowflake
 from .types import Webhook as DiscordWebhook
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 from .utils import remove_undefined
 
@@ -44,12 +44,12 @@ class Webhook:
 
     async def send(
         self,
-        content: str | UndefinedType = UNDEFINED,
-        username: str | UndefinedType = UNDEFINED,
-        tts: bool | UndefinedType = UNDEFINED,
-        embeds: list[Embed] | UndefinedType = UNDEFINED,
-        sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
-        flags: int | UndefinedType = UNDEFINED,
+        content: str | MissingEnum = MISSING,
+        username: str | MissingEnum = MISSING,
+        tts: bool | MissingEnum = MISSING,
+        embeds: list[Embed] | MissingEnum = MISSING,
+        sticker_ids: list[Snowflake] | MissingEnum = MISSING,
+        flags: int | MissingEnum = MISSING,
     ):
         await self.execute(
             content=content,
@@ -62,14 +62,14 @@ class Webhook:
 
     async def execute(
         self,
-        content: str | UndefinedType = UNDEFINED,
-        username: str | UndefinedType = UNDEFINED,
-        tts: bool | UndefinedType = UNDEFINED,
-        embeds: list[Embed] | UndefinedType = UNDEFINED,
-        sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
-        flags: int | UndefinedType = UNDEFINED,
+        content: str | MissingEnum = MISSING,
+        username: str | MissingEnum = MISSING,
+        tts: bool | MissingEnum = MISSING,
+        embeds: list[Embed] | MissingEnum = MISSING,
+        sticker_ids: list[Snowflake] | MissingEnum = MISSING,
+        flags: int | MissingEnum = MISSING,
     ):
-        if embeds is not UNDEFINED:
+        if embeds is not MISSING:
             embeds = [embed._to_data() for embed in embeds]
 
         return await self._http.request(
@@ -94,30 +94,30 @@ class GuildWebhook:
     def __init__(self, data: DiscordWebhook, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self.type: WebhookType = WebhookType(data['type'])
-        self.guild_id: Snowflake | None | UndefinedType = (
+        self.guild_id: Snowflake | None | MissingEnum = (
             Snowflake(data['guild_id'])
             if data.get('guild_id') is not None
-            else data.get('guild_id', UNDEFINED)
+            else data.get('guild_id', MISSING)
         )
-        self.channel_id: Snowflake | None | UndefinedType = (
+        self.channel_id: Snowflake | None | MissingEnum = (
             Snowflake(data['channel_id'])
             if data.get('channel_id') is not None
             else None
         )
-        self.user: User | UndefinedType = (
-            User(data['user'], state) if data.get('user') is not None else UNDEFINED
+        self.user: User | MissingEnum = (
+            User(data['user'], state) if data.get('user') is not None else MISSING
         )
         self.name: str | None = data['name']
         self._avatar: str | None = data['avatar']
-        self.token: str | UndefinedType = data.get('token', UNDEFINED)
+        self.token: str | MissingEnum = data.get('token', MISSING)
         self.application_id: Snowflake | None = (
             Snowflake(data['application_id'])
             if data.get('application_id') is not None
             else None
         )
-        self.source_guild: Guild | UndefinedType = (
+        self.source_guild: Guild | MissingEnum = (
             Guild(data['source_guild'], state)
             if data.get('source_guild') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.url: str | UndefinedType = data.get('url', UNDEFINED)
+        self.url: str | MissingEnum = data.get('url', MISSING)

@@ -25,7 +25,7 @@ from typing import TYPE_CHECKING
 from .enums import StageInstancePrivacyLevel
 from .snowflake import Snowflake
 from .types import StageInstance as DiscordStageInstance
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State
@@ -40,8 +40,8 @@ class StageInstance:
         self.privacy_level: StageInstancePrivacyLevel = StageInstancePrivacyLevel(
             data['privacy_level']
         )
-        self.guild_scheduled_event_id: UndefinedType | Snowflake = (
+        self.guild_scheduled_event_id: MissingEnum | Snowflake = (
             Snowflake(data['guild_scheduled_event_id'])
             if data.get('guild_scheduled_event_id') is not None
-            else UNDEFINED
+            else MISSING
         )

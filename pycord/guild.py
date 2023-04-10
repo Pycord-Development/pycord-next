@@ -71,7 +71,7 @@ from .types import (
     Widget as DiscordWidget,
     WidgetSettings as DiscordWidgetSettings,
 )
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 from .utils import remove_undefined
 from .welcome_screen import WelcomeScreen
@@ -89,7 +89,7 @@ class ChannelPosition:
         position: int,
         *,
         lock_permissions: bool = False,
-        parent_id: Snowflake | None | UndefinedType,
+        parent_id: Snowflake | None | MissingEnum,
     ) -> None:
         self.id = id
         self.position = position
@@ -169,10 +169,10 @@ class Guild:
             self.name: str = data['name']
             # TODO: Asset classes
             self._icon: str | None = data['icon']
-            self._icon_hash: str | None | UndefinedType = data.get('icon_hash')
+            self._icon_hash: str | None | MissingEnum = data.get('icon_hash')
             self._splash: str | None = data['splash']
             self._discovery_splash: str | None = data['discovery_splash']
-            self.owner: bool | UndefinedType = data.get('owner', UNDEFINED)
+            self.owner: bool | MissingEnum = data.get('owner', MISSING)
             self.owner_id: Snowflake = Snowflake(data.get('owner_id'))
             self.permissions: Permissions = Permissions.from_value(
                 data.get('permissions', 0)
@@ -184,13 +184,13 @@ class Guild:
                 else None
             )
             self.afk_timeout: int = data.get('afk_timeout')
-            self.widget_enabled: bool | UndefinedType = data.get(
-                'widget_enabled', UNDEFINED
+            self.widget_enabled: bool | MissingEnum = data.get(
+                'widget_enabled', MISSING
             )
-            self._widget_channel_id: str | None | UndefinedType = data.get(
+            self._widget_channel_id: str | None | MissingEnum = data.get(
                 'widget_channel_id'
             )
-            self.widget_channel_id: UndefinedType | Snowflake | None = (
+            self.widget_channel_id: MissingEnum | Snowflake | None = (
                 Snowflake(self._widget_channel_id)
                 if isinstance(self._widget_channel_id, str)
                 else self._widget_channel_id
@@ -232,16 +232,16 @@ class Guild:
                 if self._rules_channel_id is not None
                 else None
             )
-            self.max_presences: int | UndefinedType = data.get(
-                'max_presences', UNDEFINED
+            self.max_presences: int | MissingEnum = data.get(
+                'max_presences', MISSING
             )
-            self.max_members: int | UndefinedType = data.get('max_members', UNDEFINED)
+            self.max_members: int | MissingEnum = data.get('max_members', MISSING)
             self.vanity_url: str | None = data.get('vanity_url_code')
             self.description: str | None = data.get('description')
             self._banner: str | None = data.get('banner')
             self.premium_tier: PremiumTier = PremiumTier(data['premium_tier'])
-            self.premium_subscription_count: int | UndefinedType = data.get(
-                'premium_subscription_count', UNDEFINED
+            self.premium_subscription_count: int | MissingEnum = data.get(
+                'premium_subscription_count', MISSING
             )
             self.preferred_locale: LOCALE = data['preferred_locale']
             self._public_updates_channel_id: str | None = data[
@@ -252,20 +252,20 @@ class Guild:
                 if self._public_updates_channel_id is not None
                 else None
             )
-            self.max_video_channel_users: int | UndefinedType = data.get(
-                'max_video_channel_users', UNDEFINED
+            self.max_video_channel_users: int | MissingEnum = data.get(
+                'max_video_channel_users', MISSING
             )
-            self.approximate_member_count: int | UndefinedType = data.get(
-                'approximate_member_count', UNDEFINED
+            self.approximate_member_count: int | MissingEnum = data.get(
+                'approximate_member_count', MISSING
             )
-            self.approximate_presence_count: int | UndefinedType = data.get(
-                'approximate_presence_count', UNDEFINED
+            self.approximate_presence_count: int | MissingEnum = data.get(
+                'approximate_presence_count', MISSING
             )
-            self._welcome_screen = data.get('welcome_screen', UNDEFINED)
-            self.welcome_screen: WelcomeScreen | UndefinedType = (
+            self._welcome_screen = data.get('welcome_screen', MISSING)
+            self.welcome_screen: WelcomeScreen | MissingEnum = (
                 WelcomeScreen(self._welcome_screen)
-                if self._welcome_screen is not UNDEFINED
-                else UNDEFINED
+                if self._welcome_screen is not MISSING
+                else MISSING
             )
             self.nsfw_level: NSFWLevel = NSFWLevel(data.get('nsfw_level', 0))
             self.stickers: list[Sticker] = [
@@ -322,11 +322,11 @@ class Guild:
         name: str,
         event_type: AutoModEventType,
         trigger_type: AutoModTriggerType,
-        trigger_metadata: AutoModTriggerMetadata | UndefinedType = UNDEFINED,
+        trigger_metadata: AutoModTriggerMetadata | MissingEnum = MISSING,
         actions: list[AutoModAction],
         enabled: bool = False,
-        exempt_roles: list[Snowflake] | UndefinedType = UNDEFINED,
-        exempt_channels: list[Snowflake] | UndefinedType = UNDEFINED,
+        exempt_roles: list[Snowflake] | MissingEnum = MISSING,
+        exempt_channels: list[Snowflake] | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> AutoModRule:
         """Create an auto moderation rule for this guild.
@@ -406,8 +406,8 @@ class Guild:
         self,
         emoji_id: Snowflake,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        roles: list[Role] | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        roles: list[Role] | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Emoji:
         """Edits the emoji.
@@ -461,28 +461,28 @@ class Guild:
     async def edit(
         self,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        verification_level: VerificationLevel | None | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        verification_level: VerificationLevel | None | MissingEnum = MISSING,
         default_message_notifications: DefaultMessageNotificationLevel
         | None
-        | UndefinedType = UNDEFINED,
+        | MissingEnum = MISSING,
         explicit_content_filter: ExplicitContentFilterLevel
         | None
-        | UndefinedType = UNDEFINED,
-        afk_channel: VoiceChannel | None | UndefinedType = UNDEFINED,
-        afk_timeout: int | UndefinedType = UNDEFINED,
-        icon: File | None | UndefinedType = UNDEFINED,
-        owner: User | UndefinedType = UNDEFINED,
-        splash: File | None | UndefinedType = UNDEFINED,
-        discovery_splash: File | None | UndefinedType = UNDEFINED,
-        banner: File | None | UndefinedType = UNDEFINED,
-        system_channel: TextChannel | None | UndefinedType = UNDEFINED,
-        rules_channel: TextChannel | None | UndefinedType = UNDEFINED,
-        public_updates_channel: TextChannel | None | UndefinedType = UNDEFINED,
-        preferred_locale: str | None | UndefinedType = UNDEFINED,
-        features: list[GUILD_FEATURE] | UndefinedType = UNDEFINED,
-        description: str | None | UndefinedType = UNDEFINED,
-        premium_progress_bar_enabled: bool | UndefinedType = UNDEFINED,
+        | MissingEnum = MISSING,
+        afk_channel: VoiceChannel | None | MissingEnum = MISSING,
+        afk_timeout: int | MissingEnum = MISSING,
+        icon: File | None | MissingEnum = MISSING,
+        owner: User | MissingEnum = MISSING,
+        splash: File | None | MissingEnum = MISSING,
+        discovery_splash: File | None | MissingEnum = MISSING,
+        banner: File | None | MissingEnum = MISSING,
+        system_channel: TextChannel | None | MissingEnum = MISSING,
+        rules_channel: TextChannel | None | MissingEnum = MISSING,
+        public_updates_channel: TextChannel | None | MissingEnum = MISSING,
+        preferred_locale: str | None | MissingEnum = MISSING,
+        features: list[GUILD_FEATURE] | MissingEnum = MISSING,
+        description: str | None | MissingEnum = MISSING,
+        premium_progress_bar_enabled: bool | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Guild:
         """Edits the guild.
@@ -585,20 +585,20 @@ class Guild:
         name: str,
         type: ChannelType,
         *,
-        topic: str | None | UndefinedType = UNDEFINED,
-        bitrate: int | None | UndefinedType = UNDEFINED,
-        user_limit: int | None | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
-        position: int | None | UndefinedType = UNDEFINED,
-        permission_overwrites: list[_Overwrite] | None | UndefinedType = UNDEFINED,
-        parent: CategoryChannel | None | UndefinedType = UNDEFINED,
-        nsfw: bool | UndefinedType = UNDEFINED,
-        rtc_region: str | None | UndefinedType = UNDEFINED,
-        video_quality_mode: VideoQualityMode | None | UndefinedType = UNDEFINED,
-        default_auto_archive_duration: int | None | UndefinedType = UNDEFINED,
-        default_reaction_emoji: str | None | UndefinedType = UNDEFINED,
-        available_tags: list[ForumTag] | None | UndefinedType = UNDEFINED,
-        default_sort_order: SortOrderType | None | UndefinedType = UNDEFINED,
+        topic: str | None | MissingEnum = MISSING,
+        bitrate: int | None | MissingEnum = MISSING,
+        user_limit: int | None | MissingEnum = MISSING,
+        rate_limit_per_user: int | None | MissingEnum = MISSING,
+        position: int | None | MissingEnum = MISSING,
+        permission_overwrites: list[_Overwrite] | None | MissingEnum = MISSING,
+        parent: CategoryChannel | None | MissingEnum = MISSING,
+        nsfw: bool | MissingEnum = MISSING,
+        rtc_region: str | None | MissingEnum = MISSING,
+        video_quality_mode: VideoQualityMode | None | MissingEnum = MISSING,
+        default_auto_archive_duration: int | None | MissingEnum = MISSING,
+        default_reaction_emoji: str | None | MissingEnum = MISSING,
+        available_tags: list[ForumTag] | None | MissingEnum = MISSING,
+        default_sort_order: SortOrderType | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> CHANNEL_TYPE:
         """Creates a channel in the guild.
@@ -609,33 +609,33 @@ class Guild:
             The name of the channel.
         type: :class:`ChannelType`
             The type of the channel.
-        topic: :class:`str` | None | :class:`.UndefinedType`
+        topic: :class:`str` | None | :class:`.MissingEnum`
             The topic of the channel.
-        bitrate: :class:`int` | None | :class:`.UndefinedType`
+        bitrate: :class:`int` | None | :class:`.MissingEnum`
             The bitrate of the channel.
-        user_limit: :class:`int` | None | :class:`.UndefinedType`
+        user_limit: :class:`int` | None | :class:`.MissingEnum`
             The user limit of the channel.
-        rate_limit_per_user: :class:`int` | None | :class:`.UndefinedType`
+        rate_limit_per_user: :class:`int` | None | :class:`.MissingEnum`
             The rate limit per user of the channel.
-        position: :class:`int` | None | :class:`.UndefinedType`
+        position: :class:`int` | None | :class:`.MissingEnum`
             The position of the channel.
         permission_overwrites: list[:class:`_Overwrite`]
             The permission overwrites of the channel.
-        parent: :class:`CategoryChannel` | None | :class:`.UndefinedType`
+        parent: :class:`CategoryChannel` | None | :class:`.MissingEnum`
             The parent of the channel.
-        nsfw: :class:`bool` | :class:`.UndefinedType`
+        nsfw: :class:`bool` | :class:`.MissingEnum`
             Whether the channel is NSFW.
-        rtc_region: :class:`str` | None | :class:`.UndefinedType`
+        rtc_region: :class:`str` | None | :class:`.MissingEnum`
             The RTC region of the channel.
-        video_quality_mode: :class:`VideoQualityMode` | None | :class:`.UndefinedType`
+        video_quality_mode: :class:`VideoQualityMode` | None | :class:`.MissingEnum`
             The video quality mode of the channel.
-        default_auto_archive_duration: :class:`int` | None | :class:`.UndefinedType`
+        default_auto_archive_duration: :class:`int` | None | :class:`.MissingEnum`
             The default auto archive duration of the channel.
-        default_reaction_emoji: :class:`str` | None | :class:`.UndefinedType`
+        default_reaction_emoji: :class:`str` | None | :class:`.MissingEnum`
             The default reaction emoji of the channel.
-        available_tags: list[:class:`ForumTag`] | None | :class:`.UndefinedType`
+        available_tags: list[:class:`ForumTag`] | None | :class:`.MissingEnum`
             The available tags of the channel.
-        default_sort_order: :class:`SortOrderType` | None | :class:`.UndefinedType`
+        default_sort_order: :class:`SortOrderType` | None | :class:`.MissingEnum`
             The default sort order of the channel.
         reason: :class:`str` | None
             The reason for creating the channel. Shows up on the audit log.
@@ -780,7 +780,7 @@ class Guild:
         :class:`Member`
             The member.
         """
-        nick = nick or UNDEFINED
+        nick = nick or MISSING
         roles = roles or []
         data = await self._state.http.add_member(
             self.id,
@@ -794,13 +794,13 @@ class Guild:
         return Member(data, self._state, guild_id=self.id)
 
     async def edit_own_member(
-        self, *, nick: str | None | UndefinedType = UNDEFINED, reason: str | None = None
+        self, *, nick: str | None | MissingEnum = MISSING, reason: str | None = None
     ) -> Member:
         """Edits the bot's guild member.
 
         Parameters
         ----------
-        nick: :class:`str` | None | :class:`UndefinedType`
+        nick: :class:`str` | None | :class:`MissingEnum`
             The bot's new nickname.
         reason: :class:`str` | None
             The reasoning for editing the bot. Shows up in the audit log.
@@ -873,7 +873,7 @@ class Guild:
         self,
         user: User,
         *,
-        delete_message_seconds: int | UndefinedType = UNDEFINED,
+        delete_message_seconds: int | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> None:
         """Bans a user.
@@ -882,7 +882,7 @@ class Guild:
         ----------
         user: :class:`User`
             The user to ban
-        delete_message_seconds: :class:`int` | UndefinedType
+        delete_message_seconds: :class:`int` | MissingEnum
             The amount of seconds worth of messages that should be deleted.
         reason: :class:`str` | None
             The reason for the ban. Shows up in the audit log, and when the ban is fetched.
@@ -988,14 +988,14 @@ class BanPaginator(Paginator[BanPage]):
         self.guild_id: Snowflake = guild_id
         self.limit: int | None = limit
         self.reverse_order: bool = False
-        self.last_id: Snowflake | UndefinedType
+        self.last_id: Snowflake | MissingEnum
         if before:
             self.last_id = Snowflake.from_datetime(before)
             self.reverse_order = True
         elif after:
             self.last_id = Snowflake.from_datetime(after)
         else:
-            self.last_id = UNDEFINED
+            self.last_id = MISSING
         self.done = False
 
     async def fill(self):

@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING, Any
 from ...embed import Embed
 from ...flags import MessageFlags
 from ...interaction import Interaction
-from ...undefined import UNDEFINED, UndefinedType
+from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined
 
 if TYPE_CHECKING:
@@ -52,11 +52,11 @@ class Context(Interaction):
 
     async def send(
         self,
-        content: str | UndefinedType = UNDEFINED,
-        tts: bool | UndefinedType = UNDEFINED,
-        embeds: list[Embed] | UndefinedType = UNDEFINED,
-        flags: int | MessageFlags | UndefinedType = UNDEFINED,
-        ephemeral: bool | UndefinedType = UNDEFINED,
+        content: str | MissingEnum = MISSING,
+        tts: bool | MissingEnum = MISSING,
+        embeds: list[Embed] | MissingEnum = MISSING,
+        flags: int | MessageFlags | MissingEnum = MISSING,
+        ephemeral: bool | MissingEnum = MISSING,
     ) -> None:
         """
         Respond to an interaction.
@@ -97,11 +97,11 @@ class Context(Interaction):
 
     async def respond(
         self,
-        content: str | UndefinedType = UNDEFINED,
-        tts: bool | UndefinedType = UNDEFINED,
-        embeds: list[Embed] | UndefinedType = UNDEFINED,
-        flags: int | MessageFlags | UndefinedType = UNDEFINED,
-        ephemeral: bool | UndefinedType = UNDEFINED,
+        content: str | MissingEnum = MISSING,
+        tts: bool | MissingEnum = MISSING,
+        embeds: list[Embed] | MissingEnum = MISSING,
+        flags: int | MessageFlags | MissingEnum = MISSING,
+        ephemeral: bool | MissingEnum = MISSING,
     ) -> None:
         """
         Respond to an interaction.

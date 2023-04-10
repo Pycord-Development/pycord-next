@@ -31,7 +31,7 @@ from aiohttp import ClientResponse
 
 from .file import File
 from .types import AsyncFunc
-from .undefined import UNDEFINED
+from .missing import MISSING
 
 try:
     import msgspec
@@ -102,7 +102,7 @@ def chunk(items: S, n: int) -> Iterator[S]:
 
 
 def remove_undefined(**kwargs) -> dict[str, Any]:
-    return {k: v for k, v in kwargs.items() if v is not UNDEFINED}
+    return {k: v for k, v in kwargs.items() if v is not MISSING}
 
 
 async def get_iterated_data(iterator: AsyncGenerator) -> list[Any]:

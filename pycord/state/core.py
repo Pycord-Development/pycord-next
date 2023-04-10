@@ -56,7 +56,7 @@ from ..events.other import InteractionCreate, Ready, UserUpdate
 from ..ui import Component
 from ..ui.house import House
 from ..ui.text_input import Modal
-from ..undefined import UNDEFINED
+from ..missing import MISSING
 from ..user import User
 from .grouped_store import GroupedStore
 
@@ -128,7 +128,7 @@ class State:
             self.modals.append(modal)
 
     def sent_component(self, comp: Component) -> None:
-        if comp.id not in self._component_custom_ids and comp.id is not UNDEFINED:
+        if comp.id not in self._component_custom_ids and comp.id is not MISSING:
             self.components.append(comp)
             self._component_custom_ids.append(comp.id)
             self._components_via_custom_id[comp.id] = comp

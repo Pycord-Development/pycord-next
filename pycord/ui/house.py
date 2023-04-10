@@ -29,7 +29,7 @@ from ..enums import ButtonStyle, SelectMenuType
 from ..errors import ComponentException
 from ..media import Emoji
 from ..types import AsyncFunc
-from ..undefined import UNDEFINED, UndefinedType
+from ..missing import MISSING, MissingEnum
 from .button import Button
 from .component import ActionRow, Component
 from .select_menu import SelectMenu
@@ -95,8 +95,8 @@ class House:
         self,
         style: ButtonStyle | int,
         label: str | None,
-        emoji: str | Emoji | UndefinedType = UNDEFINED,
-        url: str | UndefinedType = UNDEFINED,
+        emoji: str | Emoji | MissingEnum = MISSING,
+        url: str | MissingEnum = MISSING,
         disabled: bool = False,
     ) -> Button:
         """
@@ -121,7 +121,7 @@ class House:
             if not url:
                 custom_id = str(uuid4())
             else:
-                custom_id = UNDEFINED
+                custom_id = MISSING
             button = Button(
                 func,
                 style=style,
@@ -139,11 +139,11 @@ class House:
     def select_menu(
         self,
         type: Literal[3, 5, 6, 7, 8] | SelectMenuType = 3,
-        channel_types: list[int] | UndefinedType = UNDEFINED,
-        placeholder: str | UndefinedType = UNDEFINED,
-        min_values: int | UndefinedType = UNDEFINED,
-        max_values: int | UndefinedType = UNDEFINED,
-        disabled: bool | UndefinedType = UNDEFINED,
+        channel_types: list[int] | MissingEnum = MISSING,
+        placeholder: str | MissingEnum = MISSING,
+        min_values: int | MissingEnum = MISSING,
+        max_values: int | MissingEnum = MISSING,
+        disabled: bool | MissingEnum = MISSING,
     ) -> SelectMenu:
         """
         Create a new Select Menu within this House

@@ -33,7 +33,7 @@ from .types import (
     StickerItem as DiscordStickerItem,
     User as DiscordUser,
 )
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -55,16 +55,16 @@ class Emoji:
             Snowflake(role) for role in data.get('roles', [])
         ]
         self.roles: list[Role] = []
-        self._user: DiscordUser | UndefinedType = data.get('user', UNDEFINED)
-        self.user: UndefinedType | User = (
-            User(self._user, state) if self._user is not UNDEFINED else UNDEFINED
+        self._user: DiscordUser | MissingEnum = data.get('user', MISSING)
+        self.user: MissingEnum | User = (
+            User(self._user, state) if self._user is not MISSING else MISSING
         )
-        self.require_colons: UndefinedType | bool = data.get(
-            'require_colons', UNDEFINED
+        self.require_colons: MissingEnum | bool = data.get(
+            'require_colons', MISSING
         )
-        self.managed: UndefinedType | bool = data.get('managed', UNDEFINED)
-        self.animated: UndefinedType | bool = data.get('animated', UNDEFINED)
-        self.available: UndefinedType | bool = data.get('available', UNDEFINED)
+        self.managed: MissingEnum | bool = data.get('managed', MISSING)
+        self.animated: MissingEnum | bool = data.get('animated', MISSING)
+        self.available: MissingEnum | bool = data.get('available', MISSING)
 
     def _inject_roles(self, roles: list[Role]) -> None:
         for role in roles:
@@ -111,26 +111,26 @@ class Sticker:
         self.tags: list[str] = data['tags'].split(',')
         self.type: StickerType = StickerType(data['type'])
         self.format_type: StickerFormatType = StickerFormatType(data['format_type'])
-        self.available: bool | UndefinedType = data.get('available', UNDEFINED)
+        self.available: bool | MissingEnum = data.get('available', MISSING)
         self.guild_id: Snowflake | None = (
             Snowflake(data['guild_id']) if data['guild_id'] is not None else None
         )
-        self._user: DiscordUser | UndefinedType = data.get('user', UNDEFINED)
-        self.user: UndefinedType | User = (
-            User(self._user, state) if self._user is not UNDEFINED else UNDEFINED
+        self._user: DiscordUser | MissingEnum = data.get('user', MISSING)
+        self.user: MissingEnum | User = (
+            User(self._user, state) if self._user is not MISSING else MISSING
         )
-        self.sort_value: UndefinedType | int = data.get('sort_value', UNDEFINED)
+        self.sort_value: MissingEnum | int = data.get('sort_value', MISSING)
 
 
 class Attachment:
     def __init__(self, data: DiscordAttachment, state: State) -> None:
         self.id: Snowflake = Snowflake(data['id'])
         self.filename: str = data['filename']
-        self.description: str | UndefinedType = data.get('description', UNDEFINED)
-        self.content_type: str | UndefinedType = data.get('content_type', UNDEFINED)
+        self.description: str | MissingEnum = data.get('description', MISSING)
+        self.content_type: str | MissingEnum = data.get('content_type', MISSING)
         self.size: int = data.get('size')
         self.url: str = data.get('url')
         self.proxy_url: str = data.get('proxy_url')
-        self.height: int | None | UndefinedType = data.get('height', UNDEFINED)
-        self.width: int | None | UndefinedType = data.get('width', UNDEFINED)
-        self.ephemeral: bool | UndefinedType = data.get('ephemeral', UNDEFINED)
+        self.height: int | None | MissingEnum = data.get('height', MISSING)
+        self.width: int | None | MissingEnum = data.get('width', MISSING)
+        self.ephemeral: bool | MissingEnum = data.get('ephemeral', MISSING)

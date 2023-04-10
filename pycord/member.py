@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 from .pages import Page
 from .pages.paginator import Paginator
 from .types import GuildMember
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 
@@ -59,43 +59,43 @@ class Member:
     ) -> None:
         self._state: State = state
         self._guild_id: Snowflake | None = guild_id or None
-        self.user: User | UndefinedType = (
-            User(data.get('user'), state) if data.get('user') is not None else UNDEFINED
+        self.user: User | MissingEnum = (
+            User(data.get('user'), state) if data.get('user') is not None else MISSING
         )
-        self.nick: str | None | UndefinedType = data.get('nick', UNDEFINED)
-        self._avatar: str | None | UndefinedType = data.get('avatar', UNDEFINED)
+        self.nick: str | None | MissingEnum = data.get('nick', MISSING)
+        self._avatar: str | None | MissingEnum = data.get('avatar', MISSING)
         self.roles: list[Snowflake] = [Snowflake(s) for s in data['roles']]
         self.joined_at: datetime = datetime.fromisoformat(data['joined_at'])
-        self.premium_since: None | UndefinedType | datetime = (
+        self.premium_since: None | MissingEnum | datetime = (
             datetime.fromisoformat(data.get('premium_since'))
-            if data.get('premium_since', UNDEFINED) not in [UNDEFINED, None]
-            else data.get('premium_since', UNDEFINED)
+            if data.get('premium_since', MISSING) not in [MISSING, None]
+            else data.get('premium_since', MISSING)
         )
-        self.deaf: bool | UndefinedType = data.get('deaf', UNDEFINED)
-        self.mute: bool | UndefinedType = data.get('mute', UNDEFINED)
-        self.pending: UndefinedType | bool = data.get('pending', UNDEFINED)
-        self.permissions: Permissions | UndefinedType = (
+        self.deaf: bool | MissingEnum = data.get('deaf', MISSING)
+        self.mute: bool | MissingEnum = data.get('mute', MISSING)
+        self.pending: MissingEnum | bool = data.get('pending', MISSING)
+        self.permissions: Permissions | MissingEnum = (
             Permissions.from_value(data.get('permissions'))
-            if data.get('permissions', UNDEFINED) is not UNDEFINED
-            else UNDEFINED
+            if data.get('permissions', MISSING) is not MISSING
+            else MISSING
         )
-        self.communication_disabled_until: None | UndefinedType | datetime = (
+        self.communication_disabled_until: None | MissingEnum | datetime = (
             datetime.fromisoformat(data.get('communication_disabled_until'))
-            if data.get('communication_disabled_until', UNDEFINED)
-            not in [UNDEFINED, None]
-            else data.get('communication_disabled_until', UNDEFINED)
+            if data.get('communication_disabled_until', MISSING)
+            not in [MISSING, None]
+            else data.get('communication_disabled_until', MISSING)
         )
 
     async def edit(
         self,
         *,
-        nick: str | None | UndefinedType = UNDEFINED,
-        roles: list[Snowflake] | UndefinedType = UNDEFINED,
-        mute: bool | UndefinedType = UNDEFINED,
-        deaf: bool | UndefinedType = UNDEFINED,
-        channel_id: Snowflake | None | UndefinedType = UNDEFINED,
-        communication_disabled_until: datetime | None | UndefinedType = UNDEFINED,
-        flags: MemberFlags | None | UndefinedType = UNDEFINED,
+        nick: str | None | MissingEnum = MISSING,
+        roles: list[Snowflake] | MissingEnum = MISSING,
+        mute: bool | MissingEnum = MISSING,
+        deaf: bool | MissingEnum = MISSING,
+        channel_id: Snowflake | None | MissingEnum = MISSING,
+        communication_disabled_until: datetime | None | MissingEnum = MISSING,
+        flags: MemberFlags | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Member:
         communication_disabled_until = (
@@ -107,7 +107,7 @@ class Member:
             self._guild_id,
             self.user.id,
             nick=nick,
-            roles=(roles or []) if roles is not UNDEFINED else roles,
+            roles=(roles or []) if roles is not MISSING else roles,
             mute=mute,
             deaf=deaf,
             channel_id=channel_id,
@@ -197,7 +197,7 @@ class MemberPaginator(Paginator[MemberPage]):
         if after:
             self.last_id: Snowflake = Snowflake.from_datetime(after)
         else:
-            self.last_id: UndefinedType = UNDEFINED
+            self.last_id: MissingEnum = MISSING
         self.done = False
 
     async def fill(self):

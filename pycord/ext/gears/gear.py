@@ -27,7 +27,7 @@ from ...commands import Command, Group
 from ...commands.application.command import ApplicationCommand
 from ...events.event_manager import Event
 from ...types import AsyncFunc
-from ...undefined import UNDEFINED, UndefinedType
+from ...missing import MISSING, MissingEnum
 
 if TYPE_CHECKING:
     from ...bot import Bot
@@ -98,7 +98,7 @@ class Gear(Generic[ContextT]):
 
     def command(
         self,
-        name: str | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
         cls: Type[T] = ApplicationCommand,
         **kwargs: Any,
     ) -> T:

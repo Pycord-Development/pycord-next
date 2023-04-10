@@ -45,7 +45,7 @@ from ...types import (
     Widget,
     WidgetSettings,
 )
-from ...undefined import UNDEFINED, UndefinedType
+from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined, to_datauri
 from ..route import Route
 from .base import BaseRouter
@@ -56,16 +56,16 @@ class Guilds(BaseRouter):
         self,
         *,
         name: str,
-        icon: File | UndefinedType = UNDEFINED,
-        verification_level: int | UndefinedType = UNDEFINED,
-        default_message_notifications: int | UndefinedType = UNDEFINED,
-        explicit_content_filter: int | UndefinedType = UNDEFINED,
-        roles: list[Role] | UndefinedType = UNDEFINED,
-        channels: list[Channel] | UndefinedType = UNDEFINED,
-        afk_channel_id: Snowflake | UndefinedType = UNDEFINED,
-        afk_timeout: int | UndefinedType = UNDEFINED,
-        system_channel_id: Snowflake | UndefinedType = UNDEFINED,
-        system_channel_flags: int | UndefinedType = UNDEFINED,
+        icon: File | MissingEnum = MISSING,
+        verification_level: int | MissingEnum = MISSING,
+        default_message_notifications: int | MissingEnum = MISSING,
+        explicit_content_filter: int | MissingEnum = MISSING,
+        roles: list[Role] | MissingEnum = MISSING,
+        channels: list[Channel] | MissingEnum = MISSING,
+        afk_channel_id: Snowflake | MissingEnum = MISSING,
+        afk_timeout: int | MissingEnum = MISSING,
+        system_channel_id: Snowflake | MissingEnum = MISSING,
+        system_channel_flags: int | MissingEnum = MISSING,
     ) -> Guild:
         payload = {
             'name': name,
@@ -87,7 +87,7 @@ class Guilds(BaseRouter):
         return await self.request('POST', Route('/guilds'), remove_undefined(**payload))
 
     async def get_guild(
-        self, guild_id: Snowflake, *, with_counts: bool | UndefinedType = UNDEFINED
+        self, guild_id: Snowflake, *, with_counts: bool | MissingEnum = MISSING
     ) -> Guild:
         params = {'with_counts': with_counts}
         return await self.request(
@@ -105,25 +105,25 @@ class Guilds(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        verification_level: int | None | UndefinedType = UNDEFINED,
-        default_message_notifications: int | None | UndefinedType = UNDEFINED,
-        explicit_content_filter: int | None | UndefinedType = UNDEFINED,
-        afk_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
-        afk_timeout: int | UndefinedType = UNDEFINED,
-        icon: File | None | UndefinedType = UNDEFINED,
-        owner_id: Snowflake | UndefinedType = UNDEFINED,
-        splash: bytes | None | UndefinedType = UNDEFINED,
-        discovery_splash: bytes | None | UndefinedType = UNDEFINED,
-        banner: File | None | UndefinedType = UNDEFINED,
-        system_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
-        system_channel_flags: int | UndefinedType = UNDEFINED,
-        rules_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
-        public_updates_channel_id: Snowflake | None | UndefinedType = UNDEFINED,
-        preferred_locale: str | None | UndefinedType = UNDEFINED,
-        features: list[str] | UndefinedType = UNDEFINED,
-        description: str | None | UndefinedType = UNDEFINED,
-        premium_progress_bar_enabled: bool | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        verification_level: int | None | MissingEnum = MISSING,
+        default_message_notifications: int | None | MissingEnum = MISSING,
+        explicit_content_filter: int | None | MissingEnum = MISSING,
+        afk_channel_id: Snowflake | None | MissingEnum = MISSING,
+        afk_timeout: int | MissingEnum = MISSING,
+        icon: File | None | MissingEnum = MISSING,
+        owner_id: Snowflake | MissingEnum = MISSING,
+        splash: bytes | None | MissingEnum = MISSING,
+        discovery_splash: bytes | None | MissingEnum = MISSING,
+        banner: File | None | MissingEnum = MISSING,
+        system_channel_id: Snowflake | None | MissingEnum = MISSING,
+        system_channel_flags: int | MissingEnum = MISSING,
+        rules_channel_id: Snowflake | None | MissingEnum = MISSING,
+        public_updates_channel_id: Snowflake | None | MissingEnum = MISSING,
+        preferred_locale: str | None | MissingEnum = MISSING,
+        features: list[str] | MissingEnum = MISSING,
+        description: str | None | MissingEnum = MISSING,
+        premium_progress_bar_enabled: bool | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Guild:
         payload = {
@@ -177,21 +177,21 @@ class Guilds(BaseRouter):
         guild_id: Snowflake,
         *,
         name: str,
-        type: int | None | UndefinedType = UNDEFINED,
-        topic: str | None | UndefinedType = UNDEFINED,
-        bitrate: int | None | UndefinedType = UNDEFINED,
-        user_limit: int | None | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
-        position: int | None | UndefinedType = UNDEFINED,
-        permission_overwrites: list[dict] | None | UndefinedType = UNDEFINED,
-        parent_id: Snowflake | None | UndefinedType = UNDEFINED,
-        nsfw: bool | None | UndefinedType = UNDEFINED,
-        rtc_region: str | None | UndefinedType = UNDEFINED,
-        video_quality_mode: int | None | UndefinedType = UNDEFINED,
-        default_auto_archive_duration: int | None | UndefinedType = UNDEFINED,
-        default_reaction_emoji: DefaultReaction | None | UndefinedType = UNDEFINED,
-        available_tags: list[ForumTag] | None | UndefinedType = UNDEFINED,
-        default_sort_order: int | None | UndefinedType = UNDEFINED,
+        type: int | None | MissingEnum = MISSING,
+        topic: str | None | MissingEnum = MISSING,
+        bitrate: int | None | MissingEnum = MISSING,
+        user_limit: int | None | MissingEnum = MISSING,
+        rate_limit_per_user: int | None | MissingEnum = MISSING,
+        position: int | None | MissingEnum = MISSING,
+        permission_overwrites: list[dict] | None | MissingEnum = MISSING,
+        parent_id: Snowflake | None | MissingEnum = MISSING,
+        nsfw: bool | None | MissingEnum = MISSING,
+        rtc_region: str | None | MissingEnum = MISSING,
+        video_quality_mode: int | None | MissingEnum = MISSING,
+        default_auto_archive_duration: int | None | MissingEnum = MISSING,
+        default_reaction_emoji: DefaultReaction | None | MissingEnum = MISSING,
+        available_tags: list[ForumTag] | None | MissingEnum = MISSING,
+        default_sort_order: int | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Channel:
         payload = {
@@ -249,12 +249,12 @@ class Guilds(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        limit: int | UndefinedType = UNDEFINED,
-        after: Snowflake | UndefinedType = UNDEFINED,
+        limit: int | MissingEnum = MISSING,
+        after: Snowflake | MissingEnum = MISSING,
     ) -> list[GuildMember]:
         params = {
             'limit': limit,
-            'after': str(after) if after is not UNDEFINED else UNDEFINED,
+            'after': str(after) if after is not MISSING else MISSING,
         }
         return await self.request(
             'GET',
@@ -267,7 +267,7 @@ class Guilds(BaseRouter):
         guild_id: Snowflake,
         *,
         query: str,
-        limit: int | None | UndefinedType = UNDEFINED,
+        limit: int | None | MissingEnum = MISSING,
     ) -> list[GuildMember]:
         params = {
             'query': query,
@@ -285,10 +285,10 @@ class Guilds(BaseRouter):
         user_id: Snowflake,
         *,
         access_token: str,
-        nick: str | UndefinedType = UNDEFINED,
-        roles: list[Snowflake] | UndefinedType = UNDEFINED,
-        mute: bool | UndefinedType = UNDEFINED,
-        deaf: bool | UndefinedType = UNDEFINED,
+        nick: str | MissingEnum = MISSING,
+        roles: list[Snowflake] | MissingEnum = MISSING,
+        mute: bool | MissingEnum = MISSING,
+        deaf: bool | MissingEnum = MISSING,
     ) -> GuildMember:
         payload = {
             'access_token': access_token,
@@ -312,15 +312,15 @@ class Guilds(BaseRouter):
         guild_id: Snowflake,
         user_id: Snowflake,
         *,
-        nick: str | None | UndefinedType = UNDEFINED,
-        roles: list[Snowflake] | None | UndefinedType = UNDEFINED,
-        mute: bool | None | UndefinedType = UNDEFINED,
-        deaf: bool | None | UndefinedType = UNDEFINED,
-        channel_id: Snowflake | None | UndefinedType = UNDEFINED,
+        nick: str | None | MissingEnum = MISSING,
+        roles: list[Snowflake] | None | MissingEnum = MISSING,
+        mute: bool | None | MissingEnum = MISSING,
+        deaf: bool | None | MissingEnum = MISSING,
+        channel_id: Snowflake | None | MissingEnum = MISSING,
         communication_disabled_until: datetime.datetime
         | None
-        | UndefinedType = UNDEFINED,
-        flags: int | None | UndefinedType = UNDEFINED,
+        | MissingEnum = MISSING,
+        flags: int | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> GuildMember:
         if communication_disabled_until:
@@ -349,7 +349,7 @@ class Guilds(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        nick: str | None | UndefinedType = UNDEFINED,
+        nick: str | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> GuildMember:
         payload = {
@@ -421,9 +421,9 @@ class Guilds(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        limit: int | UndefinedType = UNDEFINED,
-        before: Snowflake | UndefinedType = UNDEFINED,
-        after: Snowflake | UndefinedType = UNDEFINED,
+        limit: int | MissingEnum = MISSING,
+        before: Snowflake | MissingEnum = MISSING,
+        after: Snowflake | MissingEnum = MISSING,
     ) -> list[Ban]:
         params = {
             'limit': limit,
@@ -449,7 +449,7 @@ class Guilds(BaseRouter):
         guild_id: Snowflake,
         user_id: Snowflake,
         *,
-        delete_message_seconds: int | UndefinedType = UNDEFINED,
+        delete_message_seconds: int | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> None:
         payload = {
@@ -489,13 +489,13 @@ class Guilds(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        permissions: int | UndefinedType = UNDEFINED,
-        color: int | UndefinedType = UNDEFINED,
-        hoist: bool | UndefinedType = UNDEFINED,
-        icon: bytes | None | UndefinedType = UNDEFINED,  # TODO
-        unicode_emoji: str | None | UndefinedType = UNDEFINED,
-        mentionable: bool | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        permissions: int | MissingEnum = MISSING,
+        color: int | MissingEnum = MISSING,
+        hoist: bool | MissingEnum = MISSING,
+        icon: bytes | None | MissingEnum = MISSING,  # TODO
+        unicode_emoji: str | None | MissingEnum = MISSING,
+        mentionable: bool | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Role:
         payload = {
@@ -532,13 +532,13 @@ class Guilds(BaseRouter):
         guild_id: Snowflake,
         role_id: Snowflake,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        permissions: int | UndefinedType = UNDEFINED,
-        color: int | UndefinedType = UNDEFINED,
-        hoist: bool | UndefinedType = UNDEFINED,
-        icon: bytes | None | UndefinedType = UNDEFINED,  # TODO
-        unicode_emoji: str | None | UndefinedType = UNDEFINED,
-        mentionable: bool | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        permissions: int | MissingEnum = MISSING,
+        color: int | MissingEnum = MISSING,
+        hoist: bool | MissingEnum = MISSING,
+        icon: bytes | None | MissingEnum = MISSING,  # TODO
+        unicode_emoji: str | None | MissingEnum = MISSING,
+        mentionable: bool | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Role:
         payload = {
@@ -595,8 +595,8 @@ class Guilds(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        days: int | UndefinedType = UNDEFINED,
-        include_roles: list[Snowflake] | UndefinedType = UNDEFINED,
+        days: int | MissingEnum = MISSING,
+        include_roles: list[Snowflake] | MissingEnum = MISSING,
     ) -> int:
         params = {
             'days': days,
@@ -613,9 +613,9 @@ class Guilds(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        days: int | UndefinedType = UNDEFINED,
-        compute_prune_count: bool | UndefinedType = UNDEFINED,
-        include_roles: list[Snowflake] | UndefinedType = UNDEFINED,
+        days: int | MissingEnum = MISSING,
+        compute_prune_count: bool | MissingEnum = MISSING,
+        include_roles: list[Snowflake] | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> int:
         payload = {
@@ -676,8 +676,8 @@ class Guilds(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        enabled: bool | UndefinedType = UNDEFINED,
-        channel_id: Snowflake | UndefinedType = UNDEFINED,
+        enabled: bool | MissingEnum = MISSING,
+        channel_id: Snowflake | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> WidgetSettings:
         payload = {
@@ -704,7 +704,7 @@ class Guilds(BaseRouter):
         )
 
     async def get_guild_widget_image(
-        self, guild_id: Snowflake, style: WIDGET_STYLE | UndefinedType = UNDEFINED
+        self, guild_id: Snowflake, style: WIDGET_STYLE | MissingEnum = MISSING
     ) -> bytes:
         params = {
             'style': style,
@@ -725,9 +725,9 @@ class Guilds(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        enabled: bool | None | UndefinedType = UNDEFINED,
-        welcome_channels: list[WelcomeScreenChannel] | None | UndefinedType = UNDEFINED,
-        description: str | None | UndefinedType = UNDEFINED,
+        enabled: bool | None | MissingEnum = MISSING,
+        welcome_channels: list[WelcomeScreenChannel] | None | MissingEnum = MISSING,
+        description: str | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> WelcomeScreen:
         payload = {
@@ -746,11 +746,11 @@ class Guilds(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        channel_id: Snowflake | UndefinedType = UNDEFINED,
-        suppress: bool | UndefinedType = UNDEFINED,
+        channel_id: Snowflake | MissingEnum = MISSING,
+        suppress: bool | MissingEnum = MISSING,
         request_to_speak_timestamp: datetime.datetime
         | None
-        | UndefinedType = UNDEFINED,
+        | MissingEnum = MISSING,
     ) -> None:
         if request_to_speak_timestamp:
             request_to_speak_timestamp = request_to_speak_timestamp.isoformat()
@@ -770,8 +770,8 @@ class Guilds(BaseRouter):
         guild_id: Snowflake,
         user_id: Snowflake,
         *,
-        channel_id: Snowflake | UndefinedType = UNDEFINED,
-        suppress: bool | UndefinedType = UNDEFINED,
+        channel_id: Snowflake | MissingEnum = MISSING,
+        suppress: bool | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> None:
         payload = {

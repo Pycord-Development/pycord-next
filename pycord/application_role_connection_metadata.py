@@ -26,7 +26,7 @@ from .enums import ApplicationRoleConnectionMetadataType
 from .types import (
     ApplicationRoleConnectionMetadata as DiscordApplicationRoleConnectionMetadata,
 )
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import LOCALE
 from .utils import remove_undefined
 
@@ -68,8 +68,8 @@ class ApplicationRoleConnectionMetadata:
         key: str,
         name: str,
         description: str,
-        name_localizations: dict[LOCALE, str] | UndefinedType = UNDEFINED,
-        description_localizations: dict[LOCALE, str] | UndefinedType = UNDEFINED,
+        name_localizations: Maybe[dict[LOCALE, str]] = MISSING,
+        description_localizations: Maybe[dict[LOCALE, str]] = MISSING,
     ) -> None:
         self.type: ApplicationRoleConnectionMetadataType = type
         self.key: str = key

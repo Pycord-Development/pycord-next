@@ -43,7 +43,7 @@ from .snowflake import Snowflake
 from .state import State
 from .types import AsyncFunc
 from .types.audit_log import AUDIT_LOG_EVENT_TYPE
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 from .utils import chunk, get_arg_defaults
 
@@ -366,7 +366,7 @@ class Bot:
 
     def command(
         self,
-        name: str | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
         cls: T = ApplicationCommand,
         **kwargs: Any,
     ) -> T:
@@ -454,17 +454,17 @@ class Bot:
         self,
         name: str,
         *,
-        icon: File | UndefinedType = UNDEFINED,
-        verification_level: VerificationLevel | UndefinedType = UNDEFINED,
+        icon: File | MissingEnum = MISSING,
+        verification_level: VerificationLevel | MissingEnum = MISSING,
         default_message_notifications: DefaultMessageNotificationLevel
-        | UndefinedType = UNDEFINED,
-        explicit_content_filter: ExplicitContentFilterLevel | UndefinedType = UNDEFINED,
-        roles: list[dict] | UndefinedType = UNDEFINED,  # TODO
-        channels: list[dict] | UndefinedType = UNDEFINED,  # TODO
-        afk_channel_id: Snowflake | UndefinedType = UNDEFINED,
-        afk_timeout: int | UndefinedType = UNDEFINED,
-        system_channel_id: Snowflake | UndefinedType = UNDEFINED,
-        system_channel_flags: SystemChannelFlags | UndefinedType = UNDEFINED,
+        | MissingEnum = MISSING,
+        explicit_content_filter: ExplicitContentFilterLevel | MissingEnum = MISSING,
+        roles: list[dict] | MissingEnum = MISSING,  # TODO
+        channels: list[dict] | MissingEnum = MISSING,  # TODO
+        afk_channel_id: Snowflake | MissingEnum = MISSING,
+        afk_timeout: int | MissingEnum = MISSING,
+        system_channel_id: Snowflake | MissingEnum = MISSING,
+        system_channel_flags: SystemChannelFlags | MissingEnum = MISSING,
     ) -> Guild:
         """Create a guild.
 
@@ -548,11 +548,11 @@ class Bot:
     async def fetch_guild_audit_log(
         self,
         guild_id: Snowflake,
-        user_id: Snowflake | UndefinedType = UNDEFINED,
-        action_type: AUDIT_LOG_EVENT_TYPE | UndefinedType = UNDEFINED,
-        before: Snowflake | UndefinedType = UNDEFINED,
-        after: Snowflake | UndefinedType = UNDEFINED,
-        limit: int | UndefinedType = UNDEFINED,
+        user_id: Snowflake | MissingEnum = MISSING,
+        action_type: AUDIT_LOG_EVENT_TYPE | MissingEnum = MISSING,
+        before: Snowflake | MissingEnum = MISSING,
+        after: Snowflake | MissingEnum = MISSING,
+        limit: int | MissingEnum = MISSING,
     ) -> AuditLog:
         """
         Fetches and returns the audit log.

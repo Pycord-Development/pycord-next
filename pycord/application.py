@@ -30,7 +30,7 @@ from .types import (
     Application as DiscordApplication,
     InstallParams as DiscordInstallParams,
 )
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -67,34 +67,34 @@ class Application:
         The Icon hash of the Application
     description: :class:`str`
         Description of this Application
-    rpc_origins: list[:class:`str`] | :class:`.undefined.UndefinedType`
+    rpc_origins: list[:class:`str`] | :class:`.undefined.MissingEnum`
         A list of RPC Origins for this Application
     bot_public: :class:`bool`
         Whether this bot can be invited by anyone or only the owner
     bot_require_code_grant: :class:`bool`
         Whether this bot needs a code grant to be invited
-    terms_of_service_url: :class:`str` | :class:`.undefined.UndefinedType`
+    terms_of_service_url: :class:`str` | :class:`.undefined.MissingEnum`
         The TOS url of this Application
-    privacy_policy_url: :class:`str` | :class:`.undefined.UndefinedType`
+    privacy_policy_url: :class:`str` | :class:`.undefined.MissingEnum`
         The Privacy Policy url of this Application
-    owner: :class:`.user.User` | :class:`.undefined.UndefinedType`
+    owner: :class:`.user.User` | :class:`.undefined.MissingEnum`
         The owner of this application, if any, or only if a user
     verify_key: :class:`str`
         The verification key of this Application
     team: :class:`Team` | None
         The team of this Application, if any
-    guild_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
+    guild_id: :class:`.snowflake.Snowflake` | :class:`.undefined.MissingEnum`
         The guild this application is withheld in, if any
-    primary_sku_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
+    primary_sku_id: :class:`.snowflake.Snowflake` | :class:`.undefined.MissingEnum`
         The Primary SKU ID (Product ID) of this Application, if any
-    slug: :class:`str` | :class:`.undefined.UndefinedType`
+    slug: :class:`str` | :class:`.undefined.MissingEnum`
         The slug of this Application, if any
-    flags: :class:`.flags.ApplicationFlags` | :class:`.undefined.UndefinedType`
+    flags: :class:`.flags.ApplicationFlags` | :class:`.undefined.MissingEnum`
         A Class representation of this Application's Flags
     tags: list[:class:`str`]
         The list of tags this Application withholds
-    install_params: :class:`.application.InstallParams` | :class:`.undefined.UndefinedType`
-    custom_install_url: :class:`str` | :class:`.undefined.UndefinedType`
+    install_params: :class:`.application.InstallParams` | :class:`.undefined.MissingEnum`
+    custom_install_url: :class:`str` | :class:`.undefined.MissingEnum`
         The Custom Installation URL of this Application
     """
 
@@ -126,45 +126,45 @@ class Application:
         self.name: str = data['name']
         self.icon: str | None = data['icon']
         self.description: str = data['description']
-        self.rpc_origins: list[str] | UndefinedType = data.get('rpc_origins', UNDEFINED)
+        self.rpc_origins: Maybe[list[str]] = data.get('rpc_origins', MISSING)
         self.bot_public: bool = data['bot_public']
         self.bot_require_code_grant: bool = data['bot_require_code_grant']
-        self.terms_of_service_url: str | UndefinedType = data.get(
-            'terms_of_service_url', UNDEFINED
+        self.terms_of_service_url: Maybe[str] = data.get(
+            'terms_of_service_url', MISSING
         )
-        self.privacy_policy_url: str | UndefinedType = data.get(
-            'privacy_policy_url', UNDEFINED
+        self.privacy_policy_url: Maybe[str] = data.get(
+            'privacy_policy_url', MISSING
         )
-        self.owner: User | UndefinedType = (
+        self.owner: Maybe[User] = (
             User(data.get('owner'), state)
             if data.get('owner') is not None
-            else UNDEFINED
+            else MISSING
         )
         self.verify_key: str = data.get('verify_key')
         self.team: Team | None = (
             Team(data.get('team')) if data.get('team') is not None else None
         )
-        self.guild_id: Snowflake | UndefinedType = (
+        self.guild_id: Maybe[Snowflake] = (
             Snowflake(data.get('guild_id'))
             if data.get('guild_id') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.primary_sku_id: Snowflake | UndefinedType = (
+        self.primary_sku_id: Maybe[Snowflake] = (
             Snowflake(data.get('primary_sku_id'))
             if data.get('primary_sku_id') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.slug: str | UndefinedType = data.get('slug', UNDEFINED)
-        self._cover_image: str | UndefinedType = data.get('cover_image', UNDEFINED)
-        self.flags: ApplicationFlags | UndefinedType = (
+        self.slug: Maybe[str] = data.get('slug', MISSING)
+        self._cover_image: Maybe[str] = data.get('cover_image', MISSING)
+        self.flags: Maybe[ApplicationFlags] = (
             ApplicationFlags.from_value(data.get('flags'))
             if data.get('flags') is not None
-            else UNDEFINED
+            else MISSING
         )
         self.tags: list[str] = data.get('tags', [])
-        self.install_params: InstallParams | UndefinedType = (
+        self.install_params: InstallParams | MissingEnum = (
             InstallParams(data.get('install_params'))
             if data.get('install_params') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.custom_install_url: str | UndefinedType = data.get('custom_install_url')
+        self.custom_install_url: str | MissingEnum = data.get('custom_install_url')

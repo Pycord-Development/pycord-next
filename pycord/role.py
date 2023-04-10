@@ -30,25 +30,25 @@ if TYPE_CHECKING:
     from .state import State
 
 from .types import Role as DiscordRole, RoleTags as DiscordRoleTags
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 
 
 class RoleTags:
     __slots__ = ('bot_id', 'integration_id', 'premium_subscriber')
 
     def __init__(self, data: DiscordRoleTags) -> None:
-        self.bot_id: UndefinedType | Snowflake = (
+        self.bot_id: MissingEnum | Snowflake = (
             Snowflake(data.get('bot_id'))
-            if data.get('bot_id', UNDEFINED) is not UNDEFINED
-            else UNDEFINED
+            if data.get('bot_id', MISSING) is not MISSING
+            else MISSING
         )
-        self.integration_id: UndefinedType | Snowflake = (
+        self.integration_id: MissingEnum | Snowflake = (
             Snowflake(data.get('integration_id'))
-            if data.get('integration_id', UNDEFINED) is not UNDEFINED
-            else UNDEFINED
+            if data.get('integration_id', MISSING) is not MISSING
+            else MISSING
         )
-        self.premium_subscriber: UndefinedType | None = data.get(
-            'premium_subscriber', UNDEFINED
+        self.premium_subscriber: MissingEnum | None = data.get(
+            'premium_subscriber', MISSING
         )
 
 
@@ -75,15 +75,15 @@ class Role:
         self.name: str = data['name']
         self.color: Color = Color(data['color'])
         self.hoist: bool = data['hoist']
-        self.icon: str | None | UndefinedType = data.get('icon', UNDEFINED)
-        self.unicode_emoji: str | None | UndefinedType = data.get(
-            'unicode_emoji', UNDEFINED
+        self.icon: str | None | MissingEnum = data.get('icon', MISSING)
+        self.unicode_emoji: str | None | MissingEnum = data.get(
+            'unicode_emoji', MISSING
         )
         self.position: int = data['position']
         self.permissions: Permissions = Permissions.from_value(data['permissions'])
         self.managed: bool = data['managed']
         self.mentionable: bool = data['mentionable']
-        self._tags: dict[str, str | None] | UndefinedType = data.get('tags', UNDEFINED)
-        self.tags: RoleTags | UndefinedType = (
-            RoleTags(self._tags) if self._tags is not UNDEFINED else UNDEFINED
+        self._tags: dict[str, str | None] | MissingEnum = data.get('tags', MISSING)
+        self.tags: RoleTags | MissingEnum = (
+            RoleTags(self._tags) if self._tags is not MISSING else MISSING
         )

@@ -26,7 +26,7 @@ from ...types import (
     AutoModerationRule,
     AutoModerationTriggerMetadata,
 )
-from ...undefined import UNDEFINED, UndefinedType
+from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined
 from ..route import Route
 from .base import BaseRouter
@@ -66,10 +66,10 @@ class AutoModeration(BaseRouter):
         event_type: AUTO_MODERATION_EVENT_TYPES,
         trigger_type: AUTO_MODERATION_TRIGGER_TYPES,
         actions: list[AutoModerationAction],
-        trigger_metadata: AutoModerationTriggerMetadata | UndefinedType = UNDEFINED,
+        trigger_metadata: AutoModerationTriggerMetadata | MissingEnum = MISSING,
         enabled: bool = False,
-        exempt_roles: list[Snowflake] | UndefinedType = UNDEFINED,
-        exempt_channels: list[Snowflake] | UndefinedType = UNDEFINED,
+        exempt_roles: list[Snowflake] | MissingEnum = MISSING,
+        exempt_channels: list[Snowflake] | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> AutoModerationRule:
         data = {
@@ -97,15 +97,15 @@ class AutoModeration(BaseRouter):
         guild_id: Snowflake,
         rule_id: Snowflake,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        event_type: AUTO_MODERATION_EVENT_TYPES | UndefinedType = UNDEFINED,
-        actions: list[AutoModerationAction] | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        event_type: AUTO_MODERATION_EVENT_TYPES | MissingEnum = MISSING,
+        actions: list[AutoModerationAction] | MissingEnum = MISSING,
         trigger_metadata: AutoModerationTriggerMetadata
-        | UndefinedType
-        | None = UNDEFINED,
-        enabled: bool | UndefinedType = UNDEFINED,
-        exempt_roles: list[Snowflake] | UndefinedType = UNDEFINED,
-        exempt_channels: list[Snowflake] | UndefinedType = UNDEFINED,
+        | MissingEnum
+        | None = MISSING,
+        enabled: bool | MissingEnum = MISSING,
+        exempt_roles: list[Snowflake] | MissingEnum = MISSING,
+        exempt_channels: list[Snowflake] | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> AutoModerationRule:
         data = {

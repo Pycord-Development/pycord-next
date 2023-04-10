@@ -6,7 +6,7 @@ bot = pycord.Bot(intents=pycord.Intents())
 # the guild id to deploy on. Often used for developing to
 # avoid having to wait the extraneous amount of time Discord has for global
 # commands
-GUILD_ID: int | pycord.UndefinedType = pycord.UNDEFINED
+GUILD_ID: int | pycord.MissingEnum = pycord.MISSING
 
 
 # make a chat input command which

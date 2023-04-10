@@ -32,7 +32,7 @@ from ...types import (
     Overwrite,
     ThreadMember,
 )
-from ...undefined import UNDEFINED, UndefinedType
+from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined
 from ..route import Route
 from .base import BaseRouter
@@ -51,35 +51,35 @@ class Channels(BaseRouter):
         self,
         channel_id: Snowflake,
         *,
-        name: str | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
         # Group DM Only
-        icon: bytes | UndefinedType = UNDEFINED,  # TODO
+        icon: bytes | MissingEnum = MISSING,  # TODO
         # Thread Only
-        archived: bool | UndefinedType = UNDEFINED,
-        auto_archive_duration: int | UndefinedType = UNDEFINED,
-        locked: bool | UndefinedType = UNDEFINED,
-        invitable: bool | UndefinedType = UNDEFINED,
-        applied_tags: list[Snowflake] | UndefinedType = UNDEFINED,
+        archived: bool | MissingEnum = MISSING,
+        auto_archive_duration: int | MissingEnum = MISSING,
+        locked: bool | MissingEnum = MISSING,
+        invitable: bool | MissingEnum = MISSING,
+        applied_tags: list[Snowflake] | MissingEnum = MISSING,
         # Thread & Guild Channels
-        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
-        flags: int | None | UndefinedType = UNDEFINED,
+        rate_limit_per_user: int | None | MissingEnum = MISSING,
+        flags: int | None | MissingEnum = MISSING,
         # Guild Channels Only
-        type: CTYPE | UndefinedType = UNDEFINED,
-        position: int | None | UndefinedType = UNDEFINED,
-        topic: str | None | UndefinedType = UNDEFINED,
-        nsfw: bool | None | UndefinedType = UNDEFINED,
-        bitrate: int | None | UndefinedType = UNDEFINED,
-        user_imit: int | None | UndefinedType = UNDEFINED,
-        permission_overwrites: list[Overwrite] | None | UndefinedType = UNDEFINED,
-        parent_id: int | None | UndefinedType = UNDEFINED,
-        rtc_region: str | None | UndefinedType = UNDEFINED,
-        video_quality_mode: int | None | UndefinedType = UNDEFINED,
-        default_auto_archive_duration: int | None | UndefinedType = UNDEFINED,
-        available_tags: list[ForumTag] | None | UndefinedType = UNDEFINED,
-        default_reaction_emoji: DefaultReaction | None | UndefinedType = UNDEFINED,
-        default_thread_rate_limit_per_user: int | UndefinedType = UNDEFINED,
-        default_sort_order: int | None | UndefinedType = UNDEFINED,
-        default_forum_layout: int | UndefinedType = UNDEFINED,
+        type: CTYPE | MissingEnum = MISSING,
+        position: int | None | MissingEnum = MISSING,
+        topic: str | None | MissingEnum = MISSING,
+        nsfw: bool | None | MissingEnum = MISSING,
+        bitrate: int | None | MissingEnum = MISSING,
+        user_imit: int | None | MissingEnum = MISSING,
+        permission_overwrites: list[Overwrite] | None | MissingEnum = MISSING,
+        parent_id: int | None | MissingEnum = MISSING,
+        rtc_region: str | None | MissingEnum = MISSING,
+        video_quality_mode: int | None | MissingEnum = MISSING,
+        default_auto_archive_duration: int | None | MissingEnum = MISSING,
+        available_tags: list[ForumTag] | None | MissingEnum = MISSING,
+        default_reaction_emoji: DefaultReaction | None | MissingEnum = MISSING,
+        default_thread_rate_limit_per_user: int | MissingEnum = MISSING,
+        default_sort_order: int | None | MissingEnum = MISSING,
+        default_forum_layout: int | MissingEnum = MISSING,
         # Reason
         reason: str | None = None,
     ) -> Channel:
@@ -134,8 +134,8 @@ class Channels(BaseRouter):
         overwrite_id: Snowflake,
         *,
         type: int,
-        allow: int | None | UndefinedType = UNDEFINED,
-        deny: int | None | UndefinedType = UNDEFINED,
+        allow: int | None | MissingEnum = MISSING,
+        deny: int | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> None:
         data = {
@@ -166,13 +166,13 @@ class Channels(BaseRouter):
         self,
         channel_id: Snowflake,
         *,
-        max_age: int | UndefinedType = UNDEFINED,
-        max_uses: int | UndefinedType = UNDEFINED,
-        temporary: bool | UndefinedType = UNDEFINED,
-        unique: bool | UndefinedType = UNDEFINED,
-        target_type: int | UndefinedType = UNDEFINED,
-        target_user_id: Snowflake | UndefinedType = UNDEFINED,
-        target_application_id: Snowflake | UndefinedType = UNDEFINED,
+        max_age: int | MissingEnum = MISSING,
+        max_uses: int | MissingEnum = MISSING,
+        temporary: bool | MissingEnum = MISSING,
+        unique: bool | MissingEnum = MISSING,
+        target_type: int | MissingEnum = MISSING,
+        target_user_id: Snowflake | MissingEnum = MISSING,
+        target_application_id: Snowflake | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Invite:
         data = {
@@ -248,7 +248,7 @@ class Channels(BaseRouter):
         user_id: Snowflake,
         *,
         access_token: str,
-        nick: str | None | UndefinedType = UNDEFINED,
+        nick: str | None | MissingEnum = MISSING,
     ) -> None:
         data = {
             'access_token': access_token,
@@ -284,8 +284,8 @@ class Channels(BaseRouter):
         message_id: Snowflake,
         *,
         name: str,
-        auto_archive_duration: int | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
+        auto_archive_duration: int | MissingEnum = MISSING,
+        rate_limit_per_user: int | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Channel:
         data = {
@@ -309,10 +309,10 @@ class Channels(BaseRouter):
         channel_id: Snowflake,
         *,
         name: str,
-        auto_archive_duration: int | UndefinedType = UNDEFINED,
-        type: CTYPE | UndefinedType = UNDEFINED,
-        invitable: bool | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
+        auto_archive_duration: int | MissingEnum = MISSING,
+        type: CTYPE | MissingEnum = MISSING,
+        invitable: bool | MissingEnum = MISSING,
+        rate_limit_per_user: int | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Channel:
         data = {
@@ -337,10 +337,10 @@ class Channels(BaseRouter):
         channel_id: Snowflake,
         *,
         name: str,
-        auto_archive_duration: int | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
+        auto_archive_duration: int | MissingEnum = MISSING,
+        rate_limit_per_user: int | None | MissingEnum = MISSING,
         message: ForumThreadMessageParams,
-        applied_tags: list[Snowflake] | UndefinedType = UNDEFINED,
+        applied_tags: list[Snowflake] | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Channel:
         data = {
@@ -415,7 +415,7 @@ class Channels(BaseRouter):
         channel_id: Snowflake,
         user_id: Snowflake,
         *,
-        with_member: bool | UndefinedType = UNDEFINED,
+        with_member: bool | MissingEnum = MISSING,
     ) -> ThreadMember:
         params = {
             'with_member': with_member,
@@ -434,9 +434,9 @@ class Channels(BaseRouter):
         self,
         channel_id: Snowflake,
         *,
-        with_member: bool | UndefinedType = UNDEFINED,
-        after: Snowflake | UndefinedType = UNDEFINED,
-        limit: int | UndefinedType = UNDEFINED,
+        with_member: bool | MissingEnum = MISSING,
+        after: Snowflake | MissingEnum = MISSING,
+        limit: int | MissingEnum = MISSING,
     ) -> list[ThreadMember]:
         params = {
             'with_member': with_member,
@@ -456,8 +456,8 @@ class Channels(BaseRouter):
         self,
         channel_id: Snowflake,
         *,
-        before: str | UndefinedType = UNDEFINED,
-        limit: int | UndefinedType = UNDEFINED,
+        before: str | MissingEnum = MISSING,
+        limit: int | MissingEnum = MISSING,
     ) -> ListThreadsResponse:
         params = {
             'before': before,
@@ -476,8 +476,8 @@ class Channels(BaseRouter):
         self,
         channel_id: Snowflake,
         *,
-        before: str | UndefinedType = UNDEFINED,
-        limit: int | UndefinedType = UNDEFINED,
+        before: str | MissingEnum = MISSING,
+        limit: int | MissingEnum = MISSING,
     ) -> ListThreadsResponse:
         params = {
             'before': before,
@@ -496,8 +496,8 @@ class Channels(BaseRouter):
         self,
         channel_id: Snowflake,
         *,
-        before: str | UndefinedType = UNDEFINED,
-        limit: int | UndefinedType = UNDEFINED,
+        before: str | MissingEnum = MISSING,
+        limit: int | MissingEnum = MISSING,
     ) -> ListThreadsResponse:
         params = {
             'before': before,

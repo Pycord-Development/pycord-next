@@ -29,7 +29,7 @@ from ..interaction import Interaction
 from ..media import Emoji
 from ..role import Role
 from ..types import AsyncFunc
-from ..undefined import UNDEFINED, UndefinedType
+from ..missing import MISSING, MissingEnum
 from ..user import User
 from ..utils import get_arg_defaults, remove_undefined
 from .interactive_component import InteractiveComponent
@@ -55,9 +55,9 @@ class SelectOption:
     def __init__(
         self,
         label: str,
-        description: str | UndefinedType = UNDEFINED,
-        emoji: str | Emoji | UndefinedType = UNDEFINED,
-        default: bool | UndefinedType = UNDEFINED,
+        description: str | MissingEnum = MISSING,
+        emoji: str | Emoji | MissingEnum = MISSING,
+        default: bool | MissingEnum = MISSING,
     ) -> None:
         self.label = label
         self.description = description
@@ -74,7 +74,7 @@ class SelectOption:
         return remove_undefined(
             label=self.label,
             description=self.description,
-            emoji=self.emoji._partial() if self.emoji else UNDEFINED,
+            emoji=self.emoji._partial() if self.emoji else MISSING,
             value=self.value,
             default=self.default,
         )
@@ -96,11 +96,11 @@ class SelectMenu(InteractiveComponent):
         callback: AsyncFunc,
         custom_id: str,
         type: Literal[3, 5, 6, 7, 8] = 3,
-        channel_types: list[int] | UndefinedType = UNDEFINED,
-        placeholder: str | UndefinedType = UNDEFINED,
-        min_values: int | UndefinedType = UNDEFINED,
-        max_values: int | UndefinedType = UNDEFINED,
-        disabled: bool | UndefinedType = UNDEFINED,
+        channel_types: list[int] | MissingEnum = MISSING,
+        placeholder: str | MissingEnum = MISSING,
+        min_values: int | MissingEnum = MISSING,
+        max_values: int | MissingEnum = MISSING,
+        disabled: bool | MissingEnum = MISSING,
     ) -> None:
         super().__init__(callback, custom_id)
         self.type = type

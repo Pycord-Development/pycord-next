@@ -54,9 +54,7 @@ Audit Log
 Etcetera Classes
 ----------------
 
-Undefined
-~~~~~~~~~
+Missing
+~~~~~~~
 
-.. autoclass:: UndefinedType
-
-.. autoclass:: UNDEFINED
+.. autoclass:: MISSING

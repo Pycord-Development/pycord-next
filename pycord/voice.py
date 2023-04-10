@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING
 from .member import Member
 from .snowflake import Snowflake
 from .types import VoiceState as DiscordVoiceState
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State
@@ -34,10 +34,10 @@ if TYPE_CHECKING:
 
 class VoiceState:
     def __init__(self, data: DiscordVoiceState, state: State) -> None:
-        self.guild_id: Snowflake | UndefinedType = (
+        self.guild_id: Snowflake | MissingEnum = (
             Snowflake(data['guild_id'])
             if data.get('guild_id') is not None
-            else UNDEFINED
+            else MISSING
         )
         self.channel_id: Snowflake | None = (
             Snowflake(data['channel_id'])
@@ -45,20 +45,20 @@ class VoiceState:
             else None
         )
         self.user_id: Snowflake = Snowflake(data['user_id'])
-        self.member: Member | UndefinedType = (
+        self.member: Member | MissingEnum = (
             Member(data['member'], state, guild_id=self.guild_id)
             if data.get('member') is not None
-            else UNDEFINED
+            else MISSING
         )
         self.session_id: str = data['session_id']
         self.deaf: bool = data['deaf']
         self.mute: bool = data['mute']
         self.self_deaf: bool = data['self_deaf']
         self.self_mute: bool = data['self_mute']
-        self.self_stream: bool | UndefinedType = data.get('self_stream', UNDEFINED)
+        self.self_stream: bool | MissingEnum = data.get('self_stream', MISSING)
         self.self_video: bool = data['self_video']
         self.suppress: bool = data['suppress']
-        self.request_to_speak: datetime | UndefinedType = (
+        self.request_to_speak: datetime | MissingEnum = (
             datetime.fromisoformat(data['request_to_speak_timestamp'])
             if data.get('request_to_speak_timestamp') is not None
             else None

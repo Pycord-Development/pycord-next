@@ -22,10 +22,22 @@
 # SOFTWARE
 
 from enum import Enum, auto
-from typing import Literal
+from typing import Literal, TypeVar, Union
 
-class UndefinedType(Enum):
-    UNDEFINED = auto()
-    def __bool__(self) -> Literal[False]: ...
+T = TypeVar('T')
 
-UNDEFINED: Literal[UndefinedType.UNDEFINED] = UndefinedType.UNDEFINED
+
+class MissingEnum(Enum):
+    MISSING = auto()
+
+    def __bool__(self) -> Literal[False]:
+        return False
+
+
+MISSING: Literal[MissingEnum.MISSING] = MissingEnum.MISSING
+"""
+An instance of `.missing.MissingEnum` for purposes of code use.
+"""
+
+
+Maybe = Union[T, Literal[MissingEnum.MISSING]]

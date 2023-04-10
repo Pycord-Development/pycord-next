@@ -20,7 +20,7 @@
 # SOFTWARE
 from ...snowflake import Snowflake
 from ...types import AUDIT_LOG_EVENT_TYPE, AuditLog
-from ...undefined import UNDEFINED, UndefinedType
+from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined
 from ..route import Route
 from .base import BaseRouter
@@ -31,11 +31,11 @@ class AuditLogs(BaseRouter):
         self,
         guild_id: Snowflake,
         *,
-        user_id: Snowflake | UndefinedType = UNDEFINED,
-        action_type: AUDIT_LOG_EVENT_TYPE | UndefinedType = UNDEFINED,
-        before: Snowflake | UndefinedType = UNDEFINED,
-        after: Snowflake | UndefinedType = UNDEFINED,
-        limit: int | UndefinedType = UNDEFINED,
+        user_id: Snowflake | MissingEnum = MISSING,
+        action_type: AUDIT_LOG_EVENT_TYPE | MissingEnum = MISSING,
+        before: Snowflake | MissingEnum = MISSING,
+        after: Snowflake | MissingEnum = MISSING,
+        limit: int | MissingEnum = MISSING,
     ) -> AuditLog:
         params = {
             'user_id': user_id,

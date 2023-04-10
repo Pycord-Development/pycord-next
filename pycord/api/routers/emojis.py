@@ -20,7 +20,7 @@
 # SOFTWARE
 from ...snowflake import Snowflake
 from ...types import Emoji
-from ...undefined import UNDEFINED, UndefinedType
+from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined
 from ..route import Route
 from .base import BaseRouter
@@ -48,7 +48,7 @@ class Emojis(BaseRouter):
         *,
         name: str,
         image: bytes,  # TODO
-        roles: list[Snowflake] | UndefinedType = UNDEFINED,
+        roles: list[Snowflake] | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Emoji:
         payload = {
@@ -68,8 +68,8 @@ class Emojis(BaseRouter):
         guild_id: Snowflake,
         emoji_id: Snowflake,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        roles: list[Snowflake] | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        roles: list[Snowflake] | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Emoji:
         payload = {

@@ -41,7 +41,7 @@ from .types import (
     ThreadMetadata as DiscordThreadMetadata,
 )
 from .typing import Typing
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State
@@ -99,11 +99,11 @@ class ThreadMetadata:
             metadata['archive_timestamp']
         )
         self.locked: bool = metadata['locked']
-        self.invitable: bool | UndefinedType = metadata.get('invitable', UNDEFINED)
-        self.create_timestamp: datetime | UndefinedType = (
+        self.invitable: bool | MissingEnum = metadata.get('invitable', MISSING)
+        self.create_timestamp: datetime | MissingEnum = (
             datetime.fromisoformat(metadata.get('create_timestamp'))
             if metadata.get('create_timestamp') is not None
-            else UNDEFINED
+            else MISSING
         )
 
 
@@ -112,12 +112,12 @@ class ThreadMember:
 
     def __init__(self, member: DiscordThreadMember) -> None:
         _id: str | None = member.get('id')
-        self.id: Snowflake | UndefinedType = (
-            Snowflake(_id) if _id is not None else UNDEFINED
+        self.id: Snowflake | MissingEnum = (
+            Snowflake(_id) if _id is not None else MISSING
         )
         _user_id: str | None = member.get('user_id')
-        self.user_id: Snowflake | UndefinedType = (
-            Snowflake(_user_id) if _user_id is not None else UNDEFINED
+        self.user_id: Snowflake | MissingEnum = (
+            Snowflake(_user_id) if _user_id is not None else MISSING
         )
         self.join_timestamp: datetime = datetime.fromisoformat(member['join_timestamp'])
         self.flags: int = member['flags']
@@ -194,9 +194,9 @@ class Channel:
         The ID of the channel.
     type: :class:`ChannelType`
         The type of the channel.
-    name: :class:`str` | :class:`UndefinedType`
+    name: :class:`str` | :class:`MissingEnum`
         The name of the channel.
-    flags: :class:`ChannelFlags` | :class:`UndefinedType`
+    flags: :class:`ChannelFlags` | :class:`MissingEnum`
         The flags of the channel.
     """
 
@@ -206,11 +206,11 @@ class Channel:
         self._state = state
         self.id: Snowflake = Snowflake(data['id'])
         self.type: ChannelType = ChannelType(data['type'])
-        self.name: str | UndefinedType = data.get('name', UNDEFINED)
-        self.flags: ChannelFlags | UndefinedType = (
+        self.name: str | MissingEnum = data.get('name', MISSING)
+        self.flags: ChannelFlags | MissingEnum = (
             ChannelFlags.from_value(data['flags'])
             if data.get('flags') is not None
-            else UNDEFINED
+            else MISSING
         )
 
     async def _base_edit(self, **kwargs: Any) -> Channel:
@@ -237,27 +237,27 @@ class GuildChannel(Channel):
         The ID of the channel.
     type: :class:`ChannelType`
         The type of the channel.
-    name: :class:`str` | :class:`UndefinedType`
+    name: :class:`str` | :class:`MissingEnum`
         The name of the channel.
-    flags: :class:`ChannelFlags` | :class:`UndefinedType`
+    flags: :class:`ChannelFlags` | :class:`MissingEnum`
         The flags of the channel.
-    guild_id: :class:`Snowflake` | :class:`UndefinedType`
+    guild_id: :class:`Snowflake` | :class:`MissingEnum`
         The ID of the guild this channel belongs to.
-    position: :class:`int` | :class:`UndefinedType`
+    position: :class:`int` | :class:`MissingEnum`
         The position of the channel.
     permission_overwrites: list[:class:`_Overwrite`]
         The permission overwrites of the channel.
-    topic: :class:`str` | None | :class:`UndefinedType`
+    topic: :class:`str` | None | :class:`MissingEnum`
         The topic of the channel.
-    nsfw: :class:`bool` | :class:`UndefinedType`
+    nsfw: :class:`bool` | :class:`MissingEnum`
         Whether the channel is NSFW.
-    permissions: :class:`Permissions` | :class:`UndefinedType`
+    permissions: :class:`Permissions` | :class:`MissingEnum`
         The bot's permissions in this channel.
-    parent_id: :class:`Snowflake` | None | :class:`UndefinedType`
+    parent_id: :class:`Snowflake` | None | :class:`MissingEnum`
         The ID of the parent category of this channel.
-    rate_limit_per_user: :class:`int` | :class:`UndefinedType`
+    rate_limit_per_user: :class:`int` | :class:`MissingEnum`
         The slowmode rate limit of the channel.
-    default_auto_archive_duration: :class:`int` | :class:`UndefinedType`
+    default_auto_archive_duration: :class:`int` | :class:`MissingEnum`
         The default auto archive duration of the channel.
     """
 
@@ -275,32 +275,32 @@ class GuildChannel(Channel):
 
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
-        self.guild_id: Snowflake | UndefinedType = (
+        self.guild_id: Snowflake | MissingEnum = (
             Snowflake(data['guild_id'])
             if data.get('guild_id') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.position: int | UndefinedType = data.get('position', UNDEFINED)
+        self.position: int | MissingEnum = data.get('position', MISSING)
         self.permission_overwrites: list[_Overwrite] = [
             _Overwrite.from_dict(d) for d in data.get('permission_overwrites', [])
         ]
-        self.topic: str | None | UndefinedType = data.get('topic', UNDEFINED)
-        self.nsfw: bool | UndefinedType = data.get('nsfw', UNDEFINED)
-        self.permissions: Permissions | UndefinedType = (
+        self.topic: str | None | MissingEnum = data.get('topic', MISSING)
+        self.nsfw: bool | MissingEnum = data.get('nsfw', MISSING)
+        self.permissions: Permissions | MissingEnum = (
             Permissions.from_value(data['permissions'])
             if data.get('permissions') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.parent_id: Snowflake | UndefinedType = (
+        self.parent_id: Snowflake | MissingEnum = (
             Snowflake(data['parent_id'])
             if data.get('parent_id') is not None
-            else data.get('parent_id', UNDEFINED)
+            else data.get('parent_id', MISSING)
         )
-        self.rate_limit_per_user: int | UndefinedType = data.get(
-            'rate_limit_per_user', UNDEFINED
+        self.rate_limit_per_user: int | MissingEnum = data.get(
+            'rate_limit_per_user', MISSING
         )
-        self.default_auto_archive_duration: int | UndefinedType = data.get(
-            'default_auto_archive_duration', UNDEFINED
+        self.default_auto_archive_duration: int | MissingEnum = data.get(
+            'default_auto_archive_duration', MISSING
         )
 
 
@@ -312,25 +312,25 @@ class MessageableChannel(Channel):
             if data.get('last_message_id') is not None
             else None
         )
-        self.last_pin_timestamp: None | datetime | UndefinedType = (
+        self.last_pin_timestamp: None | datetime | MissingEnum = (
             datetime.fromisoformat(data['last_pin_timestamp'])
             if data.get('last_pin_timestamp') is not None
-            else data.get('last_pin_timestamp', UNDEFINED)
+            else data.get('last_pin_timestamp', MISSING)
         )
 
     async def send(
         self,
-        content: str | UndefinedType = UNDEFINED,
+        content: str | MissingEnum = MISSING,
         *,
-        nonce: int | str | UndefinedType = UNDEFINED,
-        tts: bool | UndefinedType = UNDEFINED,
-        embeds: list[Embed] | UndefinedType = UNDEFINED,
-        allowed_mentions: AllowedMentions | UndefinedType = UNDEFINED,
-        message_reference: MessageReference | UndefinedType = UNDEFINED,
-        sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
-        files: list[File] | UndefinedType = UNDEFINED,
-        flags: int | UndefinedType = UNDEFINED,
-        houses: list[House] | UndefinedType = UNDEFINED,
+        nonce: int | str | MissingEnum = MISSING,
+        tts: bool | MissingEnum = MISSING,
+        embeds: list[Embed] | MissingEnum = MISSING,
+        allowed_mentions: AllowedMentions | MissingEnum = MISSING,
+        message_reference: MessageReference | MissingEnum = MISSING,
+        sticker_ids: list[Snowflake] | MissingEnum = MISSING,
+        files: list[File] | MissingEnum = MISSING,
+        flags: int | MissingEnum = MISSING,
+        houses: list[House] | MissingEnum = MISSING,
     ) -> Message:
         if houses:
             if len(houses) > 5:
@@ -341,7 +341,7 @@ class MessageableChannel(Channel):
             for house in houses:
                 self._state.sent_house(house)
         else:
-            components = UNDEFINED
+            components = MISSING
 
         data = await self._state.http.create_message(
             channel_id=self.id,
@@ -351,10 +351,10 @@ class MessageableChannel(Channel):
             embeds=embeds,
             allowed_mentions=allowed_mentions.to_dict()
             if allowed_mentions
-            else UNDEFINED,
+            else MISSING,
             message_reference=message_reference.to_dict()
             if message_reference
-            else UNDEFINED,
+            else MISSING,
             sticker_ids=sticker_ids,
             flags=flags,
             components=components,
@@ -380,14 +380,14 @@ class MessageableChannel(Channel):
 class AudioChannel(GuildChannel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
-        self.rtc_region: str | UndefinedType = data.get('rtc_region', UNDEFINED)
-        self.video_quality_mode: VideoQualityMode | UndefinedType = (
+        self.rtc_region: str | MissingEnum = data.get('rtc_region', MISSING)
+        self.video_quality_mode: VideoQualityMode | MissingEnum = (
             VideoQualityMode(data['video_quality_mode'])
             if data.get('video_quality_mode') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.bitrate: int | UndefinedType = data.get('bitrate', UNDEFINED)
-        self.user_limit: int | UndefinedType = data.get('user_limit', UNDEFINED)
+        self.bitrate: int | MissingEnum = data.get('bitrate', MISSING)
+        self.user_limit: int | MissingEnum = data.get('user_limit', MISSING)
 
 
 class TextChannel(MessageableChannel, GuildChannel):
@@ -395,27 +395,27 @@ class TextChannel(MessageableChannel, GuildChannel):
     async def edit(
         self,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        type: ChannelType | UndefinedType = UNDEFINED,
-        position: int | None | UndefinedType = UNDEFINED,
-        topic: str | None | UndefinedType = UNDEFINED,
-        nsfw: bool | None | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
-        permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
-        parent_id: Snowflake | None | UndefinedType = UNDEFINED,
-        default_auto_archive_duration: int | None | UndefinedType = UNDEFINED,
-        default_thread_rate_limit_per_user: int | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        type: ChannelType | MissingEnum = MISSING,
+        position: int | None | MissingEnum = MISSING,
+        topic: str | None | MissingEnum = MISSING,
+        nsfw: bool | None | MissingEnum = MISSING,
+        rate_limit_per_user: int | None | MissingEnum = MISSING,
+        permission_overwrites: list[_Overwrite] | MissingEnum = MISSING,
+        parent_id: Snowflake | None | MissingEnum = MISSING,
+        default_auto_archive_duration: int | None | MissingEnum = MISSING,
+        default_thread_rate_limit_per_user: int | MissingEnum = MISSING,
     ) -> TextChannel:
         return await self._base_edit(
             name=name,
-            type=type.value if type else UNDEFINED,
+            type=type.value if type else MISSING,
             position=position,
             topic=topic,
             nsfw=nsfw,
             rate_limit_per_user=rate_limit_per_user,
             permission_overwrites=[o.to_dict() for o in permission_overwrites]
             if permission_overwrites
-            else UNDEFINED,
+            else MISSING,
             parent_id=parent_id,
             default_auto_archive_duration=default_auto_archive_duration,
             default_thread_rate_limit_per_user=default_thread_rate_limit_per_user,
@@ -430,10 +430,10 @@ class TextChannel(MessageableChannel, GuildChannel):
         message: Message | None = None,
         *,
         name: str,
-        auto_archive_duration: int | UndefinedType = UNDEFINED,
+        auto_archive_duration: int | MissingEnum = MISSING,
         type: ChannelType = ChannelType.PUBLIC_THREAD,
-        invitable: bool | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
+        invitable: bool | MissingEnum = MISSING,
+        rate_limit_per_user: int | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Thread | AnnouncementThread:
         if message:
@@ -459,36 +459,36 @@ class TextChannel(MessageableChannel, GuildChannel):
 
     async def list_public_archived_threads(
         self,
-        before: datetime.datetime | UndefinedType = UNDEFINED,
-        limit: int | UndefinedType = UNDEFINED,
+        before: datetime.datetime | MissingEnum = MISSING,
+        limit: int | MissingEnum = MISSING,
     ) -> list[Thread]:
         data = await self._state.http.list_public_archived_threads(
             self.id,
-            before=before.isoformat() if before else UNDEFINED,
+            before=before.isoformat() if before else MISSING,
             limit=limit,
         )
         return [Thread(d, state=self._state) for d in data]
 
     async def list_private_archived_threads(
         self,
-        before: datetime.datetime | UndefinedType = UNDEFINED,
-        limit: int | UndefinedType = UNDEFINED,
+        before: datetime.datetime | MissingEnum = MISSING,
+        limit: int | MissingEnum = MISSING,
     ) -> list[Thread]:
         data = await self._state.http.list_private_archived_threads(
             self.id,
-            before=before.isoformat() if before else UNDEFINED,
+            before=before.isoformat() if before else MISSING,
             limit=limit,
         )
         return [Thread(d, state=self._state) for d in data]
 
     async def list_joined_private_archived_threads(
         self,
-        before: datetime.datetime | UndefinedType = UNDEFINED,
-        limit: int | UndefinedType = UNDEFINED,
+        before: datetime.datetime | MissingEnum = MISSING,
+        limit: int | MissingEnum = MISSING,
     ) -> list[Thread]:
         data = await self._state.http.list_joined_private_archived_threads(
             self.id,
-            before=before.isoformat() if before else UNDEFINED,
+            before=before.isoformat() if before else MISSING,
             limit=limit,
         )
         return [Thread(d, state=self._state) for d in data]
@@ -504,15 +504,15 @@ class VoiceChannel(MessageableChannel, AudioChannel):
     async def edit(
         self,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        position: int | None | UndefinedType = UNDEFINED,
-        nsfw: bool | None | UndefinedType = UNDEFINED,
-        bitrate: int | None | UndefinedType = UNDEFINED,
-        user_limit: int | None | UndefinedType = UNDEFINED,
-        permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
-        parent_id: Snowflake | None | UndefinedType = UNDEFINED,
-        rtc_region: str | None | UndefinedType = UNDEFINED,
-        video_quality_mode: VideoQualityMode | None | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        position: int | None | MissingEnum = MISSING,
+        nsfw: bool | None | MissingEnum = MISSING,
+        bitrate: int | None | MissingEnum = MISSING,
+        user_limit: int | None | MissingEnum = MISSING,
+        permission_overwrites: list[_Overwrite] | MissingEnum = MISSING,
+        parent_id: Snowflake | None | MissingEnum = MISSING,
+        rtc_region: str | None | MissingEnum = MISSING,
+        video_quality_mode: VideoQualityMode | None | MissingEnum = MISSING,
     ) -> VoiceChannel:
         return await self._base_edit(
             name=name,
@@ -522,12 +522,12 @@ class VoiceChannel(MessageableChannel, AudioChannel):
             user_limit=user_limit,
             permission_overwrites=[o.to_dict() for o in permission_overwrites]
             if permission_overwrites
-            else UNDEFINED,
+            else MISSING,
             parent_id=parent_id,
             rtc_region=rtc_region,
             video_quality_mode=video_quality_mode.value
             if video_quality_mode
-            else UNDEFINED,
+            else MISSING,
         )
 
 
@@ -536,8 +536,8 @@ class GroupDMChannel(MessageableChannel):
     async def edit(
         self,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        icon: str | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        icon: str | MissingEnum = MISSING,
     ) -> GroupDMChannel:
         data = await self._state.http.modify_channel(self.id, name=name, icon=icon)
         return GroupDMChannel(data, self._state)
@@ -548,16 +548,16 @@ class CategoryChannel(Channel):
     async def edit(
         self,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        position: int | None | UndefinedType = UNDEFINED,
-        permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        position: int | None | MissingEnum = MISSING,
+        permission_overwrites: list[_Overwrite] | MissingEnum = MISSING,
     ) -> CategoryChannel:
         return await self._base_edit(
             name=name,
             position=position,
             permission_overwrites=[o.to_dict() for o in permission_overwrites]
             if permission_overwrites
-            else UNDEFINED,
+            else MISSING,
         )
 
 
@@ -572,9 +572,9 @@ class AnnouncementChannel(TextChannel):
         message: Message | None = None,
         *,
         name: str,
-        auto_archive_duration: int | UndefinedType = UNDEFINED,
-        invitable: bool | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
+        auto_archive_duration: int | MissingEnum = MISSING,
+        invitable: bool | MissingEnum = MISSING,
+        rate_limit_per_user: int | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> Thread:
         return await super().create_thread(
@@ -592,32 +592,32 @@ class Thread(MessageableChannel, GuildChannel):
     # Type 11 & 12
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
-        self.default_thread_rate_limit_per_user: int | UndefinedType = data.get(
-            'default_thread_rate_limit_per_user', UndefinedType
+        self.default_thread_rate_limit_per_user: int | MissingEnum = data.get(
+            'default_thread_rate_limit_per_user', MissingEnum
         )
-        self.message_count: int | UndefinedType = data.get('message_count', UNDEFINED)
-        self.thread_metadata: ThreadMetadata | UndefinedType = (
+        self.message_count: int | MissingEnum = data.get('message_count', MISSING)
+        self.thread_metadata: ThreadMetadata | MissingEnum = (
             ThreadMetadata(data['thread_metadata'])
             if data.get('thread_metadata') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.owner_id: Snowflake | UndefinedType = (
+        self.owner_id: Snowflake | MissingEnum = (
             Snowflake(data['owner_id'])
             if data.get('owner_id') is not None
-            else UNDEFINED
+            else MISSING
         )
 
     async def edit(
         self,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        archived: bool | UndefinedType = UNDEFINED,
-        auto_archive_duration: int | UndefinedType = UNDEFINED,
-        locked: bool | UndefinedType = UNDEFINED,
-        invitable: bool | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | UndefinedType = UNDEFINED,
-        flags: ChannelFlags | UndefinedType = UNDEFINED,
-        applied_tags: list[ForumTag] | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        archived: bool | MissingEnum = MISSING,
+        auto_archive_duration: int | MissingEnum = MISSING,
+        locked: bool | MissingEnum = MISSING,
+        invitable: bool | MissingEnum = MISSING,
+        rate_limit_per_user: int | MissingEnum = MISSING,
+        flags: ChannelFlags | MissingEnum = MISSING,
+        applied_tags: list[ForumTag] | MissingEnum = MISSING,
     ) -> Thread:
         return await self._base_edit(
             name=name,
@@ -626,8 +626,8 @@ class Thread(MessageableChannel, GuildChannel):
             locked=locked,
             invitable=invitable,
             rate_limit_per_user=rate_limit_per_user,
-            flags=flags.value if flags else UNDEFINED,
-            applied_tags=[t.id for t in applied_tags] if applied_tags else UNDEFINED,
+            flags=flags.value if flags else MISSING,
+            applied_tags=[t.id for t in applied_tags] if applied_tags else MISSING,
         )
 
     async def join(self) -> None:
@@ -655,7 +655,7 @@ class Thread(MessageableChannel, GuildChannel):
         *,
         with_member: bool = True,
         limit: int = 100,
-        after: Snowflake | UndefinedType = UNDEFINED,
+        after: Snowflake | MissingEnum = MISSING,
     ) -> list[ThreadMember]:
         data = await self._state.http.list_thread_members(
             self.id, with_member=with_member, limit=limit, after=after
@@ -668,11 +668,11 @@ class AnnouncementThread(Thread):
     async def edit(
         self,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        archived: bool | UndefinedType = UNDEFINED,
-        auto_archive_duration: int | UndefinedType = UNDEFINED,
-        locked: bool | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        archived: bool | MissingEnum = MISSING,
+        auto_archive_duration: int | MissingEnum = MISSING,
+        locked: bool | MissingEnum = MISSING,
+        rate_limit_per_user: int | MissingEnum = MISSING,
     ) -> AnnouncementThread:
         return await self._base_edit(
             name=name,
@@ -688,15 +688,15 @@ class StageChannel(AudioChannel, MessageableChannel):
     async def edit(
         self,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        position: int | None | UndefinedType = UNDEFINED,
-        nsfw: bool | None | UndefinedType = UNDEFINED,
-        bitrate: int | None | UndefinedType = UNDEFINED,
-        user_limit: int | None | UndefinedType = UNDEFINED,
-        permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
-        parent_id: Snowflake | None | UndefinedType = UNDEFINED,
-        rtc_region: str | None | UndefinedType = UNDEFINED,
-        video_quality_mode: VideoQualityMode | None | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        position: int | None | MissingEnum = MISSING,
+        nsfw: bool | None | MissingEnum = MISSING,
+        bitrate: int | None | MissingEnum = MISSING,
+        user_limit: int | None | MissingEnum = MISSING,
+        permission_overwrites: list[_Overwrite] | MissingEnum = MISSING,
+        parent_id: Snowflake | None | MissingEnum = MISSING,
+        rtc_region: str | None | MissingEnum = MISSING,
+        video_quality_mode: VideoQualityMode | None | MissingEnum = MISSING,
     ) -> StageChannel:
         return await self._base_edit(
             name=name,
@@ -706,12 +706,12 @@ class StageChannel(AudioChannel, MessageableChannel):
             user_limit=user_limit,
             permission_overwrites=[o.to_dict() for o in permission_overwrites]
             if permission_overwrites
-            else UNDEFINED,
+            else MISSING,
             parent_id=parent_id,
             rtc_region=rtc_region,
             video_quality_mode=video_quality_mode.value
             if video_quality_mode
-            else UNDEFINED,
+            else MISSING,
         )
 
 
@@ -724,13 +724,13 @@ class ForumChannel(Channel):
     # Type 15
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
-        self.default_sort_order: int | None | UndefinedType = data.get(
-            'default_sort_order', UndefinedType
+        self.default_sort_order: int | None | MissingEnum = data.get(
+            'default_sort_order', MissingEnum
         )
-        self.default_reaction_emoji: DefaultReaction | UndefinedType = (
+        self.default_reaction_emoji: DefaultReaction | MissingEnum = (
             DefaultReaction(data['default_reaction_emoji'])
             if data.get('default_reaction_emoji') is not None
-            else UNDEFINED
+            else MISSING
         )
         self.available_tags: list[ForumTag] = [
             ForumTag.from_dict(d) for d in data.get('available_tags', [])
@@ -739,16 +739,16 @@ class ForumChannel(Channel):
     async def edit(
         self,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        position: int | None | UndefinedType = UNDEFINED,
-        topic: str | None | UndefinedType = UNDEFINED,
-        nsfw: bool | None | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | None | UndefinedType = UNDEFINED,
-        permission_overwrites: list[_Overwrite] | UndefinedType = UNDEFINED,
-        parent_id: Snowflake | None | UndefinedType = UNDEFINED,
-        default_auto_archive_duration: int | None | UndefinedType = UNDEFINED,
-        flags: ChannelFlags | UndefinedType = UNDEFINED,
-        available_tags: list[ForumTag] | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        position: int | None | MissingEnum = MISSING,
+        topic: str | None | MissingEnum = MISSING,
+        nsfw: bool | None | MissingEnum = MISSING,
+        rate_limit_per_user: int | None | MissingEnum = MISSING,
+        permission_overwrites: list[_Overwrite] | MissingEnum = MISSING,
+        parent_id: Snowflake | None | MissingEnum = MISSING,
+        default_auto_archive_duration: int | None | MissingEnum = MISSING,
+        flags: ChannelFlags | MissingEnum = MISSING,
+        available_tags: list[ForumTag] | MissingEnum = MISSING,
     ) -> ForumChannel:
         return await self._base_edit(
             name=name,
@@ -758,13 +758,13 @@ class ForumChannel(Channel):
             rate_limit_per_user=rate_limit_per_user,
             permission_overwrites=[o.to_dict() for o in permission_overwrites]
             if permission_overwrites
-            else UNDEFINED,
+            else MISSING,
             parent_id=parent_id,
             default_auto_archive_duration=default_auto_archive_duration,
-            flags=flags.value if flags else UNDEFINED,
+            flags=flags.value if flags else MISSING,
             available_tags=[t.to_dict() for t in available_tags]
             if available_tags
-            else UNDEFINED,
+            else MISSING,
         )
 
 

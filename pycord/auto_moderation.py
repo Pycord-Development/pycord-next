@@ -36,7 +36,7 @@ from .types import (
     AutoModerationRule as DiscordAutoModerationRule,
     AutoModerationTriggerMetadata as DiscordAutoModerationTriggerMetadata,
 )
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State
@@ -44,32 +44,32 @@ if TYPE_CHECKING:
 
 class AutoModTriggerMetadata:
     def __init__(self, data: DiscordAutoModerationTriggerMetadata) -> None:
-        self.keyword_filter: list[str] | UndefinedType = data.get(
-            'keyword_filter', UNDEFINED
+        self.keyword_filter: list[str] | MissingEnum = data.get(
+            'keyword_filter', MISSING
         )
-        self.regex_patterns: list[str] | UndefinedType = data.get(
-            'regex_patterns', UNDEFINED
+        self.regex_patterns: list[str] | MissingEnum = data.get(
+            'regex_patterns', MISSING
         )
-        self.presets: list[AutoModKeywordPresetType] | UndefinedType = (
+        self.presets: list[AutoModKeywordPresetType] | MissingEnum = (
             [AutoModKeywordPresetType(preset) for preset in data['presets']]
             if data.get('presets') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.allow_list: list[str] | UndefinedType = data.get('allow_list', UNDEFINED)
-        self.mention_total_limit: int | UndefinedType = data.get(
-            'mention_total_limit', UNDEFINED
+        self.allow_list: list[str] | MissingEnum = data.get('allow_list', MISSING)
+        self.mention_total_limit: int | MissingEnum = data.get(
+            'mention_total_limit', MISSING
         )
 
 
 class AutoModActionMetadata:
     def __init__(self, data: DiscordAutoModerationActionMetadata) -> None:
-        self.channel_id: Snowflake | UndefinedType = (
+        self.channel_id: Snowflake | MissingEnum = (
             Snowflake(data['channel_id'])
             if data.get('channel_id') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.duration_seconds: int | UndefinedType = data.get(
-            'duration_seconds', UNDEFINED
+        self.duration_seconds: int | MissingEnum = data.get(
+            'duration_seconds', MISSING
         )
 
 
@@ -105,13 +105,13 @@ class AutoModRule:
     async def edit(
         self,
         *,
-        name: str | UndefinedType = UNDEFINED,
-        event_type: AutoModEventType | UndefinedType = UNDEFINED,
-        trigger_metadata: AutoModTriggerMetadata | UndefinedType = UNDEFINED,
-        actions: list[AutoModAction] | UndefinedType = UNDEFINED,
-        enabled: bool | UndefinedType = UNDEFINED,
-        exempt_roles: list[Snowflake] | UndefinedType = UNDEFINED,
-        exempt_channels: list[Snowflake] | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        event_type: AutoModEventType | MissingEnum = MISSING,
+        trigger_metadata: AutoModTriggerMetadata | MissingEnum = MISSING,
+        actions: list[AutoModAction] | MissingEnum = MISSING,
+        enabled: bool | MissingEnum = MISSING,
+        exempt_roles: list[Snowflake] | MissingEnum = MISSING,
+        exempt_channels: list[Snowflake] | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> AutoModRule:
         """Edits the auto moderation rule.

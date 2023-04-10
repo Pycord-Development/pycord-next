@@ -27,7 +27,7 @@ from ..enums import ButtonStyle
 from ..errors import ComponentException
 from ..media import Emoji
 from ..types import AsyncFunc
-from ..undefined import UNDEFINED, UndefinedType
+from ..missing import MISSING, MissingEnum
 from ..utils import remove_undefined
 from .interactive_component import InteractiveComponent
 
@@ -45,10 +45,10 @@ class Button(InteractiveComponent):
         callback: AsyncFunc,
         # button-based values
         style: ButtonStyle | int,
-        label: str | UndefinedType = UNDEFINED,
-        custom_id: str | UndefinedType = UNDEFINED,
-        emoji: str | Emoji | UndefinedType = UNDEFINED,
-        url: str | UndefinedType = UNDEFINED,
+        label: str | MissingEnum = MISSING,
+        custom_id: str | MissingEnum = MISSING,
+        emoji: str | Emoji | MissingEnum = MISSING,
+        url: str | MissingEnum = MISSING,
         disabled: bool = False,
     ) -> None:
         super().__init__(callback, custom_id)
@@ -57,7 +57,7 @@ class Button(InteractiveComponent):
         else:
             self._style = style
         self.style = style
-        self.label: str | None | UndefinedType = label
+        self.label: str | None | MissingEnum = label
         self.url = url
 
         if label is None and url is None:
@@ -67,7 +67,7 @@ class Button(InteractiveComponent):
             raise ComponentException('Cannot have custom_id and url at the same time')
 
         if label is None:
-            self.label = UNDEFINED
+            self.label = MISSING
 
         if isinstance(emoji, str):
             self.emoji = Emoji._from_str(emoji, None)
@@ -83,7 +83,7 @@ class Button(InteractiveComponent):
                 'label': self.label,
                 'url': self.url,
                 'custom_id': self.id,
-                'emoji': self.emoji._partial() if self.emoji else UNDEFINED,
+                'emoji': self.emoji._partial() if self.emoji else MISSING,
                 'disabled': self.disabled,
                 'type': 2,
             }

@@ -29,7 +29,7 @@ from .enums import InviteTargetType
 from .guild import Guild
 from .scheduled_event import ScheduledEvent
 from .types import Invite as DiscordInvite, InviteMetadata as DiscordInviteMetadata
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -48,45 +48,45 @@ class InviteMetadata:
 class Invite:
     def __init__(self, data: DiscordInvite, state: State) -> None:
         self.code: str = data['code']
-        self.guild: Guild | UndefinedType = (
-            Guild(data['guild'], state) if data.get('guild') is not None else UNDEFINED
+        self.guild: Guild | MissingEnum = (
+            Guild(data['guild'], state) if data.get('guild') is not None else MISSING
         )
         self.channel: Channel | None = (
             Channel(data['channel'], state) if data.get('channel') is not None else None
         )
-        self.inviter: User | UndefinedType = (
+        self.inviter: User | MissingEnum = (
             User(data['inviter'], state)
             if data.get('inviter') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.target_type: int | UndefinedType = (
+        self.target_type: int | MissingEnum = (
             InviteTargetType(data['target_type'])
             if data.get('target_type') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.target_user: User | UndefinedType = (
+        self.target_user: User | MissingEnum = (
             User(data['target_user'], state)
             if data.get('target_user') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.target_application: Application | UndefinedType = (
+        self.target_application: Application | MissingEnum = (
             Application(data['target_application'], state)
             if data.get('target_application') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.approximate_presence_count: int | UndefinedType = data.get(
-            'approximate_presence_count', UNDEFINED
+        self.approximate_presence_count: int | MissingEnum = data.get(
+            'approximate_presence_count', MISSING
         )
-        self.approximate_member_count: int | UndefinedType = data.get(
-            'approximate_member_count', UNDEFINED
+        self.approximate_member_count: int | MissingEnum = data.get(
+            'approximate_member_count', MISSING
         )
         self.expires_at: datetime | None = (
             datetime.fromisoformat(data['expires_at'])
             if data.get('expires_at') is not None
-            else data.get('expires_at', UNDEFINED)
+            else data.get('expires_at', MISSING)
         )
-        self.guild_scheduled_event: ScheduledEvent | UndefinedType = (
+        self.guild_scheduled_event: ScheduledEvent | MissingEnum = (
             ScheduledEvent(data['guild_scheduled_event'], state)
             if data.get('guild_scheduled_event') is not None
-            else UNDEFINED
+            else MISSING
         )

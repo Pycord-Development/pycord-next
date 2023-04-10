@@ -27,7 +27,7 @@ from ...types.channel import AllowedMentions
 from ...types.component import Component
 from ...types.embed import Embed
 from ...types.message import Message, MessageReference
-from ...undefined import UNDEFINED, UndefinedType
+from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined
 from ..route import Route
 from .base import BaseRouter
@@ -38,16 +38,16 @@ class Messages(BaseRouter):
         self,
         channel_id: Snowflake,
         *,
-        content: str | UndefinedType = UNDEFINED,
-        nonce: int | str | UndefinedType = UNDEFINED,
-        tts: bool | UndefinedType = UNDEFINED,
-        embeds: list[Embed] | UndefinedType = UNDEFINED,
-        allowed_mentions: AllowedMentions | UndefinedType = UNDEFINED,
-        message_reference: MessageReference | UndefinedType = UNDEFINED,
-        components: list[Component] | UndefinedType = UNDEFINED,
-        sticker_ids: list[Snowflake] | UndefinedType = UNDEFINED,
-        files: list[File] | UndefinedType = UNDEFINED,
-        flags: int | UndefinedType = UNDEFINED,
+        content: str | MissingEnum = MISSING,
+        nonce: int | str | MissingEnum = MISSING,
+        tts: bool | MissingEnum = MISSING,
+        embeds: list[Embed] | MissingEnum = MISSING,
+        allowed_mentions: AllowedMentions | MissingEnum = MISSING,
+        message_reference: MessageReference | MissingEnum = MISSING,
+        components: list[Component] | MissingEnum = MISSING,
+        sticker_ids: list[Snowflake] | MissingEnum = MISSING,
+        files: list[File] | MissingEnum = MISSING,
+        flags: int | MissingEnum = MISSING,
     ) -> Message:
         data = {
             'content': content,
@@ -145,8 +145,8 @@ class Messages(BaseRouter):
         message_id: Snowflake,
         emoji: str | Emoji,
         *,
-        limit: int | UndefinedType = UNDEFINED,
-        after: Snowflake | UndefinedType = UNDEFINED,
+        limit: int | MissingEnum = MISSING,
+        after: Snowflake | MissingEnum = MISSING,
     ) -> list[User]:
         if isinstance(emoji, Emoji):
             emoji = f'{emoji.name}:{emoji.id}'
@@ -204,13 +204,13 @@ class Messages(BaseRouter):
         channel_id: Snowflake,
         message_id: Snowflake,
         *,
-        content: str | None | UndefinedType = UNDEFINED,
-        embeds: list[Embed] | None | UndefinedType = UNDEFINED,
-        flags: int | None | UndefinedType = UNDEFINED,
-        allowed_mentions: AllowedMentions | None | UndefinedType = UNDEFINED,
-        components: list[Component] | None | UndefinedType = UNDEFINED,
-        files: list[File] | None | UndefinedType = UNDEFINED,
-        attachments: list[Attachment] | None | UndefinedType = UNDEFINED,
+        content: str | None | MissingEnum = MISSING,
+        embeds: list[Embed] | None | MissingEnum = MISSING,
+        flags: int | None | MissingEnum = MISSING,
+        allowed_mentions: AllowedMentions | None | MissingEnum = MISSING,
+        components: list[Component] | None | MissingEnum = MISSING,
+        files: list[File] | None | MissingEnum = MISSING,
+        attachments: list[Attachment] | None | MissingEnum = MISSING,
     ) -> Message:
         data = {
             'content': content,

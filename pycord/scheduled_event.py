@@ -31,7 +31,7 @@ from .enums import (
 from .member import Member
 from .snowflake import Snowflake
 from .types import EntityMetadata as DiscordEntityMetadata, GuildScheduledEvent
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 
 class EntityMetadata:
     def __init__(self, data: DiscordEntityMetadata) -> None:
-        self.location: UndefinedType | str = data.get('location', UNDEFINED)
+        self.location: MissingEnum | str = data.get('location', MISSING)
 
 
 class ScheduledEventUser:
@@ -49,10 +49,10 @@ class ScheduledEventUser:
             data['guild_scheduled_event_id']
         )
         self.user: User = User(data['user'], state)
-        self.member: Member | UndefinedType = (
+        self.member: Member | MissingEnum = (
             Member(data['member'], state)
             if data.get('member') is not None
-            else UNDEFINED
+            else MISSING
         )
 
 
@@ -64,15 +64,15 @@ class ScheduledEvent:
         self.channel_id: Snowflake | None = (
             Snowflake(self._channel_id) if self._channel_id is not None else None
         )
-        self._creator_id: UndefinedType | None | str = data.get('creator_id', UNDEFINED)
-        self.creator_id: UndefinedType | None | Snowflake = (
+        self._creator_id: MissingEnum | None | str = data.get('creator_id', MISSING)
+        self.creator_id: MissingEnum | None | Snowflake = (
             Snowflake(self._creator_id)
             if isinstance(self._creator_id, str)
             else self._creator_id
         )
         self.name: str = data['name']
-        self.description: UndefinedType | str | None = data.get(
-            'description', UNDEFINED
+        self.description: MissingEnum | str | None = data.get(
+            'description', MISSING
         )
         self.scheduled_start_time: datetime = datetime.fromisoformat(
             data['scheduled_start_time']
@@ -96,17 +96,17 @@ class ScheduledEvent:
         self.entity_id: Snowflake | None = (
             Snowflake(self._entity_id) if self._entity_id is not None else None
         )
-        self._entity_metadata: dict[str, Any] | UndefinedType = data.get(
-            'entity_metadata', UNDEFINED
+        self._entity_metadata: dict[str, Any] | MissingEnum = data.get(
+            'entity_metadata', MISSING
         )
-        self.entity_metadata: EntityMetadata | UndefinedType = (
+        self.entity_metadata: EntityMetadata | MissingEnum = (
             EntityMetadata(self._entity_metadata)
-            if self._entity_metadata is not UNDEFINED
-            else UNDEFINED
+            if self._entity_metadata is not MISSING
+            else MISSING
         )
-        self._creator: dict[str, Any] | UndefinedType = data.get('creator', UNDEFINED)
-        self.creator: User | UndefinedType = (
-            User(self._creator, state) if self._creator is not UNDEFINED else UNDEFINED
+        self._creator: dict[str, Any] | MissingEnum = data.get('creator', MISSING)
+        self.creator: User | MissingEnum = (
+            User(self._creator, state) if self._creator is not MISSING else MISSING
         )
-        self.user_count: int | UndefinedType = data.get('user_count', UNDEFINED)
-        self._image: None | str | UndefinedType = data.get('image', UNDEFINED)
+        self.user_count: int | MissingEnum = data.get('user_count', MISSING)
+        self._image: None | str | MissingEnum = data.get('image', MISSING)

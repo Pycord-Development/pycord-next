@@ -36,7 +36,7 @@ from .types import (
     AuditLogEntry as DiscordAuditLogEntry,
     OptionalAuditEntryInfo as DiscordOptionalAuditEntryInfo,
 )
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 from .webhook import GuildWebhook
 
@@ -50,17 +50,17 @@ class OptionalAuditEntryInfo:
 
     Attributes
     ----------
-    application_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
-    auto_moderation_rule_name: :class:`str` | :class:`.undefined.UndefinedType`
-    auto_moderation_rule_trigger_type: :class:`str` | :class:`.undefined.UndefinedType`
-    channel_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
-    count: :class:`int` | :class:`.undefined.UndefinedType`
-    delete_member_days: :class:`int` | :class:`.undefined.UndefinedType`
-    id: :class:`Snowflake` | :class:`.undefined.UndefinedType`
-    members_removed: :class:`int` | :class:`.undefined.UndefinedType`
-    message_id: :class:`Snowflake` | :class:`.undefined.UndefinedType`
-    role_name: :class:`str` | :class:`.undefined.UndefinedType`
-    type: :class:`int` | :class:`.undefined.UndefinedType`
+    application_id: :class:`.snowflake.Snowflake` | :class:`.undefined.MissingEnum`
+    auto_moderation_rule_name: :class:`str` | :class:`.undefined.MissingEnum`
+    auto_moderation_rule_trigger_type: :class:`str` | :class:`.undefined.MissingEnum`
+    channel_id: :class:`.snowflake.Snowflake` | :class:`.undefined.MissingEnum`
+    count: :class:`int` | :class:`.undefined.MissingEnum`
+    delete_member_days: :class:`int` | :class:`.undefined.MissingEnum`
+    id: :class:`Snowflake` | :class:`.undefined.MissingEnum`
+    members_removed: :class:`int` | :class:`.undefined.MissingEnum`
+    message_id: :class:`Snowflake` | :class:`.undefined.MissingEnum`
+    role_name: :class:`str` | :class:`.undefined.MissingEnum`
+    type: :class:`int` | :class:`.undefined.MissingEnum`
     """
 
     __slots__ = (
@@ -78,38 +78,38 @@ class OptionalAuditEntryInfo:
     )
 
     def __init__(self, data: DiscordOptionalAuditEntryInfo) -> None:
-        self.application_id: Snowflake | UndefinedType = (
-            Snowflake(data['application_id']) if 'application_id' in data else UNDEFINED
+        self.application_id: Snowflake | MissingEnum = (
+            Snowflake(data['application_id']) if 'application_id' in data else MISSING
         )
-        self.auto_moderation_rule_name: str | UndefinedType = data.get(
-            'auto_moderation_rule_name', UNDEFINED
+        self.auto_moderation_rule_name: str | MissingEnum = data.get(
+            'auto_moderation_rule_name', MISSING
         )
-        self.auto_moderation_rule_trigger_type: str | UndefinedType = data.get(
-            'auto_moderation_rule_trigger_type', UNDEFINED
+        self.auto_moderation_rule_trigger_type: str | MissingEnum = data.get(
+            'auto_moderation_rule_trigger_type', MISSING
         )
-        self.channel_id: Snowflake | UndefinedType = (
-            Snowflake(data['channel_id']) if 'channel_id' in data else UNDEFINED
+        self.channel_id: Snowflake | MissingEnum = (
+            Snowflake(data['channel_id']) if 'channel_id' in data else MISSING
         )
-        self.count: int | UndefinedType = (
-            int(data['count']) if 'count' in data else UNDEFINED
+        self.count: int | MissingEnum = (
+            int(data['count']) if 'count' in data else MISSING
         )
-        self.delete_member_days: int | UndefinedType = (
+        self.delete_member_days: int | MissingEnum = (
             int(data['delete_member_days'])
             if 'delete_member_days' in data
-            else UNDEFINED
+            else MISSING
         )
-        self.id: Snowflake | UndefinedType = (
-            Snowflake(data['id']) if 'id' in data else UNDEFINED
+        self.id: Snowflake | MissingEnum = (
+            Snowflake(data['id']) if 'id' in data else MISSING
         )
-        self.members_removed: int | UndefinedType = (
-            int(data['members_removed']) if 'members_removed' in data else UNDEFINED
+        self.members_removed: int | MissingEnum = (
+            int(data['members_removed']) if 'members_removed' in data else MISSING
         )
-        self.message_id: Snowflake | UndefinedType = (
-            Snowflake(data['message_id']) if 'message_id' in data else UNDEFINED
+        self.message_id: Snowflake | MissingEnum = (
+            Snowflake(data['message_id']) if 'message_id' in data else MISSING
         )
-        self.role_name: str | UndefinedType = data.get('role_name', UNDEFINED)
-        self.type: int | UndefinedType = (
-            int(data['type']) if 'type' in data else UNDEFINED
+        self.role_name: str | MissingEnum = data.get('role_name', MISSING)
+        self.type: int | MissingEnum = (
+            int(data['type']) if 'type' in data else MISSING
         )
 
 
@@ -120,16 +120,16 @@ class AuditLogChange:
     Attributes
     ----------
     key: :class:`str`
-    new_value: :class:`typing.Any` | :class:`.undefined.UndefinedType`
-    old_value: :class:`typing.Any` | :class:`.undefined.UndefinedType`
+    new_value: :class:`typing.Any` | :class:`.undefined.MissingEnum`
+    old_value: :class:`typing.Any` | :class:`.undefined.MissingEnum`
     """
 
     __slots__ = ('key', 'new_value', 'old_value')
 
     def __init__(self, data: DiscordAuditLogChange) -> None:
         self.key: str = data['key']
-        self.new_value: Any | UndefinedType = data.get('new_value', UNDEFINED)
-        self.old_value: Any | UndefinedType = data.get('old_value', UNDEFINED)
+        self.new_value: Any | MissingEnum = data.get('new_value', MISSING)
+        self.old_value: Any | MissingEnum = data.get('old_value', MISSING)
 
 
 class AuditLogEntry:
@@ -139,11 +139,11 @@ class AuditLogEntry:
     Attributes
     ----------
     id: :class:`.snowflake.Snowflake`
-    target_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
-    user_id: :class:`.snowflake.Snowflake` | :class:`.undefined.UndefinedType`
+    target_id: :class:`.snowflake.Snowflake` | :class:`.undefined.MissingEnum`
+    user_id: :class:`.snowflake.Snowflake` | :class:`.undefined.MissingEnum`
     action_type: :class:`.audit_log.AuditLogEvent`
-    options: :class:`.audit_log.OptionalAuditEntryInfo` | :class:`.undefined.UndefinedType`
-    reason: :class:`str` | :class:`.undefined.UndefinedType`
+    options: :class:`.audit_log.OptionalAuditEntryInfo` | :class:`.undefined.MissingEnum`
+    reason: :class:`str` | :class:`.undefined.MissingEnum`
     """
 
     __slots__ = (
@@ -157,24 +157,24 @@ class AuditLogEntry:
     )
 
     def __init__(self, data: DiscordAuditLogEntry) -> None:
-        self.target_id: Snowflake | UndefinedType = (
-            Snowflake(data['target_id']) if data['target_id'] is not None else UNDEFINED
+        self.target_id: Snowflake | MissingEnum = (
+            Snowflake(data['target_id']) if data['target_id'] is not None else MISSING
         )
         self._changes: list[AuditLogChange] = [
             AuditLogChange(change) for change in data.get('changes', [])
         ]
-        self.user_id: Snowflake | UndefinedType = (
-            Snowflake(data['user_id']) if data['user_id'] is not None else UNDEFINED
+        self.user_id: Snowflake | MissingEnum = (
+            Snowflake(data['user_id']) if data['user_id'] is not None else MISSING
         )
 
         self.id: Snowflake = Snowflake(data['id'])
         self.action_type: AuditLogEvent = AuditLogEvent(data['action_type'])
-        self.options: OptionalAuditEntryInfo | UndefinedType = (
+        self.options: OptionalAuditEntryInfo | MissingEnum = (
             OptionalAuditEntryInfo(data['options'])
             if data.get('options') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.reason: str | UndefinedType = data.get('reason', UNDEFINED)
+        self.reason: str | MissingEnum = data.get('reason', MISSING)
 
 
 class AuditLog:

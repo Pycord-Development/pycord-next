@@ -30,7 +30,7 @@ from .member import Member
 from .message import Message
 from .snowflake import Snowflake
 from .types import INTERACTION_DATA, Interaction as InteractionData
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 from .webhook import Webhook
 
@@ -46,9 +46,9 @@ class InteractionOption:
         self,
         name: str,
         type: int,
-        value: str | int | float | UndefinedType = UNDEFINED,
+        value: str | int | float | MissingEnum = MISSING,
         options: list[InteractionOption] = [],
-        focused: bool | UndefinedType = UNDEFINED,
+        focused: bool | MissingEnum = MISSING,
     ) -> None:
         self.name = name
         self.type = type
@@ -96,37 +96,37 @@ class Interaction:
         self.id = Snowflake(data['id'])
         self.application_id = Snowflake(data['application_id'])
         self.type = data['type']
-        self.data: INTERACTION_DATA | UndefinedType = data.get('data', UNDEFINED)
+        self.data: INTERACTION_DATA | MissingEnum = data.get('data', MISSING)
         _guild_id = data.get('guild_id')
-        self.guild_id: Snowflake | UndefinedType = (
-            Snowflake(_guild_id) if _guild_id is not None else UNDEFINED
+        self.guild_id: Snowflake | MissingEnum = (
+            Snowflake(_guild_id) if _guild_id is not None else MISSING
         )
         _channel_id = data.get('channel_id')
-        self.channel_id: Snowflake | UndefinedType = (
-            Snowflake(_channel_id) if _channel_id is not None else UNDEFINED
+        self.channel_id: Snowflake | MissingEnum = (
+            Snowflake(_channel_id) if _channel_id is not None else MISSING
         )
         _member = data.get('member')
         self.member = (
             Member(_member, state, guild_id=self.guild_id)
             if _member is not None
-            else UNDEFINED
+            else MISSING
         )
         _user = data.get('user')
-        if self.member is not UNDEFINED:
+        if self.member is not MISSING:
             self.user = self.member.user
         else:
-            self.user = User(_user, state) if _user is not None else UNDEFINED
+            self.user = User(_user, state) if _user is not None else MISSING
         self.token = data['token']
         self.version = data['version']
         _message = data.get('message')
-        self.message: Message | UndefinedType = (
-            Message(_message, state) if _message is not None else UNDEFINED
+        self.message: Message | MissingEnum = (
+            Message(_message, state) if _message is not None else MISSING
         )
-        self.app_permissions: str | UndefinedType = data.get(
-            'app_permissions', UNDEFINED
+        self.app_permissions: str | MissingEnum = data.get(
+            'app_permissions', MISSING
         )
-        self.locale: str | UndefinedType = data.get('locale', UNDEFINED)
-        self.guild_locale: str | UndefinedType = data.get('guild_locale', UNDEFINED)
+        self.locale: str | MissingEnum = data.get('locale', MISSING)
+        self.guild_locale: str | MissingEnum = data.get('guild_locale', MISSING)
         self.options = []
 
         # app command data
@@ -141,12 +141,12 @@ class Interaction:
             self.guild_id = (
                 Snowflake(data.get('guild_id'))
                 if data.get('guild_id') is not None
-                else UNDEFINED
+                else MISSING
             )
         elif self.type == 3:
             self.custom_id = self.data['custom_id']
             self.component_type = self.data['component_type']
-            self.values = self.data.get('values', UNDEFINED)
+            self.values = self.data.get('values', MISSING)
 
     @property
     def resp(self) -> InteractionResponse:

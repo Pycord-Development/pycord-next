@@ -30,7 +30,7 @@ from .types import (
     Connection as DiscordConnection,
     Integration as DiscordIntegration,
 )
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State
@@ -41,9 +41,9 @@ class Connection:
         self.id: Snowflake = Snowflake(data['id'])
         self.name: str = data['name']
         self.type: SERVICE = data['type']
-        self.revoked: bool | UndefinedType = data.get('revoked', UNDEFINED)
-        self._integrations: list[DiscordIntegration] | UndefinedType = data.get(
-            'integrations', UNDEFINED
+        self.revoked: bool | MissingEnum = data.get('revoked', MISSING)
+        self._integrations: list[DiscordIntegration] | MissingEnum = data.get(
+            'integrations', MISSING
         )
         self.verified: bool = data['verified']
         self.friend_sync: bool = data['friend_sync']

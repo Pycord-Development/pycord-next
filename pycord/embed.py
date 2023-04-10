@@ -32,38 +32,38 @@ from .types import (
     Thumbnail as DiscordThumbnail,
     Video as DiscordVideo,
 )
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .utils import remove_undefined
 
 
 # pure data classes, no user interaction.
 class Provider:
     def __init__(self, data: DiscordProvider) -> None:
-        self.name: UndefinedType | str = data.get('name', UNDEFINED)
-        self.url: UndefinedType | str = data.get('url', UNDEFINED)
+        self.name: MissingEnum | str = data.get('name', MISSING)
+        self.url: MissingEnum | str = data.get('url', MISSING)
 
 
 class Video:
     def __init__(self, data: DiscordVideo) -> None:
-        self.url: UndefinedType | str = data.get('url', UNDEFINED)
-        self.proxy_url: UndefinedType | str = data.get('proxy_url', UNDEFINED)
-        self.width: UndefinedType | int = data.get('width', UNDEFINED)
-        self.height: UndefinedType | int = data.get('height', UNDEFINED)
+        self.url: MissingEnum | str = data.get('url', MISSING)
+        self.proxy_url: MissingEnum | str = data.get('proxy_url', MISSING)
+        self.width: MissingEnum | int = data.get('width', MISSING)
+        self.height: MissingEnum | int = data.get('height', MISSING)
 
 
 class Thumbnail:
     def __init__(self, url: str) -> None:
         self.url: str = url
-        self.proxy_url: str | UndefinedType = UNDEFINED
-        self.height: UndefinedType | int = UNDEFINED
-        self.width: UndefinedType | int = UNDEFINED
+        self.proxy_url: str | MissingEnum = MISSING
+        self.height: MissingEnum | int = MISSING
+        self.width: MissingEnum | int = MISSING
 
     @classmethod
     def _from_data(cls, data: DiscordThumbnail) -> 'Thumbnail':
         self = cls(data['url'])
-        self.proxy_url = data.get('proxy_url', UndefinedType)
-        self.height = data.get('height', UndefinedType)
-        self.width = data.get('width', UndefinedType)
+        self.proxy_url = data.get('proxy_url', MissingEnum)
+        self.height = data.get('height', MissingEnum)
+        self.width = data.get('width', MissingEnum)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -73,16 +73,16 @@ class Thumbnail:
 class Image:
     def __init__(self, url: str) -> None:
         self.url: str = url
-        self.proxy_url: str | UndefinedType = UNDEFINED
-        self.height: UndefinedType | int = UNDEFINED
-        self.width: UndefinedType | int = UNDEFINED
+        self.proxy_url: str | MissingEnum = MISSING
+        self.height: MissingEnum | int = MISSING
+        self.width: MissingEnum | int = MISSING
 
     @classmethod
     def _from_data(cls, data: DiscordImage) -> 'Image':
         self = cls(data['url'])
-        self.proxy_url = data.get('proxy_url', UndefinedType)
-        self.height = data.get('height', UndefinedType)
-        self.width = data.get('width', UndefinedType)
+        self.proxy_url = data.get('proxy_url', MissingEnum)
+        self.height = data.get('height', MissingEnum)
+        self.width = data.get('width', MissingEnum)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -90,15 +90,15 @@ class Image:
 
 
 class Footer:
-    def __init__(self, text: str, icon_url: str | UndefinedType = UNDEFINED) -> None:
+    def __init__(self, text: str, icon_url: str | MissingEnum = MISSING) -> None:
         self.text = text
         self.icon_url = icon_url
-        self.proxy_icon_url: UndefinedType | str = UNDEFINED
+        self.proxy_icon_url: MissingEnum | str = MISSING
 
     @classmethod
     def _from_data(cls, data: DiscordFooter) -> 'Footer':
-        self = cls(data['text'], data.get('icon_url', UNDEFINED))
-        self.proxy_icon_url = data.get('proxy_icon_url', UNDEFINED)
+        self = cls(data['text'], data.get('icon_url', MISSING))
+        self.proxy_icon_url = data.get('proxy_icon_url', MISSING)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -109,18 +109,18 @@ class Author:
     def __init__(
         self,
         name: str,
-        icon_url: str | UndefinedType = UNDEFINED,
-        url: str | UndefinedType = UNDEFINED,
+        icon_url: str | MissingEnum = MISSING,
+        url: str | MissingEnum = MISSING,
     ) -> None:
         self.name = name
         self.url = url
         self.icon_url = icon_url
-        self.proxy_icon_url: UndefinedType | str = UNDEFINED
+        self.proxy_icon_url: MissingEnum | str = MISSING
 
     @classmethod
     def _from_data(cls, data: DiscordAuthor) -> 'Author':
-        self = cls(data['name'], data.get('icon_url', UNDEFINED, data['url']))
-        self.proxy_icon_url = data.get('proxy_icon_url', UNDEFINED)
+        self = cls(data['name'], data.get('icon_url', MISSING, data['url']))
+        self.proxy_icon_url = data.get('proxy_icon_url', MISSING)
         return self
 
     def _to_data(self) -> dict[str, Any]:
@@ -129,7 +129,7 @@ class Author:
 
 class Field:
     def __init__(
-        self, name: str, value: str, inline: bool | UndefinedType = UNDEFINED
+        self, name: str, value: str, inline: bool | MissingEnum = MISSING
     ) -> None:
         self.name = name
         self.value = value
@@ -137,7 +137,7 @@ class Field:
 
     @classmethod
     def _from_data(cls, data: DiscordField) -> 'Field':
-        return cls(data['name'], data['value'], data.get('field', UNDEFINED))
+        return cls(data['name'], data['value'], data.get('field', MISSING))
 
     def _to_data(self) -> dict[str, Any]:
         return remove_undefined(name=self.name, value=self.value, inline=self.inline)
@@ -155,14 +155,14 @@ class Embed:
         self,
         *,
         title: str,
-        description: str | UndefinedType = UNDEFINED,
-        url: str | UndefinedType = UNDEFINED,
-        timestamp: datetime | UndefinedType = UNDEFINED,
-        color: Color | UndefinedType = UNDEFINED,
-        thumbnail: Thumbnail | UndefinedType = UNDEFINED,
-        author: Author | UndefinedType = UNDEFINED,
-        footer: Footer | UndefinedType = UNDEFINED,
-        image: Image | UndefinedType = UNDEFINED,
+        description: str | MissingEnum = MISSING,
+        url: str | MissingEnum = MISSING,
+        timestamp: datetime | MissingEnum = MISSING,
+        color: Color | MissingEnum = MISSING,
+        thumbnail: Thumbnail | MissingEnum = MISSING,
+        author: Author | MissingEnum = MISSING,
+        footer: Footer | MissingEnum = MISSING,
+        image: Image | MissingEnum = MISSING,
         fields: list[Field] = None,
     ) -> None:
         if fields is None:
@@ -226,12 +226,12 @@ class Embed:
 
     def _to_data(self) -> dict[str, Any]:
         color = self.color.value if self.color else None
-        thumbnail = self.thumbnail._to_data() if self.thumbnail else UNDEFINED
-        author = self.author._to_data() if self.author else UNDEFINED
-        footer = self.footer._to_data() if self.footer else UNDEFINED
-        image = self.image._to_data() if self.image else UNDEFINED
+        thumbnail = self.thumbnail._to_data() if self.thumbnail else MISSING
+        author = self.author._to_data() if self.author else MISSING
+        footer = self.footer._to_data() if self.footer else MISSING
+        image = self.image._to_data() if self.image else MISSING
         fields = [field._to_data() for field in self.fields]
-        timestamp = self.timestamp.isoformat() if self.timestamp else UNDEFINED
+        timestamp = self.timestamp.isoformat() if self.timestamp else MISSING
 
         return remove_undefined(
             title=self.title,

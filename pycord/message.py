@@ -42,7 +42,7 @@ from .types import (
     MessageReference as DiscordMessageReference,
     Reaction as DiscordReaction,
 )
-from .undefined import UNDEFINED, UndefinedType
+from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -86,63 +86,63 @@ class MessageActivity:
 
     def __init__(self, data: DiscordMessageActivity) -> None:
         self.type: MessageActivityType = MessageActivityType(data['type'])
-        self.party_id: UndefinedType | str = data.get('party_id', UNDEFINED)
+        self.party_id: MissingEnum | str = data.get('party_id', MISSING)
 
 
 class MessageReference:
     __slots__ = ('message_id', 'channel_id', 'guild_id', 'fail_if_not_exists')
 
     def __init__(self, data: DiscordMessageReference) -> None:
-        self.message_id: Snowflake | UndefinedType = (
+        self.message_id: Snowflake | MissingEnum = (
             Snowflake(data.get('message_id'))
             if data.get('message_id') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.channel_id: Snowflake | UndefinedType = (
+        self.channel_id: Snowflake | MissingEnum = (
             Snowflake(data.get('channel_id'))
             if data.get('channel_id') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.guild_id: Snowflake | UndefinedType = (
+        self.guild_id: Snowflake | MissingEnum = (
             Snowflake(data.get('guild_id'))
             if data.get('guild_id') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.fail_if_not_exists: bool | UndefinedType = data.get(
-            'fail_if_not_exists', UNDEFINED
+        self.fail_if_not_exists: bool | MissingEnum = data.get(
+            'fail_if_not_exists', MISSING
         )
 
     # refactor so user can initialize
     def __init__(
         self,
-        message_id: Snowflake | UndefinedType = UNDEFINED,
-        channel_id: Snowflake | UndefinedType = UNDEFINED,
-        guild_id: Snowflake | UndefinedType = UNDEFINED,
-        fail_if_not_exists: bool | UndefinedType = UNDEFINED,
+        message_id: Snowflake | MissingEnum = MISSING,
+        channel_id: Snowflake | MissingEnum = MISSING,
+        guild_id: Snowflake | MissingEnum = MISSING,
+        fail_if_not_exists: bool | MissingEnum = MISSING,
     ) -> None:
-        self.message_id: Snowflake | UndefinedType = message_id
-        self.channel_id: Snowflake | UndefinedType = channel_id
-        self.guild_id: Snowflake | UndefinedType = guild_id
-        self.fail_if_not_exists: bool | UndefinedType = fail_if_not_exists
+        self.message_id: Snowflake | MissingEnum = message_id
+        self.channel_id: Snowflake | MissingEnum = channel_id
+        self.guild_id: Snowflake | MissingEnum = guild_id
+        self.fail_if_not_exists: bool | MissingEnum = fail_if_not_exists
 
     def to_dict(self) -> DiscordMessageReference:
         data = {}
-        if self.message_id is not UNDEFINED:
+        if self.message_id is not MISSING:
             data['message_id'] = self.message_id
-        if self.channel_id is not UNDEFINED:
+        if self.channel_id is not MISSING:
             data['channel_id'] = self.channel_id
-        if self.guild_id is not UNDEFINED:
+        if self.guild_id is not MISSING:
             data['guild_id'] = self.guild_id
-        if self.fail_if_not_exists is not UNDEFINED:
+        if self.fail_if_not_exists is not MISSING:
             data['fail_if_not_exists'] = self.fail_if_not_exists
         return data
 
     @classmethod
     def from_dict(cls, data: DiscordMessageReference) -> MessageReference:
         return cls(
-            message_id=data.get('message_id', UNDEFINED),
-            channel_id=data.get('channel_id', UNDEFINED),
-            guild_id=data.get('guild_id', UNDEFINED),
+            message_id=data.get('message_id', MISSING),
+            channel_id=data.get('channel_id', MISSING),
+            guild_id=data.get('guild_id', MISSING),
         )
 
 
@@ -154,10 +154,10 @@ class MessageInteraction:
         self.type: InteractionType = InteractionType(data['type'])
         self.name: str = data['name']
         self.user: User = User(data['user'], state)
-        self.member: Member | UndefinedType = (
+        self.member: Member | MissingEnum = (
             Member(data.get('member'), state)
             if data.get('member') is not None
-            else UNDEFINED
+            else MISSING
         )
 
 
@@ -257,53 +257,53 @@ class Message:
         self.reactions: list[Reaction] = [
             Reaction(r) for r in data.get('reactions', [])
         ]
-        self.nonce: UndefinedType | int | str = data.get('nonce', UNDEFINED)
+        self.nonce: MissingEnum | int | str = data.get('nonce', MISSING)
         self.pinned: bool = data['pinned']
         self.webhook_id: Snowflake = (
             Snowflake(data.get('webhook_id'))
             if data.get('webhook_id') is not None
-            else UNDEFINED
+            else MISSING
         )
         self.type: MessageType = MessageType(data['type'])
-        self.activity: MessageActivity | UndefinedType = (
+        self.activity: MessageActivity | MissingEnum = (
             MessageActivity(data.get('activity'))
             if data.get('activity') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.application: Application | UndefinedType = (
+        self.application: Application | MissingEnum = (
             Application(data.get('application'))
             if data.get('application') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.application_id: Snowflake | UndefinedType = (
+        self.application_id: Snowflake | MissingEnum = (
             Snowflake(data.get('application_id'))
             if data.get('application_id') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.reference: MessageReference | UndefinedType = (
+        self.reference: MessageReference | MissingEnum = (
             MessageReference.from_dict(data.get('message_reference'))
             if data.get('message_reference') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.flags: MessageFlags | UndefinedType = (
+        self.flags: MessageFlags | MissingEnum = (
             MessageFlags.from_value(data.get('flags'))
             if data.get('flags') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.referenced_message: Message | UndefinedType = (
+        self.referenced_message: Message | MissingEnum = (
             Message(data.get('referenced_message'), state)
             if data.get('referenced_message') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.interaction: MessageInteraction | UndefinedType = (
+        self.interaction: MessageInteraction | MissingEnum = (
             MessageInteraction(data.get('interaction'), state)
             if data.get('interaction') is not None
-            else UNDEFINED
+            else MISSING
         )
-        self.thread: Thread | UndefinedType = (
+        self.thread: Thread | MissingEnum = (
             Thread(data.get('thread'), state=state)
             if data.get('thread') is not None
-            else UNDEFINED
+            else MISSING
         )
         # TODO: Work on components
         # self.components
@@ -311,7 +311,7 @@ class Message:
             StickerItem(si) for si in data.get('sticker_items', [])
         ]
         self.stickers: list[Sticker] = [Sticker(s) for s in data.get('stickers', [])]
-        self.position: UndefinedType | int = data.get('position', UndefinedType)
+        self.position: MissingEnum | int = data.get('position', MissingEnum)
         asyncio.create_task(self._retreive_channel())
 
     async def _retreive_channel(self) -> None:
@@ -393,7 +393,7 @@ class Message:
         self,
         emoji: Emoji | str,
         *,
-        after: Snowflake | UndefinedType = UNDEFINED,
+        after: Snowflake | MissingEnum = MISSING,
         limit: int = 25,
     ) -> list[User]:
         if isinstance(emoji, Emoji):
@@ -425,12 +425,12 @@ class Message:
     async def edit(
         self,
         *,
-        content: str | None | UndefinedType = UNDEFINED,
-        embeds: list[Embed] | None | UndefinedType = UNDEFINED,
-        allowed_mentions: AllowedMentions | None | UndefinedType = UNDEFINED,
-        attachments: list[Attachment] | None | UndefinedType = UNDEFINED,
-        flags: MessageFlags | None | UndefinedType = UNDEFINED,
-        houses: list[House] | UndefinedType = UNDEFINED,
+        content: str | None | MissingEnum = MISSING,
+        embeds: list[Embed] | None | MissingEnum = MISSING,
+        allowed_mentions: AllowedMentions | None | MissingEnum = MISSING,
+        attachments: list[Attachment] | None | MissingEnum = MISSING,
+        flags: MessageFlags | None | MissingEnum = MISSING,
+        houses: list[House] | MissingEnum = MISSING,
     ) -> Message:
         if houses:
             if len(houses) > 5:
@@ -441,7 +441,7 @@ class Message:
             for house in houses:
                 self._state.sent_house(house)
         else:
-            components = UNDEFINED
+            components = MISSING
 
         data = await self._state.http.edit_message(
             self.channel_id,
@@ -475,8 +475,8 @@ class Message:
         self,
         *,
         name: str,
-        auto_archive_duration: int | UndefinedType = UNDEFINED,
-        rate_limit_per_user: int | UndefinedType = UNDEFINED,
+        auto_archive_duration: int | MissingEnum = MISSING,
+        rate_limit_per_user: int | MissingEnum = MISSING,
     ) -> Thread | AnnouncementThread:
         return await self.channel.create_thread(
             self,

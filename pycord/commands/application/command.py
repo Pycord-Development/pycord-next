@@ -35,7 +35,7 @@ from ...role import Role
 from ...snowflake import Snowflake
 from ...types import AsyncFunc
 from ...types.interaction import ApplicationCommandData
-from ...undefined import UNDEFINED, UndefinedType
+from ...missing import MISSING, MissingEnum
 from ...user import User
 from ...utils import get_arg_defaults, remove_undefined
 from ..command import Command
@@ -163,15 +163,15 @@ class Option(_BaseOption):
         type: ApplicationCommandOptionType
         | int
         | Any = ApplicationCommandOptionType.STRING,
-        name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
-        description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
-        required: bool | UndefinedType = UNDEFINED,
-        choices: list[CommandChoice] | UndefinedType = UNDEFINED,
-        options: list['Option'] | UndefinedType = UNDEFINED,
-        channel_types: list[int] | UndefinedType = UNDEFINED,
-        min_value: int | UndefinedType = UNDEFINED,
-        max_value: int | UndefinedType = UNDEFINED,
-        autocomplete: bool | UndefinedType = UNDEFINED,
+        name_localizations: dict[str, str] | MissingEnum = MISSING,
+        description_localizations: dict[str, str] | MissingEnum = MISSING,
+        required: bool | MissingEnum = MISSING,
+        choices: list[CommandChoice] | MissingEnum = MISSING,
+        options: list['Option'] | MissingEnum = MISSING,
+        channel_types: list[int] | MissingEnum = MISSING,
+        min_value: int | MissingEnum = MISSING,
+        max_value: int | MissingEnum = MISSING,
+        autocomplete: bool | MissingEnum = MISSING,
         autocompleter: AsyncFunc = _autocomplete,
     ) -> None:
         if isinstance(type, ApplicationCommandOptionType):
@@ -195,7 +195,7 @@ class Option(_BaseOption):
         else:
             if choices:
                 self.choices = [choice._to_dict() for choice in choices]
-        if options is UNDEFINED:
+        if options is MISSING:
             self.options = []
         else:
             self.options = options
@@ -206,11 +206,11 @@ class Option(_BaseOption):
         self._subs = {}
 
         if TYPE_CHECKING:
-            self.focused: bool | UndefinedType = UNDEFINED
-            self.value: str | int | float | UndefinedType = UNDEFINED
-            self.options: list[InteractionOption] = UNDEFINED
-            self._param: str = UNDEFINED
-            self._callback: AsyncFunc | None = UNDEFINED
+            self.focused: bool | MissingEnum = MISSING
+            self.value: str | int | float | MissingEnum = MISSING
+            self.options: list[InteractionOption] = MISSING
+            self._param: str = MISSING
+            self._callback: AsyncFunc | None = MISSING
 
     @property
     def callback(self) -> AsyncFunc:
@@ -269,8 +269,8 @@ class Option(_BaseOption):
             required=self.required,
             choices=self.choices,
             options=[option.to_dict() for option in self.options]
-            if self.options is not UNDEFINED
-            else UNDEFINED,
+            if self.options is not MISSING
+            else MISSING,
             channel_types=self.channel_types,
             min_value=self.min_value,
             max_value=self.max_value,
@@ -281,8 +281,8 @@ class Option(_BaseOption):
         self,
         name: str | None = None,
         description: str | None = None,
-        name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
-        description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
+        name_localizations: dict[str, str] | MissingEnum = MISSING,
+        description_localizations: dict[str, str] | MissingEnum = MISSING,
     ) -> ApplicationCommand:
         """
         Add a command to this sub command to make it a group.
@@ -368,16 +368,16 @@ class ApplicationCommand(Command):
         # normal parameters
         callback: AsyncFunc | None,
         state: State,
-        name: str | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
         type: int | ApplicationCommandType = ApplicationCommandType.CHAT_INPUT,
-        description: str | UndefinedType = UNDEFINED,
+        description: str | MissingEnum = MISSING,
         guild_id: int | None = None,
         group: Group | None = None,
         # discord parameters
-        name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
-        description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
-        dm_permission: bool | UndefinedType = UNDEFINED,
-        nsfw: bool | UndefinedType = UNDEFINED,
+        name_localizations: dict[str, str] | MissingEnum = MISSING,
+        description_localizations: dict[str, str] | MissingEnum = MISSING,
+        dm_permission: bool | MissingEnum = MISSING,
+        nsfw: bool | MissingEnum = MISSING,
     ) -> None:
         super().__init__(callback, name, state, group)
 
@@ -395,7 +395,7 @@ class ApplicationCommand(Command):
                 description or callback.__doc__ or 'No description provided'
             )
         else:
-            self.description = UNDEFINED
+            self.description = MISSING
         self.description_localizations = description_localizations
         self.dm_permission = dm_permission
         self.nsfw = nsfw
@@ -407,10 +407,10 @@ class ApplicationCommand(Command):
 
     def command(
         self,
-        name: str | UndefinedType = UNDEFINED,
-        description: str | UndefinedType = UNDEFINED,
-        name_localizations: dict[str, str] | UndefinedType = UNDEFINED,
-        description_localizations: dict[str, str] | UndefinedType = UNDEFINED,
+        name: str | MissingEnum = MISSING,
+        description: str | MissingEnum = MISSING,
+        name_localizations: dict[str, str] | MissingEnum = MISSING,
+        description_localizations: dict[str, str] | MissingEnum = MISSING,
     ) -> ApplicationCommand:
         """
         Add a sub command to this command

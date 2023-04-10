@@ -27,7 +27,7 @@ from uuid import uuid4
 from ..enums import TextInputStyle
 from ..interaction import Interaction
 from ..types import AsyncFunc
-from ..undefined import UNDEFINED, UndefinedType
+from ..missing import MISSING, MissingEnum
 from ..utils import remove_undefined
 from .interactive_component import InteractiveComponent
 
@@ -123,11 +123,11 @@ class TextInput(InteractiveComponent):
         self,
         label: str,
         style: TextInputStyle | int,
-        min_length: int | UndefinedType = UNDEFINED,
-        max_length: int | UndefinedType = UNDEFINED,
-        required: bool | UndefinedType = UNDEFINED,
-        value: str | UndefinedType = UNDEFINED,
-        placeholder: str | UndefinedType = UNDEFINED,
+        min_length: int | MissingEnum = MISSING,
+        max_length: int | MissingEnum = MISSING,
+        required: bool | MissingEnum = MISSING,
+        value: str | MissingEnum = MISSING,
+        placeholder: str | MissingEnum = MISSING,
     ) -> None:
         self.id = str(uuid4())
         self.label = label
