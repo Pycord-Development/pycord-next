@@ -46,8 +46,8 @@ ContextT = TypeVar('ContextT', bound=BaseContext)
 
 class Gear(Generic[ContextT]):
     """
-    The Gear. Pycord's reinterpretation of Cogs in a way which is easier for both developers and library developers.
-    It removes the old subclass-based system with a new instance-based system.
+    The Gear. A set of commands & events separate from Bot.
+    Useful for multi-file separation for huge bots.
 
     Parameters
     ----------
