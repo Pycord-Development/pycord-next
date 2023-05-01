@@ -100,7 +100,7 @@ class State:
         self.max_messages: int | None = options.get('max_messages', 1000)
         self.large_threshold: int = options.get('large_threshold', 250)
         self.shard_concurrency: PassThrough | None = None
-        self.intents: Intents = options['intents']
+        self.intents: Intents = options.get('intents', Intents())
         self.user: User | None = None
         self.raw_user: dict[str, Any] | None = None
         self.store = GroupedStore(messages_max_items=self.max_messages)

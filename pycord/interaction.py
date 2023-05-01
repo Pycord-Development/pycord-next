@@ -88,11 +88,15 @@ class Interaction:
     )
 
     def __init__(
-        self, data: InteractionData, state: State, response: bool = False
+        self,
+        data: InteractionData,
+        state: State,
+        response: bool = False,
+        save: bool = False,
     ) -> None:
         self._state = state
         if response:
-            self.response = InteractionResponse(self)
+            self.response = InteractionResponse(self, save=save)
         self.id = Snowflake(data['id'])
         self.application_id = Snowflake(data['application_id'])
         self.type = data['type']
@@ -154,10 +158,12 @@ class Interaction:
 class InteractionResponse:
     __slots__ = ('_parent', '_deferred', 'responded')
 
-    def __init__(self, parent: Interaction) -> None:
+    def __init__(self, parent: Interaction, save: bool) -> None:
         self._parent = parent
         self.responded: bool = False
         self._deferred: bool = False
+        self._save = save
+        self.raw_response = None
 
     @cached_property
     def followup(self) -> Webhook:
@@ -175,6 +181,19 @@ class InteractionResponse:
 
         if isinstance(flags, MessageFlags):
             flags = flags.as_bit
+
+        if self.save:
+            self.raw_response = {
+                'type': 4,
+                'data': {
+                    'content': content,
+                    'tts': tts,
+                    'embeds': embeds,
+                    'flags': flags,
+                },
+            }
+            self.responded = True
+            return
 
         await self._parent._state.http.create_interaction_response(
             self._parent.id,
@@ -213,3 +232,22 @@ class InteractionResponse:
         )
         self._parent._state.sent_modal(modal)
         self.responded = True
+
+    async def autocomplete(self, choices: list[str]) -> None:
+        if self.responded:
+            raise InteractionException('This interaction has already been responded to')
+
+        if self._save:
+            self.raw_response = {
+                'type': 8,
+                'data': {'choices': choices},
+            }
+
+        await self._state.http.create_interaction_response(
+            self._parent.id,
+            self._parent.token,
+            {
+                'type': 8,
+                'data': {'choices': choices},
+            },
+        )
