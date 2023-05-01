@@ -18,6 +18,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
+from ...missing import MISSING, MissingEnum
 from ...snowflake import Snowflake
 from ...types import (
     AUTO_MODERATION_EVENT_TYPES,
@@ -26,7 +27,6 @@ from ...types import (
     AutoModerationRule,
     AutoModerationTriggerMetadata,
 )
-from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined
 from ..route import Route
 from .base import BaseRouter
@@ -100,9 +100,7 @@ class AutoModeration(BaseRouter):
         name: str | MissingEnum = MISSING,
         event_type: AUTO_MODERATION_EVENT_TYPES | MissingEnum = MISSING,
         actions: list[AutoModerationAction] | MissingEnum = MISSING,
-        trigger_metadata: AutoModerationTriggerMetadata
-        | MissingEnum
-        | None = MISSING,
+        trigger_metadata: AutoModerationTriggerMetadata | MissingEnum | None = MISSING,
         enabled: bool | MissingEnum = MISSING,
         exempt_roles: list[Snowflake] | MissingEnum = MISSING,
         exempt_channels: list[Snowflake] | MissingEnum = MISSING,

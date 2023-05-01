@@ -29,9 +29,9 @@ from .enums import (
     GuildScheduledEventStatus,
 )
 from .member import Member
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .types import EntityMetadata as DiscordEntityMetadata, GuildScheduledEvent
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -50,9 +50,7 @@ class ScheduledEventUser:
         )
         self.user: User = User(data['user'], state)
         self.member: Member | MissingEnum = (
-            Member(data['member'], state)
-            if data.get('member') is not None
-            else MISSING
+            Member(data['member'], state) if data.get('member') is not None else MISSING
         )
 
 
@@ -71,9 +69,7 @@ class ScheduledEvent:
             else self._creator_id
         )
         self.name: str = data['name']
-        self.description: MissingEnum | str | None = data.get(
-            'description', MISSING
-        )
+        self.description: MissingEnum | str | None = data.get('description', MISSING)
         self.scheduled_start_time: datetime = datetime.fromisoformat(
             data['scheduled_start_time']
         )

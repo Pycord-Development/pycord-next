@@ -27,6 +27,7 @@ from .auto_moderation import AutoModRule
 from .channel import Thread
 from .enums import AuditLogEvent
 from .integration import Integration
+from .missing import MISSING, Maybe, MissingEnum
 from .scheduled_event import ScheduledEvent
 from .snowflake import Snowflake
 from .types import (
@@ -36,7 +37,6 @@ from .types import (
     AuditLogEntry as DiscordAuditLogEntry,
     OptionalAuditEntryInfo as DiscordOptionalAuditEntryInfo,
 )
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 from .webhook import GuildWebhook
 
@@ -94,9 +94,7 @@ class OptionalAuditEntryInfo:
             int(data['count']) if 'count' in data else MISSING
         )
         self.delete_member_days: int | MissingEnum = (
-            int(data['delete_member_days'])
-            if 'delete_member_days' in data
-            else MISSING
+            int(data['delete_member_days']) if 'delete_member_days' in data else MISSING
         )
         self.id: Snowflake | MissingEnum = (
             Snowflake(data['id']) if 'id' in data else MISSING
@@ -108,9 +106,7 @@ class OptionalAuditEntryInfo:
             Snowflake(data['message_id']) if 'message_id' in data else MISSING
         )
         self.role_name: str | MissingEnum = data.get('role_name', MISSING)
-        self.type: int | MissingEnum = (
-            int(data['type']) if 'type' in data else MISSING
-        )
+        self.type: int | MissingEnum = int(data['type']) if 'type' in data else MISSING
 
 
 class AuditLogChange:

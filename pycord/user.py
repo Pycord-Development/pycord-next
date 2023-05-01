@@ -26,9 +26,9 @@ from typing import TYPE_CHECKING
 from .color import Color
 from .enums import PremiumType
 from .flags import UserFlags
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .types import LOCALE, User as DiscordUser
-from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State
@@ -44,9 +44,7 @@ class User:
         self.system: bool | MissingEnum = data.get('system', MISSING)
         self.mfa_enabled: bool | MissingEnum = data.get('mfa_enabled', MISSING)
         self._banner: MissingEnum | str | None = data.get('banner', MISSING)
-        self._accent_color: MissingEnum | int | None = data.get(
-            'accent_color', MISSING
-        )
+        self._accent_color: MissingEnum | int | None = data.get('accent_color', MISSING)
         self.accent_color: MissingEnum | Color | None = (
             Color(self._accent_color)
             if self._accent_color not in [MISSING, None]
@@ -57,9 +55,7 @@ class User:
         self.email: str | None | MissingEnum = data.get('email', MISSING)
         self._flags: MissingEnum | int = data.get('flags', MISSING)
         self.flags: MissingEnum | UserFlags = (
-            UserFlags.from_value(self._flags)
-            if self._flags is not MISSING
-            else MISSING
+            UserFlags.from_value(self._flags) if self._flags is not MISSING else MISSING
         )
         self._premium_type: MissingEnum | int = data.get('premium_type', MISSING)
         self.premium_type: PremiumType | MissingEnum = (

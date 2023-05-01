@@ -24,6 +24,7 @@ import re
 from typing import TYPE_CHECKING, Any
 
 from .enums import StickerFormatType, StickerType
+from .missing import MISSING, Maybe, MissingEnum
 from .role import Role
 from .snowflake import Snowflake
 from .types import (
@@ -33,7 +34,6 @@ from .types import (
     StickerItem as DiscordStickerItem,
     User as DiscordUser,
 )
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -59,9 +59,7 @@ class Emoji:
         self.user: MissingEnum | User = (
             User(self._user, state) if self._user is not MISSING else MISSING
         )
-        self.require_colons: MissingEnum | bool = data.get(
-            'require_colons', MISSING
-        )
+        self.require_colons: MissingEnum | bool = data.get('require_colons', MISSING)
         self.managed: MissingEnum | bool = data.get('managed', MISSING)
         self.animated: MissingEnum | bool = data.get('animated', MISSING)
         self.available: MissingEnum | bool = data.get('available', MISSING)

@@ -21,9 +21,9 @@
 from typing import Literal
 
 from ...file import File
+from ...missing import MISSING, MissingEnum
 from ...snowflake import Snowflake
 from ...types import PRIVACY_LEVEL, EntityMetadata, GuildScheduledEvent
-from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined, to_datauri
 from ..route import Route
 from .base import BaseRouter

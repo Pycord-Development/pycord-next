@@ -31,6 +31,7 @@ from .errors import ComponentException
 from .flags import MessageFlags
 from .media import Attachment, Emoji, Sticker, StickerItem
 from .member import Member
+from .missing import MISSING, Maybe, MissingEnum
 from .role import Role
 from .snowflake import Snowflake
 from .types import (
@@ -42,7 +43,6 @@ from .types import (
     MessageReference as DiscordMessageReference,
     Reaction as DiscordReaction,
 )
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:

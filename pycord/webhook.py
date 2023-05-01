@@ -26,9 +26,9 @@ from .api import HTTPClient, Route
 from .embed import Embed
 from .enums import WebhookType
 from .guild import Guild
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .types import Webhook as DiscordWebhook
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 from .utils import remove_undefined
 

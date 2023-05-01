@@ -26,8 +26,8 @@ from uuid import uuid4
 
 from ..enums import TextInputStyle
 from ..interaction import Interaction
-from ..types import AsyncFunc
 from ..missing import MISSING, MissingEnum
+from ..types import AsyncFunc
 from ..utils import remove_undefined
 from .interactive_component import InteractiveComponent
 

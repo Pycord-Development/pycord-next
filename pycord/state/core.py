@@ -53,10 +53,10 @@ from ..events.guilds import (
     GuildUpdate,
 )
 from ..events.other import InteractionCreate, Ready, UserUpdate
+from ..missing import MISSING
 from ..ui import Component
 from ..ui.house import House
 from ..ui.text_input import Modal
-from ..missing import MISSING
 from ..user import User
 from .grouped_store import GroupedStore
 

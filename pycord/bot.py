@@ -39,11 +39,11 @@ from .flags import Intents, SystemChannelFlags
 from .gateway import PassThrough, ShardCluster, ShardManager
 from .guild import Guild, GuildPreview
 from .interface import print_banner, start_logging
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .state import State
 from .types import AsyncFunc
 from .types.audit_log import AUDIT_LOG_EVENT_TYPE
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 from .utils import chunk, get_arg_defaults
 

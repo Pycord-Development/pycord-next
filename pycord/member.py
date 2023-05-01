@@ -30,10 +30,10 @@ from .snowflake import Snowflake
 if TYPE_CHECKING:
     from .state import State
 
+from .missing import MISSING, Maybe, MissingEnum
 from .pages import Page
 from .pages.paginator import Paginator
 from .types import GuildMember
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 
@@ -81,8 +81,7 @@ class Member:
         )
         self.communication_disabled_until: None | MissingEnum | datetime = (
             datetime.fromisoformat(data.get('communication_disabled_until'))
-            if data.get('communication_disabled_until', MISSING)
-            not in [MISSING, None]
+            if data.get('communication_disabled_until', MISSING) not in [MISSING, None]
             else data.get('communication_disabled_until', MISSING)
         )
 

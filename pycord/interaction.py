@@ -28,9 +28,9 @@ from .errors import InteractionException
 from .flags import MessageFlags
 from .member import Member
 from .message import Message
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .types import INTERACTION_DATA, Interaction as InteractionData
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 from .webhook import Webhook
 
@@ -122,9 +122,7 @@ class Interaction:
         self.message: Message | MissingEnum = (
             Message(_message, state) if _message is not None else MISSING
         )
-        self.app_permissions: str | MissingEnum = data.get(
-            'app_permissions', MISSING
-        )
+        self.app_permissions: str | MissingEnum = data.get('app_permissions', MISSING)
         self.locale: str | MissingEnum = data.get('locale', MISSING)
         self.guild_locale: str | MissingEnum = data.get('guild_locale', MISSING)
         self.options = []

@@ -26,8 +26,8 @@ from typing import TYPE_CHECKING, Any
 from ..enums import ButtonStyle
 from ..errors import ComponentException
 from ..media import Emoji
-from ..types import AsyncFunc
 from ..missing import MISSING, MissingEnum
+from ..types import AsyncFunc
 from ..utils import remove_undefined
 from .interactive_component import InteractiveComponent
 

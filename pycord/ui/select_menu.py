@@ -27,9 +27,9 @@ from ..channel import identify_channel
 from ..errors import ComponentException
 from ..interaction import Interaction
 from ..media import Emoji
+from ..missing import MISSING, MissingEnum
 from ..role import Role
 from ..types import AsyncFunc
-from ..missing import MISSING, MissingEnum
 from ..user import User
 from ..utils import get_arg_defaults, remove_undefined
 from .interactive_component import InteractiveComponent

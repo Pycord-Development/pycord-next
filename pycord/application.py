@@ -23,6 +23,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .flags import ApplicationFlags, Permissions
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .team import Team
 from .types import (
@@ -30,7 +31,6 @@ from .types import (
     Application as DiscordApplication,
     InstallParams as DiscordInstallParams,
 )
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -132,13 +132,9 @@ class Application:
         self.terms_of_service_url: Maybe[str] = data.get(
             'terms_of_service_url', MISSING
         )
-        self.privacy_policy_url: Maybe[str] = data.get(
-            'privacy_policy_url', MISSING
-        )
+        self.privacy_policy_url: Maybe[str] = data.get('privacy_policy_url', MISSING)
         self.owner: Maybe[User] = (
-            User(data.get('owner'), state)
-            if data.get('owner') is not None
-            else MISSING
+            User(data.get('owner'), state) if data.get('owner') is not None else MISSING
         )
         self.verify_key: str = data.get('verify_key')
         self.team: Team | None = (

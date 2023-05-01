@@ -29,6 +29,7 @@ from .enums import (
     AutoModKeywordPresetType,
     AutoModTriggerType,
 )
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .types import (
     AutoModerationAction as DiscordAutoModerationAction,
@@ -36,7 +37,6 @@ from .types import (
     AutoModerationRule as DiscordAutoModerationRule,
     AutoModerationTriggerMetadata as DiscordAutoModerationTriggerMetadata,
 )
-from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State
@@ -68,9 +68,7 @@ class AutoModActionMetadata:
             if data.get('channel_id') is not None
             else MISSING
         )
-        self.duration_seconds: int | MissingEnum = data.get(
-            'duration_seconds', MISSING
-        )
+        self.duration_seconds: int | MissingEnum = data.get('duration_seconds', MISSING)
 
 
 class AutoModAction:

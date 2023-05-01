@@ -21,13 +21,13 @@
 from urllib.parse import quote
 
 from ...file import File
+from ...missing import MISSING, MissingEnum
 from ...snowflake import Snowflake
 from ...types import Attachment, Emoji, User
 from ...types.channel import AllowedMentions
 from ...types.component import Component
 from ...types.embed import Embed
 from ...types.message import Message, MessageReference
-from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined
 from ..route import Route
 from .base import BaseRouter

@@ -23,9 +23,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .enums import StageInstancePrivacyLevel
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .types import StageInstance as DiscordStageInstance
-from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State

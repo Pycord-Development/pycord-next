@@ -25,6 +25,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from .application import Application
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .types import (
     INTEGRATION_EXPIRE_BEHAVIOR,
@@ -34,7 +35,6 @@ from .types import (
     Integration as DiscordIntegration,
     IntegrationApplication as DiscordIntegrationApplication,
 )
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -86,9 +86,7 @@ class Integration:
             if data.get('synced_at') is not None
             else MISSING
         )
-        self.subscriber_count: int | MissingEnum = data.get(
-            'subscriber_count', MISSING
-        )
+        self.subscriber_count: int | MissingEnum = data.get('subscriber_count', MISSING)
         self.revoked: bool | MissingEnum = data.get('revoked', MISSING)
         self.application: Application | MissingEnum = (
             IntegrationApplication(data['application'], state)

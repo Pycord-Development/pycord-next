@@ -31,6 +31,7 @@ from .file import File
 from .flags import ChannelFlags, Permissions
 from .member import Member
 from .message import AllowedMentions, Message, MessageReference
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .types import (
     Channel as DiscordChannel,
@@ -41,7 +42,6 @@ from .types import (
     ThreadMetadata as DiscordThreadMetadata,
 )
 from .typing import Typing
-from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State
@@ -276,9 +276,7 @@ class GuildChannel(Channel):
     def __init__(self, data: DiscordChannel, state: State) -> None:
         super().__init__(data, state)
         self.guild_id: Snowflake | MissingEnum = (
-            Snowflake(data['guild_id'])
-            if data.get('guild_id') is not None
-            else MISSING
+            Snowflake(data['guild_id']) if data.get('guild_id') is not None else MISSING
         )
         self.position: int | MissingEnum = data.get('position', MISSING)
         self.permission_overwrites: list[_Overwrite] = [
@@ -602,9 +600,7 @@ class Thread(MessageableChannel, GuildChannel):
             else MISSING
         )
         self.owner_id: Snowflake | MissingEnum = (
-            Snowflake(data['owner_id'])
-            if data.get('owner_id') is not None
-            else MISSING
+            Snowflake(data['owner_id']) if data.get('owner_id') is not None else MISSING
         )
 
     async def edit(

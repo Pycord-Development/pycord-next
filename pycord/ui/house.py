@@ -28,8 +28,8 @@ from uuid import uuid4
 from ..enums import ButtonStyle, SelectMenuType
 from ..errors import ComponentException
 from ..media import Emoji
-from ..types import AsyncFunc
 from ..missing import MISSING, MissingEnum
+from ..types import AsyncFunc
 from .button import Button
 from .component import ActionRow, Component
 from .select_menu import SelectMenu

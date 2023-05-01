@@ -24,13 +24,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .enums import VisibilityType
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .types import (
     SERVICE,
     Connection as DiscordConnection,
     Integration as DiscordIntegration,
 )
-from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State

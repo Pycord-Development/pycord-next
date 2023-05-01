@@ -75,7 +75,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     install_requires=requirements,
     extras_require=extra_requires,
-    description="A modern Discord API wrapper for Python",
+    description='A modern Discord API wrapper for Python',
     python_requires='>=3.10',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',

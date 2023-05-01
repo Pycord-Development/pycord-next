@@ -57,6 +57,7 @@ from .file import File
 from .flags import Permissions, SystemChannelFlags
 from .media import Emoji, Sticker
 from .member import Member, MemberPaginator
+from .missing import MISSING, Maybe, MissingEnum
 from .pages.paginator import Page, Paginator
 from .role import Role
 from .scheduled_event import ScheduledEvent
@@ -71,7 +72,6 @@ from .types import (
     Widget as DiscordWidget,
     WidgetSettings as DiscordWidgetSettings,
 )
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 from .utils import remove_undefined
 from .welcome_screen import WelcomeScreen
@@ -232,9 +232,7 @@ class Guild:
                 if self._rules_channel_id is not None
                 else None
             )
-            self.max_presences: int | MissingEnum = data.get(
-                'max_presences', MISSING
-            )
+            self.max_presences: int | MissingEnum = data.get('max_presences', MISSING)
             self.max_members: int | MissingEnum = data.get('max_members', MISSING)
             self.vanity_url: str | None = data.get('vanity_url_code')
             self.description: str | None = data.get('description')

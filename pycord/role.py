@@ -29,8 +29,8 @@ from .snowflake import Snowflake
 if TYPE_CHECKING:
     from .state import State
 
+from .missing import MISSING, Maybe, MissingEnum
 from .types import Role as DiscordRole, RoleTags as DiscordRoleTags
-from .missing import MISSING, MissingEnum, Maybe
 
 
 class RoleTags:

@@ -22,6 +22,7 @@ from datetime import datetime
 from typing import Any
 
 from .color import Color
+from .missing import MISSING, Maybe, MissingEnum
 from .types import (
     Author as DiscordAuthor,
     Embed as DiscordEmbed,
@@ -32,7 +33,6 @@ from .types import (
     Thumbnail as DiscordThumbnail,
     Video as DiscordVideo,
 )
-from .missing import MISSING, MissingEnum, Maybe
 from .utils import remove_undefined
 
 

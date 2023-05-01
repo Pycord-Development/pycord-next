@@ -24,9 +24,9 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from .member import Member
+from .missing import MISSING, Maybe, MissingEnum
 from .snowflake import Snowflake
 from .types import VoiceState as DiscordVoiceState
-from .missing import MISSING, MissingEnum, Maybe
 
 if TYPE_CHECKING:
     from .state import State
@@ -35,9 +35,7 @@ if TYPE_CHECKING:
 class VoiceState:
     def __init__(self, data: DiscordVoiceState, state: State) -> None:
         self.guild_id: Snowflake | MissingEnum = (
-            Snowflake(data['guild_id'])
-            if data.get('guild_id') is not None
-            else MISSING
+            Snowflake(data['guild_id']) if data.get('guild_id') is not None else MISSING
         )
         self.channel_id: Snowflake | None = (
             Snowflake(data['channel_id'])

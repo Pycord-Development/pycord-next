@@ -23,10 +23,10 @@ from __future__ import annotations
 from typing import Sequence
 
 from .enums import ApplicationRoleConnectionMetadataType
+from .missing import MISSING, Maybe, MissingEnum
 from .types import (
     ApplicationRoleConnectionMetadata as DiscordApplicationRoleConnectionMetadata,
 )
-from .missing import MISSING, MissingEnum, Maybe
 from .user import LOCALE
 from .utils import remove_undefined
 

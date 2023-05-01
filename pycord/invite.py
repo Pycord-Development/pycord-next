@@ -27,9 +27,9 @@ from .application import Application
 from .channel import Channel
 from .enums import InviteTargetType
 from .guild import Guild
+from .missing import MISSING, Maybe, MissingEnum
 from .scheduled_event import ScheduledEvent
 from .types import Invite as DiscordInvite, InviteMetadata as DiscordInviteMetadata
-from .missing import MISSING, MissingEnum, Maybe
 from .user import User
 
 if TYPE_CHECKING:
@@ -55,9 +55,7 @@ class Invite:
             Channel(data['channel'], state) if data.get('channel') is not None else None
         )
         self.inviter: User | MissingEnum = (
-            User(data['inviter'], state)
-            if data.get('inviter') is not None
-            else MISSING
+            User(data['inviter'], state) if data.get('inviter') is not None else MISSING
         )
         self.target_type: int | MissingEnum = (
             InviteTargetType(data['target_type'])

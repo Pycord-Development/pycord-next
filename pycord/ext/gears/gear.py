@@ -26,8 +26,8 @@ from typing import TYPE_CHECKING, Any, Callable, Generic, Type, TypeVar
 from ...commands import Command, Group
 from ...commands.application.command import ApplicationCommand
 from ...events.event_manager import Event
-from ...types import AsyncFunc
 from ...missing import MISSING, MissingEnum
+from ...types import AsyncFunc
 
 if TYPE_CHECKING:
     from ...bot import Bot

@@ -21,6 +21,7 @@
 import datetime
 
 from ...file import File
+from ...missing import MISSING, MissingEnum
 from ...snowflake import Snowflake
 from ...types import (
     MFA_LEVEL,
@@ -45,7 +46,6 @@ from ...types import (
     Widget,
     WidgetSettings,
 )
-from ...missing import MISSING, MissingEnum
 from ...utils import remove_undefined, to_datauri
 from ..route import Route
 from .base import BaseRouter
@@ -317,9 +317,7 @@ class Guilds(BaseRouter):
         mute: bool | None | MissingEnum = MISSING,
         deaf: bool | None | MissingEnum = MISSING,
         channel_id: Snowflake | None | MissingEnum = MISSING,
-        communication_disabled_until: datetime.datetime
-        | None
-        | MissingEnum = MISSING,
+        communication_disabled_until: datetime.datetime | None | MissingEnum = MISSING,
         flags: int | None | MissingEnum = MISSING,
         reason: str | None = None,
     ) -> GuildMember:
@@ -748,9 +746,7 @@ class Guilds(BaseRouter):
         *,
         channel_id: Snowflake | MissingEnum = MISSING,
         suppress: bool | MissingEnum = MISSING,
-        request_to_speak_timestamp: datetime.datetime
-        | None
-        | MissingEnum = MISSING,
+        request_to_speak_timestamp: datetime.datetime | None | MissingEnum = MISSING,
     ) -> None:
         if request_to_speak_timestamp:
             request_to_speak_timestamp = request_to_speak_timestamp.isoformat()
