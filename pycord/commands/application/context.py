@@ -39,8 +39,8 @@ class Context(Interaction):
     Contextual prelude to Interactions.
     """
 
-    def __init__(self, data: InteractionData, state: State, _: Any = None) -> None:
-        super().__init__(data, state, response=True)
+    def __init__(self, data: InteractionData, state: State, **kwargs) -> None:
+        super().__init__(data, state, **kwargs)
 
     async def defer(self) -> None:
         """

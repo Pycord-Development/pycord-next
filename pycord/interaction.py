@@ -156,7 +156,7 @@ class Interaction:
 
 
 class InteractionResponse:
-    __slots__ = ('_parent', '_deferred', 'responded')
+    __slots__ = ('_parent', '_deferred', '_save', 'responded', 'raw_response')
 
     def __init__(self, parent: Interaction, save: bool) -> None:
         self._parent = parent
@@ -182,7 +182,7 @@ class InteractionResponse:
         if isinstance(flags, MessageFlags):
             flags = flags.as_bit
 
-        if self.save:
+        if self._save:
             self.raw_response = {
                 'type': 4,
                 'data': {

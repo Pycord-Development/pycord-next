@@ -97,7 +97,7 @@ class InteractionCreate(Event):
     _name = 'INTERACTION_CREATE'
 
     def __init__(self, interaction: Type[Interaction] = Interaction) -> None:
-        self.__interaction_object = interaction
+        self._interaction_object = interaction
 
     def __call__(self) -> typing_extensions.Self:
         """
@@ -106,7 +106,7 @@ class InteractionCreate(Event):
         return self
 
     async def _async_load(self, data: dict[str, Any], state: 'State') -> None:
-        interaction = self.__interaction_object(data, state, True)
+        interaction = self._interaction_object(data, state, True)
 
         for component in state.components:
             asyncio.create_task(component._invoke(interaction))

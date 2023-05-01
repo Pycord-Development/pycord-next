@@ -53,6 +53,7 @@ from ..events.guilds import (
     GuildUpdate,
 )
 from ..events.other import InteractionCreate, Ready, UserUpdate
+from ..flags import Intents
 from ..missing import MISSING
 from ..ui import Component
 from ..ui.house import House
