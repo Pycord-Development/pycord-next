@@ -1,3 +1,5 @@
+from typing import Annotated
+
 import pycord
 
 # start the bot with no intents, and with default config
@@ -22,28 +24,31 @@ async def favorite(
     # The name of this option,
     # can be set to anything but
     # try to keep it short
-    anime: str = pycord.Option(
-        # The description for this option,
-        # this is a longer version of name displaying
-        # more detail and technicalities
-        description='Your favorite Anime Show',
-        # this just sets it so the user cannot proceed without
-        # entering this option
-        required=True,
-        # enables autocomplete on Discord's side
-        autocomplete=True,
-        # these are the choices the user can pick.
-        # the first value is the name, which is what
-        # the user will see. The second is the value, which is what
-        # you, or the bot, will see.
-        choices=[
-            pycord.CommandChoice('Attack on Titan'),
-            pycord.CommandChoice("JoJo's Bizzare Adventure"),
-            pycord.CommandChoice('Cowboy Bebop'),
-            pycord.CommandChoice('Hunter x Hunter'),
-            pycord.CommandChoice('Spy x Family'),
-        ],
-    ),
+    anime: Annotated[
+        str,
+        pycord.Option(
+            # The description for this option,
+            # this is a longer version of name displaying
+            # more detail and technicalities
+            description='Your favorite Anime Show',
+            # this just sets it so the user cannot proceed without
+            # entering this option
+            required=True,
+            # enables autocomplete on Discord's side
+            autocomplete=True,
+            # these are the choices the user can pick.
+            # the first value is the name, which is what
+            # the user will see. The second is the value, which is what
+            # you, or the bot, will see.
+            choices=[
+                pycord.CommandChoice('Attack on Titan'),
+                pycord.CommandChoice("JoJo's Bizzare Adventure"),
+                pycord.CommandChoice('Cowboy Bebop'),
+                pycord.CommandChoice('Hunter x Hunter'),
+                pycord.CommandChoice('Spy x Family'),
+            ],
+        ),
+    ],
 ):
     """Pick which one is your favorite anime"""
 

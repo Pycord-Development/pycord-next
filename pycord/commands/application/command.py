@@ -22,7 +22,8 @@ from __future__ import annotations
 
 import asyncio
 from copy import copy
-from typing import TYPE_CHECKING, Any, Sequence, Union
+from inspect import isclass
+from typing import TYPE_CHECKING, Any, Sequence, Union, get_origin
 
 from ...channel import Channel, identify_channel
 from ...enums import ApplicationCommandOptionType, ApplicationCommandType
@@ -31,17 +32,17 @@ from ...interaction import Interaction, InteractionOption
 from ...media import Attachment
 from ...member import Member
 from ...message import Message
+from ...missing import MISSING, MissingEnum
 from ...role import Role
 from ...snowflake import Snowflake
 from ...types import AsyncFunc
 from ...types.interaction import ApplicationCommandData
-from ...missing import MISSING, MissingEnum
 from ...user import User
-from ...utils import get_arg_defaults, remove_undefined
+from ...utils import get_arg_defaults, get_args, remove_undefined
 from ..command import Command
 from ..group import Group
-from .errors import ApplicationCommandException
 from .context import Context
+from .errors import ApplicationCommandException
 
 if TYPE_CHECKING:
     from ...state import State
@@ -195,6 +196,8 @@ class Option(_BaseOption):
         else:
             if choices:
                 self.choices = [choice._to_dict() for choice in choices]
+            else:
+                self.choices = MISSING
         if options is MISSING:
             self.options = []
         else:
@@ -537,28 +540,24 @@ class ApplicationCommand(Command):
                 continue
             elif v[1] is Interaction or v[1] is Context:
                 continue
-            elif not isinstance(v[0], Option) and v[0] is not None:
+
+            args = get_args(v[1])
+
+            if not isinstance(args[1], Option):
                 raise ApplicationCommandException(
-                    f'Options may only be of type Option, not {v[0]}'
+                    f'Options may only be of type Option, not {args[1]}'
                 )
 
-            if v[0]:
-                v[0]._param = name
-                v[0].type = _OPTION_BIND[v[1]].value
+            option: Option = args[1]
 
-                if not v[0].name:
-                    v[0].name = name
+            option._param = name
+            option.type = _OPTION_BIND[args[0]].value
 
-                self.options.append(v[0])
-                self._options_dict[v[0].name] = v[0]
-            else:
-                if v[1] is None:
-                    raise
+            if not option.name:
+                option.name = name
 
-                option = Option(name=name, type=v[1])
-                option._param = name
-                self.options.append(option)
-                self._options_dict[name] = option
+            self.options.append(option)
+            self._options_dict[option.name] = option
 
         for option in self.options:
             self._options.append(option.to_dict())

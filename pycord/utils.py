@@ -25,13 +25,13 @@ import inspect
 import warnings
 from collections.abc import Iterator, Sequence
 from itertools import accumulate
-from typing import Any, AsyncGenerator, Callable, Type, TypeVar
+from typing import Annotated, Any, AsyncGenerator, Callable, Type, TypeVar, get_origin
 
 from aiohttp import ClientResponse
 
 from .file import File
-from .types import AsyncFunc
 from .missing import MISSING
+from .types import AsyncFunc
 
 try:
     import msgspec
@@ -270,3 +270,19 @@ def to_datauri(f: File) -> str:
     b64 = base64.b64encode(b)
 
     return f'data:{m};base64,{b64}'
+
+
+def get_args(annotation: Any) -> tuple[Any, ...]:
+    if get_origin(annotation) is not Annotated:
+        raise ValueError(
+            f'Argument annotation {annotation} must originate from typing.Annotated'
+        )
+
+    anns = annotation.__args__ + annotation.__metadata__
+
+    if len(anns) != 2:
+        raise ValueError(
+            f'Annotation {annotation} must only have two arguments subsequently'
+        )
+
+    return anns
