@@ -147,6 +147,9 @@ class Pycord:
     async def setup(self) -> None:
         self.__state.user = User(await self.http.get_current_user(), self.__state)
 
+        if not self.synchronize_commands:
+            return
+
         global_commands: list[
             RawCommand
         ] = await self.http.get_global_application_commands(self.user.id, True)
