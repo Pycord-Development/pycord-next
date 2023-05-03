@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report broken/incorrect behavior caused by the library.
+description: Report broken or incorrect behavior caused by the library.
 labels: unconfirmed bug
 body:
   - type: markdown
@@ -22,9 +22,10 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Reproduction Code
-      description: If code that causes the bug can be given, please provide it here.
-    render: python
+      label: Minimal Reproducible Code
+      description: > 
+        If code that causes the bug can be given, please provide it here.
+        render: python
   - type: textarea
     attributes:
       label: Expectations vs. Actual
