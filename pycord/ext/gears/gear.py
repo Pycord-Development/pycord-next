@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 
 T = TypeVar('T')
-AF = TypeVar('AF', AsyncFunc)
+AF = TypeVar('AF')
 
 
 class BaseContext(SimpleNamespace):

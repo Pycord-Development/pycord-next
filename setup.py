@@ -33,6 +33,7 @@ packages = [
     'pycord.events',
     'pycord.state',
     'pycord.api',
+    'pycord.pages',
     'pycord.api.execution',
     'pycord.gateway',
     'pycord.commands',
@@ -40,6 +41,7 @@ packages = [
     'pycord.api.routers',
     'pycord.ext',
     'pycord.ext.gears',
+    'pycord._cli_extracts',
 ]
 
 extra_requires = {
@@ -76,7 +78,7 @@ setuptools.setup(
     install_requires=requirements,
     extras_require=extra_requires,
     description='A modern Discord API wrapper for Python',
-    python_requires='>=3.10',
+    python_requires='>=3.11',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'License :: OSI Approved :: MIT License',
@@ -84,7 +86,6 @@ setuptools.setup(
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython',
         'Framework :: AsyncIO',
         'Framework :: aiohttp',

@@ -6,3 +6,5 @@ colorlog~=6.7
 fastenum~=1.0.4
 # extensions for the typing module
 typing-extensions~=4.5.0
+# used for cli features
+typer~=0.9.0

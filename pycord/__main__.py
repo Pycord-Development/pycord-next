@@ -19,18 +19,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 """Cli processes."""
-import platform
-import sys
 
-import pycord
+import typer
+
+from .cli import new as _new, run as _run
+
+cli = typer.Typer(name='Pycord CLI')
 
 
-def main() -> None:
-    version = pycord.__version__
-    python_version = platform.python_version()
-    sys.stderr.write(f'Running on Pycord Version {version},')
-    sys.stderr.write(f' with Python version {python_version}.')
+@cli.command('new')
+def new() -> None:
+    _new()
+
+
+@cli.command('run')
+def run() -> None:
+    _run()
 
 
 if __name__ == '__main__':
-    main()
+    cli()
