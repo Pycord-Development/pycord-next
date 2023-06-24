@@ -65,6 +65,11 @@ class EventManager:
         except KeyError:
             self.events[event] = [func]
 
+    def remove_event(self, event: Type[Event], func: AsyncFunc) -> None:
+        self.events[event].remove(func)
+        if self.events[event] == []:
+            self.events.pop(event)
+
     def wait_for(self, event: Type[T]) -> Future[T]:
         fut = Future()
 

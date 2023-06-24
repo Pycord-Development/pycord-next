@@ -124,7 +124,7 @@ class Bot:
     def user(self) -> User:
         return self._state.user
 
-    async def _run_async(self, token: str) -> None:
+    async def _run_async(self, token: str, block: bool) -> None:
         start_logging(flavor=self._logging_flavor)
         self._state.bot_init(
             token=token, clustered=False, proxy=self._proxy, proxy_auth=self._proxy_auth
@@ -181,7 +181,8 @@ class Bot:
                 bot_name=self.user.name,
             )
 
-        await self._run_until_exited()
+        if block:
+            await self._run_until_exited()
 
     async def _run_until_exited(self) -> None:
         try:
@@ -197,7 +198,12 @@ class Bot:
                 for sc in self._state.shard_clusters:
                     sc.keep_alive.set_result(None)
 
-    def run(self, token: str) -> None:
+    def run(
+        self,
+        token: str,
+        loop: asyncio.AbstractEventLoop | None = None,
+        block: bool = True,
+    ) -> None:
         """
         Run the Bot without being clustered.
 
@@ -209,7 +215,13 @@ class Bot:
         token: :class:`str`
             The authentication token of this Bot.
         """
-        asyncio.run(self._run_async(token=token))
+        if loop:
+            if block:
+                loop.run_until_complete(self._run_async(token=token, block=block))
+            else:
+                loop.create_task(self._run_async(token=token, block=False))
+        else:
+            asyncio.run(self._run_async(token=token, block=False))
 
     async def _run_cluster(
         self, token: str, clusters: int, amount: int, managers: int
@@ -276,6 +288,7 @@ class Bot:
         clusters: int,
         amount: int | None = None,
         managers: int | None = None,
+        loop: asyncio.AbstractEventLoop | None = None,
     ) -> None:
         """
         Run the Bot in a clustered formation.
@@ -315,11 +328,18 @@ class Bot:
         if managers > shards:
             raise OverfilledShardsException('Cannot have more managers than shards')
 
-        asyncio.run(
-            self._run_cluster(
-                token=token, clusters=clusters, amount=amount, managers=managers
+        if loop:
+            loop.run_until_complete(
+                self._run_cluster(
+                    token=token, clusters=clusters, amount=amount, managers=managers
+                )
             )
-        )
+        else:
+            asyncio.run(
+                self._run_cluster(
+                    token=token, clusters=clusters, amount=amount, managers=managers
+                )
+            )
 
     def listen(self, event: Event | None = None) -> T:
         """

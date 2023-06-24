@@ -19,6 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+import asyncio
 import importlib.util
 import os
 import sys
@@ -26,6 +27,7 @@ from pathlib import Path
 from typing import Any
 
 import tomllib
+from watchfiles import Change, awatch
 
 from ._cli_extracts import basic
 from .bot import Bot
@@ -126,3 +128,136 @@ def run():
         )
     else:
         bot.run(token)
+
+
+def dev():
+    if not pyproject:
+        raise ValueError('pyproject.toml must exist')
+
+    bot_var = tool.get('bot_var', 'bot')
+    gears = Path('gears')
+    bot_py = Path('bot.py')
+
+    verify_paths(bot_py)
+
+    bot_spec = importlib.util.spec_from_file_location('bot', bot_py.absolute())
+    bot_mod = importlib.util.module_from_spec(bot_spec)
+    sys.modules['bot'] = bot_mod
+    bot_spec.loader.exec_module(bot_mod)
+    bot = getattr(bot_mod, bot_var)
+
+    assert isinstance(
+        bot, Bot
+    ), f'{bot_var} must be of type Bot, or changed to another variable name.'
+
+    loaded_gears = ''
+
+    if gears.exists():
+        for gear in gears.glob('*'):
+            path = gear.absolute()
+
+            name = gear.name.removesuffix('.py')
+            spec = importlib.util.spec_from_file_location(name, path)
+            if spec is None:
+                continue
+
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules[name] = mod
+            spec.loader.exec_module(mod)
+
+            for attr in dir(mod):
+                attr = getattr(mod, attr)
+                if isinstance(attr, Gear):
+                    attr.attach(bot)
+                    loaded_gears += f'\n        {attr.name}'
+
+    # TODO: beautify!
+    print(
+        f'    Finished bot initialization. Loaded gears:{loaded_gears}', file=sys.stderr
+    )
+
+    if tool.get('load_env', False) is True:
+        try:
+            import dotenv
+        except ImportError:
+            raise ValueError(
+                'dotenv is not installed on your system. Please run pip install -U dotenv or other such command to get dotenv installed.'
+            )
+        dotenv.load_dotenv(Path('.env').absolute())
+
+        token = os.environ['TOKEN']
+    else:
+        token = bot_mod.TOKEN
+
+    loop = asyncio.new_event_loop()
+
+    bot.run(token, loop=loop, block=False)
+
+    async def watcher() -> None:
+        async for changes in awatch(Path.cwd()):
+            for change in changes:
+                # TODO: handle deletes
+                if change[0] is Change.modified:
+                    if change[1] != str(bot_py):
+                        path = Path(change[1])
+
+                        if path.parent.name == 'gear':
+                            for gear in bot._state.gears:
+                                gear.delete()
+
+                            if gears.exists():
+                                for gear in gears.glob('*'):
+                                    path = gear.absolute()
+
+                                    name = gear.name.removesuffix('.py')
+                                    spec = importlib.util.spec_from_file_location(
+                                        name, path
+                                    )
+
+                                    mod = importlib.util.module_from_spec(spec)
+                                    sys.modules[name] = mod
+
+                                    for attr in dir(mod):
+                                        attr = getattr(mod, attr)
+                                        if isinstance(attr, Gear):
+                                            attr.attach(bot)
+                                            loaded_gears += f'\n        {attr.name}'
+                        else:
+                            name = path.name.removesuffix('.py')
+                            spec = importlib.util.spec_from_file_location(
+                                name, path.absolute()
+                            )
+                            mod = importlib.util.module_from_spec(spec)
+                            sys.modules[name] = mod
+                    else:
+                        print(
+                            'bot.py seems to have been updated. For changes to take affect, please restart the bot.'
+                        )
+                elif change[0] is Change.added:
+                    gear = Path(change[1])
+                    if gear.parent.name == 'gear':
+                        path = gear.absolute()
+
+                        name = gear.name.removesuffix('.py')
+                        spec = importlib.util.spec_from_file_location(name, path)
+
+                        mod = importlib.util.module_from_spec(spec)
+                        sys.modules[name] = mod
+                        spec.loader.exec_module(mod)
+
+                        for attr in dir(mod):
+                            attr = getattr(mod, attr)
+                            if isinstance(attr, Gear):
+                                attr.attach(bot)
+                                loaded_gears += f'\n        {attr.name}'
+                    else:
+                        path = gear.absolute()
+
+                        name = gear.name.removesuffix('.py')
+                        spec = importlib.util.spec_from_file_location(name, path)
+
+                        mod = importlib.util.module_from_spec(spec)
+                        sys.modules[name] = mod
+                        spec.loader.exec_module(mod)
+
+    loop.run_until_complete(watcher())

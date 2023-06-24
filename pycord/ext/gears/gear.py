@@ -62,7 +62,7 @@ class Gear(Generic[ContextT]):
 
     ctx: ContextT
 
-    __slots__ = ('_listener_functions', '_commands', 'name', 'ctx', 'bot')
+    __slots__ = ('___archive', '_listener_functions', '_commands', 'name', 'ctx', 'bot')
 
     def __init__(self, name: str, ctx: ContextT | None = None) -> None:
         self.name = name
@@ -171,3 +171,13 @@ class Gear(Generic[ContextT]):
         self.bot = bot
 
         self.bot._state.gears.append(self)
+        self.___archive = {'lf': self._listener_functions, 'cmds': self._commands}
+
+    def delete(self) -> None:
+        for name, funcs in self.___archive['lf']:
+            for func in funcs:
+                self.bot._state.event_manager.remove_event(name, func)
+
+        for cmd in self.___archive['cmds']:
+            if isinstance(cmd, Command):
+                cmd._state.commands.remove(cmd)

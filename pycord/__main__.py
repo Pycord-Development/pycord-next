@@ -22,19 +22,31 @@
 
 import typer
 
-from .cli import new as _new, run as _run
+from .cli import dev as _dev, new as _new, run as _run
 
 cli = typer.Typer(name='Pycord CLI')
 
 
-@cli.command('new')
+@cli.command(
+    'new', rich_help_panel='Makes a brand new Discord bot in the current directory'
+)
 def new() -> None:
     _new()
 
 
-@cli.command('run')
+@cli.command('run', rich_help_panel='Starts your Discord Bot')
 def run() -> None:
     _run()
+
+
+@cli.command('start', rich_help_panel='Starts your Discord Bot')
+def start() -> None:
+    _run()
+
+
+@cli.command('dev', rich_help_panel="Runs the current bot in a 'developer mode'")
+def dev() -> None:
+    _dev()
 
 
 if __name__ == '__main__':
