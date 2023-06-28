@@ -9,4 +9,4 @@ typing-extensions~=4.6.3
 # used for cli features
 typer~=0.9.0
 # watching cli files
-watchfiles!=0.19.0
+watchfiles~=0.19.0
