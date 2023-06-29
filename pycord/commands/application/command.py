@@ -32,7 +32,7 @@ from ...interaction import Interaction, InteractionOption
 from ...media import Attachment
 from ...member import Member
 from ...message import Message
-from ...missing import MISSING, MissingEnum
+from ...missing import MISSING, Maybe, MissingEnum
 from ...role import Role
 from ...snowflake import Snowflake
 from ...types import AsyncFunc
@@ -347,6 +347,8 @@ class ApplicationCommand(Command):
     nsfw: :class:`bool`
         Whether this Application Command is for NSFW audiences or not
         Defaults to False.
+    default_member_permissions: :class:`int`
+        The default member permissions for this command.
     """
 
     _processor_event = InteractionCreate(Context)
@@ -367,6 +369,7 @@ class ApplicationCommand(Command):
         description_localizations: dict[str, str] | MissingEnum = MISSING,
         dm_permission: bool | MissingEnum = MISSING,
         nsfw: bool | MissingEnum = MISSING,
+        default_member_permissions: Maybe[int] = MISSING,
     ) -> None:
         super().__init__(callback, name, state, group)
 
@@ -393,6 +396,7 @@ class ApplicationCommand(Command):
         if self.type == 1:
             self._subs: dict[str, ApplicationCommand] = {}
         self._created: bool = False
+        self.default_member_permissions = default_member_permissions
 
     def command(
         self,
@@ -638,7 +642,7 @@ class ApplicationCommand(Command):
             )
             self.id = res['id']
 
-    def _process_options(
+    async def _process_options(
         self,
         interaction: Interaction,
         options: list[InteractionOption],
@@ -650,15 +654,15 @@ class ApplicationCommand(Command):
             if option.type == 1:
                 sub = self._subs[option.name]
 
-                opts = self._process_options(
+                opts = await self._process_options(
                     interaction=interaction, options=option.options
                 )
                 if not grouped:
-                    asyncio.create_task(self._callback(interaction))
-                asyncio.create_task(sub._callback(interaction, **opts))
+                    await self._callback(interaction)
+                await sub._callback(interaction, **opts)
             elif option.type == 2:
-                asyncio.create_task(self._callback(interaction))
-                self._process_options(
+                await self._callback(interaction)
+                await self._process_options(
                     interaction=interaction, options=option.options, grouped=True
                 )
             elif option.type in (3, 4, 5, 10):
@@ -721,8 +725,11 @@ class ApplicationCommand(Command):
         else:
             return inter.user
 
-    async def _invoke(self, event: InteractionCreate) -> None:
-        interaction = event.interaction
+    async def _invoke(self, event: InteractionCreate | Interaction) -> None:
+        if not isinstance(event, Interaction):
+            interaction = event.interaction
+        else:
+            interaction = event
 
         if interaction.type == 4:
             if interaction.data.get('name') is not None:
@@ -733,21 +740,14 @@ class ApplicationCommand(Command):
                         interaction, real_option, option['value']
                     )
 
-                    await self._state.http.create_interaction_response(
-                        interaction.id,
-                        interaction.token,
-                        {
-                            'type': 8,
-                            'data': {'choices': choices},
-                        },
-                    )
+                    await interaction.response.autocomplete(choices)
             return
 
         if interaction.data:
             if interaction.data.get('name') is not None:
                 if interaction.data['name'] == self.name:
                     if interaction.data['type'] == 1:
-                        binding = self._process_options(
+                        binding = await self._process_options(
                             interaction, interaction.options
                         )
 

@@ -19,13 +19,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+from __future__ import annotations
+
 import base64
 import functools
 import inspect
 import warnings
 from collections.abc import Iterator, Sequence
 from itertools import accumulate
-from typing import Annotated, Any, AsyncGenerator, Callable, Type, TypeVar, get_origin
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    Any,
+    AsyncGenerator,
+    Callable,
+    Type,
+    TypeVar,
+    get_origin,
+)
 
 from aiohttp import ClientResponse
 
@@ -39,6 +50,9 @@ except ImportError:
     import json
 
     msgspec = None
+
+if TYPE_CHECKING:
+    from .commands.application import ApplicationCommand
 
 DISCORD_EPOCH: int = 1420070400000
 S = TypeVar('S', bound=Sequence)
@@ -286,3 +300,64 @@ def get_args(annotation: Any) -> tuple[Any, ...]:
         )
 
     return anns
+
+
+def dict_compare(d1: dict, d2: dict) -> bool:
+    for n, v in d1.items():
+        if d2.get(n) != v:
+            return False
+
+    return True
+
+
+def compare_application_command(cmd: ApplicationCommand, raw: dict[str, Any]) -> bool:
+    if cmd.default_member_permissions != raw['default_member_permissions']:
+        return False
+    elif not dict_compare(cmd.name_localizations, raw['name_localizations']):
+        return False
+    elif cmd.description != raw['description']:
+        return False
+    elif not dict_compare(
+        cmd.description_localizations, raw['description_localizations']
+    ):
+        return False
+    elif cmd.dm_permission != raw['dm_permisison']:
+        return False
+    elif cmd.nsfw != raw['nsfw']:
+        return False
+
+    raw_options = {opt['name']: opt for opt in raw['options']}
+
+    for option in cmd.options:
+        raw = raw_options.get(option.name)
+
+        if raw is None:
+            return False
+
+        if not dict_compare(
+            option.name_localizations, raw.get('name_localizations', MISSING)
+        ):
+            return False
+        elif option.description != raw.get('description', MISSING):
+            return False
+        elif not dict_compare(
+            option.description_localizations,
+            raw.get('description_localziations', MISSING),
+        ):
+            return False
+        elif option.channel_types != raw.get('channel_types', MISSING):
+            return False
+        elif option.autocomplete != raw.get('autocomplete', MISSING):
+            return False
+        elif option.choices != raw.get('choices', MISSING):
+            return False
+        elif option.focused != raw.get('focused', MISSING):
+            return False
+        elif option.required != raw.get('required', MISSING):
+            return False
+        elif option.min_value != raw.get('min_value', MISSING):
+            return False
+        elif option.max_value != raw.get('max_value', MISSING):
+            return False
+
+    return True

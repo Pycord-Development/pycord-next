@@ -23,6 +23,7 @@ from .flags import *
 from .gateway import *
 from .guild import *
 from .guild_template import *
+from .http import *
 from .integration import *
 from .interaction import *
 from .interface import *

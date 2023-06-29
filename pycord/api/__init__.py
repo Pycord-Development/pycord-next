@@ -22,6 +22,7 @@ from .execution import Executer
 from .route import BaseRoute, Route
 from .routers import *
 from .routers.scheduled_events import ScheduledEvents
+from .routers.user import Users
 
 __all__: Sequence[str] = ('Route', 'BaseRoute', 'HTTPClient')
 
@@ -38,6 +39,7 @@ class HTTPClient(
     Guilds,
     Messages,
     ScheduledEvents,
+    Users,
 ):
     def __init__(
         self,
