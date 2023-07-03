@@ -5,4 +5,4 @@ colorlog~=6.7
 # used for enumerate objects
 fastenum~=1.0.4
 # extensions for the typing module
-typing-extensions~=4.6.3
+typing-extensions~=4.7.1
