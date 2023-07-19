@@ -32,6 +32,7 @@ packages = [
     'pycord.types',
     'pycord.events',
     'pycord.state',
+    'pycord.pages',
     'pycord.api',
     'pycord.api.execution',
     'pycord.gateway',
