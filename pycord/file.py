@@ -65,6 +65,7 @@ class SysFile(File):
         if self.spoiler and not self.filename.startswith("SPOILER_"):
             self.filename = f"SPOILER_{self.filename}"
 
+        self._closer = self.file.close
         self.file.close = lambda: None  # type: ignore[method-assign]
 
         self._original_position = self.file.tell()
@@ -75,7 +76,8 @@ class SysFile(File):
 
     # TODO: circumvent mypy, and safely reassign the .close method
     def close(self) -> None:
-        self.file.close()
+        self.file.close = self._closer
+        self._closer()
 
 
 class BytesFile(File):
@@ -89,6 +91,7 @@ class BytesFile(File):
         if self.spoiler and not self.filename.startswith("SPOILER_"):
             self.filename = f"SPOILER_{self.filename}"
 
+        self._closer = self.file.close
         self.file.close = lambda: None  # type: ignore[method-assign]
 
         self._original_position = self.file.tell()
@@ -98,4 +101,5 @@ class BytesFile(File):
             self.file.seek(self._original_position)
 
     def close(self) -> None:
-        self.file.close()
+        self.file.close = self._closer
+        self._closer()
