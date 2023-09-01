@@ -1,6 +1,15 @@
-[tool.brunette]
-target-version = ["py310", "py311"]
-single-quotes = true
+[build-system]
+requires = [
+    "setuptools~=68.1",
+    "wheel~=0.41",
+    "mypy~=1.5",
+    "types-setuptools~=68.1",
+    "mypy-extensions~=1.0.0"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+target-version = ["py311"]
 
 [tool.isort]
 profile = "black"
@@ -38,29 +47,12 @@ type = [
 ]
 
 [tool.mypy]
-strict = false
-check_untyped_defs = false
+strict = true
 incremental = true
-namespace_packages = true
-no_implicit_optional = true
 pretty = true
 python_version = 3.11
+
 show_column_numbers = true
 show_error_codes = true
 show_error_context = true
-
-# allowed
-allow_untyped_globals = false
-allow_redefinition = true
-
-# disallowed
-disallow_untyped_decorators = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-
-# warnings
-warn_redundant_casts = true
-warn_return_any = true
-warn_unreachable = true
-warn_unused_configs = true
-warn_unused_ignores = true
+ignore_missing_imports = true

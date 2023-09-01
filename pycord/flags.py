@@ -1,5 +1,6 @@
-# cython: language_level=3
-# Copyright (c) 2021-present Pycord Development
+# MIT License
+#
+# Copyright (c) 2023 Pycord
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,31 +18,30 @@
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE
+# SOFTWARE.
 
 from __future__ import annotations
 
 from collections.abc import Callable
 from typing import Sequence, Type, TypeVar
 
-from .errors import FlagException
+from mypy_extensions import mypyc_attr, trait
 
-F = TypeVar('F', bound='Flags')
-FF = TypeVar('FF')
+F = TypeVar("F", bound="Flags")
 
 __all__: Sequence[str] = (
-    'Intents',
-    'Permissions',
-    'ChannelFlags',
-    'MessageFlags',
-    'SystemChannelFlags',
-    'ApplicationFlags',
-    'UserFlags',
+    "Intents",
+    "Permissions",
+    "ChannelFlags",
+    "MessageFlags",
+    "SystemChannelFlags",
+    "ApplicationFlags",
+    "UserFlags",
 )
 
 
 class flag:
-    def __init__(self, func: Callable):
+    def __init__(self, func: Callable[..., int]):
         self.value: int = func(None)
         self.__doc__ = func.__doc__
         self._name = func.__name__
@@ -73,8 +73,10 @@ def fill() -> Callable[[Type[F]], Type[F]]:
     return wrapper
 
 
+@trait
+@mypyc_attr(allow_interpreted_subclasses=True)
 class Flags:
-    _FLAGS = {}
+    _FLAGS: dict[str, int] = {}
 
     def __init__(self, **flags_named: bool) -> None:
         self._values: dict[str, bool] = {}
@@ -83,8 +85,8 @@ class Flags:
             try:
                 self._FLAGS[name]
             except KeyError:
-                raise FlagException(
-                    f'Flag {name} is not a valid flag of {self.__class__}'
+                raise RuntimeError(
+                    f"Flag {name} is not a valid flag of {self.__class__}"
                 )
 
             if set is False:
@@ -93,7 +95,7 @@ class Flags:
             self._values[name] = set
 
     @classmethod
-    def from_value(cls: Type[FF], value: int | str) -> FF:
+    def from_value(cls: Type[F], value: int | str) -> F:
         self = cls()
         value = int(value)
 

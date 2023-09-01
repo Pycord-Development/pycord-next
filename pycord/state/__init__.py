@@ -1,11 +1,11 @@
 """
 pycord.state
 ~~~~~~~~~~~~
-Pycord's State, keeps track of everything.
+Modules used for Pycord's central bot state.
 
-:copyright: 2021-present Pycord Development
-:license: MIT
+:copyright: 2021-present Pycord
+:license: MIT, see LICENSE for more info.
 """
+
+from .cache import *
 from .core import *
-from .grouped_store import *
-from .store import *

@@ -1,5 +1,6 @@
-# cython: language_level=3
-# Copyright (c) 2021-present Pycord Development
+# MIT License
+#
+# Copyright (c) 2023 Pycord
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,7 +18,7 @@
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE
+# SOFTWARE.
 
 
 import asyncio
@@ -27,12 +28,12 @@ from typing import BinaryIO, Protocol
 
 
 def _open_file(path: pathlib.Path) -> BinaryIO:
-    return path.expanduser().open('rb')
+    return path.expanduser().open("rb")
 
 
 class File(Protocol):
     path: pathlib.Path | None
-    filename: str
+    filename: str | None
     file: BinaryIO
     spoiler: bool
 
@@ -56,17 +57,15 @@ class SysFile(File):
     async def _hook_file(self) -> None:
         loop = asyncio.get_running_loop()
 
-        self.file = await loop.run_in_executor(None, _open_file, _open_file, self._path)
-
-        # assure we have control over closures
-        self._closer = self.file.close
-        self.file.close = lambda: None
+        self.file = await loop.run_in_executor(None, _open_file, _open_file, self.path)
 
         if self.filename is None:
             self.filename = self.path.name
 
-        if self.spoiler and not self.filename.startswith('SPOILER_'):
-            self.filename = f'SPOILER_{self.filename}'
+        if self.spoiler and not self.filename.startswith("SPOILER_"):
+            self.filename = f"SPOILER_{self.filename}"
+
+        self.file.close = lambda: None  # type: ignore[method-assign]
 
         self._original_position = self.file.tell()
 
@@ -74,22 +73,23 @@ class SysFile(File):
         if seek:
             self.file.seek(self._original_position)
 
+    # TODO: circumvent mypy, and safely reassign the .close method
     def close(self) -> None:
-        self.file.close = self._closer
-        self._closer()
+        self.file.close()
 
 
 class BytesFile(File):
     def __init__(self, filename: str, io: bytes | BytesIO) -> None:
         self.filename = filename
-        self.file = BytesIO(io)
+        if not isinstance(io, BytesIO):
+            self.file = BytesIO(io)
+        else:
+            self.file = io
 
-        # assure we have control over closures
-        self._closer = self.file.close
-        self.file.close = lambda: None
+        if self.spoiler and not self.filename.startswith("SPOILER_"):
+            self.filename = f"SPOILER_{self.filename}"
 
-        if self.spoiler and not self.filename.startswith('SPOILER_'):
-            self.filename = f'SPOILER_{self.filename}'
+        self.file.close = lambda: None  # type: ignore[method-assign]
 
         self._original_position = self.file.tell()
 
@@ -98,5 +98,4 @@ class BytesFile(File):
             self.file.seek(self._original_position)
 
     def close(self) -> None:
-        self.file.close = self._closer
-        self._closer()
+        self.file.close()
