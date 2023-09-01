@@ -1,87 +1,92 @@
-# Rewrite Overview
+# The Pycord Rewrite
 
-Complete overview of every breaking change
-made in v3, and why we made them.
+v3 aims at making an interface objectively easier to use, faster, and more intuitive than v2.
+To do this we have elected that breaking changes in any degree are tolerated.
 
-## Namespace
+This means, that with v3 we did not add constraints to differences in UI, or other such.
+That means that v3 will feel like a fundamentally different library as compared to v2.
+Do not expect v3 to be a drop-in replacement for v2. You will *most likely* have to rewrite
+the majority of your bot-facing code.
 
-By far one of the smallest yet most significant
-changes is our namespace.
-While v2 used to have the discord namespace
-for v3 to signify we're not a fork anymore
-we changed it to pycord.
+We do not have all of these "breaking changes" documented or covered, primarily because they
+aren't changes in their own right, they are a new way to do it. V3 is a rewrite of v2, so we
+do not have any obligation to hold back on necessary breaking changes, especially since we follow
+SemVer.
 
-So instead of `import discord` its just
-`import pycord` now.
 
-## Generalized Commands
+This document will justify and showcase many of these major breaking changes and show
+why they were made. So let's get started.
 
-In v3, commands have been restructured
-into one system to allow the easy creation
-of new ones.
 
-Instead of having `bot.slash_command` and the other types
-like in v2, you instead use our one decorator `bot.command`.
+### Bots
 
-Expansibility has been made a priority
-for v3, so we also made Commands easy to customize.
-Command creators provide a `cls` field to
-show which Command class they want to use.
-This is required and is not set to any default 
+Firstly is just your bot. Pycord v3 removes `commands.Bot` (we don't support prefix commands anymore,)
+and `Client` for just a single `Bot` class abstracting all of these things.
 
-An example Slash Command could be the following:
+We try to make the Bot class as extensible as possible so as to not force you to sub-class, but if needed,
+The opportunity is always there.
+
+`.run` has been removed from Bots, and bots must now have to be started manually.
+This forces developers to grapple with async i/o and makes it easier to do things like
+database connections before your bot starts.
+
+
+
 
 ```py
-import pycord
+# decorator for identifying commands, or parent commands.
+# sub commands should use a sort of `parent.command` design.
 
-bot = pycord.Bot(...)
+@command()
+async def echo(
+   cx: Context,
+   input: Annotated[str, Option(description="What do you want me to say?")]
+):
+   await cx.say(input)
 
-@bot.command('echo', pycord.ApplicationCommand, description='Command to echo a message')
-async def echo(inter: pycord.Interaction, msg: str = pycord.Option(name='message', description='The message to echo')):
-   await inter.resp.send(msg)
 
-bot.run(...)
+# events now use classes instead of strings.
+# this is a much more extensible system and makes it easier for
+# developers to make extensions
+
+@listen()
+async def on_ready(event: Ready):
+   print(f"I'm online and logged into {event.user.name}!")
+
+
+async def main():
+   bot = Bot(
+      token='token',
+      guild_ids=[...],
+      commands=[await echo.build()]
+   )
+
+   await bot.start()
+
+
+if __name__ == "__main__":
+   asyncio.run(main())
 ```
 
-## Extensible Cache
+### Cogs are Gone.
 
-Caching has been rebuilt to allow
-higher levels of extensibility.
+As of version 3, Pycord will no longer be supporting Cogs, as their current design has them.
+We will still support grouping your commands and listeners in separate files, just with a
+smarter and more "raw" way.
 
-Do you want to cache on redis? Now you can!
-It's extremely easy, just subclass our
-Store class and rebuild it for your cacher.
 
-## Extensions
 
-### Cogs
 
-Cogs have been completely reformed from the
-ground up to build a brand new and better
-experience.
+```py
+async def setup():
+   return [
+      cx,
+      command,
+      listener
+   ]
+```
 
-To show that difference, we have renamed Cogs
-to Gears, also because it's particularly a better name.
 
-- Basic Cog with Slash Command
-  ```py
-     from discord.cogs import Cog
-     from discord.commands import slash_command
 
-     class MyCog(Cog):
-        @slash_command
-        async def dunce(self) -> None:
-           ...
-   ```
 
-- Basic Gear with Slash Command
-  ```py
-     import pycord
-     from pycord.ext.gears import Gear
-
-     gear = Gear(__name__)
-
-     @gear.command('dunce', pycord.ApplicationCommand, type=1, description='duncy command')
-     async def dunce(inter: pycord.Interaction) -> None:
-        ...
-  ```
+todo!("There is still more content on the way! The more v3 develops, the more we'll add here :)")
