@@ -20,6 +20,7 @@
 # SOFTWARE
 
 
+import asyncio
 from typing import Any
 
 from aiohttp import BasicAuth
@@ -33,6 +34,7 @@ class Bot:
         self,
         token: str,
         intents: int,
+        shards: list[int] | range | None = None,
         max_message_cache: int = 10000,
         max_member_cache: int = 50000,
         base_url: str = "https://discord.com/api/v10",
@@ -51,4 +53,15 @@ class Bot:
             proxy_auth=proxy_auth,
             store_class=store_class,
             cache_model_classes=model_classes,
+            shards=shards,
         )
+
+    async def start(self) -> None:
+        await self.state.http.force_start()
+        await self.state.gateway.start()
+
+        try:
+            await asyncio.Future()
+        except (asyncio.CancelledError, KeyboardInterrupt):
+            await self.state.http._session.close()
+            return

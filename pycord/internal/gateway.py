@@ -22,9 +22,14 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import TYPE_CHECKING, Protocol
 
+from aiohttp import BasicAuth
 from mypy_extensions import trait
+
+from ..task_descheduler import tasks
+from .shard import Shard
 
 if TYPE_CHECKING:
     from ..state.core import State
@@ -67,8 +72,40 @@ class GatewayProtocol:
 
 
 class Gateway(GatewayProtocol):
-    def __init__(self, state: State) -> None:
+    def __init__(
+        self,
+        state: State,
+        version: int,
+        proxy: str | None,
+        proxy_auth: BasicAuth | None,
+        # shards
+        shard_ids: list[int],
+        shard_total: int,
+    ) -> None:
         self._state = state
+        self.shards: list[Shard] = []
+        self.shard_ids = shard_ids
+        self.shard_total = shard_total
+        self.version = version
+        self.proxy = proxy
+        self.proxy_auth = proxy_auth
+
+    async def start(self) -> None:
+        for shard_id in self.shard_ids:
+            self.shards.append(
+                Shard(
+                    self._state,
+                    shard_id,
+                    self.shard_total,
+                    version=self.version,
+                    proxy=self.proxy,
+                    proxy_auth=self.proxy_auth,
+                )
+            )
+
+        for shard in self.shards:
+            async with tasks() as tg:
+                tg[asyncio.create_task(shard.connect())]
 
     async def get_guild_members(
         self,

@@ -8,6 +8,7 @@ A library for modern Discord bots.
 """
 
 from ._about import *
+from .bot import *
 from .color import *
 from .enums import *
 from .flags import *

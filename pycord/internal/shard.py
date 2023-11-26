@@ -20,22 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from __future__ import annotations
 
 import asyncio
 import logging
 import zlib
 from asyncio import Task
 from platform import system
-from typing import Any
+from random import random
+from typing import TYPE_CHECKING, Any
 
 from aiohttp import BasicAuth, ClientConnectionError, ClientConnectorError, WSMsgType
 
-from ..state.core import State
+from ..errors import DisallowedIntents, InvalidAuth, ShardingRequired
 from ..task_descheduler import tasks
 from ..utils import dumps, loads
 from .reserver import Reserver
 
-_log = logging.getLogger()
+if TYPE_CHECKING:
+    from ..state.core import State
+
+_log = logging.getLogger(__name__)
+
+
+RESUMABLE: list[int] = [
+    4000,
+    4001,
+    4002,
+    4003,
+    4005,
+    4007,
+    4008,
+    4009,
+]
 
 
 class Shard:
@@ -48,8 +65,8 @@ class Shard:
         shard_id: int,
         shard_total: int,
         version: int,
-        proxy: str,
-        proxy_auth: BasicAuth,
+        proxy: str | None,
+        proxy_auth: BasicAuth | None,
     ) -> None:
         self._state = state
         self.version = version
@@ -60,24 +77,34 @@ class Shard:
         # leaving out 10 gives Shards more safety in terms
         # of heart beating
         self.rate_limiter = Reserver(110, 60)
+        self.open = False
 
         self._hb_task: Task | None = None
         self._recv_task: Task | None = None
         self._proxy = proxy
         self._proxy_auth = proxy_auth
         self._hello_received = asyncio.Event()
+        self._resume_gateway_url = None
 
     def log(self, level: int, msg: str) -> None:
         _log.log(level, f"shard:{self.shard_id}: {msg}")
 
     async def connect(self, resume: bool = False) -> None:
+        self.open = False
         self._hello_received.clear()
         self._inflator = zlib.decompressobj()
+        self._hb_task: Task | None = None
+        self._recv_task: Task | None = None
+
+        if not resume:
+            self.session_id = None
+            self._sequence = 0
+            self._resume_gateway_url = None
 
         try:
             async with self._state.shard_rate_limit:
                 self.log(logging.INFO, "attempting connection to gateway")
-                self._ws = self._state.http._session.ws_connect(
+                self._ws = await self._state.http._session.ws_connect(
                     url=self.URL_FMT.format(
                         version=self.version, base=self._resume_gateway_url
                     )
@@ -88,7 +115,6 @@ class Shard:
                     proxy=self._proxy,
                     proxy_auth=self._proxy_auth,
                 )
-                self.log(logging.INFO, "attempt successful")
         except (ClientConnectionError, ClientConnectorError):
             self.log(
                 logging.ERROR,
@@ -98,6 +124,9 @@ class Shard:
             await self.connect(resume=resume)
             return
         else:
+            self.log(logging.INFO, "attempt successful")
+            self.open = True
+
             self._recv_task = asyncio.create_task(self._recv())
 
             if not resume:
@@ -106,7 +135,7 @@ class Shard:
             else:
                 await self.send_resume()
 
-    async def recv(self) -> None:
+    async def _recv(self) -> None:
         async for message in self._ws:
             if message.type == WSMsgType.CLOSED:
                 break
@@ -118,12 +147,13 @@ class Shard:
                     text_coded = self._inflator.decompress(message.data).decode("utf-8")
                 except Exception as e:
                     # while being an edge case, the data could sometimes be corrupted.
-                    _log.debug(
-                        f"shard:{self.id}: failed to decompress gateway data {message.data}:{e}"
+                    self.log(
+                        logging.ERROR,
+                        f"failed to decompress gateway data {message.data}:{e}",
                     )
                     continue
 
-                _log.debug(f"shard:{self.id}: received message {text_coded}")
+                self.log(logging.DEBUG, f"received message {text_coded}")
 
                 data: dict[str, Any] = loads(text_coded)
 
@@ -131,6 +161,8 @@ class Shard:
 
                 async with tasks() as tg:
                     tg[asyncio.create_task(self.on_receive(data))]
+
+        self.handle_close(self._ws.close_code)
 
     async def on_receive(self, data: dict[str, Any]) -> None:
         op: int = data.get("op")
@@ -141,23 +173,59 @@ class Shard:
             if t == "READY":
                 self.session_id = d["session_id"]
                 self._resume_gateway_url = d["resume_gateway_url"]
-                self._state.cache["users"].upsert(d["user"]["id"], d["user"])
-            self._state.event_manager.push("ready", d)
+                await self._state.cache["users"].upsert(d["user"]["id"], d["user"])
+            await self._state.event_manager.push("ready", d)
         elif op == 1:
             await self._ws.send_str(dumps({"op": 1, "d": self._sequence}))
+        elif op == 7:
+            await self._ws.close(code=1002)
+            await self.connect(resume=True)
+            return
+        elif op == 10:
+            self._heartbeat_interval = d["heartbeat_interval"] / 1000
+
+            self._hb_task = asyncio.create_task(self._heartbeat_loop())
+            self._hello_received.set()
+
+    async def _heartbeat_loop(self) -> None:
+        jitter = True
+
+        while not self._ws.closed:
+            if jitter:
+                jitter = False
+                await asyncio.sleep(self._heartbeat_interval + random())
+            else:
+                await asyncio.sleep(self._heartbeat_interval)
+
+            self.log(logging.DEBUG, "attempting heartbeat")
+
+            try:
+                await self._ws.send_str(dumps({"op": 1, "d": self._sequence}))
+            except ConnectionResetError:
+                self.log(
+                    logging.ERROR,
+                    f"failed to send heartbeat due to connection reset, attempting reconnection",
+                )
+                self._receive_task.cancel()
+                if not self._ws.closed:
+                    await self._ws.close(code=1008)
+                await self.connect(bool(self._resume_gateway_url))
+                return
 
     async def send(self, data: dict[str, Any]) -> None:
         async with self.rate_limiter:
             d = dumps(data)
-            _log.debug(f"shard:{self.id}: sending {d}")
+            self.log(logging.DEBUG, f"sending {d}")
             await self._ws.send_str(d)
 
     async def send_identify(self) -> None:
+        self.log(logging.INFO, "shard is identifying")
+
         await self.send(
             {
                 "op": 2,
                 "d": {
-                    "token": self._token,
+                    "token": self._state._token,
                     "properties": {
                         "os": system(),
                         "browser": "pycord",
@@ -165,7 +233,7 @@ class Shard:
                     },
                     "compress": True,
                     "large_threshold": self._state.large_threshold,
-                    "shard": [self.id, self.shard_total],
+                    "shard": [self.shard_id, self.shard_total],
                     "intents": self._state.intents,
                 },
             }
@@ -182,3 +250,27 @@ class Shard:
                 },
             }
         )
+
+    async def handle_close(self, code: int | None) -> None:
+        self.log(logging.ERROR, f"shard socket closed with code {code}")
+        if self._hb_task and not self._hb_task.done():
+            self._hb_task.cancel()
+        if code in RESUMABLE:
+            await self.connect(True)
+        elif code is None:
+            await self.connect(True)
+        else:
+            if code == 4004:
+                raise InvalidAuth("Authentication used in gateway is invalid")
+            elif code == 4011:
+                raise ShardingRequired("Discord is requiring you shard your bot")
+            elif code == 4014:
+                raise DisallowedIntents(
+                    "You aren't allowed to carry a privileged intent wanted"
+                )
+
+            if code > 4000 or code == 4000:
+                await self.connect(resume=False)
+            else:
+                # the connection most likely died
+                await self.connect(resume=True)

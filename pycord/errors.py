@@ -22,24 +22,37 @@
 
 
 class PycordException(Exception):
-    ...
+    pass
 
 
 class BotException(PycordException):
-    ...
+    pass
 
 
 class HTTPException(Exception):
-    ...
+    pass
 
 
 class Forbidden(HTTPException):
-    ...
+    pass
 
 
 class NotFound(HTTPException):
-    ...
+    pass
 
 
 class DiscordException(HTTPException):
-    ...
+    pass
+
+
+# Gateway
+class ShardingRequired(BotException):
+    pass
+
+
+class InvalidAuth(BotException):
+    pass
+
+
+class DisallowedIntents(BotException):
+    pass

@@ -48,6 +48,7 @@ class State:
         base_url: str = "https://discord.com/api/v10",
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
+        shards: list[int] | range | None = None,
         # classes
         store_class: Type[Store] = Store,
         cache_model_classes: dict[Any, Any] = BASE_MODELS,
@@ -59,7 +60,9 @@ class State:
         self.max_members = max_members
         self.intents = intents
         self.http = HTTPClient(token, base_url, proxy, proxy_auth)
-        self.gateway = Gateway(self)
+        self.gateway = Gateway(
+            self, 10, None, None, shards or [0], len(shards) if shards else 1
+        )
         self.cache_models = cache_model_classes
         # this is just a really low default.
         # it should be set at the start, just in case however,

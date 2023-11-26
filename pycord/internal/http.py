@@ -88,7 +88,7 @@ class HTTPClient:
 
     async def force_start(self) -> None:
         if self._session is None:
-            self._session = aiohttp.ClientSession(self.base_url)
+            self._session = aiohttp.ClientSession()
 
     async def request(  # type: ignore[return]
         self,
@@ -102,10 +102,10 @@ class HTTPClient:
         query_params: dict[str, str] | None = None,
         t: Type[T],
     ) -> T:
-        endpoint = route.path
+        endpoint = self.base_url + route.path
 
         if self._session is None:
-            self._session = aiohttp.ClientSession(self.base_url)
+            self._session = aiohttp.ClientSession()
 
         if TYPE_CHECKING:
             assert self._session
