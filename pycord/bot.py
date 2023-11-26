@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 # cython: language_level=3
-# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,40 +20,35 @@
 # SOFTWARE
 
 
-import asyncio
-import gc
-from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator, Literal
+from typing import Any
+
+from aiohttp import BasicAuth
+
+from .state.cache import Store
+from .state.core import BASE_MODELS, State
 
 
-class TaskDescheduler:
-    def __init__(self) -> None:
-        self.active_tasks: list[asyncio.Future[Any]] = []
-        gc.callbacks.append(self.__collect_finished_tasks)
-
-    def __getitem__(self, item: asyncio.Future[Any]) -> None:
-        self.active_tasks.append(item)
-
-    def __collect_finished_tasks(
-        self, phase: Literal["start", "stop"], info: dict[str, int]
+class Bot:
+    def __init__(
+        self,
+        token: str,
+        intents: int,
+        max_message_cache: int = 10000,
+        max_member_cache: int = 50000,
+        base_url: str = "https://discord.com/api/v10",
+        proxy: str | None = None,
+        proxy_auth: BasicAuth | None = None,
+        store_class: type[Store] = Store,
+        model_classes: dict[Any, Any] = BASE_MODELS,
     ) -> None:
-        del info
-
-        if phase == "stop":
-            return
-
-        active_tasks = self.active_tasks.copy()
-
-        for task in active_tasks:
-            if task.done():
-                self.active_tasks.remove(task)
-
-        del active_tasks
-
-
-Tasks = TaskDescheduler()
-
-
-@asynccontextmanager
-async def tasks() -> AsyncGenerator[TaskDescheduler, Any]:
-    yield Tasks
+        self.state = State(
+            token=token,
+            max_messages=max_message_cache,
+            max_members=max_member_cache,
+            intents=intents,
+            base_url=base_url,
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            store_class=store_class,
+            cache_model_classes=model_classes,
+        )

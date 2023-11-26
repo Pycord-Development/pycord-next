@@ -24,11 +24,13 @@ from typing import Any, Type
 
 from aiohttp import BasicAuth
 
+from ..internal.event_manager import EventManager
 from ..internal.gateway import Gateway
 from ..internal.http import HTTPClient
+from ..internal.reserver import Reserver
 from .cache import CacheStore, Store
 
-_BASE_MODELS: dict[Any, Any] = {}
+BASE_MODELS: dict[Any, Any] = {}
 
 
 class State:
@@ -41,13 +43,14 @@ class State:
         max_messages: int,
         max_members: int,
         intents: int,
+        gateway_large_threshold: int = 250,
         # "advanced" options
         base_url: str = "https://discord.com/api/v10",
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
         # classes
         store_class: Type[Store] = Store,
-        cache_model_classes: dict[Any, Any] = _BASE_MODELS,
+        cache_model_classes: dict[Any, Any] = BASE_MODELS,
     ) -> None:
         self._token = token
         self.cache = CacheStore(store_class)
@@ -58,3 +61,9 @@ class State:
         self.http = HTTPClient(token, base_url, proxy, proxy_auth)
         self.gateway = Gateway(self)
         self.cache_models = cache_model_classes
+        # this is just a really low default.
+        # it should be set at the start, just in case however,
+        # this is here.
+        self.shard_rate_limit = Reserver(5, 7)
+        self.event_manager = EventManager()
+        self.large_threshold = gateway_large_threshold

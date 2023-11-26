@@ -22,7 +22,7 @@
 
 
 import asyncio
-from typing import Any, Callable, Coroutine, Self, Type
+from typing import Any, Callable, Coroutine, Generic, Self, Type, TypeVar
 
 from mypy_extensions import i16, mypyc_attr, trait
 

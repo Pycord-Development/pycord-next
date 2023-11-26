@@ -31,8 +31,6 @@ This forces developers to grapple with async i/o and makes it easier to do thing
 database connections before your bot starts.
 
 
-
-
 ```py
 # decorator for identifying commands, or parent commands.
 # sub commands should use a sort of `parent.command` design.
@@ -70,11 +68,9 @@ if __name__ == "__main__":
 
 ### Cogs are Gone.
 
-As of version 3, Pycord will no longer be supporting Cogs, as their current design has them.
+As of version 3, Pycord will no longer be supporting Cogs in their current design.
 We will still support grouping your commands and listeners in separate files, just with a
-smarter and more "raw" way.
-
-
+smarter and less object-oriented way.
 
 
 ```py
@@ -87,6 +83,6 @@ async def setup():
 ```
 
 
+# A tiny note
 
-
-todo!("There is still more content on the way! The more v3 develops, the more we'll add here :)")
+There is still more content on the way! The more v3 develops, the more we'll add here :)

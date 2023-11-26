@@ -97,6 +97,7 @@ setuptools.setup(
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: Implementation :: CPython",
         "Framework :: AsyncIO",
         "Framework :: aiohttp",

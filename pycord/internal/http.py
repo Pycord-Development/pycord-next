@@ -86,6 +86,10 @@ class HTTPClient:
 
         self._session: None | ClientSession = None
 
+    async def force_start(self) -> None:
+        if self._session is None:
+            self._session = aiohttp.ClientSession(self.base_url)
+
     async def request(  # type: ignore[return]
         self,
         method: str,
