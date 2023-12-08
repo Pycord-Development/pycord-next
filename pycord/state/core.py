@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Any, Type
+from typing import Any, Iterable, Type
 
 from aiohttp import BasicAuth
 
@@ -48,11 +48,12 @@ class State:
         base_url: str = "https://discord.com/api/v10",
         proxy: str | None = None,
         proxy_auth: BasicAuth | None = None,
-        shards: list[int] | range | None = None,
+        shards: Iterable[int] | None = None,
         # classes
         store_class: Type[Store] = Store,
         cache_model_classes: dict[Any, Any] = BASE_MODELS,
     ) -> None:
+        self.shards = shards or range(1)
         self._token = token
         self.cache = CacheStore(store_class)
         self.cache["messages"] = max_messages
@@ -67,6 +68,7 @@ class State:
         # this is just a really low default.
         # it should be set at the start, just in case however,
         # this is here.
-        self.shard_rate_limit = Reserver(5, 7)
+        self.shard_rate_limit = Reserver(1, 5)
         self.event_manager = EventManager()
         self.large_threshold = gateway_large_threshold
+        self.user_id: int | None = None

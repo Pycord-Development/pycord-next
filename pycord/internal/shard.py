@@ -174,7 +174,8 @@ class Shard:
                 self.session_id = d["session_id"]
                 self._resume_gateway_url = d["resume_gateway_url"]
                 await self._state.cache["users"].upsert(d["user"]["id"], d["user"])
-            await self._state.event_manager.push("ready", d)
+                self._state.user_id = d["user"]["id"]
+            await self._state.event_manager.push(t, d)
         elif op == 1:
             await self._ws.send_str(dumps({"op": 1, "d": self._sequence}))
         elif op == 7:

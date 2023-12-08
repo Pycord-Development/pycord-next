@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING, Any, Type, TypeVar, cast
 
 import aiohttp
 from aiohttp import BasicAuth, ClientSession, FormData, __version__ as aiohttp_version
+from discord_typings import GetGatewayBotData
 from discord_typings.resources.application import ApplicationData
 from discord_typings.resources.audit_log import AuditLogData, AuditLogEvents
 from msgspec import json
@@ -181,6 +182,13 @@ class HTTPClient:
                 return d
             else:
                 raise HTTPException(r, d)
+
+    # gateway
+    async def get_gateway_bot(self) -> GetGatewayBotData:
+        return cast(
+            GetGatewayBotData,
+            await self.request("GET", Route(self, "/gateway/bot"), t=GetGatewayBotData),
+        )
 
     # audit log
 

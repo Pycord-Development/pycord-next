@@ -21,10 +21,11 @@
 
 
 import asyncio
-from typing import Any
+from typing import Any, Iterable
 
 from aiohttp import BasicAuth
 
+from .interface import print_banner, start_logging
 from .state.cache import Store
 from .state.core import BASE_MODELS, State
 
@@ -34,7 +35,7 @@ class Bot:
         self,
         token: str,
         intents: int,
-        shards: list[int] | range | None = None,
+        shards: Iterable[int] | None = None,
         max_message_cache: int = 10000,
         max_member_cache: int = 50000,
         base_url: str = "https://discord.com/api/v10",
@@ -56,9 +57,15 @@ class Bot:
             shards=shards,
         )
 
-    async def start(self) -> None:
+    async def start(
+        self, logging_flavor: None | int | str | dict[str, Any] = None
+    ) -> None:
         await self.state.http.force_start()
-        await self.state.gateway.start()
+        gateway_data = await self.state.http.get_gateway_bot()
+        await self.state.gateway.start(gateway_data)
+
+        start_logging(flavor=logging_flavor)
+        print_banner(10, len(self.state.shards), "")
 
         try:
             await asyncio.Future()

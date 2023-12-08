@@ -26,9 +26,11 @@ import asyncio
 from typing import TYPE_CHECKING, Protocol
 
 from aiohttp import BasicAuth
+from discord_typings.gateway import GetGatewayBotData
 from mypy_extensions import trait
 
 from ..task_descheduler import tasks
+from .reserver import Reserver
 from .shard import Shard
 
 if TYPE_CHECKING:
@@ -90,7 +92,14 @@ class Gateway(GatewayProtocol):
         self.proxy = proxy
         self.proxy_auth = proxy_auth
 
-    async def start(self) -> None:
+    async def start(self, gateway_data: GetGatewayBotData) -> None:
+        self._state.shard_rate_limit = Reserver(
+            gateway_data["session_start_limit"]["max_concurrency"], 5
+        )
+        self._state.shard_rate_limit.current = gateway_data["session_start_limit"][
+            "remaining"
+        ]
+
         for shard_id in self.shard_ids:
             self.shards.append(
                 Shard(

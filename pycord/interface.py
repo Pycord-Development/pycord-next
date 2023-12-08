@@ -117,7 +117,7 @@ def print_banner(
         "version": __version__,
         "license": __license__,
         # the # prefix only works on Windows, and the - prefix only works on linux/unix systems
-        "current_time": today.strftime(f"%B the %#d{get_day_prefix(today.day)} of %Y")
+        "current_time": today.strftime(f"%B the %#d{get_day_prefix(today.day)}, %Y")
         if os.name == "nt"
         else today.strftime(f"%B the %-d{get_day_prefix(today.day)} of %Y"),
         "py_version": platform.python_version(),

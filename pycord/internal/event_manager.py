@@ -22,9 +22,9 @@
 
 
 import asyncio
-from typing import Any, Callable, Coroutine, Generic, Self, Type, TypeVar
+from typing import Any, Callable, Coroutine, Self, Type
 
-from mypy_extensions import i16, mypyc_attr, trait
+from mypy_extensions import i32, mypyc_attr, trait
 
 from ..task_descheduler import tasks
 
@@ -55,7 +55,7 @@ class EventManager:
     def __init__(self) -> None:
         self._events: dict[Type[EventTrait], list[tuple[Filters, EventFunc]]] = {}
 
-    async def push(self, name: str, data: dict[str, Any]) -> i16:
+    async def push(self, name: str, data: dict[str, Any]) -> i32:
         ret = 0
         async with tasks() as tg:
             for event, funcs in self._events.copy().items():
