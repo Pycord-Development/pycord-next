@@ -68,7 +68,7 @@ class Shard:
         proxy: str | None,
         proxy_auth: BasicAuth | None,
     ) -> None:
-        self._state = state
+        self._state: "State" = state
         self.version = version
         self.shard_id = shard_id
         self.shard_total = shard_total

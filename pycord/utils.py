@@ -35,6 +35,7 @@ from typing import (
     AsyncGenerator,
     AsyncIterator,
     Callable,
+    Protocol,
     Type,
     TypeVar,
     cast,
@@ -332,3 +333,7 @@ def form_qs(path: str, **queries: Any) -> str:
         path += prefix + f"{k}={v}"
 
     return path
+
+
+class Snowflake(Protocol):
+    id: int

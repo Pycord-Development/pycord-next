@@ -36,7 +36,11 @@ __all__: Sequence[str] = (
     "MessageFlags",
     "SystemChannelFlags",
     "ApplicationFlags",
+    "ChannelFlags",
+    "MessageFlags",
     "UserFlags",
+    "MemberFlags",
+    "RoleFlags",
 )
 
 
@@ -401,6 +405,10 @@ class SystemChannelFlags(Flags):
 @fill()
 class ApplicationFlags(Flags):
     @flag
+    def application_auto_moderation_rule_create_badge(self) -> bool | int:
+        return 1 << 6
+
+    @flag
     def gateway_presence(self) -> bool | int:
         return 1 << 12
 
@@ -571,3 +579,17 @@ class MemberFlags(Flags):
     @flag
     def started_onboarding(self) -> bool | int:
         return 1 << 3
+
+
+@fill()
+class RoleFlags(Flags):
+    @flag
+    def in_prompt(self) -> bool | int:
+        return 1 << 0
+    
+
+@fill()
+class AttachmentFlags(Flags):
+    @flag
+    def is_remix(self) -> bool | int:
+        return 1 << 2

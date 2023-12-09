@@ -26,7 +26,7 @@ import asyncio
 from typing import TYPE_CHECKING, Protocol
 
 from aiohttp import BasicAuth
-from discord_typings.gateway import GetGatewayBotData
+from discord_typings import GetGatewayBotData
 from mypy_extensions import trait
 
 from ..task_descheduler import tasks
@@ -84,7 +84,7 @@ class Gateway(GatewayProtocol):
         shard_ids: list[int],
         shard_total: int,
     ) -> None:
-        self._state = state
+        self._state: "State" = state
         self.shards: list[Shard] = []
         self.shard_ids = shard_ids
         self.shard_total = shard_total

@@ -26,9 +26,7 @@ from typing import TYPE_CHECKING, Any, Type, TypeVar, cast
 
 import aiohttp
 from aiohttp import BasicAuth, ClientSession, FormData, __version__ as aiohttp_version
-from discord_typings import GetGatewayBotData
-from discord_typings.resources.application import ApplicationData
-from discord_typings.resources.audit_log import AuditLogData, AuditLogEvents
+from discord_typings import GetGatewayBotData, ApplicationData, AuditLogData, AuditLogEvents
 from msgspec import json
 
 from .._about import __version__
@@ -182,6 +180,31 @@ class HTTPClient:
                 return d
             else:
                 raise HTTPException(r, d)
+            
+    # cdn
+    async def get_from_cdn(self, url: str) -> bytes:
+        if self._session is None:
+            self._session = aiohttp.ClientSession()
+
+        if TYPE_CHECKING:
+            assert self._session
+
+        r = await self._session.request(
+            "GET",
+            url,
+        )
+        d = await r.read()
+        if r.status == 403:
+            raise Forbidden(r, d)
+        elif r.status == 404:
+            raise NotFound(r, d)
+        elif r.status == 500:
+            raise DiscordException(r, d)
+        elif r.ok:
+            return d
+        else:
+            raise HTTPException(r, d)
+        
 
     # gateway
     async def get_gateway_bot(self) -> GetGatewayBotData:

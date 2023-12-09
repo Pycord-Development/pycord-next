@@ -235,6 +235,7 @@ class ChannelType(Enum):
     GUILD_STAGE_VOICE = 13
     GUILD_DIRECTORY = 14
     GUILD_FORUM = 15
+    GUILD_MEDIA = 16
 
 
 class VideoQualityMode(Enum):
@@ -245,6 +246,12 @@ class VideoQualityMode(Enum):
 class SortOrderType(Enum):
     LATEST_ACTIVITY = 0
     CREATION_DATE = 1
+
+
+class ForumLayoutType(Enum):
+    NOT_SET = 0
+    LIST_VIEW = 1
+    GALLERY_VIEW = 2
 
 
 class MessageType(Enum):
