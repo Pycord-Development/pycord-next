@@ -23,7 +23,7 @@
 import os
 from glob import glob
 
-import mypyc.build
+# import mypyc.build
 import setuptools
 
 __version__ = "3.0.0"
@@ -35,9 +35,14 @@ with open("requirements/_.txt") as f:
 packages: list[str] = []
 
 
-for fn in os.scandir("pycord"):
-    if fn.is_dir():
-        packages.append(f.name)
+def scan_dir_for_pkgs(folder: str) -> None:
+    for fn in os.scandir(folder):
+        if fn.is_dir():
+            packages.append(f.name)
+            scan_dir_for_pkgs(fn.path)
+
+
+scan_dir_for_pkgs("pycord")
 
 
 def get_extra_requirements() -> dict[str, list[str]]:
