@@ -1,8 +1,8 @@
 """
 pycord.ext
 ~~~~~~~~~~
-A variety of Pycord extensions to make your bot development experience easier
+Officially vendored extensions part of Pycord.
 
-:copyright: 2021-present Pycord Development
+:copyright: 2021-present Pycord
 :license: MIT
 """

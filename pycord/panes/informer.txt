@@ -1,0 +1,4 @@
+  ${bold_red}Wel${reset}${blue}come${reset} ${bold_blue}to${reset} ${yellow}Pycord v${version}${reset}
+  ${bold_white}It's currently ${current_time}. Being run on Python ${py_version}${reset}
+
+  ${bold_yellow}${botname}${reset} currently has ${red}${concurrency}${reset} connects left and will be running ${bold_blue}${shardcount}${reset} shard${sp}.

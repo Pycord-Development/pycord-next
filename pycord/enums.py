@@ -1,5 +1,6 @@
-# cython: language_level=3
-# Copyright (c) 2021-present Pycord Development
+# MIT License
+#
+# Copyright (c) 2023 Pycord
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,14 +18,9 @@
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE
+# SOFTWARE.
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from enum import Enum
-else:
-    from fastenum.fastenum import Enum
+from enum import Enum
 
 
 class VerificationLevel(Enum):
@@ -239,6 +235,7 @@ class ChannelType(Enum):
     GUILD_STAGE_VOICE = 13
     GUILD_DIRECTORY = 14
     GUILD_FORUM = 15
+    GUILD_MEDIA = 16
 
 
 class VideoQualityMode(Enum):
@@ -249,6 +246,12 @@ class VideoQualityMode(Enum):
 class SortOrderType(Enum):
     LATEST_ACTIVITY = 0
     CREATION_DATE = 1
+
+
+class ForumLayoutType(Enum):
+    NOT_SET = 0
+    LIST_VIEW = 1
+    GALLERY_VIEW = 2
 
 
 class MessageType(Enum):
@@ -286,12 +289,12 @@ class MessageActivityType(Enum):
 
 
 class EmbedType(Enum):
-    rich = 'rich'
-    image = 'image'
-    video = 'video'
-    gif = 'gifv'
-    article = 'article'
-    link = 'link'
+    rich = "rich"
+    image = "image"
+    video = "video"
+    gif = "gifv"
+    article = "article"
+    link = "link"
 
 
 class GuildScheduledEventPrivacyLevel(Enum):

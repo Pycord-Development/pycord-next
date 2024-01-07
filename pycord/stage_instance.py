@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Copyright (c) 2021-present Pycord Development
+# Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,30 +18,58 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from __future__ import annotations
+
+
+
+from .enums import StageInstancePrivacyLevel
+from .mixins import Identifiable
 
 from typing import TYPE_CHECKING
 
-from .enums import StageInstancePrivacyLevel
-from .missing import MISSING, Maybe, MissingEnum
-from .snowflake import Snowflake
-from .types import StageInstance as DiscordStageInstance
-
 if TYPE_CHECKING:
+    from discord_typings import StageInstanceData
+
     from .state import State
 
 
-class StageInstance:
-    def __init__(self, data: DiscordStageInstance, state: State) -> None:
-        self.id: Snowflake = Snowflake(data['id'])
-        self.guild_id: Snowflake = Snowflake(data['guild_id'])
-        self.channel_id: Snowflake = Snowflake(data['channel_id'])
-        self.topic: str = data['topic']
-        self.privacy_level: StageInstancePrivacyLevel = StageInstancePrivacyLevel(
-            data['privacy_level']
-        )
-        self.guild_scheduled_event_id: MissingEnum | Snowflake = (
-            Snowflake(data['guild_scheduled_event_id'])
-            if data.get('guild_scheduled_event_id') is not None
-            else MISSING
-        )
+class StageInstance(Identifiable):
+    __slots__ = (
+        "id",
+        "guild_id",
+        "channel_id",
+        "topic",
+        "privacy_level",
+        "discoverable_disabled",
+        "guild_scheduled_event_id",
+    )
+
+    def __init__(self, *, data: "StageInstanceData", state: "State"):
+        self._state: "State" = state
+        self._update(data)
+
+    def _update(self, data: "StageInstanceData"):
+        self.id: int = int(data["id"])
+        self.guild_id: int = int(data["guild_id"])
+        self.channel_id: int = int(data["channel_id"])
+        self.topic: str = data["topic"]
+        self.privacy_level: StageInstancePrivacyLevel = StageInstancePrivacyLevel(data["privacy_level"])
+        self.discoverable_disabled: bool = data["discoverable_disabled"]
+        self.guild_scheduled_event_id: int | None = int(gseid) if (gseid := data.get("guild_scheduled_event_id")) else None
+
+    def __repr__(self) -> str:
+        return f"<StageInstance id={self.id} guild_id={self.guild_id} channel_id={self.channel_id} topic={self.topic} privacy_level={self.privacy_level} discoverable_disabled={self.discoverable_disabled} guild_scheduled_event_id={self.guild_scheduled_event_id}>"
+    
+    async def modify(
+            self, 
+            *, 
+            topic: str = None, 
+            privacy_level: StageInstancePrivacyLevel = None, 
+            discoverable_disabled: bool = None,
+            reason: str | None = None,
+    ) -> "StageInstance":
+        # TODO: implement
+        raise NotImplementedError
+    
+    async def delete(self, *, reason: str | None = None) -> None:
+        # TODO: implement
+        raise NotImplementedError

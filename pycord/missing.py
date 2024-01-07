@@ -22,9 +22,9 @@
 # SOFTWARE
 
 from enum import Enum, auto
-from typing import Literal, TypeVar, Union
+from typing import Literal, TypeAlias, TypeVar, Union
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class MissingEnum(Enum):
@@ -40,4 +40,4 @@ An instance of `.missing.MissingEnum` for purposes of code use.
 """
 
 
-Maybe = Union[T, Literal[MissingEnum.MISSING]]
+Maybe: TypeAlias = Union[T, Literal[MissingEnum.MISSING]]

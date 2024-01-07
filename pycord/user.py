@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Copyright (c) 2021-present Pycord Development
+# Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,58 +18,108 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from __future__ import annotations
 
-from functools import cached_property
 from typing import TYPE_CHECKING
 
-from .color import Color
+from pycord.channel import DMChannel
+
+from .asset import Asset
 from .enums import PremiumType
 from .flags import UserFlags
-from .missing import MISSING, Maybe, MissingEnum
-from .snowflake import Snowflake
-from .types import LOCALE, User as DiscordUser
+from .missing import Maybe, MISSING
+from .mixins import Identifiable
 
 if TYPE_CHECKING:
+    from discord_typings import UserData
+
     from .state import State
 
 
-class User:
-    def __init__(self, data: DiscordUser, state: State) -> None:
-        self.id: Snowflake = Snowflake(data['id'])
-        self.name: str = data['username']
-        self.discriminator: str = data['discriminator']
-        self._avatar: str | None = data['avatar']
-        self.bot: bool | MissingEnum = data.get('bot', MISSING)
-        self.system: bool | MissingEnum = data.get('system', MISSING)
-        self.mfa_enabled: bool | MissingEnum = data.get('mfa_enabled', MISSING)
-        self._banner: MissingEnum | str | None = data.get('banner', MISSING)
-        self._accent_color: MissingEnum | int | None = data.get('accent_color', MISSING)
-        self.accent_color: MissingEnum | Color | None = (
-            Color(self._accent_color)
-            if self._accent_color not in [MISSING, None]
-            else self._accent_color
-        )
-        self.locale: MissingEnum | LOCALE = data.get('locale', MISSING)
-        self.verified: MissingEnum | bool = data.get('verified', MISSING)
-        self.email: str | None | MissingEnum = data.get('email', MISSING)
-        self._flags: MissingEnum | int = data.get('flags', MISSING)
-        self.flags: MissingEnum | UserFlags = (
-            UserFlags.from_value(self._flags) if self._flags is not MISSING else MISSING
-        )
-        self._premium_type: MissingEnum | int = data.get('premium_type', MISSING)
-        self.premium_type: PremiumType | MissingEnum = (
-            PremiumType(self._premium_type)
-            if self._premium_type is not MISSING
-            else MISSING
-        )
-        self._public_flags: MissingEnum | int = data.get('public_flags', MISSING)
-        self.public_flags: MissingEnum | UserFlags = (
-            UserFlags.from_value(self._public_flags)
-            if self._public_flags is not MISSING
-            else MISSING
-        )
+__all__ = (
+    "User",
+)
 
-    @cached_property
+
+class User(Identifiable):
+    __slots__ = (
+        "_state",
+        "id",
+        "username",
+        "discriminator",
+        "global_name",
+        "avatar_hash",
+        "bot",
+        "system",
+        "mfa_enabled",
+        "banner_hash",
+        "accent_color",
+        "locale",
+        "verified",
+        "email",
+        "flags",
+        "premium_type",
+        "public_flags",
+        "avatar_decoration_hash",
+    )
+    def __init__(self, data: "UserData", state: "State") -> None:
+        self._state: "State" = state
+        self._update(data)
+        
+    def __repr__(self) -> str:
+        return (
+            f"<User id={self.id} username={self.username} discriminator={self.discriminator} "
+            f"bot={self.bot} system={self.system}>"
+        )
+    
+    def __str__(self) -> str:
+        return self.global_name or f"{self.username}#{self.discriminator}"
+    
+    def _update(self, data: "UserData") -> None:
+        self.username = data["username"]
+        self.discriminator = data["discriminator"]
+        self.global_name = data["global_name"]
+        self.avatar_hash = data["avatar"]
+        self.bot = data.get("bot", MISSING)
+        self.system = data.get("system", MISSING)
+        self.mfa_enabled = data.get("mfa_enabled", MISSING)
+        self.banner_hash = data.get("banner", MISSING)
+        self.accent_color = data.get("accent_color", MISSING)
+        self.locale = data.get("locale", MISSING)
+        self.verified = data.get("verified", MISSING)
+        self.email = data.get("email", MISSING)
+        self.flags = UserFlags.from_value(data["flags"]) if "flags" in data else MISSING
+        self.premium_type = PremiumType(data["premium_type"]) if "premium_type" in data else MISSING
+        self.public_flags = UserFlags.from_value(data["public_flags"]) if "public_flags" in data else MISSING
+        self.avatar_decoration_hash = data.get("avatar_decoration", MISSING)
+
+    @property
     def mention(self) -> str:
-        return f'<@{self.id}>'
+        return f"<@{self.id}>"
+    
+    @property
+    def display_name(self) -> str:
+        return self.global_name or self.username
+    
+    @property
+    def avatar(self) -> Asset:
+        # TODO: Return Asset
+        if self.avatar_hash:
+            return Asset.from_user_avatar(self._state, self.id, self.avatar_hash)
+        index = (int(self.discriminator) % 5) if self.discriminator != "0" else (self.id >> 22) % 6
+        return Asset.from_default_user_avatar(self._state, index)
+    
+    @property
+    def banner(self) -> Asset | None:
+        return Asset.from_user_banner(self._state, self.id, self.banner_hash) if self.banner_hash else None
+    
+    @property
+    def avatar_decoration(self) -> Asset | None:
+        return Asset.from_user_avatar_decoration(self._state, self.id, self.avatar_decoration_hash) if self.avatar_decoration_hash else None
+    
+    async def create_dm(self) -> DMChannel:
+        # TODO: implement
+        raise NotImplementedError
+    
+    async def send(self, *args, **kwargs) -> Message:
+        dm = await self.create_dm()
+        return await dm.send(*args, **kwargs)

@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Copyright (c) 2021-present Pycord Development
+# Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,149 +18,164 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from __future__ import annotations
+
+
+from .asset import Asset
+from .enums import MembershipState
+from .flags import ApplicationFlags, Permissions
+from .guild import Guild
+from .mixins import Identifiable
+from .missing import Maybe, MISSING
+from .user import User
 
 from typing import TYPE_CHECKING
 
-from .flags import ApplicationFlags, Permissions
-from .missing import MISSING, Maybe, MissingEnum
-from .snowflake import Snowflake
-from .team import Team
-from .types import (
-    SCOPE,
-    Application as DiscordApplication,
-    InstallParams as DiscordInstallParams,
-)
-from .user import User
-
 if TYPE_CHECKING:
+    from discord_typings import ApplicationData, PartialApplicationData, InstallParams as InstallParamsData, OAuth2Scopes, TeamData, TeamMemberData
     from .state import State
+
+__all__ = (
+    "Application",
+    "InstallParams",
+    "Team",
+    "TeamMember",
+)
+
+class Application(Identifiable):
+    __slots__ = (
+        "_state",
+        "id",
+        "name",
+        "icon_hash",
+        "description",
+        "rpc_origins",
+        "bot_public",
+        "bot_require_code_grant",
+        "bot",
+        "terms_of_service_url",
+        "privacy_policy_url",
+        "owner",
+        "verify_key",
+        "team",
+        "guild_id",
+        "guild",
+        "primary_sku_id",
+        "slug",
+        "cover_image_hash",
+        "flags",
+        "approximate_guild_count",
+        "redirect_uris",
+        "role_connections_verification_url",
+        "tags",
+        "install_params",
+        "custom_install_url",
+    )
+
+    def __init__(self, data: "ApplicationData | PartialApplicationData", state: "State") -> None:
+        self._state: "State" = state
+        self.id: int = int(data["id"])
+        self.name: Maybe[str] = data.get("name", MISSING)
+        self.icon_hash: Maybe[str | None] = data.get("icon", MISSING)
+        self.description: Maybe[str] = data.get("description", MISSING)
+        self.rpc_origins: Maybe[list[str]] = data.get("rpc_origins", MISSING)
+        self.bot_public: Maybe[bool] = data.get("bot_public", MISSING)
+        self.bot_require_code_grant: Maybe[bool] = data.get("bot_require_code_grant", MISSING)
+        self.bot: Maybe["User"] = User(data["bot"], state) if "bot" in data else MISSING
+        self.terms_of_service_url: Maybe[str] = data.get("terms_of_service_url", MISSING)
+        self.privacy_policy_url: Maybe[str] = data.get("privacy_policy_url", MISSING)
+        self.owner: Maybe["User"] = User(data["owner"], state) if "owner" in data else MISSING
+        self.verify_key: Maybe[str] = data.get("verify_key", MISSING)
+        self.team: "Team" | None = Team(teamdata, state) if (teamdata := data.get("team")) else None
+        self.guild_id: Maybe[int] = data.get("guild_id", MISSING)
+        self.guild: Maybe["Guild"] = Guild(guild, state) if (guild := data.get("guild")) else MISSING
+        self.primary_sku_id: Maybe[int] = data.get("primary_sku_id", MISSING)
+        self.slug: Maybe[str] = data.get("slug", MISSING)
+        self.cover_image_hash: Maybe[str] = data.get("cover_image", MISSING)
+        self.flags: Maybe[ApplicationFlags] = ApplicationFlags.from_value(data["flags"]) if "flags" in data else MISSING
+        self.approximate_guild_count: Maybe[int] = data.get("approximate_guild_count", MISSING)
+        self.redirect_uris: Maybe[list[str]] = data.get("redirect_uris", MISSING)
+        self.role_connections_verification_url: Maybe[str] = data.get("role_connections_verification_url", MISSING)
+        self.tags: Maybe[list[str]] = data.get("tags", MISSING)
+        self.install_params: Maybe[InstallParams] = InstallParams(data["install_params"]) if "install_params" in data else MISSING
+        self.custom_install_url: Maybe[str] = data.get("custom_install_url", MISSING)
+
+    def __repr__(self) -> str:
+        return f"<Application id={self.id} name={self.name}>"
+    
+    def __str__(self) -> str:
+        return self.__repr__()
+    
+    @property
+    def icon(self) -> Asset | None:
+        return Asset.from_application_icon(self._state, self.id, self.icon_hash) if self.icon_hash else None
+
+    @property
+    def cover_image(self) -> Asset | None:
+        return Asset.from_application_cover(self._state, self.id, self.cover_image_hash) if self.cover_image_hash else None
 
 
 class InstallParams:
-    """
-    Discord's Application Installation Parameters.
-
-    Attributes
-    ----------
-    scopes: list[:class:`.types.SCOPE`]
-    permissions: :class:`.flags.Permissions`
-    """
-
-    __slots__ = ('scopes', 'permissions')
-
-    def __init__(self, data: DiscordInstallParams) -> None:
-        self.scopes: list[SCOPE] = data['scopes']
-        self.permissions: Permissions = Permissions.from_value(data['permissions'])
-
-
-class Application:
-    """
-    Represents a Discord Application. Like a bot or webhook.
-
-    Attributes
-    ----------
-    id: :class:`.snowflake.Snowflake`
-    name: :class:`str`
-        Name of this Application
-    icon: :class:`str`
-        The Icon hash of the Application
-    description: :class:`str`
-        Description of this Application
-    rpc_origins: list[:class:`str`] | :class:`.undefined.MissingEnum`
-        A list of RPC Origins for this Application
-    bot_public: :class:`bool`
-        Whether this bot can be invited by anyone or only the owner
-    bot_require_code_grant: :class:`bool`
-        Whether this bot needs a code grant to be invited
-    terms_of_service_url: :class:`str` | :class:`.undefined.MissingEnum`
-        The TOS url of this Application
-    privacy_policy_url: :class:`str` | :class:`.undefined.MissingEnum`
-        The Privacy Policy url of this Application
-    owner: :class:`.user.User` | :class:`.undefined.MissingEnum`
-        The owner of this application, if any, or only if a user
-    verify_key: :class:`str`
-        The verification key of this Application
-    team: :class:`Team` | None
-        The team of this Application, if any
-    guild_id: :class:`.snowflake.Snowflake` | :class:`.undefined.MissingEnum`
-        The guild this application is withheld in, if any
-    primary_sku_id: :class:`.snowflake.Snowflake` | :class:`.undefined.MissingEnum`
-        The Primary SKU ID (Product ID) of this Application, if any
-    slug: :class:`str` | :class:`.undefined.MissingEnum`
-        The slug of this Application, if any
-    flags: :class:`.flags.ApplicationFlags` | :class:`.undefined.MissingEnum`
-        A Class representation of this Application's Flags
-    tags: list[:class:`str`]
-        The list of tags this Application withholds
-    install_params: :class:`.application.InstallParams` | :class:`.undefined.MissingEnum`
-    custom_install_url: :class:`str` | :class:`.undefined.MissingEnum`
-        The Custom Installation URL of this Application
-    """
-
     __slots__ = (
-        '_cover_image',
-        'id',
-        'name',
-        'icon',
-        'description',
-        'rpc_origins',
-        'bot_public',
-        'bot_require_code_grant',
-        'terms_of_service_url',
-        'privacy_policy_url',
-        'owner',
-        'verify_key',
-        'team',
-        'guild_id',
-        'primary_sku_id',
-        'slug',
-        'flags',
-        'tags',
-        'install_params',
-        'custom_install_url',
+        "scopes",
+        "permissions",
     )
 
-    def __init__(self, data: DiscordApplication, state: State) -> None:
-        self.id: Snowflake = Snowflake(data['id'])
-        self.name: str = data['name']
-        self.icon: str | None = data['icon']
-        self.description: str = data['description']
-        self.rpc_origins: Maybe[list[str]] = data.get('rpc_origins', MISSING)
-        self.bot_public: bool = data['bot_public']
-        self.bot_require_code_grant: bool = data['bot_require_code_grant']
-        self.terms_of_service_url: Maybe[str] = data.get(
-            'terms_of_service_url', MISSING
-        )
-        self.privacy_policy_url: Maybe[str] = data.get('privacy_policy_url', MISSING)
-        self.owner: Maybe[User] = (
-            User(data.get('owner'), state) if data.get('owner') is not None else MISSING
-        )
-        self.verify_key: str = data.get('verify_key')
-        self.team: Team | None = (
-            Team(data.get('team')) if data.get('team') is not None else None
-        )
-        self.guild_id: Maybe[Snowflake] = (
-            Snowflake(data.get('guild_id'))
-            if data.get('guild_id') is not None
-            else MISSING
-        )
-        self.primary_sku_id: Maybe[Snowflake] = (
-            Snowflake(data.get('primary_sku_id'))
-            if data.get('primary_sku_id') is not None
-            else MISSING
-        )
-        self.slug: Maybe[str] = data.get('slug', MISSING)
-        self._cover_image: Maybe[str] = data.get('cover_image', MISSING)
-        self.flags: Maybe[ApplicationFlags] = (
-            ApplicationFlags.from_value(data.get('flags'))
-            if data.get('flags') is not None
-            else MISSING
-        )
-        self.tags: list[str] = data.get('tags', [])
-        self.install_params: InstallParams | MissingEnum = (
-            InstallParams(data.get('install_params'))
-            if data.get('install_params') is not None
-            else MISSING
-        )
-        self.custom_install_url: str | MissingEnum = data.get('custom_install_url')
+    def __init__(self, data: "InstallParamsData") -> None:
+        self.scopes: list["OAuth2Scopes"] = data["scopes"]
+        self.permissions: Permissions = Permissions.from_value(data["permissions"])
+
+    def __repr__(self) -> str:
+        return f"<InstallParams scopes={self.scopes} permissions={self.permissions}>"
+    
+    def __str__(self) -> str:
+        return self.__repr__()
+    
+
+class Team(Identifiable):
+    __slots__ = (
+        "_state",
+        "icon_hash",
+        "id",
+        "members",
+        "name",
+        "owner_user_id",
+    )
+
+    def __init__(self, data: "TeamData", state: State) -> None:
+        self._state: "State" = state
+        self.icon_hash: str | None = data["icon"]
+        self.id: int = int(data["id"])
+        self.members: list["TeamMember"] = [TeamMember(member, state) for member in data["members"]]
+        self.name: str = data["name"]
+        self.owner_user_id: int = int(data["owner_user_id"])
+
+    def __repr__(self) -> str:
+        return f"<Team id={self.id} name={self.name}>"
+    
+    def __str__(self) -> str:
+        return self.name
+    
+    @property
+    def icon(self) -> Asset | None:
+        return Asset.from_team_icon(self._state, self.id, self.icon_hash) if self.icon_hash else None
+    
+
+class TeamMember(Identifiable):
+    __slots__ = (
+        "membership_state",
+        "team_id",
+        "user",
+        "role",
+    )
+
+    def __init__(self, data: "TeamMemberData", state: "State") -> None:
+        self.membership_state: MembershipState = MembershipState(data["membership_state"])
+        self.team_id: int = int(data["team_id"])
+        self.user: "User" = User(data["user"], state)
+        self.role: str = data["role"]
+        
+    def __repr__(self) -> str:
+        return f"<TeamMember user={self.user} role={self.role}>"
+    
+    def __str__(self) -> str:
+        return str(self.user)

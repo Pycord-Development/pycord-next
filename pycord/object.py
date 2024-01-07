@@ -19,37 +19,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-import logging
-import typing
+from .mixins import Identifiable
 
-__title__: str = "pycord"
-__author__: str = "Pycord Development"
-__license__: str = "MIT"
-__copyright__: str = "Copyright 2021-present Pycord Development"
-__version__: str = "3.0.0"
-__git_sha1__: str = "HEAD"
-
-
-class VersionInfo(typing.NamedTuple):
-    major: int
-    minor: int
-    micro: int
-    releaselevel: typing.Literal["alpha", "beta", "candidate", "final"]
-    serial: int
-
-
-version_info: VersionInfo = VersionInfo(
-    major=3, minor=0, micro=0, releaselevel="alpha", serial=0
+__all__ = (
+    "Object",
 )
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
+class Object(Identifiable):
+    __slots__ = (
+        "id",
+    )
 
-__all__: typing.Sequence[str] = (
-    "__title__",
-    "__author__",
-    "__license__",
-    "__copyright__",
-    "__version__",
-    "VersionInfo",
-    "version_info",
-)
+    def __init__(self, id: int) -> None:
+        self.id = id
+
+    def __repr__(self) -> str:
+        return f"<Object id={self.id}>"
+    

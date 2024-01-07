@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Copyright (c) 2021-present Pycord Development
+# Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,73 +18,56 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
-from __future__ import annotations
 
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+
 from .application import Application
-from .channel import Channel
-from .enums import InviteTargetType
-from .guild import Guild
-from .missing import MISSING, Maybe, MissingEnum
-from .scheduled_event import ScheduledEvent
-from .types import Invite as DiscordInvite, InviteMetadata as DiscordInviteMetadata
+from .asset import Asset
+from .emoji import Emoji
+from .enums import DefaultMessageNotificationLevel, ExplicitContentFilterLevel, InviteTargetType, MFALevel, NSFWLevel, PremiumTier, VerificationLevel
+from .flags import Permissions, SystemChannelFlags, RoleFlags
+from .guild_scheduled_event import GuildScheduledEvent
+from .missing import Maybe, MISSING
+from .mixins import Identifiable
 from .user import User
 
 if TYPE_CHECKING:
+    from discord_typings import InviteData, InviteStageInstanceData
+
     from .state import State
 
 
-class InviteMetadata:
-    def __init__(self, data: DiscordInviteMetadata) -> None:
-        self.uses: int = data['uses']
-        self.max_uses: int = data['max_uses']
-        self.max_age: int = data['max_age']
-        self.temporary: bool = data['temporary']
-        self.created_at: datetime = datetime.fromisoformat(data['created_at'])
+__all__ = (
+    "Invite",
+    "InviteStageInstance",
+)
 
 
 class Invite:
-    def __init__(self, data: DiscordInvite, state: State) -> None:
-        self.code: str = data['code']
-        self.guild: Guild | MissingEnum = (
-            Guild(data['guild'], state) if data.get('guild') is not None else MISSING
-        )
-        self.channel: Channel | None = (
-            Channel(data['channel'], state) if data.get('channel') is not None else None
-        )
-        self.inviter: User | MissingEnum = (
-            User(data['inviter'], state) if data.get('inviter') is not None else MISSING
-        )
-        self.target_type: int | MissingEnum = (
-            InviteTargetType(data['target_type'])
-            if data.get('target_type') is not None
-            else MISSING
-        )
-        self.target_user: User | MissingEnum = (
-            User(data['target_user'], state)
-            if data.get('target_user') is not None
-            else MISSING
-        )
-        self.target_application: Application | MissingEnum = (
-            Application(data['target_application'], state)
-            if data.get('target_application') is not None
-            else MISSING
-        )
-        self.approximate_presence_count: int | MissingEnum = data.get(
-            'approximate_presence_count', MISSING
-        )
-        self.approximate_member_count: int | MissingEnum = data.get(
-            'approximate_member_count', MISSING
-        )
-        self.expires_at: datetime | None = (
-            datetime.fromisoformat(data['expires_at'])
-            if data.get('expires_at') is not None
-            else data.get('expires_at', MISSING)
-        )
-        self.guild_scheduled_event: ScheduledEvent | MissingEnum = (
-            ScheduledEvent(data['guild_scheduled_event'], state)
-            if data.get('guild_scheduled_event') is not None
-            else MISSING
-        )
+    def __init__(self, data: "InviteData", state: "State") -> None:
+        self._state: "State" = state
+        self._update(data)
+
+    def _update(self, data: "InviteData") -> None:
+        self.code: str = data["code"]
+        self.guild_id: Maybe[int] = data.get("guild_id", MISSING)
+        self.channel: Channel | None = Channel(channel, self._state) if (channel := data.get("channel")) else None
+        self.inviter: Maybe[User] = User(inviter, self._state) if (inviter := data.get("inviter")) else MISSING
+        self.target_type: Maybe[InviteTargetType] = InviteTargetType(data.get("target_type")) if (data.get("target_type")) else MISSING
+        self.target_user: Maybe[User] = User(target_user, self._state) if (target_user := data.get("target_user")) else MISSING
+        self.target_application: Maybe[Application] = Application(target_application, self._state) if (target_application := data.get("target_application")) else MISSING
+        self.approximate_presence_count: Maybe[int] = data.get("approximate_presence_count", MISSING)
+        self.approximate_member_count: Maybe[int] = data.get("approximate_member_count", MISSING)
+        self.expires_at: Maybe[datetime | None] = datetime.fromisoformat(expires) if (expires := data.get("expires_at", MISSING)) not in (None, MISSING) else expires
+        self.stage_instance: Maybe[InviteStageInstance] = InviteStageInstance(stage_instance, self._state) if (stage_instance := data.get("stage_instance")) else MISSING
+        self.guild_scheduled_event: Maybe[GuildScheduledEvent] = GuildScheduledEvent(guild_scheduled_event, self._state) if (guild_scheduled_event := data.get("guild_scheduled_event")) else MISSING
+
+
+class InviteStageInstance:
+    def __init__(self, data: "InviteStageInstanceData", state: "State") -> None:
+        self.members: list[Member] = [Member(member, state) for member in data["members"]]
+        self.participant_count: int = data["participant_count"]
+        self.speaker_count: int = data["speaker_count"]
+        self.topic: str = data["topic"]

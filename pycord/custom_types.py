@@ -1,5 +1,6 @@
-# cython: language_level=3
-# Copyright (c) 2022-present Pycord Development
+# MIT License
+#
+# Copyright (c) 2023 Pycord
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,39 +18,10 @@
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE
-
-import logging
-import typing
-
-__title__: str = "pycord"
-__author__: str = "Pycord Development"
-__license__: str = "MIT"
-__copyright__: str = "Copyright 2021-present Pycord Development"
-__version__: str = "3.0.0"
-__git_sha1__: str = "HEAD"
+# SOFTWARE.
 
 
-class VersionInfo(typing.NamedTuple):
-    major: int
-    minor: int
-    micro: int
-    releaselevel: typing.Literal["alpha", "beta", "candidate", "final"]
-    serial: int
+from typing import Any, Callable, Coroutine, TypeVar
 
-
-version_info: VersionInfo = VersionInfo(
-    major=3, minor=0, micro=0, releaselevel="alpha", serial=0
-)
-
-logging.getLogger(__name__).addHandler(logging.NullHandler())
-
-__all__: typing.Sequence[str] = (
-    "__title__",
-    "__author__",
-    "__license__",
-    "__copyright__",
-    "__version__",
-    "VersionInfo",
-    "version_info",
-)
+T = TypeVar("T")
+AsyncFunc = Callable[..., Coroutine[Any, Any, T]]

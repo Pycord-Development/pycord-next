@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 # cython: language_level=3
+# Copyright (c) 2021-present VincentRPS
 # Copyright (c) 2022-present Pycord Development
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,37 +21,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-import logging
-import typing
 
-__title__: str = "pycord"
-__author__: str = "Pycord Development"
-__license__: str = "MIT"
-__copyright__: str = "Copyright 2021-present Pycord Development"
-__version__: str = "3.0.0"
-__git_sha1__: str = "HEAD"
+import asyncio
+import gc
+from contextlib import asynccontextmanager
+from typing import Any, AsyncGenerator, Literal
 
 
-class VersionInfo(typing.NamedTuple):
-    major: int
-    minor: int
-    micro: int
-    releaselevel: typing.Literal["alpha", "beta", "candidate", "final"]
-    serial: int
+class TaskDescheduler:
+    def __init__(self) -> None:
+        self.active_tasks: list[asyncio.Future[Any]] = []
+        gc.callbacks.append(self.__collect_finished_tasks)
+
+    def __getitem__(self, item: asyncio.Future[Any]) -> None:
+        self.active_tasks.append(item)
+
+    def __collect_finished_tasks(
+        self, phase: Literal["start", "stop"], info: dict[str, int]
+    ) -> None:
+        del info
+
+        if phase == "stop":
+            return
+
+        active_tasks = self.active_tasks.copy()
+
+        for task in active_tasks:
+            if task.done():
+                self.active_tasks.remove(task)
+
+        del active_tasks
 
 
-version_info: VersionInfo = VersionInfo(
-    major=3, minor=0, micro=0, releaselevel="alpha", serial=0
-)
+Tasks = TaskDescheduler()
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-__all__: typing.Sequence[str] = (
-    "__title__",
-    "__author__",
-    "__license__",
-    "__copyright__",
-    "__version__",
-    "VersionInfo",
-    "version_info",
-)
+@asynccontextmanager
+async def tasks() -> AsyncGenerator[TaskDescheduler, Any]:
+    yield Tasks

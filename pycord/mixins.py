@@ -19,37 +19,44 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-import logging
-import typing
+from datetime import datetime
 
-__title__: str = "pycord"
-__author__: str = "Pycord Development"
-__license__: str = "MIT"
-__copyright__: str = "Copyright 2021-present Pycord Development"
-__version__: str = "3.0.0"
-__git_sha1__: str = "HEAD"
+from .utils import Snowflake
 
-
-class VersionInfo(typing.NamedTuple):
-    major: int
-    minor: int
-    micro: int
-    releaselevel: typing.Literal["alpha", "beta", "candidate", "final"]
-    serial: int
-
-
-version_info: VersionInfo = VersionInfo(
-    major=3, minor=0, micro=0, releaselevel="alpha", serial=0
+__all__ = (
+    "Identifiable",
 )
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-__all__: typing.Sequence[str] = (
-    "__title__",
-    "__author__",
-    "__license__",
-    "__copyright__",
-    "__version__",
-    "VersionInfo",
-    "version_info",
-)
+class Identifiable:
+    __slots__ = ()
+
+    id: int
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, self.__class__) and other.id == self.id
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+    
+    def __hash__(self) -> int:
+        return self.id >> 22
+
+    
+class Messageable(Identifiable):
+    async def get_messages(self, *, around: datetime = None, before: int = None, after: int = None, limit: int = 50):
+        # TODO: implement
+        raise NotImplementedError
+    
+    async def get_message(self, id: int):
+        # TODO: implement
+        raise NotImplementedError
+
+    async def create_message(self, *args, **kwargs):
+        # TODO: implement
+        raise NotImplementedError
+    
+    async def trigger_typing_indicator(self):
+        # TODO: implement
+        raise NotImplementedError
+    

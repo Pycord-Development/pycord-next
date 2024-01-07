@@ -31,61 +31,66 @@ from typing import (
     TYPE_CHECKING,
     Annotated,
     Any,
+    AnyStr,
     AsyncGenerator,
+    AsyncIterator,
     Callable,
+    Protocol,
     Type,
     TypeVar,
+    cast,
     get_origin,
 )
 
 from aiohttp import ClientResponse
 
+from .custom_types import AsyncFunc
 from .file import File
 from .missing import MISSING
-from .types import AsyncFunc
 
 try:
     import msgspec
+
+    HAS_MSGSPEC = True
 except ImportError:
     import json
 
-    msgspec = None
-
-if TYPE_CHECKING:
-    from .commands.application import ApplicationCommand
+    HAS_MSGSPEC = False
 
 DISCORD_EPOCH: int = 1420070400000
-S = TypeVar('S', bound=Sequence)
-T = TypeVar('T')
+S = TypeVar("S", bound=Sequence[int])
+T = TypeVar("T")
 
 
 async def _text_or_json(cr: ClientResponse) -> str | dict[str, Any]:
-    if cr.content_type == 'application/json':
-        return await cr.json(encoding='utf-8', loads=loads)
-    return await cr.text('utf-8')
+    if cr.content_type == "application/json":
+        return cast(dict[str, Any], await cr.json(encoding="utf-8", loads=loads))
+    return await cr.text("utf-8")
 
 
 def loads(data: Any) -> Any:
-    return msgspec.json.decode(data.encode()) if msgspec else json.loads(data)
+    return msgspec.json.decode(data.encode()) if HAS_MSGSPEC else json.loads(data)
 
 
 def dumps(data: Any) -> str:
-    return msgspec.json.encode(data).decode('utf-8') if msgspec else json.dumps(data)
+    return (
+        msgspec.json.encode(data).decode("utf-8") if HAS_MSGSPEC else json.dumps(data)
+    )
 
 
 def parse_errors(errors: dict[str, Any], key: str | None = None) -> dict[str, str]:
     ret = []
 
     for k, v in errors.items():
-        kie = f'{k}.{key}' if key else k
+        kie = f"{k}.{key}" if key else k
 
         if isinstance(v, dict):
             try:
-                errors_ = v['_errors']
+                errors_ = v["_errors"]
             except KeyError:
                 continue
             else:
-                ret.append((kie, ''.join(x.get('message') for x in errors_)))
+                ret.append((kie, "".join(x.get("message") for x in errors_)))
         else:
             ret.append((kie, v))
 
@@ -115,11 +120,11 @@ def chunk(items: S, n: int) -> Iterator[S]:
         yield items[start:end]  # type: ignore
 
 
-def remove_undefined(**kwargs) -> dict[str, Any]:
+def remove_undefined(**kwargs: Any) -> dict[str, Any]:
     return {k: v for k, v in kwargs.items() if v is not MISSING}
 
 
-async def get_iterated_data(iterator: AsyncGenerator) -> list[Any]:
+async def get_iterated_data(iterator: AsyncIterator[T]) -> list[T]:
     hold = []
 
     async for data in iterator:
@@ -128,7 +133,7 @@ async def get_iterated_data(iterator: AsyncGenerator) -> list[Any]:
     return hold
 
 
-def get_arg_defaults(fnc: AsyncFunc) -> dict[str, tuple[Any, Any]]:
+def get_arg_defaults(fnc: AsyncFunc[Any]) -> dict[str, tuple[Any, Any]]:
     signature = inspect.signature(fnc)
     ret = {}
     for k, v in signature.parameters.items():
@@ -147,7 +152,7 @@ def get_arg_defaults(fnc: AsyncFunc) -> dict[str, tuple[Any, Any]]:
     return ret
 
 
-async def find(cls: Type[T], *args: Any, **kwargs: Any) -> T:
+async def find(cls: Any, name: str, *args: Any, type: T, **kwargs: Any) -> T:
     """
     Locates an object by either getting it from the cache, or
     fetching it from the API.
@@ -181,19 +186,21 @@ async def find(cls: Type[T], *args: Any, **kwargs: Any) -> T:
     A single non-Type variant of T in `cls`.
     """
 
-    if not hasattr(cls, 'fetch') or not hasattr(cls, 'get'):
-        raise RuntimeError('This class has no get or fetch function')
+    if not hasattr(cls, "fetch_" + name) or not hasattr(cls, "get_" + name):
+        raise RuntimeError("This class has no get or fetch function")
 
-    mret = await cls.get(*args, **kwargs)
+    mret = await getattr(cls, "get_" + name)(*args, **kwargs)
 
     if mret is None:
-        return await cls.fetch(*args, **kwargs)
+        return cast(T, await getattr(cls, "fetch_" + name)(*args, **kwargs))
     else:
-        return mret
+        return cast(T, mret)
 
 
 # these two (@deprecated & @experimental) are mostly added for the future
-def deprecated(alternative: str | None = None, removal: str | None = None):
+def deprecated(
+    alternative: str | None = None, removal: str | None = None
+) -> Callable[[AsyncFunc[Any]], Callable[..., AsyncFunc[Any]]]:
     """
     Used to show that a provided API is in its deprecation period.
 
@@ -205,16 +212,16 @@ def deprecated(alternative: str | None = None, removal: str | None = None):
         Planned removal version.
     """
 
-    def wrapper(func: Callable):
+    def wrapper(func: AsyncFunc[Any]) -> Callable[..., AsyncFunc[Any]]:
         @functools.wraps(func)
-        def decorator(*args, **kwargs):
-            message = f'{func.__name__} has been deprecated.'
+        def decorator(*args: Any, **kwargs: Any) -> Any:
+            message = f"{func.__name__} has been deprecated."
 
             if alternative:
-                message += f' You can use {alternative} instead.'
+                message += f" You can use {alternative} instead."
 
             if removal:
-                message += f' This feature will be removed by version {removal}.'
+                message += f" This feature will be removed by version {removal}."
 
             warnings.warn(message, DeprecationWarning, 3)
             return func(*args, **kwargs)
@@ -224,15 +231,15 @@ def deprecated(alternative: str | None = None, removal: str | None = None):
     return wrapper
 
 
-def experimental():
+def experimental() -> Callable[[AsyncFunc[Any]], Callable[..., AsyncFunc[Any]]]:
     """
     Used for showing that a provided API is still experimental.
     """
 
-    def wrapper(func: Callable):
+    def wrapper(func: AsyncFunc[Any]) -> Callable[..., AsyncFunc[Any]]:
         @functools.wraps(func)
-        def decorator(*args, **kwargs):
-            message = f'{func.__name__} is an experimental feature, it may be removed at any time and breaking changes can happen without warning.'
+        def decorator(*args: Any, **kwargs: Any) -> Any:
+            message = f"{func.__name__} is an experimental feature, it may be removed at any time and breaking changes can happen without warning."
 
             warnings.warn(message, DeprecationWarning, 3)
             return func(*args, **kwargs)
@@ -242,7 +249,7 @@ def experimental():
     return wrapper
 
 
-def find_mimetype(data: bytes):
+def find_mimetype(data: bytes) -> str:
     """
     Gets the mimetype of the given bytes.
 
@@ -252,16 +259,16 @@ def find_mimetype(data: bytes):
         The image mime type is not supported
     """
 
-    if data.startswith(b'\x89\x50\x4E\x47\x0D\x0A\x1A\x0A'):
-        return 'image/png'
-    elif data[0:3] == b'\xff\xd8\xff' or data[6:10] in (b'JFIF', b'Exif'):
-        return 'image/jpeg'
-    elif data.startswith((b'\x47\x49\x46\x38\x37\x61', b'\x47\x49\x46\x38\x39\x61')):
-        return 'image/gif'
-    elif data.startswith(b'RIFF') and data[8:12] == b'WEBP':
-        return 'image/webp'
+    if data.startswith(b"\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"):
+        return "image/png"
+    elif data[0:3] == b"\xff\xd8\xff" or data[6:10] in (b"JFIF", b"Exif"):
+        return "image/jpeg"
+    elif data.startswith((b"\x47\x49\x46\x38\x37\x61", b"\x47\x49\x46\x38\x39\x61")):
+        return "image/gif"
+    elif data.startswith(b"RIFF") and data[8:12] == b"WEBP":
+        return "image/webp"
     else:
-        raise ValueError('Unsupported image mime type given')
+        raise ValueError("Unsupported image mime type given")
 
 
 def to_datauri(f: File) -> str:
@@ -283,26 +290,26 @@ def to_datauri(f: File) -> str:
 
     b64 = base64.b64encode(b)
 
-    return f'data:{m};base64,{b64}'
+    return f"data:{m};base64,{b64.decode()}"
 
 
 def get_args(annotation: Any) -> tuple[Any, ...]:
     if get_origin(annotation) is not Annotated:
         raise ValueError(
-            f'Argument annotation {annotation} must originate from typing.Annotated'
+            f"Argument annotation {annotation} must originate from typing.Annotated"
         )
 
     anns = annotation.__args__ + annotation.__metadata__
 
     if len(anns) != 2:
         raise ValueError(
-            f'Annotation {annotation} must only have two arguments subsequently'
+            f"Annotation {annotation} must only have two arguments subsequently"
         )
 
-    return anns
+    return cast(tuple[Any, ...], anns)
 
 
-def dict_compare(d1: dict, d2: dict) -> bool:
+def dict_compare(d1: dict[str, Any], d2: dict[str, Any]) -> bool:
     for n, v in d1.items():
         if d2.get(n) != v:
             return False
@@ -310,54 +317,23 @@ def dict_compare(d1: dict, d2: dict) -> bool:
     return True
 
 
-def compare_application_command(cmd: ApplicationCommand, raw: dict[str, Any]) -> bool:
-    if cmd.default_member_permissions != raw['default_member_permissions']:
-        return False
-    elif not dict_compare(cmd.name_localizations, raw['name_localizations']):
-        return False
-    elif cmd.description != raw['description']:
-        return False
-    elif not dict_compare(
-        cmd.description_localizations, raw['description_localizations']
-    ):
-        return False
-    elif cmd.dm_permission != raw['dm_permisison']:
-        return False
-    elif cmd.nsfw != raw['nsfw']:
-        return False
+def form_qs(path: str, **queries: Any) -> str:
+    num = -1
+    for k, v in queries.items():
+        if v is MISSING:
+            continue
 
-    raw_options = {opt['name']: opt for opt in raw['options']}
+        num += 1
 
-    for option in cmd.options:
-        raw = raw_options.get(option.name)
+        if num == 0:
+            prefix = "?"
+        else:
+            prefix = "&"
 
-        if raw is None:
-            return False
+        path += prefix + f"{k}={v}"
 
-        if not dict_compare(
-            option.name_localizations, raw.get('name_localizations', MISSING)
-        ):
-            return False
-        elif option.description != raw.get('description', MISSING):
-            return False
-        elif not dict_compare(
-            option.description_localizations,
-            raw.get('description_localziations', MISSING),
-        ):
-            return False
-        elif option.channel_types != raw.get('channel_types', MISSING):
-            return False
-        elif option.autocomplete != raw.get('autocomplete', MISSING):
-            return False
-        elif option.choices != raw.get('choices', MISSING):
-            return False
-        elif option.focused != raw.get('focused', MISSING):
-            return False
-        elif option.required != raw.get('required', MISSING):
-            return False
-        elif option.min_value != raw.get('min_value', MISSING):
-            return False
-        elif option.max_value != raw.get('max_value', MISSING):
-            return False
+    return path
 
-    return True
+
+class Snowflake(Protocol):
+    id: int
