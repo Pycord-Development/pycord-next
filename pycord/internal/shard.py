@@ -42,7 +42,6 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger(__name__)
 
-
 RESUMABLE: list[int] = [
     4000,
     4001,

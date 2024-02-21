@@ -138,8 +138,8 @@ def get_arg_defaults(fnc: AsyncFunc[Any]) -> dict[str, tuple[Any, Any]]:
     ret = {}
     for k, v in signature.parameters.items():
         if (
-            v.default is not inspect.Parameter.empty
-            and v.annotation is not inspect.Parameter.empty
+                v.default is not inspect.Parameter.empty
+                and v.annotation is not inspect.Parameter.empty
         ):
             ret[k] = (v.default, v.annotation)
         elif v.default is not inspect.Parameter.empty:
@@ -333,7 +333,3 @@ def form_qs(path: str, **queries: Any) -> str:
         path += prefix + f"{k}={v}"
 
     return path
-
-
-class Snowflake(Protocol):
-    id: int

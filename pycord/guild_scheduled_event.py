@@ -61,6 +61,7 @@ class GuildScheduledEvent(Identifiable):
         "user_count",
         "image_hash",
     )
+
     def __init__(self, data: "GuildScheduledEventData", state: "State") -> None:
         self._state: "State" = state
         self._update(data)
@@ -73,28 +74,33 @@ class GuildScheduledEvent(Identifiable):
         self.name: str = data["name"]
         self.description: Maybe[str | None] = data.get("description", MISSING)
         self.scheduled_start_time: datetime = datetime.fromisoformat(data["scheduled_start_time"])
-        self.scheduled_end_time: datetime | None = datetime.fromisoformat(end) if (end := data.get("scheduled_end_time")) else None
+        self.scheduled_end_time: datetime | None = datetime.fromisoformat(end) if (
+            end := data.get("scheduled_end_time")) else None
         self.privacy_level: GuildScheduledEventPrivacyLevel = GuildScheduledEventPrivacyLevel(data["privacy_level"])
         self.status: GuildScheduledEventStatus = GuildScheduledEventStatus(data["status"])
         self.entity_type: GuildScheduledEventEntityType = GuildScheduledEventEntityType(data["entity_type"])
         self.entity_id: int | None = int(eid) if (eid := data.get("entity_id")) else None
-        self.entity_metadata: GuildScheduledEventEntityMetadata | None = GuildScheduledEventEntityMetadata.from_data(mdata) if (mdata := data.get("entity_metadata")) else None
+        self.entity_metadata: GuildScheduledEventEntityMetadata | None = GuildScheduledEventEntityMetadata.from_data(
+            mdata
+            ) if (mdata := data.get("entity_metadata")) else None
         self.creator: Maybe[User] = User(data=data["creator"], state=self._state) if (data.get("creator")) else MISSING
         self.user_count: Maybe[int] = data.get("user_count", MISSING)
         self.image_hash: Maybe[str] = data.get("image", MISSING)
 
     @property
     def cover_image(self) -> Asset | None:
-        return Asset.from_guild_scheduled_event_cover(self._state, self.guild_id, self.image_hash) if self.image_hash else None
+        return Asset.from_guild_scheduled_event_cover(
+            self._state, self.guild_id, self.image_hash
+            ) if self.image_hash else None
 
     async def modify(self, **kwargs) -> "GuildScheduledEvent":
         # TODO: Implement
         raise NotImplementedError
-    
+
     async def delete(self) -> None:
         # TODO: Implement
         raise NotImplementedError
-    
+
     async def get_users(self) -> list[User]:
         # TODO: Implement
         raise NotImplementedError
@@ -104,15 +110,16 @@ class GuildScheduledEventEntityMetadata:
     __slots__ = (
         "location",
     )
+
     def __init__(self, *, location: Maybe[str] = MISSING) -> None:
         self.location: Maybe[str] = location
 
     @classmethod
     def from_data(cls, data: "GuildScheduledEventEntityMetadataData") -> "GuildScheduledEventEntityMetadata":
         return cls(**data)
-    
+
     def __repr__(self) -> str:
         return f"<GuildScheduledEventEntityMetadata location={self.location!r}>"
-    
+
     def __str__(self) -> str:
         return self.__repr__()

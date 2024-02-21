@@ -22,11 +22,13 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-
 from .application import Application
 from .asset import Asset
 from .emoji import Emoji
-from .enums import DefaultMessageNotificationLevel, ExplicitContentFilterLevel, InviteTargetType, MFALevel, NSFWLevel, PremiumTier, VerificationLevel
+from .enums import (
+    DefaultMessageNotificationLevel, ExplicitContentFilterLevel, InviteTargetType, MFALevel, NSFWLevel,
+    PremiumTier, VerificationLevel,
+)
 from .flags import Permissions, SystemChannelFlags, RoleFlags
 from .guild_scheduled_event import GuildScheduledEvent
 from .missing import Maybe, MISSING
@@ -37,7 +39,6 @@ if TYPE_CHECKING:
     from discord_typings import InviteData, InviteStageInstanceData
 
     from .state import State
-
 
 __all__ = (
     "Invite",
@@ -55,14 +56,22 @@ class Invite:
         self.guild_id: Maybe[int] = data.get("guild_id", MISSING)
         self.channel: Channel | None = Channel(channel, self._state) if (channel := data.get("channel")) else None
         self.inviter: Maybe[User] = User(inviter, self._state) if (inviter := data.get("inviter")) else MISSING
-        self.target_type: Maybe[InviteTargetType] = InviteTargetType(data.get("target_type")) if (data.get("target_type")) else MISSING
-        self.target_user: Maybe[User] = User(target_user, self._state) if (target_user := data.get("target_user")) else MISSING
-        self.target_application: Maybe[Application] = Application(target_application, self._state) if (target_application := data.get("target_application")) else MISSING
+        self.target_type: Maybe[InviteTargetType] = InviteTargetType(data.get("target_type")) if (
+            data.get("target_type")) else MISSING
+        self.target_user: Maybe[User] = User(target_user, self._state) if (
+            target_user := data.get("target_user")) else MISSING
+        self.target_application: Maybe[Application] = Application(target_application, self._state) if (
+            target_application := data.get("target_application")) else MISSING
         self.approximate_presence_count: Maybe[int] = data.get("approximate_presence_count", MISSING)
         self.approximate_member_count: Maybe[int] = data.get("approximate_member_count", MISSING)
-        self.expires_at: Maybe[datetime | None] = datetime.fromisoformat(expires) if (expires := data.get("expires_at", MISSING)) not in (None, MISSING) else expires
-        self.stage_instance: Maybe[InviteStageInstance] = InviteStageInstance(stage_instance, self._state) if (stage_instance := data.get("stage_instance")) else MISSING
-        self.guild_scheduled_event: Maybe[GuildScheduledEvent] = GuildScheduledEvent(guild_scheduled_event, self._state) if (guild_scheduled_event := data.get("guild_scheduled_event")) else MISSING
+        self.expires_at: Maybe[datetime | None] = datetime.fromisoformat(expires) if (expires := data.get(
+            "expires_at", MISSING
+            )) not in (None, MISSING) else expires
+        self.stage_instance: Maybe[InviteStageInstance] = InviteStageInstance(stage_instance, self._state) if (
+            stage_instance := data.get("stage_instance")) else MISSING
+        self.guild_scheduled_event: Maybe[GuildScheduledEvent] = GuildScheduledEvent(
+            guild_scheduled_event, self._state
+            ) if (guild_scheduled_event := data.get("guild_scheduled_event")) else MISSING
 
 
 class InviteStageInstance:

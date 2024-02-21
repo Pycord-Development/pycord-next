@@ -25,6 +25,7 @@ __all__ = (
     "Object",
 )
 
+
 class Object(Identifiable):
     __slots__ = (
         "id",
@@ -35,4 +36,3 @@ class Object(Identifiable):
 
     def __repr__(self) -> str:
         return f"<Object id={self.id}>"
-    

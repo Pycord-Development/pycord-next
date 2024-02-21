@@ -39,5 +39,4 @@ MISSING: Literal[MissingEnum.MISSING] = MissingEnum.MISSING
 An instance of `.missing.MissingEnum` for purposes of code use.
 """
 
-
 Maybe: TypeAlias = Union[T, Literal[MissingEnum.MISSING]]

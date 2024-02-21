@@ -20,7 +20,6 @@
 # SOFTWARE
 
 
-
 from .enums import StageInstancePrivacyLevel
 from .mixins import Identifiable
 
@@ -54,22 +53,23 @@ class StageInstance(Identifiable):
         self.topic: str = data["topic"]
         self.privacy_level: StageInstancePrivacyLevel = StageInstancePrivacyLevel(data["privacy_level"])
         self.discoverable_disabled: bool = data["discoverable_disabled"]
-        self.guild_scheduled_event_id: int | None = int(gseid) if (gseid := data.get("guild_scheduled_event_id")) else None
+        self.guild_scheduled_event_id: int | None = int(gseid) if (
+            gseid := data.get("guild_scheduled_event_id")) else None
 
     def __repr__(self) -> str:
         return f"<StageInstance id={self.id} guild_id={self.guild_id} channel_id={self.channel_id} topic={self.topic} privacy_level={self.privacy_level} discoverable_disabled={self.discoverable_disabled} guild_scheduled_event_id={self.guild_scheduled_event_id}>"
-    
+
     async def modify(
-            self, 
-            *, 
-            topic: str = None, 
-            privacy_level: StageInstancePrivacyLevel = None, 
-            discoverable_disabled: bool = None,
-            reason: str | None = None,
+        self,
+        *,
+        topic: str = None,
+        privacy_level: StageInstancePrivacyLevel = None,
+        discoverable_disabled: bool = None,
+        reason: str | None = None,
     ) -> "StageInstance":
         # TODO: implement
         raise NotImplementedError
-    
+
     async def delete(self, *, reason: str | None = None) -> None:
         # TODO: implement
         raise NotImplementedError

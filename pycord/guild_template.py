@@ -35,6 +35,7 @@ __all__ = (
     "GuildTemplate",
 )
 
+
 class GuildTemplate:
     def __init__(self, data: "GuildTemplateData", state: "State") -> None:
         self._state: "State" = state
@@ -42,10 +43,10 @@ class GuildTemplate:
 
     def __repr__(self) -> str:
         return f"<GuildTemplate code={self.code} name={self.name!r}>"
-    
+
     def __str__(self) -> str:
         return self.name
-    
+
     def _update(self, data: "GuildTemplateData") -> None:
         self._data = data
         self.code: str = data["code"]
@@ -63,11 +64,11 @@ class GuildTemplate:
     async def sync(self) -> "GuildTemplate":
         # TODO: implement
         raise NotImplementedError
-    
+
     async def modify(self, *, name: Maybe[str] = MISSING, description: Maybe[str] = MISSING) -> "GuildTemplate":
         # TODO: implement
         raise NotImplementedError
-    
+
     async def delete(self) -> None:
         # TODO: implement
         raise NotImplementedError

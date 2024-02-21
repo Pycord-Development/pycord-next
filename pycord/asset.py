@@ -20,7 +20,6 @@
 # SOFTWARE
 
 
-
 from typing import Literal, TYPE_CHECKING, Self
 from urllib.parse import parse_qs, urlparse
 
@@ -40,14 +39,24 @@ VALID_ASSET_FORMATS = VALID_STATIC_ASSET_FORMATS + ("gif",)
 
 
 class Asset:
+    """
+    Represents a Discord asset.
+
+    Attributes
+    ----------
+    url: :class:`str`
+        The URL of the asset.
+    animated: :class:`bool`
+        Whether or not the asset is animated.
+    """
     BASE_URL = "https://cdn.discordapp.com/"
 
     def __init__(
-            self, 
-            state: State, 
-            *, 
-            url: str,
-            animated: bool = False,
+        self,
+        state: State,
+        *,
+        url: str,
+        animated: bool = False,
     ) -> None:
         self._state: "State" = state
         self.url = url
@@ -58,8 +67,29 @@ class Asset:
 
     def __repr__(self) -> str:
         return f"<Asset url={self.url}>"
-    
+
     def url_with_parameters(self, *, format: AssetFormat | None = None, size: int | None = None) -> str:
+        """
+        Returns the URL of the asset with the given parameters.
+
+        Parameters
+        ----------
+        format: :class:`str`
+            The file format of the asset.
+            Must be one of ``png``, ``jpg``, ``jpeg``, ``webp``, ``json``, or ``gif`` for animated assets.
+        size: :class:`int`
+            The size of the asset. Must be a power of 2 between 16 and 4096.
+
+        Returns
+        -------
+        :class:`str`
+            The asset's URL with the specified parameters.
+
+        Raises
+        ------
+        :exc:`ValueError`
+            The format or size is invalid.
+        """
         if not format and not size:
             return self.url
         if size:
@@ -80,113 +110,135 @@ class Asset:
             url = url._replace(query=form_qs("", **qs))
         url = url.geturl()
         return url
-    
+
     async def get(self, *, format: AssetFormat | None = None, size: int | None = None) -> bytes:
+        """
+        Fetches the asset from Discord.
+
+        Parameters
+        ----------
+        format: :class:`str`
+            The file format of the asset.
+            Must be one of ``png``, ``jpg``, ``jpeg``, ``webp``, ``json``, or ``gif`` for animated assets.
+        size: :class:`int`
+            The size of the asset. Must be a power of 2 between 16 and 4096.
+
+        Returns
+        -------
+        :class:`bytes`
+            The asset data.
+
+        Raises
+        ------
+        :exc:`ValueError`
+            The format or size is invalid.
+        :exc:`HTTPException`
+            Fetching the asset failed.
+        """
         url = self.url_with_parameters(format=format, size=size)
         return await self._state.http.get_from_cdn(url)
-    
+
     @classmethod
     def from_custom_emoji(cls, state: State, id: int, animated: bool = False) -> Self:
         url = cls.BASE_URL + f"emojis/{id}.png"
         return cls(state, url=url, animated=animated)
-    
+
     @classmethod
     def from_guild_icon(cls, state: State, guild_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"icons/{guild_id}/{hash}.png"
         return cls(state, url=url, animated=hash.startswith("a_"))
-    
+
     @classmethod
     def from_guild_splash(cls, state: State, guild_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"splashes/{guild_id}/{hash}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_guild_discovery_splash(cls, state: State, guild_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"discovery-splashes/{guild_id}/{hash}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_guild_banner(cls, state: State, guild_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"banners/{guild_id}/{hash}.png"
         return cls(state, url=url, animated=hash.startswith("a_"))
-    
+
     @classmethod
     def from_user_banner(cls, state: State, user_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"banners/{user_id}/{hash}.png"
         return cls(state, url=url, animated=hash.startswith("a_"))
-    
+
     @classmethod
     def from_default_user_avatar(cls, state: State, index: int) -> Self:
         url = cls.BASE_URL + f"embed/avatars/{index}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_user_avatar(cls, state: State, user_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"avatars/{user_id}/{hash}.png"
         return cls(state, url=url, animated=hash.startswith("a_"))
-    
+
     @classmethod
     def from_guild_member_avatar(cls, state: State, guild_id: int, user_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"guilds/{guild_id}/users/{user_id}/avatars/{hash}.png"
         return cls(state, url=url, animated=hash.startswith("a_"))
-    
+
     @classmethod
     def from_user_avatar_decoration(cls, state: State, user_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"avatars/{user_id}/{hash}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_application_icon(cls, state: State, application_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"app-icons/{application_id}/{hash}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_application_cover(cls, state: State, application_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"app-icons/{application_id}/{hash}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_application_asset(cls, state: State, application_id: int, asset_id: int) -> Self:
         url = cls.BASE_URL + f"app-assets/{application_id}/{asset_id}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_achievement_icon(cls, state: State, application_id: int, achievement_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"app-assets/{application_id}/achievements/{achievement_id}/icons/{hash}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_store_page_asset(cls, state: State, application_id: int, asset_id: int) -> Self:
         url = cls.BASE_URL + f"app-assets/{application_id}/store/{asset_id}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_sticker_pack_banner(cls, state: State, sticker_pack_banner_asset_id: int) -> Self:
         url = cls.BASE_URL + f"app-assets/710982414301790216/store/{sticker_pack_banner_asset_id}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_team_icon(cls, state: State, team_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"team-icons/{team_id}/{hash}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_sticker(cls, state: State, sticker_id: int, format: AssetFormat) -> Self:
         url = cls.BASE_URL + f"stickers/{sticker_id}.{format}"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_role_icon(cls, state: State, role_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"role-icons/{role_id}/{hash}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_guild_scheduled_event_cover(cls, state: State, guild_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"guild-events/{guild_id}/{hash}.png"
         return cls(state, url=url)
-    
+
     @classmethod
     def from_guild_member_banner(cls, state: State, guild_id: int, user_id: int, hash: str) -> Self:
         url = cls.BASE_URL + f"banners/{guild_id}/{user_id}/{hash}.png"
         return cls(state, url=url)
-        

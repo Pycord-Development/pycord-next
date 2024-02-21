@@ -23,7 +23,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Sequence, Type, TypeVar
+from typing import Self, Sequence, Type, TypeVar
 
 from mypy_extensions import mypyc_attr, trait
 
@@ -99,7 +99,7 @@ class Flags:
             self._values[name] = set
 
     @classmethod
-    def from_value(cls: Type[F], value: int | str) -> F:
+    def from_value(cls, value: int | str) -> Self:
         self = cls()
         value = int(value)
 
@@ -586,7 +586,7 @@ class RoleFlags(Flags):
     @flag
     def in_prompt(self) -> bool | int:
         return 1 << 0
-    
+
 
 @fill()
 class AttachmentFlags(Flags):

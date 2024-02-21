@@ -30,10 +30,10 @@ if TYPE_CHECKING:
     from discord_typings import EmojiData
     from .state import State
 
-
 __all__ = (
     "Emoji",
 )
+
 
 class Emoji(Identifiable):
     __slots__ = (
@@ -54,10 +54,10 @@ class Emoji(Identifiable):
 
     def __repr__(self) -> str:
         return f"<Emoji name={self.name} id={self.id}>"
-    
+
     def __str__(self) -> str:
         return f"<:{self.name}:{self.id}>" if not self.animated else f"<a:{self.name}:{self.id}>"
-    
+
     def _update(self, data: "EmojiData") -> None:
         self.id: int | None = int(_id) if (_id := data.get("id")) else None
         self.name: str | None = data["name"]
@@ -73,6 +73,3 @@ class Emoji(Identifiable):
         if self.id is None:
             return None
         return Asset.from_custom_emoji(self._state, self.id, bool(self.animated))
-    
-
-    

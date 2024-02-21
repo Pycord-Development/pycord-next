@@ -67,29 +67,29 @@ class Sticker(Identifiable):
 
     def __repr__(self) -> str:
         return f"<Sticker id={self.id} pack_id={self.pack_id} name={self.name} description={self.description} tags={self.tags} type={self.type} format_type={self.format_type} available={self.available} guild_id={self.guild_id} user={self.user} sort_value={self.sort_value}>"
-    
+
     def __str__(self) -> str:
         return self.name
-    
+
     async def modify(
-            self,
-            *,
-            name: str = None,
-            description: str = None,
-            tags: str = None,
-            reason: str | None = None,
+        self,
+        *,
+        name: str = None,
+        description: str = None,
+        tags: str = None,
+        reason: str | None = None,
     ) -> "Sticker":
         if self.guild_id is None:
             raise Exception("Sticker has no guild attached")
         # TODO: implement
         raise NotImplementedError
-    
+
     async def delete(self, *, reason: str | None = None) -> None:
         if self.guild_id is None:
             raise Exception("Sticker has no guild attached")
         # TODO: implement
         raise NotImplementedError
-    
+
     @property
     def asset(self) -> Asset:
         formats = {
@@ -98,7 +98,6 @@ class Sticker(Identifiable):
             StickerFormatType.LOTTIE: "json",
         }
         return Asset.from_sticker(self._state, self.id, formats.get(self.format_type, "png"))
-    
 
 
 class StickerPack(Identifiable):
@@ -127,10 +126,10 @@ class StickerPack(Identifiable):
 
     def __repr__(self) -> str:
         return f"<StickerPack id={self.id} stickers={self.stickers} name={self.name} sku_id={self.sku_id} cover_sticker_id={self.cover_sticker_id} description={self.description} banner_asset_id={self.banner_asset_id}>"
-    
+
     def __str__(self) -> str:
         return self.name
-    
+
     @property
     def cover_sticker_asset(self) -> Asset | None:
         if self.cover_sticker_id is None:
@@ -139,7 +138,7 @@ class StickerPack(Identifiable):
         if sticker is None:
             return None
         return sticker.asset
-    
+
     @property
     def banner_asset(self) -> Asset | None:
         if self.banner_asset_id is None:

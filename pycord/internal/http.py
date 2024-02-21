@@ -1545,7 +1545,7 @@ class HTTPClient:
                 'message': message,
                 'applied_tags': applied_tags,
             }
-            )
+        )
         return cast(
             ChannelData,
             await self.request(
@@ -3313,8 +3313,10 @@ class HTTPClient:
             {"name": "name", "value": name},
             {"name": "description", "value": description},
             {"name": "tags", "value": tags},
-            {"name": "file", "value": file.file.read(),
-             "filename": file.filename, "content_type": "application/octet-stream"},
+            {
+                "name": "file", "value": file.file.read(),
+                "filename": file.filename, "content_type": "application/octet-stream"
+            },
         ]
         return cast(
             StickerData,
@@ -3635,7 +3637,9 @@ class HTTPClient:
             WebhookData,
             await self.request(
                 'GET',
-                Route(self, '/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
+                Route(
+                    self, '/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token
+                    ),
                 t=WebhookData,
             )
         )
@@ -3679,7 +3683,9 @@ class HTTPClient:
             WebhookData,
             await self.request(
                 'PATCH',
-                Route(self, '/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
+                Route(
+                    self, '/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token
+                    ),
                 remove_undefined(**data),
                 t=WebhookData,
             )
@@ -3707,7 +3713,9 @@ class HTTPClient:
             None,
             await self.request(
                 'DELETE',
-                Route(self, '/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token),
+                Route(
+                    self, '/webhooks/{webhook_id}/{webhook_token}', webhook_id=webhook_id, webhook_token=webhook_token
+                    ),
                 t=None,
             )
         )

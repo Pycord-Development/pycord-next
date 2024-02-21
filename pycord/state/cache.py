@@ -28,7 +28,6 @@ from typing import Any, Literal, Type, TypeVar, cast
 
 _log = logging.getLogger()
 
-
 T = TypeVar("T")
 
 

@@ -19,19 +19,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+from __future__ import annotations
 
 from .enums import ApplicationRoleConnectionMetadataType
 from .missing import Maybe, MISSING
 
-from typing import TYPE_CHECKING
+from typing import cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from discord_typings import ApplicationRoleConnectionMetadataData, Locales
-    from .state import State
 
 __all__ = (
     "ApplicationRoleConnectionMetadata",
 )
+
 
 class ApplicationRoleConnectionMetadata:
     __slots__ = (
@@ -42,15 +43,16 @@ class ApplicationRoleConnectionMetadata:
         "name_localizations",
         "description_localizations",
     )
+
     def __init__(
-            self,
-            type: ApplicationRoleConnectionMetadataType,
-            *,
-            key: str,
-            name: str,
-            description: str,
-            name_localizations: Maybe[dict[Locales, str]] = MISSING,
-            description_localizations: Maybe[dict[Locales, str]] = MISSING,
+        self,
+        type: ApplicationRoleConnectionMetadataType,
+        *,
+        key: str,
+        name: str,
+        description: str,
+        name_localizations: Maybe[dict[Locales, str]] = MISSING,
+        description_localizations: Maybe[dict[Locales, str]] = MISSING,
     ) -> None:
         self.type: ApplicationRoleConnectionMetadataType = type
         self.key: str = key
@@ -61,12 +63,12 @@ class ApplicationRoleConnectionMetadata:
 
     def __repr__(self) -> str:
         return f"<ApplicationRoleConnectionMetadata type={self.type} key={self.key!r}>"
-    
+
     def __str__(self) -> str:
         return self.name
-    
+
     @classmethod
-    def from_data(cls, data: "ApplicationRoleConnectionMetadataData") -> "ApplicationRoleConnectionMetadata":
+    def from_data(cls, data: ApplicationRoleConnectionMetadataData) -> ApplicationRoleConnectionMetadata:
         return cls(
             ApplicationRoleConnectionMetadataType(data["type"]),
             key=data["key"],
@@ -75,16 +77,16 @@ class ApplicationRoleConnectionMetadata:
             name_localizations=data.get("name_localizations", MISSING),
             description_localizations=data.get("description_localizations", MISSING),
         )
-    
-    def to_data(self) -> "ApplicationRoleConnectionMetadataData":
-        payload: "ApplicationRoleConnectionMetadataData" = {
+
+    def to_data(self) -> ApplicationRoleConnectionMetadataData:
+        payload: ApplicationRoleConnectionMetadataData = {
             "type": self.type.value,
             "key": self.key,
             "name": self.name,
             "description": self.description,
         }
         if self.name_localizations is not MISSING:
-            payload["name_localizations"] = self.name_localizations
+            payload["name_localizations"] = cast(dict[Locales, str], self.name_localizations)
         if self.description_localizations is not MISSING:
-            payload["description_localizations"] = self.description_localizations
+            payload["description_localizations"] = cast(dict[Locales, str], self.description_localizations)
         return payload

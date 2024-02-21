@@ -37,7 +37,6 @@ from pycord._about import __copyright__, __git_sha1__, __license__, __version__
 
 __all__: Sequence[str] = ("start_logging", "print_banner")
 
-
 day_prefixes: dict[int, str] = {
     1: "st",
     2: "nd",
@@ -76,7 +75,7 @@ def start_logging(
     colorlog.basicConfig(
         level=flavor,
         format="%(log_color)s%(bold)s%(levelname)-1.1s%(thin)s %(asctime)23.23s %(bold)s%(name)s: "
-        "%(thin)s%(message)s%(reset)s",
+               "%(thin)s%(message)s%(reset)s",
         stream=sys.stderr,
         log_colors={
             "DEBUG": "cyan",

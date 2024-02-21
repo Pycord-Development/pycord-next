@@ -21,14 +21,18 @@
 
 from datetime import datetime
 
-from .utils import Snowflake
-
 __all__ = (
     "Identifiable",
 )
 
+from typing import Protocol
 
-class Identifiable:
+
+class Snowflake(Protocol):
+    id: int
+
+
+class Identifiable(Snowflake):
     __slots__ = ()
 
     id: int
@@ -38,16 +42,16 @@ class Identifiable:
 
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
-    
+
     def __hash__(self) -> int:
         return self.id >> 22
 
-    
+
 class Messageable(Identifiable):
     async def get_messages(self, *, around: datetime = None, before: int = None, after: int = None, limit: int = 50):
         # TODO: implement
         raise NotImplementedError
-    
+
     async def get_message(self, id: int):
         # TODO: implement
         raise NotImplementedError
@@ -55,8 +59,7 @@ class Messageable(Identifiable):
     async def create_message(self, *args, **kwargs):
         # TODO: implement
         raise NotImplementedError
-    
+
     async def trigger_typing_indicator(self):
         # TODO: implement
         raise NotImplementedError
-    

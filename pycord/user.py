@@ -34,7 +34,6 @@ if TYPE_CHECKING:
 
     from .state import State
 
-
 __all__ = (
     "User",
 )
@@ -61,19 +60,20 @@ class User(Identifiable):
         "public_flags",
         "avatar_decoration_hash",
     )
+
     def __init__(self, data: "UserData", state: "State") -> None:
         self._state: "State" = state
         self._update(data)
-        
+
     def __repr__(self) -> str:
         return (
             f"<User id={self.id} username={self.username} discriminator={self.discriminator} "
             f"bot={self.bot} system={self.system}>"
         )
-    
+
     def __str__(self) -> str:
         return self.global_name or f"{self.username}#{self.discriminator}"
-    
+
     def _update(self, data: "UserData") -> None:
         self.username = data["username"]
         self.discriminator = data["discriminator"]
@@ -95,31 +95,32 @@ class User(Identifiable):
     @property
     def mention(self) -> str:
         return f"<@{self.id}>"
-    
+
     @property
     def display_name(self) -> str:
         return self.global_name or self.username
-    
+
     @property
     def avatar(self) -> Asset:
-        # TODO: Return Asset
         if self.avatar_hash:
             return Asset.from_user_avatar(self._state, self.id, self.avatar_hash)
         index = (int(self.discriminator) % 5) if self.discriminator != "0" else (self.id >> 22) % 6
         return Asset.from_default_user_avatar(self._state, index)
-    
+
     @property
     def banner(self) -> Asset | None:
         return Asset.from_user_banner(self._state, self.id, self.banner_hash) if self.banner_hash else None
-    
+
     @property
     def avatar_decoration(self) -> Asset | None:
-        return Asset.from_user_avatar_decoration(self._state, self.id, self.avatar_decoration_hash) if self.avatar_decoration_hash else None
-    
+        return Asset.from_user_avatar_decoration(
+            self._state, self.id, self.avatar_decoration_hash
+        ) if self.avatar_decoration_hash else None
+
     async def create_dm(self) -> DMChannel:
         # TODO: implement
         raise NotImplementedError
-    
+
     async def send(self, *args, **kwargs) -> Message:
         dm = await self.create_dm()
         return await dm.send(*args, **kwargs)
