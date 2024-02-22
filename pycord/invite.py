@@ -19,20 +19,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+from __future__ import annotations
+
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from .enums import InviteTargetType
 from .application import Application
-from .asset import Asset
-from .emoji import Emoji
-from .enums import (
-    DefaultMessageNotificationLevel, ExplicitContentFilterLevel, InviteTargetType, MFALevel, NSFWLevel,
-    PremiumTier, VerificationLevel,
-)
-from .flags import Permissions, SystemChannelFlags, RoleFlags
+from .channel import Channel, channel_factory
+from .guild import Guild, GuildMember
 from .guild_scheduled_event import GuildScheduledEvent
 from .missing import Maybe, MISSING
-from .mixins import Identifiable
 from .user import User
 
 if TYPE_CHECKING:
@@ -47,14 +44,14 @@ __all__ = (
 
 
 class Invite:
-    def __init__(self, data: "InviteData", state: "State") -> None:
+    def __init__(self, data: InviteData, state: State) -> None:
         self._state: "State" = state
         self._update(data)
 
-    def _update(self, data: "InviteData") -> None:
+    def _update(self, data: InviteData) -> None:
         self.code: str = data["code"]
-        self.guild_id: Maybe[int] = data.get("guild_id", MISSING)
-        self.channel: Channel | None = Channel(channel, self._state) if (channel := data.get("channel")) else None
+        self.guild: Maybe[Guild] = Guild(data["guild"], self._state) if (data.get("guild")) else MISSING
+        self.channel: Channel | None = channel_factory(cnl, self._state) if (cnl := data.get("channel")) else None
         self.inviter: Maybe[User] = User(inviter, self._state) if (inviter := data.get("inviter")) else MISSING
         self.target_type: Maybe[InviteTargetType] = InviteTargetType(data.get("target_type")) if (
             data.get("target_type")) else MISSING
@@ -75,8 +72,8 @@ class Invite:
 
 
 class InviteStageInstance:
-    def __init__(self, data: "InviteStageInstanceData", state: "State") -> None:
-        self.members: list[Member] = [Member(member, state) for member in data["members"]]
+    def __init__(self, data: InviteStageInstanceData, state: State) -> None:
+        self.members: list[GuildMember] = [GuildMember(member, state) for member in data["members"]]
         self.participant_count: int = data["participant_count"]
         self.speaker_count: int = data["speaker_count"]
         self.topic: str = data["topic"]

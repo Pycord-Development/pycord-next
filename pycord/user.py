@@ -98,14 +98,23 @@ class User(Identifiable):
 
     @property
     def display_name(self) -> str:
+        if self.discriminator != "0":
+            return f"{self.username}#{self.discriminator}"
         return self.global_name or self.username
 
     @property
-    def avatar(self) -> Asset:
+    def avatar(self) -> Asset | None:
         if self.avatar_hash:
             return Asset.from_user_avatar(self._state, self.id, self.avatar_hash)
+
+    @property
+    def default_avatar(self) -> Asset:
         index = (int(self.discriminator) % 5) if self.discriminator != "0" else (self.id >> 22) % 6
         return Asset.from_default_user_avatar(self._state, index)
+
+    @property
+    def display_avatar(self) -> Asset:
+        return self.avatar or self.default_avatar
 
     @property
     def banner(self) -> Asset | None:

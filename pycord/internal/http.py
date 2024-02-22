@@ -196,18 +196,18 @@ class HTTPClient:
             if r.status == 429:
                 # TODO: properly handle rate limits
                 _log.debug(f"Request to {endpoint} failed: Request returned rate limit")
-                raise BotException("Rate Limit response received")
+                raise HTTPException(r, d, data)
 
             elif r.status == 403:
-                raise Forbidden(r, d)
+                raise Forbidden(r, d, data)
             elif r.status == 404:
-                raise NotFound(r, d)
+                raise NotFound(r, d, data)
             elif r.status == 500:
-                raise DiscordException(r, d)
+                raise DiscordException(r, d, data)
             elif r.ok:
                 return d
             else:
-                raise HTTPException(r, d)
+                raise HTTPException(r, d, data)
 
     # cdn
     async def get_from_cdn(self, url: str) -> bytes:
@@ -223,15 +223,15 @@ class HTTPClient:
         )
         d = await r.read()
         if r.status == 403:
-            raise Forbidden(r, d)
+            raise Forbidden(r, d, None)
         elif r.status == 404:
-            raise NotFound(r, d)
+            raise NotFound(r, d, None)
         elif r.status == 500:
-            raise DiscordException(r, d)
+            raise DiscordException(r, d, None)
         elif r.ok:
             return d
         else:
-            raise HTTPException(r, d)
+            raise HTTPException(r, d, None)
 
     # Application
     async def get_current_application(self) -> ApplicationData:

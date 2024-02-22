@@ -19,6 +19,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+from __future__ import annotations
+
+from typing import Self
+
 
 class Color:
     """High-level representation of Discord accent colors.
@@ -36,126 +40,126 @@ class Color:
         self.value: int = value
 
     @classmethod
-    def default(cls) -> "Color":
+    def default(cls) -> Self:
         """A factory color method which returns `0`"""
         return cls(0)
 
     @classmethod
-    def teal(cls) -> "Color":
+    def teal(cls) -> Self:
         """A factory color method which returns `0x1ABC9C`"""
         return cls(0x1ABC9C)
 
     @classmethod
-    def dark_teal(cls) -> "Color":
+    def dark_teal(cls) -> Self:
         """A factory color method which returns `0x11806A`"""
         return cls(0x11806A)
 
     @classmethod
-    def brand_green(cls) -> "Color":
+    def brand_green(cls) -> Self:
         """A factory color method which returns `0x57F287`"""
         return cls(0x57F287)
 
     @classmethod
-    def green(cls) -> "Color":
+    def green(cls) -> Self:
         """A factory color method which returns `0x2ECC71`"""
         return cls(0x2ECC71)
 
     @classmethod
-    def dark_green(cls) -> "Color":
+    def dark_green(cls) -> Self:
         """A factory color method which returns `0x1F8B4C`"""
         return cls(0x1F8B4C)
 
     @classmethod
-    def blue(cls) -> "Color":
+    def blue(cls) -> Self:
         """A factory color method which returns `0x3498DB`"""
         return cls(0x3498DB)
 
     @classmethod
-    def dark_blue(cls) -> "Color":
+    def dark_blue(cls) -> Self:
         """A factory color method which returns `0x206694`"""
         return cls(0x206694)
 
     @classmethod
-    def purple(cls) -> "Color":
+    def purple(cls) -> Self:
         """A factory color method which returns `0x9b59b6`"""
         return cls(0x9B59B6)
 
     @classmethod
-    def dark_purple(cls) -> "Color":
+    def dark_purple(cls) -> Self:
         """A factory color method which returns `0x71368A`"""
         return cls(0x71368A)
 
     @classmethod
-    def magenta(cls) -> "Color":
+    def magenta(cls) -> Self:
         """A factory color method which returns `0xE91E63`"""
         return cls(0xE91E63)
 
     @classmethod
-    def dark_magenta(cls) -> "Color":
+    def dark_magenta(cls) -> Self:
         """A factory color method which returns `0xAD1457`"""
         return cls(0xAD1457)
 
     @classmethod
-    def gold(cls) -> "Color":
+    def gold(cls) -> Self:
         """A factory color method which returns `0xF1C40F`"""
         return cls(0xF1C40F)
 
     @classmethod
-    def dark_gold(cls) -> "Color":
+    def dark_gold(cls) -> Self:
         """A factory color method which returns `0xC27C0E`"""
         return cls(0xC27C0E)
 
     @classmethod
-    def orange(cls) -> "Color":
+    def orange(cls) -> Self:
         """A factory color method which returns `0xE67E22`"""
         return cls(0xE67E22)
 
     @classmethod
-    def dark_orange(cls) -> "Color":
+    def dark_orange(cls) -> Self:
         """A factory color method which returns `0xA84300`"""
         return cls(0xA84300)
 
     @classmethod
-    def brand_red(cls) -> "Color":
+    def brand_red(cls) -> Self:
         """A factory color method which returns `0xED4245`"""
         return cls(0xED4245)
 
     @classmethod
-    def red(cls) -> "Color":
+    def red(cls) -> Self:
         """A factory color method which returns `0xE74C3C`"""
         return cls(0xE74C3C)
 
     @classmethod
-    def dark_red(cls) -> "Color":
+    def dark_red(cls) -> Self:
         """A factory color method which returns `0x992D22`"""
         return cls(0x992D22)
 
     @classmethod
-    def dark_gray(cls) -> "Color":
+    def dark_gray(cls) -> Self:
         """A factory color method which returns `0x607D8B`"""
         return cls(0x607D8B)
 
     @classmethod
-    def light_gray(cls) -> "Color":
+    def light_gray(cls) -> Self:
         """A factory color method which returns `0x979C9F`"""
         return cls(0x979C9F)
 
     @classmethod
-    def blurple(cls) -> "Color":
+    def blurple(cls) -> Self:
         """A factory color method which returns `0x5865F2`"""
         return cls(0x5865F2)
 
     @classmethod
-    def dark_theme(cls) -> "Color":
+    def dark_theme(cls) -> Self:
         """A factory color method which returns `0x2F3136`"""
         return cls(0x2F3136)
 
     @classmethod
-    def fushia(cls) -> "Color":
+    def fushia(cls) -> Self:
         """A factory color method which returns `0xEB459E`"""
         return cls(0xEB459E)
 
     @classmethod
-    def yellow(cls) -> "Color":
+    def yellow(cls) -> Self:
         """A factory color method which returns `0xFEE75C`"""
         return cls(0xFEE75C)

@@ -19,6 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
+from __future__ import annotations
+
 from .user import User
 from .asset import Asset
 from .mixins import Identifiable
@@ -36,6 +38,28 @@ __all__ = (
 
 
 class Emoji(Identifiable):
+    """
+    Represents a custom emoji.
+
+    Attributes
+    -----------
+    id: :class:`int`
+        The ID of the emoji.
+    name: :class:`str`
+        The name of the emoji.
+    roles: List[:class:`int`]
+        A list of roles that may use the emoji.
+    user: Optional[:class:`User`]
+        The user that created the emoji.
+    require_colons: Optional[:class:`bool`]
+        Whether the emoji requires colons to be used.
+    managed: Optional[:class:`bool`]
+        Whether the emoji is managed by an integration.
+    animated: Optional[:class:`bool`]
+        Whether the emoji is animated.
+    available: Optional[:class:`bool`]
+        Whether the emoji is available.
+    """
     __slots__ = (
         "_state",
         "id",
@@ -48,8 +72,8 @@ class Emoji(Identifiable):
         "available",
     )
 
-    def __init__(self, data: "EmojiData", state: "State") -> None:
-        self._state: "State" = state
+    def __init__(self, data: EmojiData, state: State) -> None:
+        self._state: State = state
         self._update(data)
 
     def __repr__(self) -> str:

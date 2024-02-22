@@ -21,12 +21,14 @@
 
 
 from datetime import datetime
+from typing import Self
+
 from discord_typings import AttachmentData, ChannelMentionData, MessageData
 from pycord.asset import Asset
 from pycord.enums import ChannelType
 from pycord.flags import AttachmentFlags
 from pycord.missing import MISSING, Maybe
-from pycord.mixins import Identifiable
+from pycord.mixins import Identifiable, Snowflake
 from pycord.state import State
 from pycord.user import User
 
@@ -65,6 +67,99 @@ class ChannelMention(Identifiable):
         self.guild_id: int = int(data["guild_id"])
         self.type: ChannelType = ChannelType(data["type"])
         self.name: str = data["name"]
+
+
+class AllowedMentions:
+    __slots__ = (
+        "parse",
+        "role_ids",
+        "user_ids",
+        "replied_user",
+    )
+
+    def __init__(
+        self,
+        *,
+        role_mentions: bool = True,
+        user_mentions: bool = True,
+        everyone: bool = True,
+        roles: list[Snowflake] | None = None,
+        users: list[Snowflake] | None = None,
+        replied_user: bool = True
+    ) -> None:
+        if role_mentions and roles:
+            raise ValueError("Cannot specify roles when role mentions are enabled")
+        if user_mentions and users:
+            raise ValueError("Cannot specify users when user mentions are enabled")
+        self.parse: list[str] = []
+        if role_mentions:
+            self.parse.append("roles")
+        if user_mentions:
+            self.parse.append("users")
+        if everyone:
+            self.parse.append("everyone")
+        self.role_ids: list[int] = [r.id for r in roles or []]
+        self.user_ids: list[int] = [r.id for r in users or []]
+        self.replied_user: bool = replied_user
+
+    @classmethod
+    def none(cls) -> Self:
+        return cls(role_mentions=False, user_mentions=False, everyone=False, replied_user=False)
+
+    @classmethod
+    def all(cls) -> Self:
+        return cls(role_mentions=True, user_mentions=True, everyone=True, replied_user=True)
+
+    @classmethod
+    def no_reply(cls) -> Self:
+        return cls(replied_user=False)
+
+    @property
+    def role_mentions(self) -> bool:
+        return "roles" in self.parse
+
+    @role_mentions.setter
+    def role_mentions(self, value: bool) -> None:
+        if value is self.role_mentions:
+            return
+        if value:
+            self.parse.append("roles")
+        else:
+            self.parse.remove("roles")
+
+    @property
+    def user_mentions(self) -> bool:
+        return "users" in self.parse
+
+    @user_mentions.setter
+    def user_mentions(self, value: bool) -> None:
+        if value is self.user_mentions:
+            return
+        if value:
+            self.parse.append("users")
+        else:
+            self.parse.remove("users")
+
+    @property
+    def everyone(self) -> bool:
+        return "everyone" in self.parse
+
+    @everyone.setter
+    def everyone(self, value: bool) -> None:
+        if value is self.everyone:
+            return
+        if value:
+            self.parse.append("everyone")
+        else:
+            self.parse.remove("everyone")
+
+    def to_dict(self) -> dict[str, list[int] | bool]:
+        return {
+            "parse": self.parse,
+            "roles": self.role_ids,
+            "users": self.user_ids,
+            "replied_user": self.replied_user
+        }
 
 
 class Attachment(Identifiable):

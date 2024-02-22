@@ -23,9 +23,15 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from discord_typings._resources._channel import FollowedChannelData
+
+from . import File
 from .asset import Asset
-from .flags import ChannelFlags, Permissions
+from .embed import Embed
+from .flags import ChannelFlags, MessageFlags, Permissions
 from .enums import ChannelType, ForumLayoutType, OverwriteType, SortOrderType, VideoQualityMode
+from .guild import GuildMember
+from .message import AllowedMentions, Attachment, Message
 from .missing import Maybe, MISSING
 from .mixins import Identifiable, Messageable
 from .object import Object
@@ -50,6 +56,7 @@ if TYPE_CHECKING:
         ForumTagData,
         ThreadMemberData,
         ThreadMetadataData,
+        PartialChannelData,
     )
 
     GuildChannelData = Union[
@@ -112,13 +119,12 @@ class BaseChannel(Identifiable):
             if (flags := cast(int, data.get("flags"))) \
             else ChannelFlags(0)
 
-    async def _edit(self, **kwargs) -> Self:
-        # TODO: implement
-        raise NotImplementedError
+    async def _modify(self, *, reason: str | None = None, **kwargs) -> Self:
+        data: ChannelData = await self._state.http.modify_channel(self.id, **kwargs, reason=reason)
+        return self.__class__(data, self._state)
 
     async def delete(self, *, reason: str | None = None) -> None:
-        # TODO: implement
-        raise NotImplementedError
+        return await self._state.http.delete_channel(self.id, reason=reason)
 
 
 class GuildChannel(BaseChannel):
@@ -267,11 +273,16 @@ class _ThreadEnabled(ChildChannel, GuildChannel):
 
     async def list_public_archived_threads(
         self,
-        before: datetime | None = None,
-        limit: int | None = None,
+        before: Maybe[datetime] = MISSING,
+        limit: Maybe[int] = MISSING,
     ) -> list[Thread]:
-        # TODO: implement
-        raise NotImplementedError
+        data = await self._state.http.list_public_archived_threads(
+            self.id, before.isoformat() if before else MISSING, limit
+        )
+        threads = {t["id"]: Thread(t, self._state) for t in data["threads"]}
+        for member in data["members"]:
+            threads[member["id"]].member = ThreadMember(member, self._state)
+        return list(threads.values())
 
 
 class ThreadEnabledChannel(_ThreadEnabled):
@@ -279,33 +290,62 @@ class ThreadEnabledChannel(_ThreadEnabled):
     async def start_thread_from_message(
         self,
         message: Snowflake,
-        **kwargs,
+        *,
+        name: str,
+        auto_archive_duration: Maybe[int] = MISSING,
+        rate_limit_per_user: Maybe[int] = MISSING,
+        reason: str | None = None,
     ) -> Thread:
-        # TODO: implement
-        raise NotImplementedError
+        data = await self._state.http.start_thread_with_message(
+            self.id,
+            message,
+            name=name,
+            auto_archive_duration=auto_archive_duration,
+            rate_limit_per_user=rate_limit_per_user,
+            reason=reason,
+        )
+        return Thread(data, self._state)
 
     async def start_thread_without_message(
         self,
-        **kwargs,
+        *,
+        name: str,
+        auto_archive_duration: Maybe[int] = MISSING,
+        type: Maybe[ChannelType] = MISSING,
+        invitable: Maybe[bool] = MISSING,
+        rate_limit_per_user: Maybe[int] = MISSING,
     ) -> Thread:
-        # TODO: implement
-        raise NotImplementedError
+        data = await self._state.http.start_thread_without_message(
+            self.id,
+            name=name,
+            auto_archive_duration=auto_archive_duration,
+            type=type,
+            invitable=invitable,
+            rate_limit_per_user=rate_limit_per_user,
+        )
+        return Thread(data, self._state)
 
     async def list_private_archived_threads(
         self,
         before: datetime | None = None,
         limit: int | None = None,
     ) -> list[Thread]:
-        # TODO: implement
-        raise NotImplementedError
+        data = await self._state.http.list_private_archived_threads(self.id, before=before, limit=limit)
+        threads = {t["id"]: Thread(t, self._state) for t in data["threads"]}
+        for member in data["members"]:
+            threads[member["id"]].member = ThreadMember(member, self._state)
+        return list(threads.values())
 
     async def list_joined_private_archived_threads(
         self,
         before: datetime | None = None,
         limit: int | None = None,
     ) -> list[Thread]:
-        # TODO: implement
-        raise NotImplementedError
+        data = await self._state.http.list_joined_private_archived_threads(self.id, before=before, limit=limit)
+        threads = {t["id"]: Thread(t, self._state) for t in data["threads"]}
+        for member in data["members"]:
+            threads[member["id"]].member = ThreadMember(member, self._state)
+        return list(threads.values())
 
 
 class ThreadBasedChannel(_ThreadEnabled):
@@ -343,10 +383,41 @@ class ThreadBasedChannel(_ThreadEnabled):
 
     async def start_thread(
         self,
-        **kwargs,
-    ) -> "Thread":
-        # TODO: implement
-        raise NotImplementedError
+        name: str,
+        *,
+        content: Maybe[str],
+        embeds: Maybe[list[Embed]] = MISSING,
+        files: Maybe[list[File]] = MISSING,
+        allowed_mentions: Maybe[AllowedMentions] = MISSING,
+        components: Maybe[list[...]] = MISSING,  # TODO: Components
+        stickers: Maybe[list[Snowflake]] = MISSING,
+        attachment: Maybe[Attachment] = MISSING,
+        flags: Maybe[MessageFlags] = MISSING,
+        auto_archive_duration: Maybe[int] = MISSING,
+        rate_limit_per_user: Maybe[int] = MISSING,
+        applied_tags: Maybe[list[Snowflake]] = MISSING,
+        reason: str | None = None,
+    ) -> Thread:
+        message = {
+            "content": content,
+            "embeds": [e.to_dict() for e in embeds] if embeds else MISSING,
+            "allowed_mentions": allowed_mentions.to_dict() if allowed_mentions else MISSING,
+            "components": components,
+            "stickers": stickers,
+            "attachment": attachment,
+            "flags": flags,
+        }
+        data = await self._state.http.start_thread_in_forum_channel(
+            self.id,
+            name=name,
+            message=message,
+            auto_archive_duration=auto_archive_duration,
+            rate_limit_per_user=rate_limit_per_user,
+            applied_tags=[tag.id for tag in applied_tags] if applied_tags else MISSING,
+            files=files,
+            reason=reason,
+        )
+        return Thread(data, self._state)
 
 
 class ForumTag:
@@ -425,6 +496,27 @@ class VoiceEnabledChannel(ChildChannel, GuildChannel):
             vqm := data.get("video_quality_mode")) else MISSING
 
 
+class FollowedChannel:
+    """
+    Represents a followed channel.
+
+    Attributes
+    -----------
+    channel_id: :class:`int`
+        The ID of the channel.
+    webhook_id: :class:`int`
+        The ID of the webhook.
+    """
+    __slots__ = (
+        "channel_id",
+        "webhook_id",
+    )
+
+    def __init__(self, data: FollowedChannelData) -> None:
+        self.channel_id: int = int(data["channel_id"])
+        self.webhook_id: int = int(data["webhook_id"])
+
+
 # Real channel types, finally
 class TextChannel(TextEnabledChannel, ThreadEnabledChannel):
     """
@@ -480,9 +572,38 @@ class TextChannel(TextEnabledChannel, ThreadEnabledChannel):
         self.last_pin_timestamp: Maybe[datetime | None] = datetime.fromisoformat(pints) if (
                 (pints := data.get("last_pin_timestamp", MISSING)) not in (MISSING, None)) else pints
 
-    async def get_pinned_messages(self):
-        # TODO: implement
-        raise NotImplementedError
+    async def modify(
+        self,
+        *,
+        name: Maybe[str] = MISSING,
+        type: Maybe[ChannelType] = MISSING,
+        position: Maybe[int | None] = MISSING,
+        topic: Maybe[str | None] = MISSING,
+        nsfw: Maybe[bool | None] = MISSING,
+        rate_limit_per_user: Maybe[int | None] = MISSING,
+        permission_overwrites: Maybe[list[PermissionOverwrite] | None] = MISSING,
+        parent_id: Maybe[int | None] = MISSING,
+        default_auto_archive_duration: Maybe[int | None] = MISSING,
+        default_thread_rate_limit_per_user: Maybe[int] = MISSING,
+        reason: str | None = None,
+    ) -> Self:
+        payload = {
+            "name": name,
+            "type": type.value,
+            "position": position,
+            "topic": topic,
+            "nsfw": nsfw,
+            "rate_limit_per_user": rate_limit_per_user,
+            "permission_overwrites": [p.to_data() for p in permission_overwrites] if permission_overwrites else MISSING,
+            "parent_id": parent_id,
+            "default_auto_archive_duration": default_auto_archive_duration,
+            "default_thread_rate_limit_per_user": default_thread_rate_limit_per_user,
+        }
+        return await self._modify(reason=reason, **payload)
+
+    async def get_pinned_messages(self) -> list[Message]:
+        data = await self._state.http.get_pinned_messages(self.id)
+        return [Message(m, self._state) for m in data]
 
 
 class DMChannel(BaseChannel, Messageable):
@@ -510,24 +631,20 @@ class DMChannel(BaseChannel, Messageable):
         "last_pin_timestamp",
     )
 
-    def __init__(self, data: DMChannelData, state: State) -> None:
+    def __init__(self, data: DMChannelData | GroupDMChannelData, state: State) -> None:
         super().__init__(data, state)
         self._update(data)
 
-    def _update(self, data: DMChannelData) -> None:
+    def _update(self, data: DMChannelData | GroupDMChannelData) -> None:
         super()._update(data)
-        self.last_message_id: int | None = int(lmid) if (lmid := data.get("last_message_id")) else None
+        self.last_message_id: int | None = int(cast(str, lmid)) if (lmid := data.get("last_message_id")) else None
         self.recipients: list[User] = [User(user, self._state) for user in data["recipients"]]
-        self.last_pin_timestamp: Maybe[datetime | None] = datetime.fromisoformat(lpts) if (
-                (lpts := data.get("last_pin_timestamp", MISSING)) not in (MISSING, None)) else lpts
+        self.last_pin_timestamp: Maybe[datetime | None] = datetime.fromisoformat(cast(str, lpts)) if (
+                (lpts := data.get("last_pin_timestamp", MISSING)) not in (MISSING, None)) else cast(Maybe[None], lpts)
 
-    async def modify(self, **kwargs) -> Self:
-        # TODO: implement
-        raise NotImplementedError
-
-    async def get_pinned_messages(self):
-        # TODO: implement
-        raise NotImplementedError
+    async def get_pinned_messages(self) -> list[Message]:
+        data = await self._state.http.get_pinned_messages(self.id)
+        return [Message(m, self._state) for m in data]
 
 
 class VoiceChannel(VoiceEnabledChannel, TextEnabledChannel):
@@ -568,9 +685,34 @@ class VoiceChannel(VoiceEnabledChannel, TextEnabledChannel):
         TextEnabledChannel.__init__(self, data, state)
         self._update(data)
 
-    async def modify(self, **kwargs) -> Self:
-        # TODO: implement
-        raise NotImplementedError
+    async def modify(
+        self,
+        *,
+        name: Maybe[str] = MISSING,
+        position: Maybe[int | None] = MISSING,
+        nsfw: Maybe[bool | None] = MISSING,
+        rate_limit_per_user: Maybe[int | None] = MISSING,
+        bitrate: Maybe[int | None] = MISSING,
+        user_limit: Maybe[int | None] = MISSING,
+        permission_overwrites: Maybe[list[PermissionOverwrite] | None] = MISSING,
+        parent_id: Maybe[int | None] = MISSING,
+        rtc_region: Maybe[str | None] = MISSING,
+        video_quality_mode: Maybe[VideoQualityMode | None] = MISSING,
+        reason: str | None = None,
+    ) -> Self:
+        payload = {
+            "name": name,
+            "position": position,
+            "nsfw": nsfw,
+            "rate_limit_per_user": rate_limit_per_user,
+            "bitrate": bitrate,
+            "user_limit": user_limit,
+            "permission_overwrites": [p.to_data() for p in permission_overwrites] if permission_overwrites else MISSING,
+            "parent_id": parent_id,
+            "rtc_region": rtc_region,
+            "video_quality_mode": video_quality_mode.value if video_quality_mode else MISSING,
+        }
+        return await self._modify(reason=reason, **payload)
 
     async def connect(self) -> None:
         # TODO: implement
@@ -622,9 +764,13 @@ class GroupDMChannel(DMChannel):
         # TODO: i don't know what route this uses, it's not documented
         return
 
-    async def modify(self, **kwargs) -> Self:
-        # TODO: implement
-        raise NotImplementedError
+    async def modify(
+        self,
+        *,
+        name: Maybe[str] = MISSING,
+        icon: Maybe[bytes] = MISSING,
+    ) -> Self:
+        return await self._modify(name=name, icon=icon)
 
     async def add_recipient(self, user: Snowflake, access_token: str, nick: str) -> None:
         # TODO: implement
@@ -658,9 +804,20 @@ class CategoryChannel(GuildChannel):
     """
     type: ChannelType.GUILD_CATEGORY
 
-    async def modify(self, **kwargs) -> Self:
-        # TODO: implement
-        raise NotImplementedError
+    async def modify(
+        self,
+        *,
+        name: Maybe[str] = MISSING,
+        position: Maybe[int | None] = MISSING,
+        permission_overwrites: Maybe[list[PermissionOverwrite] | None] = MISSING,
+        reason: str | None = None,
+    ) -> Self:
+        payload = {
+            "name": name,
+            "position": position,
+            "permission_overwrites": [p.to_data() for p in permission_overwrites] if permission_overwrites else MISSING,
+        }
+        return await self._modify(reason=reason, **payload)
 
 
 class NewsChannel(TextEnabledChannel, ThreadEnabledChannel):
@@ -709,13 +866,38 @@ class NewsChannel(TextEnabledChannel, ThreadEnabledChannel):
                 (lpts := data.get("last_pin_timestamp", MISSING)) not in (MISSING, None)) else lpts
         self.default_auto_archive_duration: Maybe[int] = data.get("default_auto_archive_duration", MISSING)
 
-    async def get_pinned_messages(self):
-        # TODO: implement
-        raise NotImplementedError
+    async def modify(
+        self,
+        *,
+        name: Maybe[str] = MISSING,
+        type: Maybe[ChannelType] = MISSING,
+        position: Maybe[int | None] = MISSING,
+        topic: Maybe[str | None] = MISSING,
+        nsfw: Maybe[bool | None] = MISSING,
+        permission_overwrites: Maybe[list[PermissionOverwrite] | None] = MISSING,
+        parent_id: Maybe[int | None] = MISSING,
+        default_auto_archive_duration: Maybe[int | None] = MISSING,
+        reason: str | None = None,
+    ) -> Self:
+        payload = {
+            "name": name,
+            "type": type.value,
+            "position": position,
+            "topic": topic,
+            "nsfw": nsfw,
+            "permission_overwrites": [p.to_data() for p in permission_overwrites] if permission_overwrites else MISSING,
+            "parent_id": parent_id,
+            "default_auto_archive_duration": default_auto_archive_duration,
+        }
+        return await self._modify(reason=reason, **payload)
 
-    async def follow(self, webhook_channel: Snowflake) -> None:
-        # TODO: implement
-        raise NotImplementedError
+    async def get_pinned_messages(self) -> list[Message]:
+        data = await self._state.http.get_pinned_messages(self.id)
+        return [Message(m, self._state) for m in data]
+
+    async def follow(self, webhook_channel: Snowflake) -> FollowedChannel:
+        data = await self._state.http.follow_announcement_channel(self.id, webhook_channel=webhook_channel.id)
+        return FollowedChannel(data)
 
 
 class Thread(ChildChannel, Messageable):
@@ -783,8 +965,8 @@ class Thread(ChildChannel, Messageable):
                 (lpts := data.get("last_pin_timestamp", MISSING)) not in (MISSING, None)) else lpts
         self.message_count: int = data["message_count"]
         self.member_count: int = data["member_count"]
-        self.thread_metadata: ThreadMetadata = ThreadMetadata.from_data(data["thread_metadata"])
-        self.member: ThreadMember | None = ThreadMember.from_data(data["member"]) if (data.get("member")) else None
+        self.thread_metadata: ThreadMetadata = ThreadMetadata(data["thread_metadata"])
+        self.member: ThreadMember | None = ThreadMember(data["member"], self._state) if (data.get("member")) else None
         self.total_messages_sent: int = data["total_messages_sent"]
         self.applied_tags: list[Snowflake] = [Object(tag) for tag in data["applied_tags"]]
 
@@ -792,37 +974,59 @@ class Thread(ChildChannel, Messageable):
     def is_private(self) -> bool:
         return self.type == ChannelType.PRIVATE_THREAD
 
-    async def modify(self, **kwargs) -> Self:
-        # TODO: implement
-        raise NotImplementedError
+    async def modify(
+        self,
+        *,
+        name: Maybe[str] = MISSING,
+        archived: Maybe[bool] = MISSING,
+        auto_archive_duration: Maybe[int] = MISSING,
+        locked: Maybe[bool] = MISSING,
+        invitable: Maybe[bool] = MISSING,
+        rate_limit_per_user: Maybe[int | None] = MISSING,
+        flags: Maybe[ChannelFlags] = MISSING,
+        applied_tags: Maybe[list[Snowflake]] = MISSING,
+    ) -> Self:
+        payload = {
+            "name": name,
+            "archived": archived,
+            "auto_archive_duration": auto_archive_duration,
+            "locked": locked,
+            "invitable": invitable,
+            "rate_limit_per_user": rate_limit_per_user,
+            "flags": flags,
+            "applied_tags": [tag.id for tag in applied_tags] if applied_tags else MISSING,
+        }
+        return await self._modify(**payload)
 
     async def join(self) -> None:
-        # TODO: implement
-        raise NotImplementedError
+        return await self._state.http.join_thread(self.id)
 
     async def add_member(self, user: Snowflake) -> None:
-        # TODO: implement
-        raise NotImplementedError
+        return await self._state.http.add_thread_member(self.id, user.id)
 
     async def leave(self) -> None:
-        # TODO: implement
-        raise NotImplementedError
+        return await self._state.http.leave_thread(self.id)
 
     async def remove_member(self, user: Snowflake) -> None:
-        # TODO: implement
-        raise NotImplementedError
+        return await self._state.http.remove_thread_member(self.id, user.id)
 
-    async def get_member(self, user: Snowflake) -> "ThreadMember":
-        # TODO: implement
-        raise NotImplementedError
+    async def get_member(self, user: Snowflake, *, with_member: bool = True) -> ThreadMember:
+        data = await self._state.http.get_thread_member(self.id, user.id, with_member=with_member)
+        return ThreadMember(data, self._state)
 
-    async def list_members(self, limit: int = 50, before: Snowflake = None) -> list["ThreadMember"]:
-        # TODO: implement
-        raise NotImplementedError
+    async def list_members(
+        self,
+        *,
+        limit: int = 50,
+        before: Snowflake = None,
+        with_member: bool = True,
+    ) -> list[ThreadMember]:
+        data = await self._state.http.list_thread_members(self.id, limit=limit, before=before, with_member=with_member)
+        return [ThreadMember(member, self._state) for member in data]
 
-    async def get_pinned_messages(self):
-        # TODO: implement
-        raise NotImplementedError
+    async def get_pinned_messages(self) -> list[Message]:
+        data = await self._state.http.get_pinned_messages(self.id)
+        return [Message(m, self._state) for m in data]
 
 
 class ThreadMetadata:
@@ -853,7 +1057,7 @@ class ThreadMetadata:
         "create_timestamp",
     )
 
-    def __init__(self, data: "ThreadMetadataData") -> None:
+    def __init__(self, data: ThreadMetadataData) -> None:
         self.archived: bool = data["archived"]
         self.auto_archive_duration: int = data["auto_archive_duration"]
         self.archive_timestamp: datetime = datetime.fromisoformat(data["archive_timestamp"])
@@ -881,6 +1085,7 @@ class ThreadMember:
         The member object of the user if they are a member of the guild.
     """
     __slots__ = (
+        "_state",
         "id",
         "user_id",
         "join_timestamp",
@@ -888,12 +1093,16 @@ class ThreadMember:
         "member",
     )
 
-    def __init__(self, data: "ThreadMemberData") -> None:
+    def __init__(self, data: ThreadMemberData, state: State) -> None:
+        self._state: State = state
         self.id: Maybe[int] = int(tid) if (tid := data.get("id")) else MISSING
         self.user_id: Maybe[int] = int(uid) if (uid := data.get("user_id")) else MISSING
         self.join_timestamp: datetime = datetime.fromisoformat(data["join_timestamp"])
         self.flags: int = data["flags"]
-        self.member: Maybe[Member] = Member.from_data(member) if (member := data.get("member")) else MISSING
+        self.member: Maybe[GuildMember] = GuildMember(member, state) if (member := data.get("member")) else MISSING
+
+    async def remove(self) -> None:
+        return await self._state.http.remove_thread_member(self.id, self.user_id)
 
 
 class StageChannel(VoiceChannel):
@@ -1034,5 +1243,5 @@ channel_types: dict[ChannelType, type[Channel]] = {
 }
 
 
-def channel_factory(data: ChannelData, state: State) -> Channel:
+def channel_factory(data: ChannelData | PartialChannelData, state: State) -> Channel:
     return channel_types[ChannelType(data["type"])](data, state)

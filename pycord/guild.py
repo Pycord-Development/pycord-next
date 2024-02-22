@@ -19,7 +19,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE
 
-from typing import TYPE_CHECKING
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Any, TYPE_CHECKING
+
+from discord_typings._resources._guild import WelcomeChannelData, WelcomeScreenData
 
 from .asset import Asset
 from .emoji import Emoji
@@ -27,12 +32,14 @@ from .enums import (
     DefaultMessageNotificationLevel, ExplicitContentFilterLevel, MFALevel, NSFWLevel, PremiumTier,
     VerificationLevel,
 )
-from .flags import Permissions, SystemChannelFlags, RoleFlags
+from .flags import MemberFlags, Permissions, SystemChannelFlags, RoleFlags
 from .missing import Maybe, MISSING
 from .mixins import Identifiable
+from .sticker import Sticker
+from .user import User
 
 if TYPE_CHECKING:
-    from discord_typings import GuildData, PartialGuildData, UnavailableGuildData, GuildFeatures, RoleData, RoleTagsData
+    from discord_typings import GuildData, PartialGuildData, UnavailableGuildData, GuildFeatures, RoleData, RoleTagsData, GuildMemberData
 
     from .state import State
 
@@ -40,10 +47,11 @@ __all__ = (
     "Guild",
     "Role",
     "RoleTags",
+    "GuildMember",
+    "WelcomeScreen",
+    "WelcomeScreenChannel",
 )
 
-
-# TODO: Guild Member
 
 class Guild(Identifiable):
     __slots__ = (
@@ -92,8 +100,8 @@ class Guild(Identifiable):
         "safety_alerts_channel_id"
     )
 
-    def __init__(self, data: "GuildData | PartialGuildData | UnavailableGuildData", state: "State") -> None:
-        self._state: "State" = state
+    def __init__(self, data: GuildData | PartialGuildData | UnavailableGuildData, state: State) -> None:
+        self._state: State = state
         self._update(data)
 
     def __repr__(self) -> str:
@@ -102,7 +110,7 @@ class Guild(Identifiable):
     def __str__(self) -> str:
         return str(self.name)
 
-    def _update(self, data: "GuildData | PartialGuildData | UnavailableGuildData") -> None:
+    def _update(self, data: GuildData | PartialGuildData | UnavailableGuildData) -> None:
         self.id: int = int(data["id"])
 
         self.name: Maybe[str] = data.get("name", MISSING)
@@ -149,7 +157,7 @@ class Guild(Identifiable):
         self.max_stage_video_channel_users: Maybe[int] = data.get("max_stage_video_channel_users", MISSING)
         self.approximate_member_count: Maybe[int] = data.get("approximate_member_count", MISSING)
         self.approximate_presence_count: Maybe[int] = data.get("approximate_presence_count", MISSING)
-        self.welcome_screen: Maybe[WelcomeScreen] = WelcomeScreen(wlc, self._state) if (
+        self.welcome_screen: Maybe[WelcomeScreen] = WelcomeScreen(wlc) if (
             wlc := data.get("welcome_screen")) else MISSING
         self.nsfw_level: Maybe[NSFWLevel] = NSFWLevel(nsfw) if (nsfw := data.get("nsfw_level")) else MISSING
         self.stickers: Maybe[list[Sticker]] = [Sticker(sticker, self._state) for sticker in stickers] if (
@@ -194,8 +202,8 @@ class Role(Identifiable):
         "flags"
     )
 
-    def __init__(self, data: "RoleData", state: "State") -> None:
-        self._state: "State" = state
+    def __init__(self, data: RoleData, state: State) -> None:
+        self._state: State = state
         self._update(data)
 
     def __repr__(self) -> str:
@@ -204,7 +212,7 @@ class Role(Identifiable):
     def __str__(self) -> str:
         return self.name
 
-    def _update(self, data: "RoleData") -> None:
+    def _update(self, data: RoleData) -> None:
         self.id: int = int(data["id"])
         self.name: str = data["name"]
         self.color: int = data["color"]
@@ -233,7 +241,7 @@ class RoleTags:
         "guild_connections"
     )
 
-    def __init__(self, data: "RoleTagsData") -> None:
+    def __init__(self, data: RoleTagsData) -> None:
         self.bot_id: Maybe[int] = int(botid) if (botid := data.get("bot_id")) else MISSING
         self.integration_id: Maybe[int] = int(integrationid) if (
             integrationid := data.get("integration_id")) else MISSING
@@ -242,3 +250,125 @@ class RoleTags:
             subid := data.get("subscription_listing_id")) else MISSING
         self.available_for_purchase: bool = "available_for_purchase" in data
         self.guild_connections: bool = "guild_connections" in data
+
+
+class GuildMember(Identifiable):
+    __slots__ = (
+        "_state",
+        "_user",
+        "guild_id",
+        "nick",
+        "guild_avatar_hash",
+        "role_ids",
+        "joined_at",
+        "premium_since",
+        "deaf",
+        "mute",
+        "pending",
+        "permissions",
+        "communication_disabled_until"
+    )
+
+    def __init__(self, data: GuildMemberData, state: State, guild_id: int = None) -> None:
+        self._state: State = state
+        self.user: Maybe[User] = User(data["user"], self._state) if "user" in data else MISSING
+        self._update(data, guild_id)
+
+    def __repr__(self) -> str:
+        return f"<Member user={self.user!r} guild_id={self.guild_id}>"
+
+    def __str__(self) -> str:
+        return self.display_name
+
+    def _update(self, data: GuildMemberData, guild_id: int) -> None:
+        self.guild_id: int = guild_id
+        if "user" in data:
+            self.id: int = int(data["user"]["id"])
+            if self.user:
+                self.user._update(data["user"])
+            else:
+                self.user: Maybe[User] = User(data["user"], self._state)
+        self.nick: Maybe[str | None] = data.get("nick", MISSING)
+        self.guild_avatar_hash: Maybe[str | None] = data.get("avatar", MISSING)
+        self.role_ids: list[int] = [int(role) for role in data.get("roles", [])]
+        self.joined_at: datetime = datetime.fromisoformat(data["joined_at"])
+        self.premium_since: Maybe[datetime] = datetime.fromisoformat(ps) if \
+            (ps := data.get("premium_since", MISSING)) else ps
+        self.deaf: bool = data["deaf"]
+        self.mute: bool = data["mute"]
+        self.flags: MemberFlags = MemberFlags.from_value(data["flags"])
+        self.pending: Maybe[bool] = data.get("pending", MISSING)
+        self.permissions: Maybe[Permissions] = Permissions.from_value(perm) \
+            if (perm := data.get("permissions", MISSING)) else perm
+        self.communication_disabled_until: Maybe[datetime | None] = datetime.fromisoformat(cd) if \
+            (cd := data.get("communication_disabled_until", MISSING)) else cd
+
+    @property
+    def guild_avatar(self) -> Asset | None:
+        return Asset.from_guild_member_avatar(
+            self._state, self.guild_id, self._user.id, self.guild_avatar_hash
+        ) if self.guild_avatar_hash else None
+
+    @property
+    def display_avatar(self) -> Asset | None:
+        return self.guild_avatar or self.user.display_avatar
+
+    @property
+    def display_name(self) -> str:
+        return self.nick or self.user.display_name
+
+    @property
+    def mention(self) -> str:
+        return self.user.mention
+
+
+class WelcomeScreen:
+    __slots__ = (
+        "description",
+        "welcome_channels"
+    )
+
+    def __init__(self, data: WelcomeScreenData) -> None:
+        self.description: str | None = data.get("description")
+        self.welcome_channels: list[WelcomeScreenChannel] = [
+            WelcomeScreenChannel.from_dict(channel) for channel in data.get("welcome_channels", [])
+        ]
+
+
+class WelcomeScreenChannel:
+    __slots__ = (
+        "channel_id",
+        "description",
+        "emoji_id",
+        "emoji_name"
+    )
+
+    def __init__(self, channel_id: int, description: str, emoji_id: int | None, emoji_name: str | None) -> None:
+        self.channel_id: int = channel_id
+        self.description: str = description
+        self.emoji_id: int | None = emoji_id
+        self.emoji_name: str | None = emoji_name
+
+    @classmethod
+    def from_dict(cls, data: WelcomeChannelData) -> WelcomeScreenChannel:
+        return cls(
+            data["channel_id"],
+            data["description"],
+            data.get("emoji_id"),
+            data.get("emoji_name")
+        )
+
+    def to_dict(self) -> WelcomeChannelData:
+        return {
+            "channel_id": self.channel_id,
+            "description": self.description,
+            "emoji_id": self.emoji_id,
+            "emoji_name": self.emoji_name
+        }
+
+    def __repr__(self) -> str:
+        return (
+            f"<WelcomeScreenChannel "
+            f"channel_id={self.channel_id} description={self.description} emoji_id={self.emoji_id} "
+            f"emoji_name={self.emoji_name}>"
+        )

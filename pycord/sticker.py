@@ -48,7 +48,7 @@ class Sticker(Identifiable):
         "sort_value",
     )
 
-    def __init__(self, *, data: "StickerData", state: "State"):
+    def __init__(self, data: "StickerData", state: "State"):
         self._state: "State" = state
         self._update(data)
 
