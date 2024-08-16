@@ -14,6 +14,8 @@
     </p>
 </div>
 
+# ⚠️Pycord-next (previously v3) is currently not maintained and we don't know when we'll work on it again
+
 ## Introduction
 
 **WARNING: Pycord v3 is pre-alpha, and is highly unstable. We suggest waiting for a alpha, beta, or release candidate before fully migrating.**
